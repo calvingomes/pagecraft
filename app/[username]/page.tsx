@@ -1,3 +1,6 @@
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+
 type Props = {
   params: Promise<{ username: string }>;
 };
@@ -5,10 +8,19 @@ type Props = {
 export default async function UserPage({ params }: Props) {
   const { username } = await params;
 
+  const ref = doc(db, "pages", username);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    return <div>Page not found</div>;
+  }
+
+  const page = snap.data();
+
   return (
     <main>
-      <div>User Page: {username}</div>
-      <p>This is your public link-in-bio page!</p>
+      <h1>{page.title}</h1>
+      <p>{page.bio}</p>
     </main>
   );
 }
