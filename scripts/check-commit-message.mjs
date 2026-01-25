@@ -3,17 +3,17 @@
 import fs from "node:fs";
 
 const TYPES = [
-  "feat",
-  "fix",
-  "chore",
-  "refactor",
-  "perf",
-  "test",
-  "docs",
-  "style",
-  "build",
-  "ci",
-  "revert",
+  "feat", // new user-facing feature or behavior
+  "fix", // bug fix that changes broken behavior
+  "chore", // maintenance / tooling / deps, no runtime change
+  "refactor", // code change with no behavior change
+  "perf", // improves performance (speed, memory, bundle)
+  "test", // add or update tests only
+  "docs", // documentation only changes
+  "style", // formatting only (prettier, lint, whitespace)
+  "build", // build system, bundler, config changes
+  "ci", // CI/CD pipeline or automation changes
+  "revert", // reverts a previous commit
 ];
 
 const commitMsgFile = process.argv[2];
