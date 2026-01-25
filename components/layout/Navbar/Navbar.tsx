@@ -7,45 +7,48 @@ import styles from "./Navbar.module.css";
 const LEFT_ITEMS = [
   { label: "Products", href: "/nothing1" },
   { label: "Customers", href: "/nothing2" },
-  { label: "Careers", href: "/nothing3" },
 ];
 
 const Navbar = () => {
   return (
-    <header className={styles.wrapper}>
+    <header className={styles.navWrapper}>
       <Image
         src="/svg/corner.svg"
         alt=""
-        width={100}
-        height={100}
-        className={`${styles.corner} ${styles.cornerLeft}`}
+        width={20}
+        height={20}
+        loading="eager"
+        className={`${styles.cornerSvg} ${styles.cornerSvgLeft}`}
       />
       <nav className={styles.nav}>
-        <div className={styles.left}>
+        <div className={styles.navItemsLeft}>
           {LEFT_ITEMS.map((item) => (
-            <Link key={item.href} href={item.href} className={styles.link}>
+            <Link key={item.href} href={item.href} className={styles.navLink}>
               {item.label}
             </Link>
           ))}
         </div>
 
-        <div className={styles.logo}>PageCraft</div>
+        <Link href="/home" className={styles.navLogo}>
+          PageCraft
+        </Link>
 
-        <div className={styles.right}>
-          <Link href="/signin" className={styles.link}>
-            Sign in
+        <div className={styles.navItemsRight}>
+          <Link href="/nothing3" className={styles.navLink}>
+            See demo
           </Link>
-          <Link href="/demo" className={styles.cta}>
-            See a demo →
+          <Link href="/auth" className={styles.navCta}>
+            Claim your page
           </Link>
         </div>
       </nav>
       <Image
         src="/svg/corner.svg"
         alt=""
-        width={100}
-        height={100}
-        className={`${styles.corner} ${styles.cornerRight}`}
+        width={20}
+        height={20}
+        loading="eager"
+        className={`${styles.cornerSvg} ${styles.cornerSvgRight}`}
       />
     </header>
   );
