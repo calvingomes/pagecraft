@@ -6,6 +6,7 @@ import { db } from "@/lib/firebase";
 import {
   doc,
   getDoc,
+  collection,
   runTransaction,
   serverTimestamp,
 } from "firebase/firestore";
@@ -36,12 +37,22 @@ export default function ClaimPage() {
    * Auth guard
    */
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged((user) => {
+    const unsub = auth.onAuthStateChanged(async (user) => {
       if (!user) {
         router.replace("/auth");
         return;
       }
 
+      // user is logged in → check if username exists
+      const userRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userRef);
+
+      if (snap.exists() && snap.data().username) {
+        router.replace("/editor");
+        return;
+      }
+
+      // logged in AND no username → allowed on /claim
       setAuthChecked(true);
     });
 
@@ -81,25 +92,61 @@ export default function ClaimPage() {
     try {
       await runTransaction(db, async (tx) => {
         const usernameRef = doc(db, "usernames", username);
+        const userRef = doc(db, "users", user.uid);
+        const pageRef = doc(db, "pages", username);
+
         const usernameSnap = await tx.get(usernameRef);
 
         if (usernameSnap.exists()) {
           throw new Error("Username taken");
         }
 
+        // 1. lock username
         tx.set(usernameRef, {
           uid: user.uid,
           createdAt: serverTimestamp(),
         });
 
+        // 2. save user profile
         tx.set(
-          doc(db, "users", user.uid),
+          userRef,
           {
             username,
             createdAt: serverTimestamp(),
           },
           { merge: true },
         );
+
+        // 3. create page
+        tx.set(pageRef, {
+          uid: user.uid,
+          published: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        });
+
+        // 4. create starter blocks
+        const introBlockRef = doc(collection(pageRef, "blocks"));
+        const linkBlockRef = doc(collection(pageRef, "blocks"));
+
+        tx.set(introBlockRef, {
+          uid: user.uid,
+          type: "text",
+          order: 1,
+          data: {
+            text: `Hi, I'm ${username} 👋`,
+          },
+        });
+
+        tx.set(linkBlockRef, {
+          uid: user.uid,
+          type: "link",
+          order: 2,
+          data: {
+            label: "My Website",
+            url: "https://example.com",
+          },
+        });
       });
 
       router.push("/editor");
@@ -109,7 +156,7 @@ export default function ClaimPage() {
   };
 
   if (!authChecked) {
-    return null;
+    return <div>Loading...</div>;
   }
 
   return (
