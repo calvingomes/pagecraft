@@ -9,15 +9,11 @@
   --color-bg-elevated: #020617;
 
   /* Text */
-  --color-text-primary: #e5e7eb;
-  --color-text-secondary: #9ca3af;
-  --color-text-muted: #6b7280;
-  --color-text-inverse: #020617;
+  --color-text-primary: #000000;
+  --color-text-secondary: #0e220e;
+  --color-text-inverse-primary: #e5e7eb;
+  --color-text-inverse-secondary: #9ca3af;
 
-  /* Borders */
-  --color-border-default: #1e293b;
-  --color-border-strong: #334155;
-  --color-border-focus: var(--color-brand-primary);
 
   /* Status */
   --color-status-error: #ef4444;
