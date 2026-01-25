@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import styles from "./home.module.css";
 
 import { Navbar } from "@/components/layout/Navbar/Navbar";
 
@@ -16,8 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Navbar />
-        {children}
+        <div className={styles.homeViewport}>
+          <Navbar />
+          {children}
+        </div>
       </body>
     </html>
   );
