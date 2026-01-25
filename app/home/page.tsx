@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Header } from "@/components/layout/HomePageHeader/Header";
 
 export const metadata: Metadata = {
   title: "Home | PageCraft",
@@ -7,10 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return (
-    <main>
-      <h1>Welcome to PageCraft</h1>
-      <h3>Hello, This is the Home page</h3>
-    </main>
-  );
+  return <Header />;
 }
