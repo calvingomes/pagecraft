@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 import {
   doc,
   getDoc,
@@ -76,9 +77,18 @@ export default function EditorPage() {
     return <div>Loading editor..</div>;
   }
 
+  /**
+   * Handle Logout
+   */
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.replace("/auth");
+  };
+
   return (
     <main>
       <h1>Welcome to the Editor</h1>
+      <button onClick={handleLogout}>Logout</button>
       {blocks.map((block) => (
         <BlockRenderer key={block.id} block={block} />
       ))}
