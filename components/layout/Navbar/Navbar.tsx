@@ -1,17 +1,25 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./Navbar.module.css";
 
 const LEFT_ITEMS = [
-  { label: "Products - dmy", href: "/nothing1" },
-  { label: "Customers - dmy", href: "/nothing2" },
-  { label: "Careers - dmy", href: "/nothing3" },
+  { label: "Products", href: "/nothing1" },
+  { label: "Customers", href: "/nothing2" },
+  { label: "Careers", href: "/nothing3" },
 ];
 
 const Navbar = () => {
   return (
     <header className={styles.wrapper}>
+      <Image
+        src="/svg/corner.svg"
+        alt=""
+        width={100}
+        height={100}
+        className={`${styles.corner} ${styles.cornerLeft}`}
+      />
       <nav className={styles.nav}>
         <div className={styles.left}>
           {LEFT_ITEMS.map((item) => (
@@ -32,6 +40,13 @@ const Navbar = () => {
           </Link>
         </div>
       </nav>
+      <Image
+        src="/svg/corner.svg"
+        alt=""
+        width={100}
+        height={100}
+        className={`${styles.corner} ${styles.cornerRight}`}
+      />
     </header>
   );
 };

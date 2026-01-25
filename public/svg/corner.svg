@@ -1,0 +1,20 @@
+<svg
+  width="20"
+  height="20"
+  viewBox="0 0 20 20"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+    <mask id="cut">
+      <rect width="20" height="20" fill="white" />
+      <circle cx="20" cy="0" r="20" fill="black" />
+    </mask>
+  </defs>
+
+  <rect
+    width="20"
+    height="20"
+    fill="white"
+    mask="url(#cut)"
+  />
+</svg>
