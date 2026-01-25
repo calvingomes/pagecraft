@@ -9,7 +9,7 @@ import {
 import { db } from "@/lib/firebase";
 
 import { Block } from "@/types/block";
-import BlockRenderer from "@/components/BlockRenderer";
+import BlockRenderer from "@/components/system/BlockRenderer";
 
 type Props = {
   params: Promise<{ username: string }>;

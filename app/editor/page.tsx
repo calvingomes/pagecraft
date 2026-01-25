@@ -13,7 +13,7 @@ import {
   query,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
-import BlockRenderer from "@/components/BlockRenderer";
+import BlockRenderer from "@/components/system/BlockRenderer";
 import type { Block } from "@/types/block";
 
 export default function EditorPage() {
