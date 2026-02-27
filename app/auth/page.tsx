@@ -6,6 +6,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 
+import AuthView from "@/components/views/AuthView/AuthView";
+
 export default function AuthPage() {
   const router = useRouter();
   const [authChecked, setAuthChecked] = useState(false);
@@ -45,7 +47,7 @@ export default function AuthPage() {
   /**
    * Login action
    */
-  const handleSignIn = async () => {
+  const handleGoogleSignIn = async () => {
     const result = await signInWithGoogle();
     const uid = result.user.uid;
 
@@ -59,10 +61,5 @@ export default function AuthPage() {
     }
   };
 
-  return (
-    <main>
-      <h1>Sign in</h1>
-      <button onClick={handleSignIn}>Continue with Google</button>
-    </main>
-  );
+  return <AuthView handleGoogleSignIn={handleGoogleSignIn} />;
 }
