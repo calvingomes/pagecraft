@@ -30,13 +30,12 @@ export default async function UserPage({ params }: Props) {
   const blocksSnap = await getDocs(blocksQuery);
 
   const blocks: Block[] = blocksSnap.docs.map((doc) => {
-    const data = doc.data();
-
+    const docData = doc.data();
     return {
       id: doc.id,
-      type: data.type,
-      order: data.order,
-      data: data.data,
+      type: docData.type,
+      order: docData.order,
+      content: docData.content, // Change 'data' to 'content'
     } as Block;
   });
 
