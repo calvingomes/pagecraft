@@ -1,0 +1,34 @@
+.textBlock {
+  width: 100%;
+}
+
+.textBlock p {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.textBlock .textarea {
+  width: 100%;
+  min-height: 4rem;
+  padding: 0.5rem 0;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.6;
+  resize: none;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.textBlock .textarea:focus {
+  outline: none;
+  border-bottom-color: #ddd;
+}
+
+.textBlock .textarea:hover {
+  background: rgba(0, 0, 0, 0.02);
+}

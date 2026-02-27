@@ -6,7 +6,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useEditorStore } from "@/stores/editor-store";
-import BlockRenderer from "@/components/system/BlockRenderer";
+import { SortableBlock } from "@/components/system/SortableBlock/SortableBlock";
 import styles from "./BlockCanvas.module.css";
 
 export const BlockCanvas = () => {
@@ -27,9 +27,7 @@ export const BlockCanvas = () => {
       >
         <div className={styles.canvas}>
           {blocks.map((block) => (
-            <div key={block.id} className={styles.blockWrapper}>
-              <BlockRenderer block={block} />
-            </div>
+            <SortableBlock key={block.id} block={block} />
           ))}
         </div>
       </SortableContext>

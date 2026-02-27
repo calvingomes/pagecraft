@@ -38,3 +38,23 @@
   color: #666;
   line-height: 1.4;
 }
+
+.logoutButton {
+  margin-top: 1.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background: #fff;
+  color: #333;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.logoutButton:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}

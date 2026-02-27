@@ -12,12 +12,14 @@ import {
   getDoc,
   setDoc,
   updateDoc,
+  deleteDoc,
   collection,
   getDocs,
   orderBy,
   query,
 } from "firebase/firestore";
 import type { Block, BlockType } from "@/types/editor";
+import { EditorProvider } from "@/contexts/EditorContext";
 import { ProfileSidebar } from "@/components/system/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/system/BlockCanvas/BlockCanvas";
 import { BlockToolbar } from "@/components/system/BlockToolbar/BlockToolbar";
@@ -31,6 +33,8 @@ export default function EditorPage() {
   const blocks = useEditorStore((s) => s.blocks);
   const setBlocks = useEditorStore((s) => s.setBlocks);
   const addBlock = useEditorStore((s) => s.addBlock);
+  const updateBlock = useEditorStore((s) => s.updateBlock);
+  const removeBlock = useEditorStore((s) => s.removeBlock);
 
   /* auth & username guard */
   useEffect(() => {
@@ -106,6 +110,21 @@ export default function EditorPage() {
     }
   };
 
+  const handleUpdateBlock = async (id: string, updates: Partial<Block>) => {
+    if (!username) return;
+    updateBlock(id, updates);
+    const block = blocks.find((b) => b.id === id);
+    if (!block) return;
+    const updated = { ...block, ...updates };
+    await updateDoc(doc(db, "pages", username, "blocks", id), updated);
+  };
+
+  const handleRemoveBlock = async (id: string) => {
+    if (!username) return;
+    removeBlock(id);
+    await deleteDoc(doc(db, "pages", username, "blocks", id));
+  };
+
   /* persist re‑ordering whenever blocks change */
   useEffect(() => {
     if (!username) return;
@@ -129,8 +148,14 @@ export default function EditorPage() {
   return (
     <main className={styles.editorLayout}>
       <ProfileSidebar />
-      <BlockCanvas />
-      <BlockToolbar onAddBlock={handleAddBlock} />
+      <EditorProvider
+        username={username ?? null}
+        onUpdateBlock={handleUpdateBlock}
+        onRemoveBlock={handleRemoveBlock}
+      >
+        <BlockCanvas />
+        <BlockToolbar onAddBlock={handleAddBlock} />
+      </EditorProvider>
     </main>
   );
 }

@@ -1,11 +1,14 @@
 export type BlockType = "text" | "link" | "image";
 
+export type BlockWidthPreset = "narrow" | "medium" | "wide" | "full";
+
 interface BaseBlock {
   id: string;
   order: number;
   styles?: {
     width?: number;
     height?: number;
+    widthPreset?: BlockWidthPreset;
   };
 }
 

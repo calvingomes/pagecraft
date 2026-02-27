@@ -1,0 +1,27 @@
+.linkBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.linkBlock[data-editing] {
+  padding: 12px;
+  background: white;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+}
+
+.linkBlock .input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.linkBlock .input:focus {
+  outline: none;
+  border-color: #666;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
