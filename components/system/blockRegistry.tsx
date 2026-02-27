@@ -1,17 +1,16 @@
-import { Block, TextBlock, LinkBlock } from "@/types/block";
+import { Block } from "@/types/editor";
 import type { ReactNode } from "react";
 
-type BlockComponent<T extends Block> = (block: T) => ReactNode;
+export type BlockRendererMap = {
+  [K in Block["type"]]: (b: Extract<Block, { type: K }>) => ReactNode;
+};
 
-export const blockRegistry: {
-  text: BlockComponent<TextBlock>;
-  link: BlockComponent<LinkBlock>;
-} = {
-  text: (block) => <p>{block.data.text}</p>,
-
-  link: (block) => (
-    <a href={block.data.url} target="_blank" rel="noopener noreferrer">
-      {block.data.label}
+export const blockRegistry: BlockRendererMap = {
+  text: (b) => <p>{b.content.text}</p>,
+  link: (b) => (
+    <a href={b.content.url} target="_blank" rel="noopener noreferrer">
+      {b.content.label}
     </a>
   ),
+  image: (b) => <img src={b.content.url} alt={b.content.alt ?? ""} />,
 };
