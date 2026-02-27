@@ -31,7 +31,7 @@ export const useEditorStore = create<EditorState>()(
     updateBlock: (id, updates) =>
       set((state) => ({
         blocks: state.blocks.map((b) =>
-          b.id === id ? { ...b, ...updates } : b,
+          b.id === id ? ({ ...b, ...updates } as Block) : b,
         ),
       })),
 

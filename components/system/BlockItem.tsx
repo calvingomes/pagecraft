@@ -54,9 +54,9 @@ export function BlockItem({ block }: BlockItemProps) {
         </a>
       )}
 
-      {block.type === "image" && block.content?.src && (
+      {block.type === "image" && block.content?.url && (
         <img
-          src={block.content.src}
+          src={block.content.url}
           alt={block.content?.alt || "block"}
           className={styles.image}
         />
