@@ -35,7 +35,7 @@ export default async function UserPage({ params }: Props) {
       id: doc.id,
       type: docData.type,
       order: docData.order,
-      content: docData.content, // Change 'data' to 'content'
+      content: docData.content,
     } as Block;
   });
 
