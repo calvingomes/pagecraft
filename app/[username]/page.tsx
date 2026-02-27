@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-import { Block } from "@/types/block";
+import { Block } from "@/types/editor";
 import BlockRenderer from "@/components/system/BlockRenderer";
 
 type Props = {

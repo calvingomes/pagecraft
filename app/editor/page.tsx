@@ -1,37 +1,46 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useEditorStore } from "@/stores/editor-store";
+import { useAuthStore } from "@/stores/auth-store";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import {
   doc,
   getDoc,
+  setDoc,
+  updateDoc,
   collection,
   getDocs,
   orderBy,
   query,
 } from "firebase/firestore";
-import { useRouter } from "next/navigation";
-import BlockRenderer from "@/components/system/BlockRenderer";
-import type { Block } from "@/types/block";
+import type { Block, BlockType } from "@/types/editor";
+import { ProfileSidebar } from "@/components/system/ProfileSidebar/ProfileSidebar";
+import { BlockCanvas } from "@/components/system/BlockCanvas/BlockCanvas";
+import { BlockToolbar } from "@/components/system/BlockToolbar/BlockToolbar";
+import styles from "./editor.module.css";
 
 export default function EditorPage() {
   const router = useRouter();
 
-  const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState<string | null>(null);
-  const [blocks, setBlocks] = useState<Block[]>([]);
+  const { user, username, loading, setUser, setUsername, setLoading } =
+    useAuthStore();
+  const blocks = useEditorStore((s) => s.blocks);
+  const setBlocks = useEditorStore((s) => s.setBlocks);
+  const addBlock = useEditorStore((s) => s.addBlock);
 
-  /**
-   * Auth + username guard
-   */
+  /* auth & username guard */
   useEffect(() => {
     const unsub = auth.onAuthStateChanged(async (user) => {
       if (!user) {
         router.replace("/auth");
         return;
       }
+
+      setUser(user);
 
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
@@ -45,11 +54,9 @@ export default function EditorPage() {
     });
 
     return () => unsub();
-  }, [router]);
+  }, [router, setUser, setUsername]);
 
-  /**
-   * Load blocks once username is known
-   */
+  /* load blocks once the username is known */
   useEffect(() => {
     if (!username) return;
 
@@ -68,30 +75,64 @@ export default function EditorPage() {
     };
 
     loadBlocks();
-  }, [username]);
+  }, [username, setBlocks, setLoading]);
 
-  /**
-   * Prevent render flicker
-   */
-  if (loading) {
-    return <div>Loading editor..</div>;
-  }
+  /* add‑block helper used by the toolbar */
+  const handleAddBlock = async (blockType: BlockType) => {
+    if (!username) return;
 
-  /**
-   * Handle Logout
-   */
-  const handleLogout = async () => {
-    await signOut(auth);
-    router.replace("/auth");
+    const id = crypto.randomUUID();
+    const defaultContent = getDefaultContent(blockType);
+
+    const newBlock: Block = {
+      id,
+      type: blockType,
+      content: defaultContent,
+      order: blocks.length,
+    };
+
+    addBlock(newBlock);
+    await setDoc(doc(db, "pages", username, "blocks", id), newBlock);
   };
 
+  const getDefaultContent = (type: BlockType) => {
+    switch (type) {
+      case "text":
+        return { text: "New text block" };
+      case "link":
+        return { url: "", label: "New link" };
+      case "image":
+        return { url: "", alt: "" };
+      default:
+        return {};
+    }
+  };
+
+  /* persist re‑ordering whenever blocks change */
+  useEffect(() => {
+    if (!username) return;
+
+    const timeout = setTimeout(() => {
+      blocks.forEach((block, index) => {
+        updateDoc(doc(db, "pages", username, "blocks", block.id), {
+          ...block,
+          order: index,
+        });
+      });
+    }, 800);
+
+    return () => clearTimeout(timeout);
+  }, [blocks, username]);
+
+  if (loading) {
+    return <div>Loading editor…</div>;
+  }
+
   return (
-    <main>
-      <h1>Welcome to the Editor</h1>
-      <button onClick={handleLogout}>Logout</button>
-      {blocks.map((block) => (
-        <BlockRenderer key={block.id} block={block} />
-      ))}
+    <main className={styles.editorLayout}>
+      <ProfileSidebar />
+      <BlockCanvas />
+      <BlockToolbar onAddBlock={handleAddBlock} />
     </main>
   );
 }
