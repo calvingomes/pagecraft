@@ -89,13 +89,13 @@ export default function EditorPage() {
       type: blockType,
       content: defaultContent,
       order: blocks.length,
-    };
+    } as Block;
 
     addBlock(newBlock);
     await setDoc(doc(db, "pages", username, "blocks", id), newBlock);
   };
 
-  const getDefaultContent = (type: BlockType) => {
+  const getDefaultContent = (type: BlockType): Block["content"] => {
     switch (type) {
       case "text":
         return { text: "New text block" };
@@ -103,8 +103,6 @@ export default function EditorPage() {
         return { url: "", label: "New link" };
       case "image":
         return { url: "", alt: "" };
-      default:
-        return {};
     }
   };
 

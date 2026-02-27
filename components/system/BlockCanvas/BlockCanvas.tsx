@@ -6,12 +6,11 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useEditorStore } from "@/stores/editor-store";
-import { BlockItem } from "@/components/system/BlockItem";
+import BlockRenderer from "@/components/system/BlockRenderer";
 import styles from "./BlockCanvas.module.css";
 
 export const BlockCanvas = () => {
   const blocks = useEditorStore((s) => s.blocks);
-  const updateBlock = useEditorStore((s) => s.updateBlock);
   const reorderBlocks = useEditorStore((s) => s.reorderBlocks);
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -29,18 +28,7 @@ export const BlockCanvas = () => {
         <div className={styles.canvas}>
           {blocks.map((block) => (
             <div key={block.id} className={styles.blockWrapper}>
-              <BlockItem block={block} />
-              {block.type === "text" && (
-                <textarea
-                  className={styles.textarea}
-                  value={block.content?.text || ""}
-                  onChange={(e) =>
-                    updateBlock(block.id, {
-                      content: { text: e.target.value },
-                    })
-                  }
-                />
-              )}
+              <BlockRenderer block={block} />
             </div>
           ))}
         </div>
