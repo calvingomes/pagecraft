@@ -1,0 +1,75 @@
+.authViewContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 30px;
+  background-color: var(--color-white);
+}
+
+.authViewContent {
+  width: 50%;
+  height: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.authViewContentContainer {
+  width: 80%;
+  padding: 40px;
+  /* background-color: #fb8f8f; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.welcomeText {
+  font-size: 56px;
+  margin-bottom: 8px;
+  color: var(--color-black);
+  text-align: center;
+}
+
+.welcomeSubtitle {
+  font-size: 18px;
+  margin-bottom: 48px;
+  color: var(--color-black);
+  text-align: center;
+}
+
+.authViewImage {
+  width: 50%;
+  height: 100%;
+  background-color: rgb(195, 255, 181);
+  border-radius: var(--radius-xl);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 24px 0;
+  font-size: 14px;
+  color: #999;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: #e5e5e5;
+}
+
+.divider::before {
+  margin-right: 12px;
+}
+
+.divider::after {
+  margin-left: 12px;
+}
