@@ -1,5 +1,4 @@
-import { Children, cloneElement, isValidElement } from "react";
-import type { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import type { PageBackgroundId, SidebarPosition } from "@/types/page";
 import styles from "./PageLayout.module.css";
 
@@ -14,43 +13,16 @@ export function PageLayout({
   background = "page-bg-1",
   sidebarPosition = "left",
 }: PageLayoutProps) {
-  const childArray = Children.toArray(children);
-  const [sidebar, content] = childArray;
-
-  const sidebarWithOrder = isValidElement(sidebar)
-    ? cloneElement(sidebar as React.ReactElement<{ position?: SidebarPosition }>, {
-        position: sidebarPosition,
-      })
-    : sidebar;
-
-  const isCenter = sidebarPosition === "center";
+  const [sidebar, content] = React.Children.toArray(children);
 
   return (
     <main
-      className={`${styles.pageLayout} ${isCenter ? styles.pageLayoutCenter : ""}`}
+      className={styles.pageLayout}
       data-bg={background}
       data-sidebar={sidebarPosition}
     >
-      <div
-        className={styles.sidebarSlot}
-        style={
-          isCenter
-            ? { order: 0 }
-            : { order: sidebarPosition === "left" ? 0 : 1 }
-        }
-      >
-        {sidebarWithOrder}
-      </div>
-      <div
-        className={styles.contentSlot}
-        style={
-          isCenter
-            ? { order: 1 }
-            : { order: sidebarPosition === "left" ? 1 : 0 }
-        }
-      >
-        {content}
-      </div>
+      <aside className={styles.sidebarSlot}>{sidebar}</aside>
+      <section className={styles.contentSlot}>{content}</section>
     </main>
   );
 }
