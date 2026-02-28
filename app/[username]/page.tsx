@@ -9,7 +9,7 @@ import {
 import { db } from "@/lib/firebase";
 
 import { Block } from "@/types/editor";
-import { PageView } from "@/components/builder/PageView/PageView";
+import { PageView } from "@/components/views/PageView/PageView";
 
 type Props = {
   params: Promise<{ username: string }>;
