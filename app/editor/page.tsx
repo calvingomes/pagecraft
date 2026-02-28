@@ -243,7 +243,7 @@ export default function EditorPage() {
 
   return (
     <PageLayout background={background} sidebarPosition={sidebarPosition}>
-      <ProfileSidebar variant="editor" />
+      <ProfileSidebar variant="editor" position={sidebarPosition} />
       <EditorProvider
         username={username ?? null}
         onUpdateBlock={handleUpdateBlock}

@@ -1,52 +1,75 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import { TextBlock as TextBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "./TextBlock.module.css";
 
 export const TextBlock = ({ block }: { block: TextBlockType }) => {
-  const editor = useEditorContext();
-  const editable = !!editor;
+  const contextEditor = useEditorContext();
+  const editable = !!contextEditor;
+  const lastSyncedContent = useRef(block.content?.text ?? "");
 
-  const [text, setText] = useState(block.content?.text ?? "");
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: block.content?.text ?? "",
+    editable,
+    immediatelyRender: false,
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      if (html !== lastSyncedContent.current && contextEditor?.onUpdateBlock) {
+      }
+    },
+    onBlur: ({ editor }) => {
+      if (!contextEditor?.onUpdateBlock) return;
 
-  const lastSyncedText = useRef(block.content?.text ?? "");
+      const html = editor.getHTML();
+      const isEmpty = html === "<p></p>";
+      const finalContent = isEmpty ? "<p>New text block</p>" : html;
+
+      if (finalContent !== lastSyncedContent.current) {
+        lastSyncedContent.current = finalContent;
+        contextEditor.onUpdateBlock(block.id, {
+          content: { text: finalContent },
+        });
+      }
+    },
+  });
 
   useEffect(() => {
-    if (block.content?.text !== lastSyncedText.current) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setText(block.content?.text ?? "");
-      lastSyncedText.current = block.content?.text ?? "";
+    if (!editor) return;
+
+    if (block.content?.text !== lastSyncedContent.current) {
+      const newContent = block.content?.text ?? "";
+      lastSyncedContent.current = newContent;
+      editor.commands.setContent(newContent);
     }
-  }, [block.id, block.content?.text]);
+  }, [block.id, block.content?.text, editor]);
 
-  const handleBlur = () => {
-    if (!editor?.onUpdateBlock) return;
+  useEffect(() => {
+    if (!editor) return;
+    editor.setEditable(editable);
+  }, [editor, editable]);
 
-    const trimmed = text.trim();
-    const finalContent = trimmed || "New text block";
-
-    if (finalContent !== block.content?.text) {
-      lastSyncedText.current = finalContent;
-      editor.onUpdateBlock(block.id, {
-        content: { text: finalContent },
-      });
-    }
-  };
-
-  if (editable) {
+  if (editable && editor) {
     return (
-      <textarea
-        className={styles.textarea}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        onBlur={handleBlur}
-        placeholder="Enter text..."
-        rows={Math.max(2, text.split("\n").length)}
-      />
+      <div className={styles.editorContainer}>
+        <EditorContent editor={editor} className={styles.editor} />
+      </div>
     );
   }
 
-  return text ? <p className={styles.display}>{text}</p> : null;
+  if (!editable && editor) {
+    const html = editor.getHTML();
+    return html && html !== "<p></p>" ? (
+      <div
+        className={styles.display}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    ) : null;
+  }
+
+  return null;
 };

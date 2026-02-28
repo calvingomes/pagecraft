@@ -11,6 +11,9 @@
     "check:commit-message": "node ./scripts/check-commit-message.mjs"
   },
   "dependencies": {
+    "@tiptap/pm": "^3.20.0",
+    "@tiptap/react": "^3.20.0",
+    "@tiptap/starter-kit": "^3.20.0",
     "firebase": "^12.8.0",
     "framer-motion": "^12.29.0",
     "lucide-react": "^0.575.0",
