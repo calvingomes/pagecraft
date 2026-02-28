@@ -7,7 +7,6 @@ import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import { BlockHoverToolbar } from "@/components/builder/BlockHoverToolbar/BlockHoverToolbar";
 import styles from "./SortableBlock.module.css";
 
-// same preset-to-columns mapping used by BlockCanvas
 const spanForPreset = (preset: BlockWidthPreset): number => {
   switch (preset) {
     case "narrow":
@@ -28,7 +27,6 @@ export function SortableBlock({ block }: SortableBlockProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   const widthPreset = block.styles?.widthPreset ?? "narrow";
-  const rowBreak = block.layout?.y === Infinity;
 
   const handleWidthChange = useCallback(
     (preset: BlockWidthPreset) => {
@@ -41,16 +39,6 @@ export function SortableBlock({ block }: SortableBlockProps) {
     [editor, block.id, block.styles, block.layout],
   );
 
-  const handleToggleRowBreak = useCallback(() => {
-    editor?.onUpdateBlock(block.id, {
-      layout: {
-        ...block.layout,
-        y: rowBreak ? undefined : Infinity,
-      },
-    });
-  }, [editor, block.id, block.layout, rowBreak]);
-
-  // no extra styles needed; grid handles positioning
   const wrapperStyle: React.CSSProperties = {};
 
   return (
@@ -65,8 +53,6 @@ export function SortableBlock({ block }: SortableBlockProps) {
             blockId={block.id}
             currentPreset={widthPreset}
             onWidthChange={handleWidthChange}
-            rowBreak={rowBreak}
-            onToggleRowBreak={handleToggleRowBreak}
             visible={isHovered}
           />
         )}

@@ -2,7 +2,7 @@
 
 import React from "react";
 import type { LucideIcon } from "lucide-react";
-import { AlignLeft, AlignCenter, Trash2, CornerDownRight } from "lucide-react";
+import { AlignLeft, AlignCenter, Trash2 } from "lucide-react";
 import type { BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "./BlockHoverToolbar.module.css";
@@ -11,8 +11,6 @@ type BlockHoverToolbarProps = {
   blockId: string;
   currentPreset?: BlockWidthPreset;
   onWidthChange: (preset: BlockWidthPreset) => void;
-  rowBreak?: boolean;
-  onToggleRowBreak?: () => void;
   visible?: boolean;
 };
 
@@ -37,8 +35,6 @@ export function BlockHoverToolbar({
   blockId,
   currentPreset = "narrow",
   onWidthChange,
-  rowBreak = false,
-  onToggleRowBreak,
   visible = false,
 }: BlockHoverToolbarProps) {
   const editor = useEditorContext();
@@ -71,17 +67,6 @@ export function BlockHoverToolbar({
             <Icon className={styles.sizeIcon} />
           </button>
         ))}
-        {onToggleRowBreak && (
-          <button
-            type="button"
-            title={rowBreak ? "Continue row" : "Start new row"}
-            aria-label={rowBreak ? "Continue row" : "Start new row"}
-            onClick={onToggleRowBreak}
-            className={`${styles.sizeButton} ${rowBreak ? styles.active : ""}`}
-          >
-            <CornerDownRight className={styles.sizeIcon} />
-          </button>
-        )}
       </div>
       <div className={styles.divider} />
       <button
