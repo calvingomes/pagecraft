@@ -1,6 +1,6 @@
 .toolbar {
   position: absolute;
-  top: 12px;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
