@@ -40,15 +40,61 @@ export default function EditorPage() {
   const [sidebarPosition, setSidebarPosition] =
     useState<SidebarPosition>("left");
 
-  const spanForPreset = (preset: string): number => {
-    switch (preset) {
-      case "narrow":
-        return 1;
-      case "medium":
-        return 2;
-      default:
-        return 3;
+  const spanForPreset = (preset?: string): number => {
+    return preset === "medium" ? 2 : 1;
+  };
+
+  const overlaps = (
+    a: { x: number; y: number; w: number; h: number },
+    b: {
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+    },
+  ) => {
+    return (
+      a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y
+    );
+  };
+
+  const rectFor = (b: Block, at?: { x: number; y: number }) => {
+    const w = spanForPreset(b.styles?.widthPreset);
+    const h = w;
+    const x = at?.x ?? b.layout?.x ?? 0;
+    const y = at?.y ?? b.layout?.y ?? 0;
+    return { x, y, w, h };
+  };
+
+  const isValidLayout = (layout: any): layout is { x: number; y: number } => {
+    return (
+      layout &&
+      typeof layout.x === "number" &&
+      Number.isFinite(layout.x) &&
+      typeof layout.y === "number" &&
+      Number.isFinite(layout.y)
+    );
+  };
+
+  const canPlace = (
+    candidate: { x: number; y: number; w: number; h: number },
+    placed: Block[],
+  ) => {
+    if (candidate.x < 0 || candidate.y < 0) return false;
+    if (candidate.x + candidate.w > 4) return false;
+    return !placed.some((p) => overlaps(candidate, rectFor(p)));
+  };
+
+  const findFirstFreeSpot = (block: Block, placed: Block[]) => {
+    const w = spanForPreset(block.styles?.widthPreset);
+    const h = w;
+    for (let y = 0; y < 100; y++) {
+      for (let x = 0; x <= 4 - w; x++) {
+        const candidate = { x, y, w, h };
+        if (canPlace(candidate, placed)) return { x, y };
+      }
     }
+    return { x: 0, y: 0 };
   };
 
   /* auth & username guard */
@@ -101,35 +147,86 @@ export default function EditorPage() {
       const q = query(blocksRef, orderBy("order"));
       const snap = await getDocs(q);
 
-      const rawBlocks = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Block[];
+      const rawBlocks = snap.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }));
 
-      // ensure every block has a layout entry; for existing data we fall back to
-      // a simple row-major placement based on its index and width preset
-      const blocksWithLayout = rawBlocks.map((b, idx) => {
-        if (b.layout && typeof b.layout.x === "number") {
-          return b;
+      // Normalize older Firestore shapes (e.g. `data` instead of `content`).
+      const normalizedBlocks: Block[] = rawBlocks.map((raw, index) => {
+        const anyRaw = raw as any;
+        const type = anyRaw.type as BlockType;
+        const order = typeof anyRaw.order === "number" ? anyRaw.order : index;
+
+        if (anyRaw.content) {
+          return { ...anyRaw, order } as Block;
         }
-        const preset = b.styles?.widthPreset ?? "narrow";
-        const w = spanForPreset(preset);
-        const x = idx % 3;
-        const y = Math.floor(idx / 3);
-        return {
-          ...b,
-          layout: { x, y, w, h: 1 },
-        } as Block;
+
+        switch (type) {
+          case "text":
+            return {
+              ...anyRaw,
+              order,
+              content: { text: anyRaw.data?.text ?? "<p>New text block</p>" },
+            } as Block;
+          case "link":
+            return {
+              ...anyRaw,
+              order,
+              content: {
+                url: anyRaw.data?.url ?? "",
+                label: anyRaw.data?.label ?? anyRaw.data?.url ?? "New link",
+              },
+            } as Block;
+          case "image":
+            return {
+              ...anyRaw,
+              order,
+              content: {
+                url: anyRaw.data?.url ?? "",
+                alt: anyRaw.data?.alt ?? "",
+              },
+            } as Block;
+          default:
+            return { ...anyRaw, order } as Block;
+        }
       });
 
-      setBlocks(blocksWithLayout);
-      // write any newly generated layouts back to Firestore so future loads
-      // don't have to recompute them
+      // Ensure every block has a stable grid position. Blocks keep their
+      // own (x,y) independent of any previous block's size.
+      const placed: Block[] = [];
+      const withLayouts = [...normalizedBlocks]
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+        .map((b) => {
+          const w = spanForPreset(b.styles?.widthPreset);
+          const h = w;
+
+          if (isValidLayout((b as any).layout)) {
+            const candidate = { x: b.layout!.x, y: b.layout!.y, w, h };
+            if (canPlace(candidate, placed)) {
+              placed.push(b);
+              return b;
+            }
+          }
+
+          const pos = findFirstFreeSpot(b, placed);
+          const next = { ...b, layout: pos } as Block;
+          placed.push(next);
+          return next;
+        });
+
+      setBlocks(withLayouts);
+
+      // Write back any missing/corrected layouts so public view stays consistent.
       await Promise.all(
-        blocksWithLayout.map(async (b) => {
-          if (!b.layout) return;
-          const orig = rawBlocks.find((o) => o.id === b.id);
-          if (orig && !orig.layout) {
+        withLayouts.map(async (b) => {
+          const orig = rawBlocks.find((o) => (o as any).id === b.id) as any;
+          const origLayout = orig?.layout;
+          if (
+            !isValidLayout(origLayout) ||
+            origLayout.x !== b.layout?.x ||
+            origLayout.y !== b.layout?.y
+          ) {
             await updateDoc(doc(db, "pages", username, "blocks", b.id), {
               layout: b.layout,
             });
@@ -152,14 +249,21 @@ export default function EditorPage() {
     const id = crypto.randomUUID();
     const defaultContent = getDefaultContent(blockType, options);
 
-    // each block starts with a simple 1x1 layout; x/y will be
-    // managed by react-grid-layout when the user drags or resizes
+    const tempBlockForPlacement = {
+      id,
+      type: blockType,
+      content: defaultContent,
+      order: blocks.length,
+      styles: { widthPreset: "narrow" },
+    } as Block;
+    const pos = findFirstFreeSpot(tempBlockForPlacement, blocks);
+
     const newBlock: Block = {
       id,
       type: blockType,
       content: defaultContent,
       order: blocks.length,
-      layout: { x: 0, y: Infinity, w: spanForPreset("narrow"), h: 1 },
+      layout: pos,
     } as Block;
 
     addBlock(newBlock);

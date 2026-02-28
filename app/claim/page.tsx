@@ -135,23 +135,22 @@ export default function ClaimPage() {
         tx.set(introBlockRef, {
           uid: user.uid,
           type: "text",
-          order: 1,
-          data: {
-            text: `Hi, I'm ${username} 👋`,
+          order: 0,
+          content: {
+            text: `<p>Hi, I'm ${username} 👋</p>`,
           },
-          // default layout values:
-          layout: { x: 0, y: 0, w: 1, h: 1 },
+          layout: { x: 0, y: 0 },
         });
 
         tx.set(linkBlockRef, {
           uid: user.uid,
           type: "link",
-          order: 2,
-          data: {
+          order: 1,
+          content: {
             label: "My Website",
             url: "https://example.com",
           },
-          layout: { x: 1, y: 0, w: 1, h: 1 },
+          layout: { x: 1, y: 0 },
         });
       });
 

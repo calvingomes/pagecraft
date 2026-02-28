@@ -51,7 +51,12 @@ export const useEditorStore = create<EditorState>()(
       const [moved] = updated.splice(oldIndex, 1);
       updated.splice(newIndex, 0, moved);
 
-      set({ blocks: updated });
+      set({
+        blocks: updated.map((b, index) => ({
+          ...b,
+          order: index,
+        })),
+      });
     },
 
     selectBlock: (id) => set({ selectedBlockId: id }),

@@ -18,8 +18,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Grid layout changes
 
-The editor now uses **react-grid-layout** for draggable/resizable blocks instead of
-@dnd-kit. Make sure the package is installed (`npm install react-grid-layout react-resizable`).
+The editor uses **@dnd-kit** for drag-and-drop reordering.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

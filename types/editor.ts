@@ -10,12 +10,11 @@ interface BaseBlock {
     height?: number;
     widthPreset?: BlockWidthPreset;
   };
+  // Fixed grid position (independent of block order). Measured in 4-column
+  // grid cells. (0-based)
   layout?: {
-    x?: number;
-    y?: number;
-    w?: number;
-    h?: number;
-    static?: boolean;
+    x: number;
+    y: number;
   };
 }
 
