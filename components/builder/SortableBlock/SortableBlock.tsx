@@ -9,11 +9,14 @@ import { useEditorStore } from "@/stores/editor-store";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import { BlockHoverToolbar } from "@/components/builder/BlockHoverToolbar/BlockHoverToolbar";
 import styles from "./SortableBlock.module.css";
-
-interface SortableBlockProps {
-  block: Block;
-  activeDragId?: string | null;
-}
+import { compactEmptyRows } from "@/lib/compactEmptyRows";
+import {
+  clamp,
+  overlaps,
+  sizePxForPreset,
+  spansForPreset,
+} from "@/lib/blockGrid";
+import type { SortableBlockProps } from "@/types/builder";
 
 export function SortableBlock({ block, activeDragId }: SortableBlockProps) {
   const editor = useEditorContext();
@@ -43,65 +46,8 @@ export function SortableBlock({ block, activeDragId }: SortableBlockProps) {
   const hideBecauseOverlay = activeDragId === block.id;
 
   const widthPreset = block.styles?.widthPreset ?? "small";
-
-  const spansForPreset = (preset: BlockWidthPreset) => {
-    switch (preset) {
-      case "medium":
-        return { w: 2, h: 2 };
-      case "wide":
-        return { w: 2, h: 1 };
-      case "skinnyTall":
-        return { w: 2, h: 1 };
-      case "tall":
-        return { w: 1, h: 2 };
-      case "small":
-      default:
-        return { w: 1, h: 1 };
-    }
-  };
-
-  const sizePxForPreset = (
-    preset: BlockWidthPreset,
-  ): { widthPx: number; heightPx: number } => {
-    switch (preset) {
-      case "medium":
-        return { widthPx: 420, heightPx: 420 };
-      case "wide":
-        return { widthPx: 420, heightPx: 200 };
-      case "tall":
-        return { widthPx: 200, heightPx: 420 };
-      case "skinnyTall":
-        return { widthPx: 420, heightPx: 100 };
-      case "small":
-      default:
-        return { widthPx: 200, heightPx: 200 };
-    }
-  };
-
-  const rectFor = (b: Block, at?: { x: number; y: number }) => {
-    const preset = b.styles?.widthPreset ?? "small";
-    const { w, h } = spansForPreset(preset);
-    const x = at?.x ?? b.layout?.x ?? 0;
-    const y = at?.y ?? b.layout?.y ?? 0;
-    return { x, y, w, h };
-  };
-
-  const overlaps = (
-    a: { x: number; y: number; w: number; h: number },
-    b: {
-      x: number;
-      y: number;
-      w: number;
-      h: number;
-    },
-  ) => {
-    return (
-      a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y
-    );
-  };
-
-  const clamp = (value: number, min: number, max: number) =>
-    Math.max(min, Math.min(max, value));
+  const slot = block.layout?.slot ?? 0;
+  const isSkinnyTall = widthPreset === "skinnyTall";
 
   const handleWidthChange = (preset: BlockWidthPreset) => {
     if (!editor?.onUpdateBlock) return;
@@ -205,13 +151,57 @@ export function SortableBlock({ block, activeDragId }: SortableBlockProps) {
       }
     }
 
-    editor.onUpdateBlock(block.id, {
-      styles: { ...block.styles, widthPreset: preset },
-      layout: anchored,
+    const nextLayoutById = new Map<string, { x: number; y: number }>();
+    nextLayoutById.set(block.id, anchored);
+    for (const change of moved) {
+      nextLayoutById.set(change.id, change.layout);
+    }
+
+    const nextBlocks = allBlocks.map((b) => {
+      if (b.id === block.id) {
+        return {
+          ...b,
+          styles: { ...b.styles, widthPreset: preset },
+          layout: anchored,
+        } as Block;
+      }
+
+      const nextLayout = nextLayoutById.get(b.id);
+      if (!nextLayout) return b;
+      return { ...b, layout: nextLayout } as Block;
     });
 
-    for (const change of moved) {
-      editor.onUpdateBlock(change.id, { layout: change.layout });
+    const compacted = compactEmptyRows(nextBlocks);
+
+    for (const next of compacted.blocks) {
+      const prev = allBlocks.find((b) => b.id === next.id);
+      if (!prev) continue;
+
+      if (next.id === block.id) {
+        const prevPreset = prev.styles?.widthPreset ?? "small";
+        const nextPreset = next.styles?.widthPreset ?? "small";
+        const prevLayout = prev.layout;
+        const nextLayout = next.layout;
+
+        if (
+          prevPreset !== nextPreset ||
+          prevLayout?.x !== nextLayout?.x ||
+          prevLayout?.y !== nextLayout?.y
+        ) {
+          editor.onUpdateBlock(next.id, {
+            styles: { ...next.styles, widthPreset: preset },
+            layout: next.layout,
+          });
+        }
+        continue;
+      }
+
+      const prevLayout = prev.layout;
+      const nextLayout = next.layout;
+      if (!prevLayout || !nextLayout) continue;
+      if (prevLayout.x === nextLayout.x && prevLayout.y === nextLayout.y)
+        continue;
+      editor.onUpdateBlock(next.id, { layout: nextLayout });
     }
   };
 
@@ -220,6 +210,9 @@ export function SortableBlock({ block, activeDragId }: SortableBlockProps) {
   return (
     <div
       className={styles.hoverZone}
+      style={
+        isSkinnyTall && slot === 1 ? { alignItems: "flex-end" } : undefined
+      }
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

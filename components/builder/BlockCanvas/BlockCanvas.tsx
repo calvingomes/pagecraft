@@ -11,77 +11,29 @@ import {
   type DragOverEvent,
   type DragEndEvent,
   type DragStartEvent,
-  type DragCancelEvent,
 } from "@dnd-kit/core";
 import { useMemo, useState } from "react";
 import { useEditorStore } from "@/stores/editor-store";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
 import sortableBlockStyles from "@/components/builder/SortableBlock/SortableBlock.module.css";
-import type { Block, BlockWidthPreset } from "@/types/editor";
+import type { Block } from "@/types/editor";
+import type { BlockCanvasProps } from "@/types/builder";
 import styles from "./BlockCanvas.module.css";
 import { useEditorContext } from "@/contexts/EditorContext";
-
-type BlockCanvasProps =
-  | { editable: true }
-  | { editable: false; blocks: Block[]; title?: string };
-
-const spansForPreset = (preset: BlockWidthPreset) => {
-  switch (preset) {
-    case "medium":
-      return { w: 2, h: 2 };
-    case "wide":
-      return { w: 2, h: 1 };
-    case "skinnyTall":
-      return { w: 2, h: 1 };
-    case "tall":
-      return { w: 1, h: 2 };
-    case "small":
-    default:
-      return { w: 1, h: 1 };
-  }
-};
-
-const sizePxForPreset = (preset: BlockWidthPreset) => {
-  switch (preset) {
-    case "medium":
-      return { widthPx: 420, heightPx: 420 };
-    case "wide":
-      return { widthPx: 420, heightPx: 200 };
-    case "tall":
-      return { widthPx: 200, heightPx: 420 };
-    case "skinnyTall":
-      return { widthPx: 420, heightPx: 100 };
-    case "small":
-    default:
-      return { widthPx: 200, heightPx: 200 };
-  }
-};
-
-const clamp = (value: number, min: number, max: number) =>
-  Math.max(min, Math.min(max, value));
-
-const overlaps = (
-  a: { x: number; y: number; w: number; h: number },
-  b: {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  },
-) => {
-  return (
-    a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y
-  );
-};
-
-const rectFor = (b: Block) => {
-  const preset = b.styles?.widthPreset ?? "small";
-  const { w, h } = spansForPreset(preset);
-  const x = b.layout?.x ?? 0;
-  const y = b.layout?.y ?? 0;
-  return { x, y, w, h };
-};
+import { compactEmptyRows } from "@/lib/compactEmptyRows";
+import {
+  sizePxForPreset,
+  spansForPreset,
+  clamp,
+  rectForBlock,
+} from "@/lib/blockGrid";
+import {
+  computePushedLayouts,
+  computeTargetFromOver,
+  maxStartYFor,
+  type LayoutById,
+} from "@/components/builder/BlockCanvas/blockCanvasLayout";
 
 export const BlockCanvas = (props: BlockCanvasProps) => {
   const storeBlocks = useEditorStore((s) => s.blocks);
@@ -90,7 +42,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [dragSnapshot, setDragSnapshot] = useState<null | {
-    layouts: Record<string, { x: number; y: number } | undefined>;
+    layouts: LayoutById;
     lastTargetKey: string | null;
   }>(null);
 
@@ -102,143 +54,6 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
     }),
   );
 
-  const computeTargetFromOver = (
-    overId: string,
-    movingW: number,
-  ): { x: number; y: number } | null => {
-    if (overId.startsWith("cell:")) {
-      const parts = overId.split(":");
-      const x = Number(parts[1]);
-      const y = Number(parts[2]);
-      if (!Number.isNaN(x) && !Number.isNaN(y)) {
-        return {
-          x: clamp(x, 0, 4 - movingW),
-          y: Math.max(0, y),
-        };
-      }
-    }
-
-    if (overId.startsWith("block:")) {
-      const id = overId.replace("block:", "");
-      const b = blocks.find((x) => x.id === id);
-      if (b) {
-        const r = rectFor(b);
-        return {
-          x: clamp(r.x, 0, 4 - movingW),
-          y: Math.max(0, r.y),
-        };
-      }
-    }
-
-    return null;
-  };
-
-  const computePushedLayouts = (
-    movingId: string,
-    target: { x: number; y: number },
-    sourceLayouts: Record<string, { x: number; y: number } | undefined>,
-  ) => {
-    const movingBlock = blocks.find((b) => b.id === movingId);
-    if (!movingBlock) return null;
-
-    const movingPreset = movingBlock.styles?.widthPreset ?? "small";
-    const movingSpans = spansForPreset(movingPreset);
-    const anchored = {
-      x: clamp(target.x, 0, 4 - movingSpans.w),
-      y: Math.max(0, target.y),
-    };
-
-    type PlacedRect = {
-      id: string;
-      x: number;
-      y: number;
-      w: number;
-      h: number;
-    };
-
-    const placed: PlacedRect[] = [
-      {
-        id: movingId,
-        x: anchored.x,
-        y: anchored.y,
-        w: movingSpans.w,
-        h: movingSpans.h,
-      },
-    ];
-
-    const isFree = (candidate: Omit<PlacedRect, "id">) => {
-      if (candidate.x < 0 || candidate.y < 0) return false;
-      if (candidate.x + candidate.w > 4) return false;
-      return !placed.some((p) => overlaps(candidate, p));
-    };
-
-    const findSpotNear = (
-      startX: number,
-      startY: number,
-      w: number,
-      h: number,
-    ) => {
-      const normalizedStartX = clamp(startX, 0, 4 - w);
-      const normalizedStartY = Math.max(0, startY);
-
-      const xCandidates = Array.from({ length: 4 - w + 1 }, (_, i) => i).filter(
-        (x) => x !== normalizedStartX,
-      );
-      const orderedXCandidates = [normalizedStartX, ...xCandidates];
-
-      for (let y = normalizedStartY; y < 100; y++) {
-        for (const x of orderedXCandidates) {
-          const candidate = { x, y, w, h };
-          if (isFree(candidate)) return { x, y };
-        }
-      }
-
-      for (let y = 0; y < 100; y++) {
-        for (let x = 0; x <= 4 - w; x++) {
-          const candidate = { x, y, w, h };
-          if (isFree(candidate)) return { x, y };
-        }
-      }
-
-      return { x: 0, y: 0 };
-    };
-
-    const others = blocks
-      .filter((b) => b.id !== movingId)
-      .slice()
-      .sort((a, b) => {
-        const ay = (sourceLayouts[a.id] ?? a.layout)?.y ?? 0;
-        const by = (sourceLayouts[b.id] ?? b.layout)?.y ?? 0;
-        if (ay !== by) return ay - by;
-        const ax = (sourceLayouts[a.id] ?? a.layout)?.x ?? 0;
-        const bx = (sourceLayouts[b.id] ?? b.layout)?.x ?? 0;
-        return ax - bx;
-      });
-
-    const nextLayouts: Record<string, { x: number; y: number }> = {
-      [movingId]: anchored,
-    };
-
-    for (const other of others) {
-      const otherPreset = other.styles?.widthPreset ?? "small";
-      const { w, h } = spansForPreset(otherPreset);
-      const source = sourceLayouts[other.id] ?? other.layout;
-      const originalX = clamp(source?.x ?? 0, 0, 4 - w);
-      const originalY = Math.max(0, source?.y ?? 0);
-      const originalRect = { x: originalX, y: originalY, w, h };
-
-      const collides = placed.some((p) => overlaps(originalRect, p));
-      const finalPos = collides
-        ? findSpotNear(originalX, originalY, w, h)
-        : { x: originalX, y: originalY };
-
-      placed.push({ id: other.id, x: finalPos.x, y: finalPos.y, w, h });
-      nextLayouts[other.id] = finalPos;
-    }
-
-    return nextLayouts;
-  };
-
   const handleDragStart = (event: DragStartEvent) => {
     if (!props.editable) return;
     const startedId = String(event.active.id);
@@ -247,14 +62,16 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
       layouts: Object.fromEntries(
         blocks.map((b) => [
           b.id,
-          b.layout ? { x: b.layout.x, y: b.layout.y } : undefined,
+          b.layout
+            ? { x: b.layout.x, y: b.layout.y, slot: b.layout.slot }
+            : undefined,
         ]),
       ),
       lastTargetKey: null,
     });
   };
 
-  const handleDragCancel = (_event: DragCancelEvent) => {
+  const handleDragCancel = () => {
     if (dragSnapshot) {
       for (const [id, layout] of Object.entries(dragSnapshot.layouts)) {
         updateBlock(id, { layout });
@@ -276,15 +93,22 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
     const movingPreset = activeBlock.styles?.widthPreset ?? "small";
     const { w: movingW } = spansForPreset(movingPreset);
     const overId = String(event.over.id);
-    const target = computeTargetFromOver(overId, movingW);
+    const target = computeTargetFromOver(overId, movingW, movingPreset, blocks);
     if (!target) return;
 
-    const targetKey = `${activeId}:${target.x}:${target.y}`;
+    const maxStartY = maxStartYFor(blocks, activeId, dragSnapshot.layouts);
+    const clampedTarget = {
+      ...target,
+      y: clamp(target.y, 0, maxStartY),
+    };
+
+    const targetKey = `${activeId}:${clampedTarget.x}:${clampedTarget.y}:${clampedTarget.slot ?? "_"}`;
     if (dragSnapshot.lastTargetKey === targetKey) return;
 
     const nextLayouts = computePushedLayouts(
       activeId,
-      target,
+      clampedTarget,
+      blocks,
       dragSnapshot.layouts,
     );
     if (!nextLayouts) return;
@@ -330,33 +154,62 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
 
     const movingPreset = activeBlock.styles?.widthPreset ?? "small";
     const { w: movingW } = spansForPreset(movingPreset);
-    const target = computeTargetFromOver(overId, movingW);
-    if (!target) return;
+    const targetRaw = computeTargetFromOver(
+      overId,
+      movingW,
+      movingPreset,
+      blocks,
+    );
+    if (!targetRaw) return;
 
     const sourceLayouts =
       snapshot?.layouts ??
       Object.fromEntries(
         blocks.map((b) => [
           b.id,
-          b.layout ? { x: b.layout.x, y: b.layout.y } : undefined,
+          b.layout
+            ? { x: b.layout.x, y: b.layout.y, slot: b.layout.slot }
+            : undefined,
         ]),
       );
+
+    const maxStartY = maxStartYFor(blocks, activeBlockId, sourceLayouts);
+    const target = {
+      ...targetRaw,
+      y: clamp(targetRaw.y, 0, maxStartY),
+    };
 
     const nextLayouts = computePushedLayouts(
       activeBlockId,
       target,
+      blocks,
       sourceLayouts,
     );
     if (!nextLayouts) return;
 
-    for (const [id, layout] of Object.entries(nextLayouts)) {
-      updateBlock(id, { layout });
+    const postMoveBlocks = blocks.map((b) => {
+      const layout = nextLayouts[b.id];
+      return layout ? ({ ...b, layout } as Block) : b;
+    });
+
+    const compacted = compactEmptyRows(postMoveBlocks);
+
+    for (const b of compacted.blocks) {
+      const current = blocks.find((x) => x.id === b.id);
+      if (!current) continue;
+      const next = b.layout;
+      const prev = current.layout;
+      if (!next || !prev) continue;
+      if (prev.x === next.x && prev.y === next.y) continue;
+      updateBlock(b.id, { layout: next });
     }
 
-    for (const [id, layout] of Object.entries(nextLayouts)) {
-      const before = sourceLayouts[id];
-      if (before?.x === layout.x && before?.y === layout.y) continue;
-      void editor.onUpdateBlock(id, { layout });
+    for (const b of compacted.blocks) {
+      const before = sourceLayouts[b.id];
+      const after = b.layout;
+      if (!after) continue;
+      if (before?.x === after.x && before?.y === after.y) continue;
+      void editor.onUpdateBlock(b.id, { layout: after });
     }
   };
 
@@ -366,17 +219,32 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
   }, [activeId, blocks]);
 
   const maxBottom = blocks.reduce((acc, b) => {
-    const r = rectFor(b);
+    const r = rectForBlock(b);
     return Math.max(acc, r.y + r.h);
   }, 0);
-  const rows = Math.max(12, maxBottom + 6);
+  // Render only what we need: occupied rows + 1 trailing empty row.
+  const rows = Math.max(1, maxBottom + 1);
 
   const DroppableCell = ({ x, y }: { x: number; y: number }) => {
-    const { setNodeRef } = useDroppable({
+    const { setNodeRef: setFullRef } = useDroppable({
       id: `cell:${x}:${y}`,
       data: { type: "cell", x, y },
     });
-    return <div ref={setNodeRef} className={styles.dropCell} />;
+    const { setNodeRef: setTopRef } = useDroppable({
+      id: `cellHalf:${x}:${y}:0`,
+      data: { type: "cellHalf", x, y, slot: 0 },
+    });
+    const { setNodeRef: setBottomRef } = useDroppable({
+      id: `cellHalf:${x}:${y}:1`,
+      data: { type: "cellHalf", x, y, slot: 1 },
+    });
+
+    return (
+      <div ref={setFullRef} className={styles.dropCell}>
+        <div ref={setTopRef} className={styles.dropHalfTop} />
+        <div ref={setBottomRef} className={styles.dropHalfBottom} />
+      </div>
+    );
   };
 
   const content = (
@@ -419,8 +287,17 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
               ) : (
                 (() => {
                   const { widthPx, heightPx } = sizePxForPreset(preset);
+                  const slot = block.layout?.slot ?? 0;
+                  const isSkinnyTall = preset === "skinnyTall";
                   return (
-                    <div className={sortableBlockStyles.hoverZone}>
+                    <div
+                      className={sortableBlockStyles.hoverZone}
+                      style={
+                        isSkinnyTall && slot === 1
+                          ? { alignItems: "flex-end" }
+                          : undefined
+                      }
+                    >
                       <div
                         className={sortableBlockStyles.wrapper}
                         style={{

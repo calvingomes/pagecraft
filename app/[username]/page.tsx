@@ -3,14 +3,15 @@ import {
   doc,
   getDoc,
   getDocs,
-  query,
   orderBy,
+  query,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 import type { Block, BlockType } from "@/types/editor";
 import type { PageBackgroundId, SidebarPosition } from "@/types/page";
 import { PageView } from "@/components/views/PageView/PageView";
+import { canPlaceBlockAt, findFirstFreeSpot } from "@/lib/blockPlacement";
 
 type Props = {
   params: Promise<{ username: string }>;
@@ -30,110 +31,76 @@ export default async function UserPage({ params }: Props) {
   const blocksQuery = query(blocksRef, orderBy("order"));
   const blocksSnap = await getDocs(blocksQuery);
 
-  const spansForPreset = (preset?: string) => {
-    switch (preset) {
-      case "medium":
-        return { w: 2, h: 2 };
-      case "wide":
-        return { w: 2, h: 1 };
-      case "skinnyTall":
-        return { w: 2, h: 1 };
-      case "tall":
-        return { w: 1, h: 2 };
-      case "small":
-      default:
-        return { w: 1, h: 1 };
-    }
-  };
-
-  const overlaps = (
-    a: { x: number; y: number; w: number; h: number },
-    b: { x: number; y: number; w: number; h: number },
-  ) => {
+  const isValidLayout = (
+    layout: unknown,
+  ): layout is { x: number; y: number; slot?: 0 | 1 } => {
+    if (!layout || typeof layout !== "object") return false;
+    const anyLayout = layout as Record<string, unknown>;
     return (
-      a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y
+      typeof anyLayout.x === "number" &&
+      Number.isFinite(anyLayout.x) &&
+      typeof anyLayout.y === "number" &&
+      Number.isFinite(anyLayout.y)
     );
   };
 
-  const isValidLayout = (layout: any): layout is { x: number; y: number } => {
-    return (
-      layout &&
-      typeof layout.x === "number" &&
-      Number.isFinite(layout.x) &&
-      typeof layout.y === "number" &&
-      Number.isFinite(layout.y)
-    );
-  };
-
-  const rectFor = (b: Block, at?: { x: number; y: number }) => {
-    const { w, h } = spansForPreset(b.styles?.widthPreset);
-    const x = at?.x ?? b.layout?.x ?? 0;
-    const y = at?.y ?? b.layout?.y ?? 0;
-    return { x, y, w, h };
-  };
-
-  const canPlace = (
-    candidate: { x: number; y: number; w: number; h: number },
-    placed: Block[],
-  ) => {
-    if (candidate.x < 0 || candidate.y < 0) return false;
-    if (candidate.x + candidate.w > 4) return false;
-    return !placed.some((p) => overlaps(candidate, rectFor(p)));
-  };
-
-  const findFirstFreeSpot = (block: Block, placed: Block[]) => {
-    const { w, h } = spansForPreset(block.styles?.widthPreset);
-    for (let y = 0; y < 100; y++) {
-      for (let x = 0; x <= 4 - w; x++) {
-        const candidate = { x, y, w, h };
-        if (canPlace(candidate, placed)) return { x, y };
-      }
-    }
-    return { x: 0, y: 0 };
-  };
-
-  const rawBlocks = blocksSnap.docs.map((docSnap) => ({
-    id: docSnap.id,
-    ...docSnap.data(),
-  }));
+  const rawBlocks: Array<{ id: string } & Record<string, unknown>> =
+    blocksSnap.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data(),
+    }));
 
   // Normalize older Firestore shapes (e.g. `data` instead of `content`).
   const normalizedBlocks: Block[] = rawBlocks.map((raw, index) => {
-    const anyRaw = raw as any;
-    const type = anyRaw.type as BlockType;
-    const order = typeof anyRaw.order === "number" ? anyRaw.order : index;
+    const type = raw.type as BlockType;
+    const order = typeof raw.order === "number" ? raw.order : index;
 
-    if (anyRaw.content) {
-      return { ...anyRaw, order } as Block;
+    if (raw.content) {
+      return { ...(raw as unknown as Block), order } as Block;
     }
+
+    const data =
+      raw.data && typeof raw.data === "object" && raw.data !== null
+        ? (raw.data as Record<string, unknown>)
+        : undefined;
 
     switch (type) {
       case "text":
         return {
-          ...anyRaw,
+          ...(raw as unknown as Block),
           order,
-          content: { text: anyRaw.data?.text ?? "<p>New text block</p>" },
+          content: {
+            text:
+              typeof data?.text === "string"
+                ? data.text
+                : "<p>New text block</p>",
+          },
         } as Block;
       case "link":
         return {
-          ...anyRaw,
+          ...(raw as unknown as Block),
           order,
           content: {
-            url: anyRaw.data?.url ?? "",
-            label: anyRaw.data?.label ?? anyRaw.data?.url ?? "New link",
+            url: typeof data?.url === "string" ? data.url : "",
+            label:
+              typeof data?.label === "string"
+                ? data.label
+                : typeof data?.url === "string"
+                  ? data.url
+                  : "New link",
           },
         } as Block;
       case "image":
         return {
-          ...anyRaw,
+          ...(raw as unknown as Block),
           order,
           content: {
-            url: anyRaw.data?.url ?? "",
-            alt: anyRaw.data?.alt ?? "",
+            url: typeof data?.url === "string" ? data.url : "",
+            alt: typeof data?.alt === "string" ? data.alt : "",
           },
         } as Block;
       default:
-        return { ...anyRaw, order } as Block;
+        return { ...(raw as unknown as Block), order } as Block;
     }
   });
 
@@ -142,11 +109,13 @@ export default async function UserPage({ params }: Props) {
   const blocks: Block[] = [...normalizedBlocks]
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     .map((b) => {
-      const { w, h } = spansForPreset(b.styles?.widthPreset);
-
-      if (isValidLayout((b as any).layout)) {
-        const candidate = { x: b.layout!.x, y: b.layout!.y, w, h };
-        if (canPlace(candidate, placed)) {
+      if (isValidLayout(b.layout)) {
+        const candidate = {
+          x: b.layout!.x,
+          y: b.layout!.y,
+          slot: b.layout!.slot,
+        };
+        if (canPlaceBlockAt(b, candidate, placed)) {
           placed.push(b);
           return b;
         }

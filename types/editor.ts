@@ -20,6 +20,8 @@ interface BaseBlock {
   layout?: {
     x: number;
     y: number;
+    // For half-height blocks (currently `skinnyTall`), 0 = top, 1 = bottom.
+    slot?: 0 | 1;
   };
 }
 
