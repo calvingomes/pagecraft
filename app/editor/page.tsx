@@ -22,7 +22,7 @@ import { EditorProvider } from "@/contexts/EditorContext";
 import { ProfileSidebar } from "@/components/system/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/system/BlockCanvas/BlockCanvas";
 import { BlockToolbar } from "@/components/system/BlockToolbar/BlockToolbar";
-import layoutStyles from "@/components/layouts/PageLayout/PageLayout.module.css";
+import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 
 export default function EditorPage() {
   const router = useRouter();
@@ -145,7 +145,7 @@ export default function EditorPage() {
   }
 
   return (
-    <main className={layoutStyles.pageLayout}>
+    <PageLayout>
       <ProfileSidebar variant="editor" />
       <EditorProvider
         username={username ?? null}
@@ -155,6 +155,6 @@ export default function EditorPage() {
         <BlockCanvas editable />
         <BlockToolbar onAddBlock={handleAddBlock} />
       </EditorProvider>
-    </main>
+    </PageLayout>
   );
 }

@@ -3,7 +3,7 @@
 import type { Block } from "@/types/editor";
 import { ProfileSidebar } from "@/components/system/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/system/BlockCanvas/BlockCanvas";
-import layoutStyles from "@/components/layouts/PageLayout/PageLayout.module.css";
+import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 
 type PageViewProps = {
   username: string;
@@ -13,9 +13,9 @@ type PageViewProps = {
 
 export function PageView({ username, title, blocks }: PageViewProps) {
   return (
-    <main className={layoutStyles.pageLayout}>
+    <PageLayout>
       <ProfileSidebar variant="view" username={username} />
       <BlockCanvas editable={false} blocks={blocks} title={title} />
-    </main>
+    </PageLayout>
   );
 }
