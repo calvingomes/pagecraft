@@ -9,6 +9,7 @@ import {
 import { db } from "@/lib/firebase";
 
 import { Block } from "@/types/editor";
+import type { PageBackgroundId } from "@/types/page";
 import { PageView } from "@/components/views/PageView/PageView";
 
 type Props = {
@@ -40,7 +41,14 @@ export default async function UserPage({ params }: Props) {
     } as Block;
   });
 
-  const page = pageSnap.data();
+  const page = pageSnap.data() as { title?: string; background?: PageBackgroundId } | undefined;
 
-  return <PageView username={username} title={page?.title} blocks={blocks} />;
+  return (
+    <PageView
+      username={username}
+      title={page?.title}
+      background={page?.background}
+      blocks={blocks}
+    />
+  );
 }

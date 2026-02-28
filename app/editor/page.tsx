@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useEditorStore } from "@/stores/editor-store";
 import { useAuthStore } from "@/stores/auth-store";
@@ -19,6 +19,7 @@ import {
 } from "firebase/firestore";
 import type { Block, BlockType } from "@/types/editor";
 import { EditorProvider } from "@/contexts/EditorContext";
+import type { PageBackgroundId } from "@/types/page";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { BlockToolbar } from "@/components/builder/BlockToolbar/BlockToolbar";
@@ -34,6 +35,7 @@ export default function EditorPage() {
   const addBlock = useEditorStore((s) => s.addBlock);
   const updateBlock = useEditorStore((s) => s.updateBlock);
   const removeBlock = useEditorStore((s) => s.removeBlock);
+  const [background, setBackground] = useState<PageBackgroundId>("page-bg-1");
 
   /* auth & username guard */
   useEffect(() => {
@@ -81,11 +83,14 @@ export default function EditorPage() {
   }, [username, setBlocks, setLoading]);
 
   /* add‑block helper used by the toolbar */
-  const handleAddBlock = async (blockType: BlockType) => {
+  const handleAddBlock = async (
+    blockType: BlockType,
+    options?: { url?: string; label?: string },
+  ) => {
     if (!username) return;
 
     const id = crypto.randomUUID();
-    const defaultContent = getDefaultContent(blockType);
+    const defaultContent = getDefaultContent(blockType, options);
 
     const newBlock: Block = {
       id,
@@ -98,12 +103,18 @@ export default function EditorPage() {
     await setDoc(doc(db, "pages", username, "blocks", id), newBlock);
   };
 
-  const getDefaultContent = (type: BlockType): Block["content"] => {
+  const getDefaultContent = (
+    type: BlockType,
+    options?: { url?: string; label?: string },
+  ): Block["content"] => {
     switch (type) {
       case "text":
         return { text: "New text block" };
       case "link":
-        return { url: "", label: "New link" };
+        return {
+          url: options?.url ?? "",
+          label: options?.label ?? (options?.url ?? "New link"),
+        };
       case "image":
         return { url: "", alt: "" };
     }
@@ -145,7 +156,7 @@ export default function EditorPage() {
   }
 
   return (
-    <PageLayout>
+    <PageLayout background={background}>
       <ProfileSidebar variant="editor" />
       <EditorProvider
         username={username ?? null}
@@ -153,7 +164,11 @@ export default function EditorPage() {
         onRemoveBlock={handleRemoveBlock}
       >
         <BlockCanvas editable />
-        <BlockToolbar onAddBlock={handleAddBlock} />
+        <BlockToolbar
+          onAddBlock={handleAddBlock}
+          onChangeBackground={setBackground}
+          background={background}
+        />
       </EditorProvider>
     </PageLayout>
   );

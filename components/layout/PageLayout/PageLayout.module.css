@@ -1,5 +1,29 @@
 .pageLayout {
   display: flex;
   height: 100vh;
-  background: #f5f5f5;
+  background: var(--color-page-bg-1);
+}
+
+.pageLayout[data-bg="page-bg-1"] {
+  background: var(--color-page-bg-1);
+}
+
+.pageLayout[data-bg="page-bg-2"] {
+  background: var(--color-page-bg-2);
+}
+
+.pageLayout[data-bg="page-bg-3"] {
+  background: var(--color-page-bg-3);
+}
+
+.pageLayout[data-bg="page-bg-4"] {
+  background: var(--color-page-bg-4);
+}
+
+.pageLayout[data-bg="page-bg-5"] {
+  background: var(--color-page-bg-5);
+}
+
+.pageLayout[data-bg="page-bg-6"] {
+  background: var(--color-page-bg-6);
 }

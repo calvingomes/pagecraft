@@ -43,3 +43,84 @@
 .toolButton:active {
   transform: scale(0.95);
 }
+
+.toolbarContentLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.backButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: #18181b;
+  color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.linkInputWrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.linkInput {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 999px;
+  border: none;
+  background: #18181b;
+  color: #e5e7eb;
+  font-size: 0.875rem;
+}
+
+.linkInput::placeholder {
+  color: #6b7280;
+}
+
+.pasteButton {
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  border: none;
+  background: #14532d;
+  color: #e5e7eb;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.paletteTrigger {
+  margin-left: 8px;
+}
+
+.palettePopover {
+  position: absolute;
+  bottom: 64px;
+  right: 0;
+  padding: 8px 10px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.25);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.colorSwatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  background-clip: padding-box;
+}
+
+.colorSwatchSelected {
+  border-color: #eab308;
+}

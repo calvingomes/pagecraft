@@ -4,9 +4,17 @@
   --color-brand-accent: #22d3ee;
 
   /* Backgrounds */
-  --color-bg-page: #020617;
+  --color-bg-page: #f5f5f5;
   --color-bg-surface: #020617;
   --color-bg-elevated: #020617;
+
+  /* Page background palette */
+  --color-page-bg-1: #f5f5f5;
+  --color-page-bg-2: #f4f9f2;
+  --color-page-bg-3: #fefce8;
+  --color-page-bg-4: #eff6ff;
+  --color-page-bg-5: #fdf2ff;
+  --color-page-bg-6: #fef2f2;
 
   /* Text */
   --color-text-primary: #000000;
