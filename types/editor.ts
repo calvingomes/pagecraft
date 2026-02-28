@@ -1,6 +1,6 @@
 export type BlockType = "text" | "link" | "image";
 
-export type BlockWidthPreset = "narrow" | "medium" | "wide" | "full";
+export type BlockWidthPreset = "narrow" | "medium";
 
 interface BaseBlock {
   id: string;
@@ -9,13 +9,7 @@ interface BaseBlock {
     width?: number;
     height?: number;
     widthPreset?: BlockWidthPreset;
-    // previous grid implementation used a break flag; now layout handles
-    // explicit positioning so this field is no longer necessary.
   };
-  /**
-   * explicit grid coordinates used by react-grid-layout
-   * x, y are zero-based grid positions; w, h are span counts
-   */
   layout?: {
     x?: number;
     y?: number;

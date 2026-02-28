@@ -46,9 +46,6 @@ export default function EditorPage() {
         return 1;
       case "medium":
         return 2;
-      case "wide":
-        return 3;
-      case "full":
       default:
         return 3;
     }
@@ -115,7 +112,7 @@ export default function EditorPage() {
         if (b.layout && typeof b.layout.x === "number") {
           return b;
         }
-        const preset = b.styles?.widthPreset ?? "full";
+        const preset = b.styles?.widthPreset ?? "narrow";
         const w = spanForPreset(preset);
         const x = idx % 3;
         const y = Math.floor(idx / 3);
@@ -162,7 +159,7 @@ export default function EditorPage() {
       type: blockType,
       content: defaultContent,
       order: blocks.length,
-      layout: { x: 0, y: Infinity, w: spanForPreset("full"), h: 1 },
+      layout: { x: 0, y: Infinity, w: spanForPreset("narrow"), h: 1 },
     } as Block;
 
     addBlock(newBlock);

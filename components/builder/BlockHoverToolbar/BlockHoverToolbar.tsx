@@ -2,14 +2,7 @@
 
 import React from "react";
 import type { LucideIcon } from "lucide-react";
-import {
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
-  Trash2,
-  CornerDownRight,
-} from "lucide-react";
+import { AlignLeft, AlignCenter, Trash2, CornerDownRight } from "lucide-react";
 import type { BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "./BlockHoverToolbar.module.css";
@@ -18,8 +11,6 @@ type BlockHoverToolbarProps = {
   blockId: string;
   currentPreset?: BlockWidthPreset;
   onWidthChange: (preset: BlockWidthPreset) => void;
-  // when true this block begins a new row (prevents earlier rows from
-  // receiving items that come later in sequence)
   rowBreak?: boolean;
   onToggleRowBreak?: () => void;
   visible?: boolean;
@@ -40,21 +31,11 @@ const WIDTH_PRESETS: {
     title: "Medium",
     Icon: AlignCenter,
   },
-  {
-    preset: "wide",
-    title: "Wide",
-    Icon: AlignRight,
-  },
-  {
-    preset: "full",
-    title: "Full width",
-    Icon: AlignJustify,
-  },
 ];
 
 export function BlockHoverToolbar({
   blockId,
-  currentPreset = "full",
+  currentPreset = "narrow",
   onWidthChange,
   rowBreak = false,
   onToggleRowBreak,

@@ -14,9 +14,6 @@ const spanForPreset = (preset: BlockWidthPreset): number => {
       return 1;
     case "medium":
       return 2;
-    case "wide":
-      return 3;
-    case "full":
     default:
       return 3;
   }
@@ -26,15 +23,11 @@ interface SortableBlockProps {
   block: Block;
 }
 
-// width presets no longer correspond to fixed pixel sizes; grid layout
-// handles spacing via column spans (see BlockCanvas). Keep the enum for
-// toolbar and logic, but the numeric sizes are unused.
-
 export function SortableBlock({ block }: SortableBlockProps) {
   const editor = useEditorContext();
   const [isHovered, setIsHovered] = useState(false);
 
-  const widthPreset = block.styles?.widthPreset ?? "full";
+  const widthPreset = block.styles?.widthPreset ?? "narrow";
   const rowBreak = block.layout?.y === Infinity;
 
   const handleWidthChange = useCallback(

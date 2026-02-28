@@ -46,9 +46,6 @@ const spanForPreset = (preset: BlockWidthPreset): number => {
       return 1;
     case "medium":
       return 2;
-    case "wide":
-      return 3;
-    case "full":
     default:
       return 3;
   }
@@ -67,7 +64,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
       i: b.id,
       x: l.x ?? 0,
       y: l.y ?? Infinity,
-      w: l.w ?? spanForPreset(b.styles?.widthPreset ?? "full"),
+      w: l.w ?? spanForPreset(b.styles?.widthPreset ?? "narrow"),
       h: l.h ?? 1,
       static: l.static || false,
     };
