@@ -16,6 +16,7 @@ import {
   getDocs,
   orderBy,
   query,
+  serverTimestamp,
 } from "firebase/firestore";
 import type { Block, BlockType } from "@/types/editor";
 import { EditorProvider } from "@/contexts/EditorContext";
@@ -63,25 +64,42 @@ export default function EditorPage() {
     return () => unsub();
   }, [router, setUser, setUsername]);
 
-  /* load blocks once the username is known */
+  /* load page metadata (background/sidebar) and blocks once the username is known */
   useEffect(() => {
     if (!username) return;
 
-    const loadBlocks = async () => {
+    const loadPageData = async () => {
+      // load page settings first so the UI can render them as early as possible
+      const pageRef = doc(db, "pages", username);
+      const pageSnap = await getDoc(pageRef);
+
+      if (pageSnap.exists()) {
+        const data = pageSnap.data() as
+          | {
+              background?: PageBackgroundId;
+              sidebarPosition?: SidebarPosition;
+            }
+          | undefined;
+
+        if (data?.background) setBackground(data.background);
+        if (data?.sidebarPosition) setSidebarPosition(data.sidebarPosition);
+      }
+
+      // then load blocks
       const blocksRef = collection(db, "pages", username, "blocks");
       const q = query(blocksRef, orderBy("order"));
       const snap = await getDocs(q);
 
-      const data = snap.docs.map((doc) => ({
+      const blockData = snap.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as Block[];
 
-      setBlocks(data);
+      setBlocks(blockData);
       setLoading(false);
     };
 
-    loadBlocks();
+    loadPageData();
   }, [username, setBlocks, setLoading]);
 
   /* add‑block helper used by the toolbar */
@@ -115,7 +133,7 @@ export default function EditorPage() {
       case "link":
         return {
           url: options?.url ?? "",
-          label: options?.label ?? (options?.url ?? "New link"),
+          label: options?.label ?? options?.url ?? "New link",
         };
       case "image":
         return { url: "", alt: "" };
@@ -153,15 +171,32 @@ export default function EditorPage() {
     return () => clearTimeout(timeout);
   }, [blocks, username]);
 
+  /* persist background changes */
+  useEffect(() => {
+    if (!username) return;
+    const pageRef = doc(db, "pages", username);
+    updateDoc(pageRef, {
+      background,
+      updatedAt: serverTimestamp(),
+    }).catch(console.error);
+  }, [background, username]);
+
+  /* persist sidebar position changes */
+  useEffect(() => {
+    if (!username) return;
+    const pageRef = doc(db, "pages", username);
+    updateDoc(pageRef, {
+      sidebarPosition,
+      updatedAt: serverTimestamp(),
+    }).catch(console.error);
+  }, [sidebarPosition, username]);
+
   if (loading) {
     return <div>Loading editor…</div>;
   }
 
   return (
-    <PageLayout
-      background={background}
-      sidebarPosition={sidebarPosition}
-    >
+    <PageLayout background={background} sidebarPosition={sidebarPosition}>
       <ProfileSidebar variant="editor" />
       <EditorProvider
         username={username ?? null}

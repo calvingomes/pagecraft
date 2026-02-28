@@ -123,6 +123,9 @@ export default function ClaimPage() {
           published: true,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
+          // set sensible defaults so editor and public view have initial values
+          background: "page-bg-1",
+          sidebarPosition: "left",
         });
 
         // 4. create starter blocks
