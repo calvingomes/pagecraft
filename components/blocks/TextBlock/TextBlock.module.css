@@ -1,34 +1,37 @@
-.textBlock {
-  width: 100%;
-}
-
-.textBlock p {
-  margin: 0;
-  line-height: 1.6;
-  white-space: pre-wrap;
-}
-
-.textBlock .textarea {
+.textarea {
   width: 100%;
   min-height: 4rem;
-  padding: 0.5rem 0;
+  padding: 0.5rem;
   border: none;
   border-bottom: 1px solid transparent;
   background: transparent;
   font-family: inherit;
   font-size: inherit;
   line-height: 1.6;
-  resize: none;
+  resize: vertical;
   transition:
-    border-color 0.15s,
-    background 0.15s;
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
-.textBlock .textarea:focus {
+.textarea:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.textarea:focus {
   outline: none;
-  border-bottom-color: #ddd;
+  border-bottom-color: #3b82f6;
+  background-color: rgba(0, 0, 0, 0.01);
 }
 
-.textBlock .textarea:hover {
-  background: rgba(0, 0, 0, 0.02);
+.textarea::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+/* display mode */
+.display {
+  margin: 0;
+  line-height: 1.6;
+  white-space: pre-wrap;
 }
