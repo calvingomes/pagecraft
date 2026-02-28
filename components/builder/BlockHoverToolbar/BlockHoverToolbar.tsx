@@ -41,9 +41,7 @@ export function BlockHoverToolbar({
   if (!editor) return null;
 
   const handleDelete = () => {
-    if (confirm("Delete this block?")) {
-      editor.onRemoveBlock(blockId);
-    }
+    editor.onRemoveBlock(blockId);
   };
 
   return (
