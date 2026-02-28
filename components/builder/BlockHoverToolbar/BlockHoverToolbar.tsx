@@ -2,7 +2,13 @@
 
 import React from "react";
 import type { LucideIcon } from "lucide-react";
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify, Trash2 } from "lucide-react";
+import {
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+  Trash2,
+} from "lucide-react";
 import type { BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "./BlockHoverToolbar.module.css";
@@ -59,6 +65,8 @@ export function BlockHoverToolbar({
   return (
     <div
       className={`${styles.toolbar} ${visible ? styles.toolbarVisible : ""}`}
+      onPointerDown={(e) => e.stopPropagation()}
+      onTouchStart={(e) => e.stopPropagation()}
     >
       <div className={styles.sizeGroup}>
         {WIDTH_PRESETS.map(({ preset, Icon, title }) => (

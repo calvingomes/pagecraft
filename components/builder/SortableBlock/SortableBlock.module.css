@@ -11,32 +11,18 @@
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
+  cursor: grab;
+  user-select: none;
 }
 
 .wrapper.dragging {
   z-index: 10;
-}
-
-.dragHandle {
-  flex-shrink: 0;
-  padding: 0.5rem;
-  cursor: grab;
-  color: #999;
-  border-radius: 6px;
-  transition:
-    color 0.15s,
-    background 0.15s;
-  user-select: none;
-}
-
-.dragHandle:hover {
-  color: #666;
-  background: #f0f0f0;
-}
-
-.dragHandle:active {
   cursor: grabbing;
 }
+
+/* the explicit drag handle is no longer used; drag listeners are on the
+   wrapper element. keeping these rules in case the handle is reinstated in
+   future, but they're effectively dead code. */
 
 .handleIcon {
   font-size: 1rem;

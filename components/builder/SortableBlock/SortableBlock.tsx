@@ -3,7 +3,6 @@
 import { useState, useCallback } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
 import type { Block, BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
@@ -62,6 +61,8 @@ export function SortableBlock({ block }: SortableBlockProps) {
         ref={setNodeRef}
         style={style}
         className={`${styles.wrapper} ${isDragging ? styles.dragging : ""}`}
+        {...attributes}
+        {...listeners}
       >
         {editor && (
           <BlockHoverToolbar
@@ -71,14 +72,6 @@ export function SortableBlock({ block }: SortableBlockProps) {
             visible={isHovered}
           />
         )}
-        <div
-          className={styles.dragHandle}
-          {...attributes}
-          {...listeners}
-          aria-label="Drag to reorder"
-      >
-        <GripVertical className={styles.handleIcon} />
-      </div>
         <div className={styles.content}>
           <div className={styles.blockContent} style={{ maxWidth }}>
             <BlockRenderer block={block} />
