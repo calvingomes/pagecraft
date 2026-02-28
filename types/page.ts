@@ -6,3 +6,5 @@ export type PageBackgroundId =
   | "page-bg-5"
   | "page-bg-6";
 
+export type SidebarPosition = "left" | "center" | "right";
+

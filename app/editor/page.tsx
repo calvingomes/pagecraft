@@ -19,7 +19,7 @@ import {
 } from "firebase/firestore";
 import type { Block, BlockType } from "@/types/editor";
 import { EditorProvider } from "@/contexts/EditorContext";
-import type { PageBackgroundId } from "@/types/page";
+import type { PageBackgroundId, SidebarPosition } from "@/types/page";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { BlockToolbar } from "@/components/builder/BlockToolbar/BlockToolbar";
@@ -36,6 +36,8 @@ export default function EditorPage() {
   const updateBlock = useEditorStore((s) => s.updateBlock);
   const removeBlock = useEditorStore((s) => s.removeBlock);
   const [background, setBackground] = useState<PageBackgroundId>("page-bg-1");
+  const [sidebarPosition, setSidebarPosition] =
+    useState<SidebarPosition>("left");
 
   /* auth & username guard */
   useEffect(() => {
@@ -156,7 +158,10 @@ export default function EditorPage() {
   }
 
   return (
-    <PageLayout background={background}>
+    <PageLayout
+      background={background}
+      sidebarPosition={sidebarPosition}
+    >
       <ProfileSidebar variant="editor" />
       <EditorProvider
         username={username ?? null}
@@ -167,7 +172,9 @@ export default function EditorPage() {
         <BlockToolbar
           onAddBlock={handleAddBlock}
           onChangeBackground={setBackground}
+          onChangeSidebarPosition={setSidebarPosition}
           background={background}
+          sidebarPosition={sidebarPosition}
         />
       </EditorProvider>
     </PageLayout>

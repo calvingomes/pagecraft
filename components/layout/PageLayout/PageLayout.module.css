@@ -1,7 +1,23 @@
 .pageLayout {
   display: flex;
+  flex-direction: row;
   height: 100vh;
   background: var(--color-page-bg-1);
+}
+
+.pageLayoutCenter {
+  flex-direction: column;
+}
+
+.sidebarSlot,
+.contentSlot {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.contentSlot {
+  flex: 1;
 }
 
 .pageLayout[data-bg="page-bg-1"] {

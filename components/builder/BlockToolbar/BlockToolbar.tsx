@@ -7,9 +7,12 @@ import {
   Image as ImageIcon,
   ArrowLeft,
   Palette,
+  PanelLeft,
+  PanelRight,
+  LayoutTemplate,
 } from "lucide-react";
 import type { BlockType } from "@/types/editor";
-import type { PageBackgroundId } from "@/types/page";
+import type { PageBackgroundId, SidebarPosition } from "@/types/page";
 import styles from "./BlockToolbar.module.css";
 
 type ToolbarMode = "default" | "link";
@@ -20,7 +23,9 @@ export type BlockToolbarProps = {
     options?: { url?: string; label?: string },
   ) => void | Promise<void>;
   onChangeBackground?: (background: PageBackgroundId) => void;
+  onChangeSidebarPosition?: (position: SidebarPosition) => void;
   background?: PageBackgroundId;
+  sidebarPosition?: SidebarPosition;
 };
 
 const PAGE_BG_OPTIONS: { id: PageBackgroundId; cssVar: string }[] = [
@@ -35,7 +40,9 @@ const PAGE_BG_OPTIONS: { id: PageBackgroundId; cssVar: string }[] = [
 export const BlockToolbar = ({
   onAddBlock,
   onChangeBackground,
+  onChangeSidebarPosition,
   background = "page-bg-1",
+  sidebarPosition = "left",
 }: BlockToolbarProps) => {
   const [mode, setMode] = useState<ToolbarMode>("default");
   const [linkUrl, setLinkUrl] = useState("");
@@ -134,19 +141,66 @@ export const BlockToolbar = ({
       </div>
       {isPaletteOpen && (
         <div className={styles.palettePopover}>
-          {PAGE_BG_OPTIONS.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              className={`${styles.colorSwatch} ${
-                background === option.id ? styles.colorSwatchSelected : ""
-              }`}
-              style={{ background: option.cssVar }}
-              onClick={() => {
-                onChangeBackground?.(option.id);
-              }}
-            />
-          ))}
+          <div className={styles.paletteSection}>
+            <span className={styles.paletteLabel}>Background</span>
+            <div className={styles.colorSwatches}>
+              {PAGE_BG_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`${styles.colorSwatch} ${
+                    background === option.id ? styles.colorSwatchSelected : ""
+                  }`}
+                  style={{ background: option.cssVar }}
+                  onClick={() => onChangeBackground?.(option.id)}
+                  aria-label={`Background ${option.id}`}
+                />
+              ))}
+            </div>
+          </div>
+          <div className={styles.paletteDivider} />
+          <div className={styles.paletteSection}>
+            <span className={styles.paletteLabel}>Profile position</span>
+            <div className={styles.sidebarPositionGroup}>
+              <button
+                type="button"
+                className={`${styles.sidebarPositionBtn} ${
+                  sidebarPosition === "left" ? styles.sidebarPositionSelected : ""
+                }`}
+                onClick={() => onChangeSidebarPosition?.("left")}
+                title="Profile on left"
+                aria-label="Profile on left"
+              >
+                <PanelLeft size={18} />
+              </button>
+              <button
+                type="button"
+                className={`${styles.sidebarPositionBtn} ${
+                  sidebarPosition === "center"
+                    ? styles.sidebarPositionSelected
+                    : ""
+                }`}
+                onClick={() => onChangeSidebarPosition?.("center")}
+                title="Profile in center"
+                aria-label="Profile in center"
+              >
+                <LayoutTemplate size={18} />
+              </button>
+              <button
+                type="button"
+                className={`${styles.sidebarPositionBtn} ${
+                  sidebarPosition === "right"
+                    ? styles.sidebarPositionSelected
+                    : ""
+                }`}
+                onClick={() => onChangeSidebarPosition?.("right")}
+                title="Profile on right"
+                aria-label="Profile on right"
+              >
+                <PanelRight size={18} />
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

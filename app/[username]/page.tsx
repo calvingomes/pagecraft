@@ -9,7 +9,7 @@ import {
 import { db } from "@/lib/firebase";
 
 import { Block } from "@/types/editor";
-import type { PageBackgroundId } from "@/types/page";
+import type { PageBackgroundId, SidebarPosition } from "@/types/page";
 import { PageView } from "@/components/views/PageView/PageView";
 
 type Props = {
@@ -41,13 +41,16 @@ export default async function UserPage({ params }: Props) {
     } as Block;
   });
 
-  const page = pageSnap.data() as { title?: string; background?: PageBackgroundId } | undefined;
+  const page = pageSnap.data() as
+    | { title?: string; background?: PageBackgroundId; sidebarPosition?: SidebarPosition }
+    | undefined;
 
   return (
     <PageView
       username={username}
       title={page?.title}
       background={page?.background}
+      sidebarPosition={page?.sidebarPosition}
       blocks={blocks}
     />
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import type { Block } from "@/types/editor";
-import type { PageBackgroundId } from "@/types/page";
+import type { PageBackgroundId, SidebarPosition } from "@/types/page";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
@@ -11,6 +11,7 @@ type PageViewProps = {
   title?: string;
   blocks: Block[];
   background?: PageBackgroundId;
+  sidebarPosition?: SidebarPosition;
 };
 
 export function PageView({
@@ -18,9 +19,10 @@ export function PageView({
   title,
   blocks,
   background = "page-bg-1",
+  sidebarPosition = "left",
 }: PageViewProps) {
   return (
-    <PageLayout background={background}>
+    <PageLayout background={background} sidebarPosition={sidebarPosition}>
       <ProfileSidebar variant="view" username={username} />
       <BlockCanvas editable={false} blocks={blocks} title={title} />
     </PageLayout>

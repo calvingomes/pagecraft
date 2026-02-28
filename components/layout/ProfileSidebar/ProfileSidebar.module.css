@@ -1,12 +1,32 @@
 .sidebar {
-  width: 280px;
-  background: #fff;
-  border-right: 1px solid #e0e0e0;
+  flex-shrink: 0;
+  background: transparent;
   padding: 2rem 1.5rem;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.sidebarLeft,
+.sidebarRight {
+  width: 280px;
+}
+
+.sidebarCenter {
+  width: 100%;
+}
+
+.sidebarLeft {
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.sidebarCenter {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.sidebarRight {
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .profileCard {
