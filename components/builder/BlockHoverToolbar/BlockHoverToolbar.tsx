@@ -2,7 +2,15 @@
 
 import React from "react";
 import type { LucideIcon } from "lucide-react";
-import { AlignLeft, AlignCenter, Trash2 } from "lucide-react";
+import {
+  AlignLeft,
+  AlignCenter,
+  Trash2,
+  RectangleVertical,
+  RectangleHorizontal,
+  Columns3,
+  RectangleEllipsis,
+} from "lucide-react";
 import type { BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "./BlockHoverToolbar.module.css";
@@ -20,20 +28,35 @@ const WIDTH_PRESETS: {
   Icon: LucideIcon;
 }[] = [
   {
-    preset: "narrow",
-    title: "Narrow",
+    preset: "small",
+    title: "200×200",
     Icon: AlignLeft,
   },
   {
     preset: "medium",
-    title: "Medium",
+    title: "420×420",
     Icon: AlignCenter,
+  },
+  {
+    preset: "tall",
+    title: "200×420",
+    Icon: RectangleVertical,
+  },
+  {
+    preset: "skinnyTall",
+    title: "420×100",
+    Icon: RectangleEllipsis,
+  },
+  {
+    preset: "wide",
+    title: "420×200",
+    Icon: RectangleHorizontal,
   },
 ];
 
 export function BlockHoverToolbar({
   blockId,
-  currentPreset = "narrow",
+  currentPreset = "small",
   onWidthChange,
   visible = false,
 }: BlockHoverToolbarProps) {

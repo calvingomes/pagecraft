@@ -20,6 +20,13 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
   }, [editor, block.id, localUrl, localLabel]);
 
   const isEditable = !!editor;
+  const preset = block.styles?.widthPreset ?? "small";
+  const clampClass =
+    preset === "skinnyTall"
+      ? styles.clampSkinnyTall
+      : preset === "tall" || preset === "medium"
+        ? styles.clampTall
+        : styles.clampSmall;
 
   if (isEditable) {
     return (
@@ -50,7 +57,12 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
 
   return (
     <div className={styles.linkBlock}>
-      <a href={block.content.url} target="_blank" rel="noopener noreferrer">
+      <a
+        className={clampClass}
+        href={block.content.url}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         {block.content.label}
       </a>
     </div>

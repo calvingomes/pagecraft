@@ -1,6 +1,11 @@
 export type BlockType = "text" | "link" | "image";
 
-export type BlockWidthPreset = "narrow" | "medium";
+export type BlockWidthPreset =
+  | "small" // 200x200
+  | "medium" // 420x420 (2x2 including gap)
+  | "tall" // 200x420
+  | "skinnyTall" // 420x100
+  | "wide"; // 420x200
 
 interface BaseBlock {
   id: string;

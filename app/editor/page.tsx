@@ -40,8 +40,20 @@ export default function EditorPage() {
   const [sidebarPosition, setSidebarPosition] =
     useState<SidebarPosition>("left");
 
-  const spanForPreset = (preset?: string): number => {
-    return preset === "medium" ? 2 : 1;
+  const spansForPreset = (preset?: string) => {
+    switch (preset) {
+      case "medium":
+        return { w: 2, h: 2 };
+      case "wide":
+        return { w: 2, h: 1 };
+      case "skinnyTall":
+        return { w: 2, h: 1 };
+      case "tall":
+        return { w: 1, h: 2 };
+      case "small":
+      default:
+        return { w: 1, h: 1 };
+    }
   };
 
   const overlaps = (
@@ -59,8 +71,7 @@ export default function EditorPage() {
   };
 
   const rectFor = (b: Block, at?: { x: number; y: number }) => {
-    const w = spanForPreset(b.styles?.widthPreset);
-    const h = w;
+    const { w, h } = spansForPreset(b.styles?.widthPreset);
     const x = at?.x ?? b.layout?.x ?? 0;
     const y = at?.y ?? b.layout?.y ?? 0;
     return { x, y, w, h };
@@ -86,8 +97,7 @@ export default function EditorPage() {
   };
 
   const findFirstFreeSpot = (block: Block, placed: Block[]) => {
-    const w = spanForPreset(block.styles?.widthPreset);
-    const h = w;
+    const { w, h } = spansForPreset(block.styles?.widthPreset);
     for (let y = 0; y < 100; y++) {
       for (let x = 0; x <= 4 - w; x++) {
         const candidate = { x, y, w, h };
@@ -198,8 +208,7 @@ export default function EditorPage() {
       const withLayouts = [...normalizedBlocks]
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
         .map((b) => {
-          const w = spanForPreset(b.styles?.widthPreset);
-          const h = w;
+          const { w, h } = spansForPreset(b.styles?.widthPreset);
 
           if (isValidLayout((b as any).layout)) {
             const candidate = { x: b.layout!.x, y: b.layout!.y, w, h };
@@ -254,7 +263,7 @@ export default function EditorPage() {
       type: blockType,
       content: defaultContent,
       order: blocks.length,
-      styles: { widthPreset: "narrow" },
+      styles: { widthPreset: "small" },
     } as Block;
     const pos = findFirstFreeSpot(tempBlockForPlacement, blocks);
 

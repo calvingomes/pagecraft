@@ -23,7 +23,11 @@ export function PageView({
 }: PageViewProps) {
   return (
     <PageLayout background={background} sidebarPosition={sidebarPosition}>
-      <ProfileSidebar variant="view" username={username} />
+      <ProfileSidebar
+        variant="view"
+        username={username}
+        position={sidebarPosition}
+      />
       <BlockCanvas editable={false} blocks={blocks} title={title} />
     </PageLayout>
   );

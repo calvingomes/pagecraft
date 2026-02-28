@@ -12,6 +12,14 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
   const editable = !!contextEditor;
   const lastSyncedContent = useRef(block.content?.text ?? "");
 
+  const preset = block.styles?.widthPreset ?? "small";
+  const clampClass =
+    preset === "skinnyTall"
+      ? styles.clampSkinnyTall
+      : preset === "tall" || preset === "medium"
+        ? styles.clampTall
+        : styles.clampSmall;
+
   const editor = useEditor({
     extensions: [StarterKit],
     content: block.content?.text ?? "",
@@ -65,7 +73,7 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
     const html = editor.getHTML();
     return html && html !== "<p></p>" ? (
       <div
-        className={styles.display}
+        className={`${styles.display} ${clampClass}`}
         dangerouslySetInnerHTML={{ __html: html }}
       />
     ) : null;
