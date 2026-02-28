@@ -1,5 +1,16 @@
 "use client";
 
+import type { LucideIcon } from "lucide-react";
+import {
+  Link2,
+  Image as ImageIcon,
+  Heading1,
+  Minus,
+  List,
+  Quote,
+  Code2,
+  SlidersHorizontal,
+} from "lucide-react";
 import styles from "./BlockMenu.module.css";
 
 type BlockType =
@@ -15,30 +26,30 @@ type BlockMenuProps = {
   onAddBlock: (type: BlockType) => void;
 };
 
-const BLOCK_OPTIONS: { type: BlockType; icon: string; label: string }[] = [
-  { type: "text", icon: "🔗", label: "Link" },
-  { type: "image", icon: "🖼️", label: "Image" },
-  { type: "heading", icon: "📝", label: "Heading" },
-  { type: "divider", icon: "➖", label: "Divider" },
-  { type: "list", icon: "📋", label: "List" },
-  { type: "quote", icon: "💬", label: "Quote" },
-  { type: "code", icon: "</>", label: "Code" },
-  { type: "text", icon: "🎛️", label: "Controls" },
+const BLOCK_OPTIONS: { type: BlockType; Icon: LucideIcon; label: string }[] = [
+  { type: "text", Icon: Link2, label: "Link" },
+  { type: "image", Icon: ImageIcon, label: "Image" },
+  { type: "heading", Icon: Heading1, label: "Heading" },
+  { type: "divider", Icon: Minus, label: "Divider" },
+  { type: "list", Icon: List, label: "List" },
+  { type: "quote", Icon: Quote, label: "Quote" },
+  { type: "code", Icon: Code2, label: "Code" },
+  { type: "text", Icon: SlidersHorizontal, label: "Controls" },
 ];
 
 export const BlockMenu = ({ onAddBlock }: BlockMenuProps) => {
   return (
     <div className={styles.blockMenuContainer}>
       <div className={styles.blockMenuContent}>
-        {BLOCK_OPTIONS.map((option) => (
+        {BLOCK_OPTIONS.map(({ type, Icon, label }) => (
           <button
-            key={`${option.type}-${option.label}`}
+            key={`${type}-${label}`}
             className={styles.blockButton}
-            onClick={() => onAddBlock(option.type)}
-            title={option.label}
-            aria-label={option.label}
+            onClick={() => onAddBlock(type)}
+            title={label}
+            aria-label={label}
           >
-            <span className={styles.icon}>{option.icon}</span>
+            <Icon className={styles.icon} />
           </button>
         ))}
       </div>
