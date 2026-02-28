@@ -53,12 +53,15 @@ export function SortableBlock({ block }: SortableBlockProps) {
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      className={`${styles.wrapper} ${isDragging ? styles.dragging : ""}`}
+      className={styles.hoverZone}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`${styles.wrapper} ${isDragging ? styles.dragging : ""}`}
+      >
       {editor && (
         <BlockHoverToolbar
           blockId={block.id}
@@ -80,6 +83,7 @@ export function SortableBlock({ block }: SortableBlockProps) {
           <BlockRenderer block={block} />
         </div>
       </div>
+    </div>
     </div>
   );
 }

@@ -1,3 +1,10 @@
+/* Extends hit area upward to include the floating toolbar, preventing it from vanishing
+   when the mouse moves from the block toward the toolbar */
+.hoverZone {
+  margin-top: -56px;
+  padding-top: 56px;
+}
+
 .wrapper {
   position: relative;
   margin-bottom: 1.5rem;
