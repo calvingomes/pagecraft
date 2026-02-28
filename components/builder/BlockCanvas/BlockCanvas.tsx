@@ -6,8 +6,8 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useEditorStore } from "@/stores/editor-store";
-import { SortableBlock } from "@/components/system/SortableBlock/SortableBlock";
-import BlockRenderer from "@/components/system/BlockRenderer/BlockRenderer";
+import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
+import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import type { Block, BlockWidthPreset } from "@/types/editor";
 import styles from "./BlockCanvas.module.css";
 
@@ -52,9 +52,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
 
   return (
     <div className={styles.canvas}>
-      {props.title && (
-        <h1 className={styles.pageTitle}>{props.title}</h1>
-      )}
+      {props.title && <h1 className={styles.pageTitle}>{props.title}</h1>}
       {blocks.map((block) => {
         const widthPreset = block.styles?.widthPreset ?? "full";
         const maxWidth = WIDTH_PRESET_MAX[widthPreset];

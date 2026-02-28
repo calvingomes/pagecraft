@@ -1,8 +1,8 @@
 "use client";
 
 import type { Block } from "@/types/editor";
-import { ProfileSidebar } from "@/components/system/ProfileSidebar/ProfileSidebar";
-import { BlockCanvas } from "@/components/system/BlockCanvas/BlockCanvas";
+import { ProfileSidebar } from "@/components/builder/ProfileSidebar/ProfileSidebar";
+import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 
 type PageViewProps = {

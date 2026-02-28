@@ -9,7 +9,7 @@ import {
 import { db } from "@/lib/firebase";
 
 import { Block } from "@/types/editor";
-import { PageView } from "@/components/system/PageView/PageView";
+import { PageView } from "@/components/builder/PageView/PageView";
 
 type Props = {
   params: Promise<{ username: string }>;
@@ -42,11 +42,5 @@ export default async function UserPage({ params }: Props) {
 
   const page = pageSnap.data();
 
-  return (
-    <PageView
-      username={username}
-      title={page?.title}
-      blocks={blocks}
-    />
-  );
+  return <PageView username={username} title={page?.title} blocks={blocks} />;
 }

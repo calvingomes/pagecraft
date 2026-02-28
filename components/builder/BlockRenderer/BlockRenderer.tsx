@@ -1,5 +1,5 @@
 import type { Block } from "@/types/editor";
-import { blockRegistry } from "@/components/system/BlockRegistry/blockRegistry";
+import { blockRegistry } from "@/components/builder/BlockRegistry/blockRegistry";
 
 export default function BlockRenderer({ block }: { block: Block }) {
   switch (block.type) {

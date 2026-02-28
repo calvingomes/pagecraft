@@ -5,8 +5,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Block, BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
-import BlockRenderer from "@/components/system/BlockRenderer/BlockRenderer";
-import { BlockHoverToolbar } from "@/components/system/BlockHoverToolbar/BlockHoverToolbar";
+import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
+import { BlockHoverToolbar } from "@/components/builder/BlockHoverToolbar/BlockHoverToolbar";
 import styles from "./SortableBlock.module.css";
 
 interface SortableBlockProps {
@@ -62,28 +62,28 @@ export function SortableBlock({ block }: SortableBlockProps) {
         style={style}
         className={`${styles.wrapper} ${isDragging ? styles.dragging : ""}`}
       >
-      {editor && (
-        <BlockHoverToolbar
-          blockId={block.id}
-          currentPreset={widthPreset}
-          onWidthChange={handleWidthChange}
-          visible={isHovered}
-        />
-      )}
-      <div
-        className={styles.dragHandle}
-        {...attributes}
-        {...listeners}
-        aria-label="Drag to reorder"
-      >
-        <span className={styles.handleIcon}>⋮⋮</span>
-      </div>
-      <div className={styles.content}>
-        <div className={styles.blockContent} style={{ maxWidth }}>
-          <BlockRenderer block={block} />
+        {editor && (
+          <BlockHoverToolbar
+            blockId={block.id}
+            currentPreset={widthPreset}
+            onWidthChange={handleWidthChange}
+            visible={isHovered}
+          />
+        )}
+        <div
+          className={styles.dragHandle}
+          {...attributes}
+          {...listeners}
+          aria-label="Drag to reorder"
+        >
+          <span className={styles.handleIcon}>⋮⋮</span>
+        </div>
+        <div className={styles.content}>
+          <div className={styles.blockContent} style={{ maxWidth }}>
+            <BlockRenderer block={block} />
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 }

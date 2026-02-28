@@ -19,9 +19,9 @@ import {
 } from "firebase/firestore";
 import type { Block, BlockType } from "@/types/editor";
 import { EditorProvider } from "@/contexts/EditorContext";
-import { ProfileSidebar } from "@/components/system/ProfileSidebar/ProfileSidebar";
-import { BlockCanvas } from "@/components/system/BlockCanvas/BlockCanvas";
-import { BlockToolbar } from "@/components/system/BlockToolbar/BlockToolbar";
+import { ProfileSidebar } from "@/components/builder/ProfileSidebar/ProfileSidebar";
+import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
+import { BlockToolbar } from "@/components/builder/BlockToolbar/BlockToolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 
 export default function EditorPage() {
