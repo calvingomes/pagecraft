@@ -6,9 +6,14 @@ import { auth } from "@/lib/auth";
 import { useAuthStore } from "@/stores/auth-store";
 import styles from "./ProfileSidebar.module.css";
 
-export const ProfileSidebar = () => {
+type ProfileSidebarProps =
+  | { variant: "editor" }
+  | { variant: "view"; username: string };
+
+export const ProfileSidebar = (props: ProfileSidebarProps) => {
   const router = useRouter();
-  const { username, logout } = useAuthStore();
+  const { username: editorUsername, logout } = useAuthStore();
+  const username = props.variant === "view" ? props.username : editorUsername;
 
   const handleLogout = async () => {
     await signOut(auth);
@@ -19,13 +24,15 @@ export const ProfileSidebar = () => {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.profileCard}>
-        <div className={styles.avatar}>{username?.[0].toUpperCase()}</div>
-        <h2 className={styles.name}>{username}</h2>
+        <div className={styles.avatar}>{username?.[0]?.toUpperCase() ?? "?"}</div>
+        <h2 className={styles.name}>{username ?? "—"}</h2>
         <p className={styles.bio}>Your bio here</p>
       </div>
-      <button className={styles.logoutButton} onClick={handleLogout}>
-        Logout
-      </button>
+      {props.variant === "editor" && (
+        <button className={styles.logoutButton} onClick={handleLogout}>
+          Logout
+        </button>
+      )}
     </aside>
   );
 };

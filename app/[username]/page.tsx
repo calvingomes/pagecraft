@@ -9,7 +9,7 @@ import {
 import { db } from "@/lib/firebase";
 
 import { Block } from "@/types/editor";
-import BlockRenderer from "@/components/system/BlockRenderer";
+import { PageView } from "@/components/system/PageView/PageView";
 
 type Props = {
   params: Promise<{ username: string }>;
@@ -29,24 +29,24 @@ export default async function UserPage({ params }: Props) {
   const blocksQuery = query(blocksRef, orderBy("order"));
   const blocksSnap = await getDocs(blocksQuery);
 
-  const blocks: Block[] = blocksSnap.docs.map((doc) => {
-    const docData = doc.data();
+  const blocks: Block[] = blocksSnap.docs.map((docSnap) => {
+    const docData = docSnap.data();
     return {
-      id: doc.id,
+      id: docSnap.id,
       type: docData.type,
       order: docData.order,
       content: docData.content,
+      styles: docData.styles,
     } as Block;
   });
 
   const page = pageSnap.data();
 
   return (
-    <main>
-      <h1>{page.title}</h1>
-      {blocks.map((block) => (
-        <BlockRenderer key={block.id} block={block} />
-      ))}
-    </main>
+    <PageView
+      username={username}
+      title={page?.title}
+      blocks={blocks}
+    />
   );
 }

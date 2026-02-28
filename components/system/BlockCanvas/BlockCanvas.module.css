@@ -5,6 +5,21 @@
   background: #fff;
 }
 
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0 0 2rem;
+}
+
+.readOnlyBlock {
+  margin-bottom: 1.5rem;
+}
+
+.blockContent {
+  margin: 0 auto;
+  transition: max-width 0.2s ease;
+}
+
 .blockWrapper {
   position: relative;
   margin-bottom: 1.5rem;

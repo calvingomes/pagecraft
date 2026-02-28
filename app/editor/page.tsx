@@ -6,7 +6,6 @@ import { useEditorStore } from "@/stores/editor-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/firebase";
-import { signOut } from "firebase/auth";
 import {
   doc,
   getDoc,
@@ -23,7 +22,7 @@ import { EditorProvider } from "@/contexts/EditorContext";
 import { ProfileSidebar } from "@/components/system/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/system/BlockCanvas/BlockCanvas";
 import { BlockToolbar } from "@/components/system/BlockToolbar/BlockToolbar";
-import styles from "./editor.module.css";
+import layoutStyles from "@/components/layouts/PageLayout/PageLayout.module.css";
 
 export default function EditorPage() {
   const router = useRouter();
@@ -146,14 +145,14 @@ export default function EditorPage() {
   }
 
   return (
-    <main className={styles.editorLayout}>
-      <ProfileSidebar />
+    <main className={layoutStyles.pageLayout}>
+      <ProfileSidebar variant="editor" />
       <EditorProvider
         username={username ?? null}
         onUpdateBlock={handleUpdateBlock}
         onRemoveBlock={handleRemoveBlock}
       >
-        <BlockCanvas />
+        <BlockCanvas editable />
         <BlockToolbar onAddBlock={handleAddBlock} />
       </EditorProvider>
     </main>
