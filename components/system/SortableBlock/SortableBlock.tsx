@@ -5,7 +5,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Block, BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
-import BlockRenderer from "@/components/system/BlockRenderer";
+import BlockRenderer from "@/components/system/BlockRenderer/BlockRenderer";
 import { BlockHoverToolbar } from "@/components/system/BlockHoverToolbar/BlockHoverToolbar";
 import styles from "./SortableBlock.module.css";
 

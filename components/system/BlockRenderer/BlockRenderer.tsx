@@ -1,6 +1,5 @@
-// components/BlockRenderer.tsx
-import { Block } from "@/types/editor";
-import { blockRegistry } from "./blockRegistry";
+import type { Block } from "@/types/editor";
+import { blockRegistry } from "@/components/system/BlockRegistry/blockRegistry";
 
 export default function BlockRenderer({ block }: { block: Block }) {
   switch (block.type) {

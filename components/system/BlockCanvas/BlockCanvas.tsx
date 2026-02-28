@@ -7,7 +7,7 @@ import {
 } from "@dnd-kit/sortable";
 import { useEditorStore } from "@/stores/editor-store";
 import { SortableBlock } from "@/components/system/SortableBlock/SortableBlock";
-import BlockRenderer from "@/components/system/BlockRenderer";
+import BlockRenderer from "@/components/system/BlockRenderer/BlockRenderer";
 import type { Block, BlockWidthPreset } from "@/types/editor";
 import styles from "./BlockCanvas.module.css";
 
