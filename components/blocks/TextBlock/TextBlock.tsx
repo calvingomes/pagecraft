@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
 import { TextBlock as TextBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "./TextBlock.module.css";
@@ -21,10 +22,23 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
         : styles.clampSmall;
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      Placeholder.configure({
+        placeholder: "Write something...",
+        showOnlyWhenEditable: true,
+      }),
+    ],
     content: block.content?.text ?? "",
     editable,
     immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        spellcheck: "false",
+        autocorrect: "off",
+        autocapitalize: "off",
+      },
+    },
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       if (html !== lastSyncedContent.current && contextEditor?.onUpdateBlock) {
@@ -34,8 +48,7 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
       if (!contextEditor?.onUpdateBlock) return;
 
       const html = editor.getHTML();
-      const isEmpty = html === "<p></p>";
-      const finalContent = isEmpty ? "<p>New text block</p>" : html;
+      const finalContent = editor.isEmpty ? "" : html;
 
       if (finalContent !== lastSyncedContent.current) {
         lastSyncedContent.current = finalContent;
@@ -69,15 +82,11 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
     );
   }
 
-  if (!editable && editor) {
-    const html = editor.getHTML();
-    return html && html !== "<p></p>" ? (
-      <div
-        className={`${styles.display} ${clampClass}`}
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
-    ) : null;
-  }
-
-  return null;
+  const html = block.content?.text ?? "";
+  return html ? (
+    <div
+      className={`${styles.display} ${clampClass}`}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  ) : null;
 };

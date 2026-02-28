@@ -134,10 +134,7 @@ export default function EditorPage() {
               ...(raw as unknown as Block),
               order,
               content: {
-                text:
-                  typeof data?.text === "string"
-                    ? data.text
-                    : "<p>New text block</p>",
+                text: typeof data?.text === "string" ? data.text : "",
               },
             } as Block;
           case "link":
@@ -258,7 +255,7 @@ export default function EditorPage() {
   ): Block["content"] => {
     switch (type) {
       case "text":
-        return { text: "New text block" };
+        return { text: "" };
       case "link":
         return {
           url: options?.url ?? "",
