@@ -139,6 +139,8 @@ export default function ClaimPage() {
           data: {
             text: `Hi, I'm ${username} 👋`,
           },
+          // default layout values:
+          layout: { x: 0, y: 0, w: 1, h: 1 },
         });
 
         tx.set(linkBlockRef, {
@@ -149,6 +151,7 @@ export default function ClaimPage() {
             label: "My Website",
             url: "https://example.com",
           },
+          layout: { x: 1, y: 0, w: 1, h: 1 },
         });
       });
 

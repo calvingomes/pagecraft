@@ -8,6 +8,7 @@ import {
   AlignRight,
   AlignJustify,
   Trash2,
+  CornerDownRight,
 } from "lucide-react";
 import type { BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
@@ -17,6 +18,10 @@ type BlockHoverToolbarProps = {
   blockId: string;
   currentPreset?: BlockWidthPreset;
   onWidthChange: (preset: BlockWidthPreset) => void;
+  // when true this block begins a new row (prevents earlier rows from
+  // receiving items that come later in sequence)
+  rowBreak?: boolean;
+  onToggleRowBreak?: () => void;
   visible?: boolean;
 };
 
@@ -51,6 +56,8 @@ export function BlockHoverToolbar({
   blockId,
   currentPreset = "full",
   onWidthChange,
+  rowBreak = false,
+  onToggleRowBreak,
   visible = false,
 }: BlockHoverToolbarProps) {
   const editor = useEditorContext();
@@ -83,6 +90,17 @@ export function BlockHoverToolbar({
             <Icon className={styles.sizeIcon} />
           </button>
         ))}
+        {onToggleRowBreak && (
+          <button
+            type="button"
+            title={rowBreak ? "Continue row" : "Start new row"}
+            aria-label={rowBreak ? "Continue row" : "Start new row"}
+            onClick={onToggleRowBreak}
+            className={`${styles.sizeButton} ${rowBreak ? styles.active : ""}`}
+          >
+            <CornerDownRight className={styles.sizeIcon} />
+          </button>
+        )}
       </div>
       <div className={styles.divider} />
       <button

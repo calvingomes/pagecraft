@@ -40,6 +40,20 @@ export default function EditorPage() {
   const [sidebarPosition, setSidebarPosition] =
     useState<SidebarPosition>("left");
 
+  const spanForPreset = (preset: string): number => {
+    switch (preset) {
+      case "narrow":
+        return 1;
+      case "medium":
+        return 2;
+      case "wide":
+        return 3;
+      case "full":
+      default:
+        return 3;
+    }
+  };
+
   /* auth & username guard */
   useEffect(() => {
     const unsub = auth.onAuthStateChanged(async (user) => {
@@ -90,12 +104,41 @@ export default function EditorPage() {
       const q = query(blocksRef, orderBy("order"));
       const snap = await getDocs(q);
 
-      const blockData = snap.docs.map((doc) => ({
+      const rawBlocks = snap.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       })) as Block[];
 
-      setBlocks(blockData);
+      // ensure every block has a layout entry; for existing data we fall back to
+      // a simple row-major placement based on its index and width preset
+      const blocksWithLayout = rawBlocks.map((b, idx) => {
+        if (b.layout && typeof b.layout.x === "number") {
+          return b;
+        }
+        const preset = b.styles?.widthPreset ?? "full";
+        const w = spanForPreset(preset);
+        const x = idx % 3;
+        const y = Math.floor(idx / 3);
+        return {
+          ...b,
+          layout: { x, y, w, h: 1 },
+        } as Block;
+      });
+
+      setBlocks(blocksWithLayout);
+      // write any newly generated layouts back to Firestore so future loads
+      // don't have to recompute them
+      await Promise.all(
+        blocksWithLayout.map(async (b) => {
+          if (!b.layout) return;
+          const orig = rawBlocks.find((o) => o.id === b.id);
+          if (orig && !orig.layout) {
+            await updateDoc(doc(db, "pages", username, "blocks", b.id), {
+              layout: b.layout,
+            });
+          }
+        }),
+      );
       setLoading(false);
     };
 
@@ -112,11 +155,14 @@ export default function EditorPage() {
     const id = crypto.randomUUID();
     const defaultContent = getDefaultContent(blockType, options);
 
+    // each block starts with a simple 1x1 layout; x/y will be
+    // managed by react-grid-layout when the user drags or resizes
     const newBlock: Block = {
       id,
       type: blockType,
       content: defaultContent,
       order: blocks.length,
+      layout: { x: 0, y: Infinity, w: spanForPreset("full"), h: 1 },
     } as Block;
 
     addBlock(newBlock);
