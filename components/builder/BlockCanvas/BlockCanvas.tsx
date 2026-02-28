@@ -38,12 +38,16 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
 
   const blocks = props.editable ? storeBlocks : props.blocks;
 
-  const layout = blocks.map((b) => {
-    const l = b.layout || { x: 0, y: Infinity, w: 1, h: 1 };
+  const cols = 3;
+  const layout = blocks.map((b, idx) => {
+    const l = b.layout || {};
+    // place based on saved coords if available, otherwise fall back to order-based grid
+    const defaultX = idx % cols;
+    const defaultY = Math.floor(idx / cols);
     return {
       i: b.id,
-      x: l.x ?? 0,
-      y: l.y ?? Infinity,
+      x: l.x ?? defaultX,
+      y: l.y ?? defaultY,
       w: l.w ?? spanForPreset(b.styles?.widthPreset ?? "narrow"),
       h: l.h ?? 1,
       static: l.static || false,
@@ -77,11 +81,12 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
       className="layout"
       layout={layout}
       cols={3}
-      rowHeight={100}
+      rowHeight={150}
       width={1200}
       onLayoutChange={onLayoutChange}
-      isResizable={props.editable}
+      isResizable={false}
       isDraggable={props.editable}
+      preventCollision={true}
       compactType={props.editable ? null : "vertical"}
     >
       {blocks.map((block: Block) => (
@@ -95,6 +100,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
               h: 1,
             }
           }
+          style={{ width: "100%", height: "100%" }}
         >
           {props.editable ? (
             <SortableBlock block={block} />

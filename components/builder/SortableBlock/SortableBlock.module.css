@@ -1,28 +1,28 @@
-/* Extends hit area upward to include the floating toolbar, preventing it from vanishing
-   when the mouse moves from the block toward the toolbar */
 .hoverZone {
   margin-top: -56px;
   padding-top: 56px;
+  /* hit area extension only, background handled by wrapper */
 }
 
 .wrapper {
   position: relative;
-  /* margin-bottom removed: grid gap handles inter-item spacing */
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
   cursor: grab;
   user-select: none;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  padding: 2rem;
+  width: 100%;
+  height: 100%;
 }
 
 .wrapper.dragging {
   z-index: 10;
   cursor: grabbing;
 }
-
-/* the explicit drag handle is no longer used; drag listeners are on the
-   wrapper element. keeping these rules in case the handle is reinstated in
-   future, but they're effectively dead code. */
 
 .handleIcon {
   font-size: 1rem;
