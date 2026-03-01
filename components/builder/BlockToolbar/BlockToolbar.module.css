@@ -85,7 +85,9 @@
 }
 
 .pasteButton {
-  padding: 0.5rem 0.9rem;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border-radius: 999px;
   border: none;
   background: #14532d;
@@ -93,6 +95,9 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .paletteTrigger {

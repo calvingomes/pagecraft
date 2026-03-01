@@ -10,6 +10,7 @@ import {
   PanelLeft,
   PanelRight,
   LayoutTemplate,
+  Check,
 } from "lucide-react";
 import type { BlockType } from "@/types/editor";
 import type { PageBackgroundId, SidebarPosition } from "@/types/page";
@@ -20,7 +21,7 @@ type ToolbarMode = "default" | "link";
 export type BlockToolbarProps = {
   onAddBlock?: (
     type: BlockType,
-    options?: { url?: string; label?: string },
+    options?: { url?: string; title?: string },
   ) => void | Promise<void>;
   onChangeBackground?: (background: PageBackgroundId) => void;
   onChangeSidebarPosition?: (position: SidebarPosition) => void;
@@ -51,19 +52,10 @@ export const BlockToolbar = ({
   const handleCreateLink = useCallback(async () => {
     const url = linkUrl.trim();
     if (!url || !onAddBlock) return;
-    await onAddBlock("link", { url, label: url });
+    await onAddBlock("link", { url });
     setLinkUrl("");
     setMode("default");
   }, [linkUrl, onAddBlock]);
-
-  const handlePasteAndCreate = useCallback(async () => {
-    if (!navigator.clipboard?.readText || !onAddBlock) return;
-    const text = (await navigator.clipboard.readText()).trim();
-    if (!text) return;
-    setLinkUrl(text);
-    await onAddBlock("link", { url: text, label: text });
-    setMode("default");
-  }, [onAddBlock]);
 
   if (mode === "link") {
     return (
@@ -93,9 +85,10 @@ export const BlockToolbar = ({
             <button
               type="button"
               className={styles.pasteButton}
-              onClick={() => void handlePasteAndCreate()}
+              onClick={() => void handleCreateLink()}
+              aria-label="Create link"
             >
-              Paste
+              <Check size={18} />
             </button>
           </div>
         </div>
@@ -165,7 +158,9 @@ export const BlockToolbar = ({
               <button
                 type="button"
                 className={`${styles.sidebarPositionBtn} ${
-                  sidebarPosition === "left" ? styles.sidebarPositionSelected : ""
+                  sidebarPosition === "left"
+                    ? styles.sidebarPositionSelected
+                    : ""
                 }`}
                 onClick={() => onChangeSidebarPosition?.("left")}
                 title="Profile on left"

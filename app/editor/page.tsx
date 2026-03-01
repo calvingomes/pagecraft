@@ -144,12 +144,7 @@ export default function EditorPage() {
               order,
               content: {
                 url: typeof data?.url === "string" ? data.url : "",
-                label:
-                  typeof data?.label === "string"
-                    ? data.label
-                    : typeof data?.url === "string"
-                      ? data.url
-                      : "New link",
+                title: typeof data?.label === "string" ? data.label : "",
               },
             } as Block;
           case "image":
@@ -222,7 +217,7 @@ export default function EditorPage() {
   /* add‑block helper used by the toolbar */
   const handleAddBlock = async (
     blockType: BlockType,
-    options?: { url?: string; label?: string },
+    options?: { url?: string; title?: string },
   ) => {
     if (!username) return;
 
@@ -252,7 +247,7 @@ export default function EditorPage() {
 
   const getDefaultContent = (
     type: BlockType,
-    options?: { url?: string; label?: string },
+    options?: { url?: string; title?: string },
   ): Block["content"] => {
     switch (type) {
       case "text":
@@ -260,7 +255,7 @@ export default function EditorPage() {
       case "link":
         return {
           url: options?.url ?? "",
-          label: options?.label ?? options?.url ?? "New link",
+          title: options?.title ?? "",
         };
       case "image":
         return { url: "", alt: "" };

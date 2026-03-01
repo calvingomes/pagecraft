@@ -79,12 +79,7 @@ export default async function UserPage({ params }: Props) {
           order,
           content: {
             url: typeof data?.url === "string" ? data.url : "",
-            label:
-              typeof data?.label === "string"
-                ? data.label
-                : typeof data?.url === "string"
-                  ? data.url
-                  : "New link",
+            title: typeof data?.label === "string" ? data.label : "",
           },
         } as Block;
       case "image":
