@@ -22,6 +22,7 @@ import type { Block, BlockType } from "@/types/editor";
 import { EditorProvider } from "@/contexts/EditorContext";
 import type { PageBackgroundId, SidebarPosition } from "@/types/page";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
+import { LogoutButton } from "@/components/layout/LogoutButton/LogoutButton";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { BlockToolbar } from "@/components/builder/BlockToolbar/BlockToolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
@@ -353,6 +354,7 @@ export default function EditorPage() {
         onUpdateBlock={handleUpdateBlock}
         onRemoveBlock={handleRemoveBlock}
       >
+        <LogoutButton />
         <BlockCanvas editable />
         <BlockToolbar
           onAddBlock={handleAddBlock}
