@@ -1,89 +1,37 @@
 @import "@styles/media.css";
+@import "./ProfileSidebar.prosemirror.css";
 
 .sidebar {
-  flex-shrink: 0;
   background: transparent;
-  padding: 2rem 1.5rem;
+  flex-shrink: 0;
+  padding: 0 20px 20px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  align-items: center;
   color: var(--color-text-primary);
-}
-
-.sidebarLeft,
-.sidebarRight {
-  width: 100%;
-  max-width: 100%;
-}
-
-.sidebarCenter {
-  width: 100%;
-  max-width: 100%;
-}
-
-@media (--bp-mobile) {
-  .sidebarLeft,
-  .sidebarRight {
-    width: 100%;
-    border-left: none;
-    border-right: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  }
+  align-items: flex-start;
+  margin-bottom: 60px;
 }
 
 .profileCard {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  justify-content: center;
+  align-items: flex-start;
 }
 
-.profileText {
+.avatar {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: #ff7a00;
+  color: #fff;
+  font-size: 2rem;
   display: flex;
-  flex-direction: column;
-}
-
-.nameInput {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: var(--color-text-primary);
-  outline: none;
-}
-
-.nameInput::placeholder {
-  color: var(--color-grey-dark);
-}
-
-.bioEditor {
-  width: 100%;
-}
-
-.bioEditor :global(.ProseMirror) {
-  width: 100%;
-  border: none;
-  background: transparent;
-  color: inherit;
-  font-family: inherit;
-  font-size: 0.875rem;
-  line-height: 1.4;
-  outline: none;
-  min-width: 0;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-.bioEditor :global(.ProseMirror p.is-editor-empty:first-child::before) {
-  content: attr(data-placeholder);
-  float: left;
-  color: var(--color-grey-dark);
-  pointer-events: none;
-  height: 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 40px;
 }
 
 .bio :global(p) {
@@ -94,65 +42,37 @@
   color: inherit;
 }
 
-.avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: #ff7a00;
-  color: #fff;
-  font-size: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1rem;
-}
-
 .name {
   font-size: 1.25rem;
   font-weight: 600;
-  margin: 0 0 0.5rem;
+  margin: 0;
+}
+
+.name :global(p) {
+  margin: 0;
+}
+
+.name :global(*) {
+  color: inherit;
 }
 
 .bio {
   font-size: 0.875rem;
   color: var(--color-grey-dark);
   line-height: 1.4;
+  margin-top: 20px;
 }
 
-/* Position behaviors */
-.sidebarLeft {
-  align-items: flex-start;
-}
-
-.sidebarLeft .profileCard {
-  align-items: flex-start;
-  text-align: left;
-}
-
-.sidebarLeft .avatar {
-  margin: 0 0 1rem 0;
-}
-
-.sidebarRight {
-  align-items: flex-end;
-}
-
-.sidebarRight .profileCard {
-  align-items: flex-end;
-  text-align: right;
-}
-
-.sidebarRight .avatar {
-  margin: 0 0 1rem auto;
-}
-
+/* Sidebar center */
 .sidebarCenter {
   align-items: stretch;
+  padding: 20px;
+  margin-bottom: 0;
 }
 
 .sidebarCenter .profileCard {
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   gap: 1.5rem;
   text-align: left;
@@ -161,4 +81,15 @@
 .sidebarCenter .avatar {
   margin: 0;
   flex-shrink: 0;
+}
+
+/* Sidebar Mobile */
+@media (--bp-mobile) {
+  .sidebarLeft,
+  .sidebarRight {
+    width: 100%;
+    border-left: none;
+    border-right: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
 }
