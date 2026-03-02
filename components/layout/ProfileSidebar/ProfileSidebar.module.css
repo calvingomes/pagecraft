@@ -13,23 +13,13 @@
 
 .sidebarLeft,
 .sidebarRight {
-  width: 400px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .sidebarCenter {
   width: 100%;
-}
-
-.sidebarLeft {
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.sidebarCenter {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.sidebarRight {
-  border-left: 1px solid rgba(0, 0, 0, 0.08);
+  max-width: 100%;
 }
 
 @media (--bp-mobile) {

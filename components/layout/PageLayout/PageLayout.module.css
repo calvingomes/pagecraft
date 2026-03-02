@@ -1,18 +1,41 @@
 @import "@styles/media.css";
 
 .pageLayout {
+  --layout-body-max: 1250px;
+  --layout-profile-max: 300px;
+  --layout-content-max: 860px;
+  --layout-gap: 40px;
+  --layout-gutter: 24px;
+
   display: flex;
-  flex-direction: row;
   justify-content: center;
   min-height: 100vh;
   padding-top: 100px;
   background: var(--color-page-bg-1);
 }
 
+.inner {
+  width: 100%;
+  max-width: var(--layout-body-max);
+  padding: 0 var(--layout-gutter);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: var(--layout-gap);
+  min-width: 0;
+}
+
 @media (--bp-mobile) {
   .pageLayout {
+    justify-content: flex-start;
+  }
+
+  .inner {
     flex-direction: column;
     justify-content: flex-start;
+    gap: 0;
+    padding: 0;
+    max-width: 100%;
   }
 
   .contentSlot {
@@ -21,11 +44,12 @@
 }
 
 /* Sidebar position modes */
-.pageLayout[data-sidebar="center"] {
+.pageLayout[data-sidebar="center"] .inner {
   flex-direction: column;
+  align-items: center;
 }
 
-.pageLayout[data-sidebar="right"] {
+.pageLayout[data-sidebar="right"] .inner {
   flex-direction: row-reverse;
 }
 
@@ -36,9 +60,45 @@
   min-width: 0;
 }
 
+.sidebarSlot {
+  flex: 0 0 var(--layout-profile-max);
+  width: 100%;
+  max-width: var(--layout-profile-max);
+}
+
 .contentSlot {
-  flex: 1;
+  flex: 1 1 var(--layout-content-max);
+  width: 100%;
+  max-width: var(--layout-content-max);
   align-items: center;
+}
+
+/* Sticky side profile on desktop only */
+.pageLayout:not([data-sidebar="center"]) .sidebarSlot {
+  position: sticky;
+  top: 100px;
+  align-self: flex-start;
+}
+
+/* Center mode: profile uses the same width as content */
+.pageLayout[data-sidebar="center"] .sidebarSlot {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: var(--layout-content-max);
+}
+
+@media (--bp-mobile) {
+  .sidebarSlot {
+    position: static;
+    top: auto;
+    align-self: auto;
+    flex: 0 0 auto;
+    max-width: 100%;
+  }
+
+  .contentSlot {
+    max-width: 100%;
+  }
 }
 
 .pageLayout[data-bg="page-bg-1"] {

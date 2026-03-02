@@ -21,8 +21,10 @@ export function PageLayout({
       data-bg={background}
       data-sidebar={sidebarPosition}
     >
-      <aside className={styles.sidebarSlot}>{sidebar}</aside>
-      <section className={styles.contentSlot}>{content}</section>
+      <div className={styles.inner}>
+        <aside className={styles.sidebarSlot}>{sidebar}</aside>
+        <section className={styles.contentSlot}>{content}</section>
+      </div>
     </main>
   );
 }
