@@ -1,3 +1,5 @@
+@import "@styles/media.css";
+
 .pageLayout {
   display: flex;
   flex-direction: row;
@@ -7,7 +9,7 @@
   background: var(--color-page-bg-1);
 }
 
-@media (max-width: 768px) {
+@media (--bp-mobile) {
   .pageLayout {
     flex-direction: column;
     justify-content: flex-start;

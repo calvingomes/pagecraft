@@ -1,3 +1,5 @@
+@import "@styles/media.css";
+
 .homeViewport {
   min-height: 100vh;
 
@@ -26,7 +28,7 @@
   overflow-y: auto;
 }
 
-@media (max-width: 768px) {
+@media (--bp-mobile) {
   .homeViewport {
     outline: none;
     border-radius: 0;

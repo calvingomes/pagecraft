@@ -1,0 +1,7 @@
+@custom-media --bp-mobile (max-width: 768px);
+@custom-media --bp-desktop (min-width: 769px);
+
+:root {
+  --bp-mobile-max: 768px;
+  --bp-desktop-min: 769px;
+}

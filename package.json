@@ -36,6 +36,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
     "husky": "^9.1.7",
+    "postcss-custom-media": "^11.0.6",
+    "postcss-import": "^16.1.1",
     "typescript": "^5"
   }
 }

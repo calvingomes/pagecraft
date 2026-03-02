@@ -1,3 +1,5 @@
+@import "@styles/media.css";
+
 .sidebar {
   flex-shrink: 0;
   background: transparent;
@@ -30,7 +32,7 @@
   border-left: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-@media (max-width: 768px) {
+@media (--bp-mobile) {
   .sidebarLeft,
   .sidebarRight {
     width: 100%;
