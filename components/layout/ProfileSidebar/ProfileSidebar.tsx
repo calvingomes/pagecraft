@@ -1,31 +1,16 @@
 "use client";
 
 import { useAuthStore } from "@/stores/auth-store";
-import type { SidebarPosition } from "@/types/page";
 import styles from "./ProfileSidebar.module.css";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { useEffect, useRef, useState } from "react";
 import { WordCount } from "@/components/ui/WordCount/WordCount";
+import { htmlToText } from "@/helper/htmlToText";
+import type { ProfileSidebarProps } from "./ProfileSidebar.types";
 
 const DISPLAY_NAME_MAX_CHARS = 70;
-
-type ProfileSidebarProps = (
-  | {
-      variant: "editor";
-      displayName?: string;
-      bioHtml?: string;
-      onChangeDisplayName?: (displayName: string) => void;
-      onChangeBioHtml?: (bioHtml: string) => void;
-    }
-  | {
-      variant: "view";
-      username: string;
-      displayName?: string;
-      bioHtml?: string;
-    }
-) & { position?: SidebarPosition };
 
 export const ProfileSidebar = (props: ProfileSidebarProps) => {
   const { username: editorUsername } = useAuthStore();
@@ -36,20 +21,6 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
     typeof props.displayName === "string"
       ? props.displayName
       : (username ?? "");
-
-  const htmlToText = (html: string) => {
-    const trimmed = html.trim();
-    if (!trimmed) return "";
-    if (typeof window === "undefined") {
-      return trimmed
-        .replace(/<[^>]*>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-    }
-    const el = document.createElement("div");
-    el.innerHTML = trimmed;
-    return (el.textContent ?? "").replace(/\s+/g, " ").trim();
-  };
 
   const displayNameText = displayNameRaw.includes("<")
     ? htmlToText(displayNameRaw)
