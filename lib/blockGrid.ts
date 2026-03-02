@@ -9,11 +9,11 @@ export function spansForPreset(preset: BlockWidthPreset | undefined): {
   h: number;
 } {
   switch (preset ?? "small") {
-    case "medium":
+    case "large":
       return { w: 2, h: 2 };
     case "wide":
       return { w: 2, h: 1 };
-    case "skinnyTall":
+    case "skinnyWide":
       return { w: 2, h: 1 };
     case "tall":
       return { w: 1, h: 2 };
@@ -28,13 +28,13 @@ export function sizePxForPreset(preset: BlockWidthPreset | undefined): {
   heightPx: number;
 } {
   switch (preset ?? "small") {
-    case "medium":
+    case "large":
       return { widthPx: 420, heightPx: 420 };
     case "wide":
       return { widthPx: 420, heightPx: 200 };
     case "tall":
       return { widthPx: 200, heightPx: 420 };
-    case "skinnyTall":
+    case "skinnyWide":
       return { widthPx: 420, heightPx: Math.max(0, 100 - GRID_GAP_PX) };
     case "small":
     default:

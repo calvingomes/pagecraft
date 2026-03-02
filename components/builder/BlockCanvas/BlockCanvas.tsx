@@ -79,10 +79,10 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
 
     const preset = activeBlock.styles?.widthPreset ?? "small";
     const { widthPx, heightPx } = sizePxForPreset(preset);
-    const isSkinnyTall = preset === "skinnyTall";
-    const slot = isSkinnyTall ? (placementTarget.slot ?? 0) : 0;
+    const isskinnyWide = preset === "skinnyWide";
+    const slot = isskinnyWide ? (placementTarget.slot ?? 0) : 0;
     const slotOffsetY =
-      isSkinnyTall && slot === 1 ? GRID_CELL_PX - heightPx : 0;
+      isskinnyWide && slot === 1 ? GRID_CELL_PX - heightPx : 0;
 
     const xPx = placementTarget.x * GRID_STRIDE_PX;
     const yPx = placementTarget.y * GRID_STRIDE_PX + slotOffsetY;

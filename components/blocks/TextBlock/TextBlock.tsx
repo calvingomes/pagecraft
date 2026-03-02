@@ -15,9 +15,9 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
 
   const preset = block.styles?.widthPreset ?? "small";
   const clampClass =
-    preset === "skinnyTall"
-      ? styles.clampSkinnyTall
-      : preset === "tall" || preset === "medium"
+    preset === "skinnyWide"
+      ? styles.clampskinnyWide
+      : preset === "tall" || preset === "large"
         ? styles.clampTall
         : styles.clampSmall;
 

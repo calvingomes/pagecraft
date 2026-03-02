@@ -5,7 +5,7 @@ import { clamp, overlaps, spansForPreset } from "@/lib/blockGrid";
 export type LayoutById = Record<string, GridLayout | undefined>;
 
 const isSkinny = (preset: BlockWidthPreset | undefined) =>
-  preset === "skinnyTall";
+  preset === "skinnyWide";
 
 const yUnitsFor = (
   layout: GridLayout | undefined,
@@ -92,7 +92,7 @@ export function computeTargetFromOver(
       return {
         x: clamp(r.x, 0, 4 - movingW),
         y: Math.max(0, r.y),
-        ...(b.styles?.widthPreset === "skinnyTall" &&
+        ...(b.styles?.widthPreset === "skinnyWide" &&
         b.layout?.slot !== undefined
           ? { slot: b.layout.slot }
           : {}),

@@ -19,9 +19,9 @@ const aspectRatioForPreset = (preset: BlockWidthPreset): string => {
       return "1 / 2";
     case "wide":
       return "2 / 1";
-    case "medium":
+    case "large":
       return "1 / 1";
-    case "skinnyTall":
+    case "skinnyWide":
       return "4 / 1";
     case "small":
     default:
@@ -68,7 +68,7 @@ export function SortableBlock({
 
   const widthPreset = block.styles?.widthPreset ?? "small";
   const slot = block.layout?.slot ?? 0;
-  const isSkinnyTall = widthPreset === "skinnyTall";
+  const isskinnyWide = widthPreset === "skinnyWide";
 
   const handleWidthChange = (preset: BlockWidthPreset) => {
     if (!editor?.onUpdateBlock) return;
@@ -91,7 +91,7 @@ export function SortableBlock({
     <div
       className={styles.hoverZone}
       style={
-        isSkinnyTall && slot === 1
+        isskinnyWide && slot === 1
           ? { alignItems: "flex-end", ...(fluid ? { height: "auto" } : {}) }
           : fluid
             ? { height: "auto" }

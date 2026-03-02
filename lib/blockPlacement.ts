@@ -3,7 +3,7 @@ import type { GridLayout, GridRect } from "@/types/grid";
 import { overlaps, spansForPreset } from "@/lib/blockGrid";
 
 const isSkinny = (preset: BlockWidthPreset | undefined) =>
-  preset === "skinnyTall";
+  preset === "skinnyWide";
 
 const yUnitsFor = (
   layout: GridLayout | undefined,

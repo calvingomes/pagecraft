@@ -2,9 +2,9 @@ export type BlockType = "text" | "link" | "image";
 
 export type BlockWidthPreset =
   | "small" // 200x200
-  | "medium" // 420x420 (2x2 including gap)
+  | "large" // 420x420 (2x2 including gap)
   | "tall" // 200x420
-  | "skinnyTall" // 420x100
+  | "skinnyWide" // 420x100
   | "wide"; // 420x200
 
 interface BaseBlock {
@@ -20,7 +20,7 @@ interface BaseBlock {
   layout?: {
     x: number;
     y: number;
-    // For half-height blocks (currently `skinnyTall`), 0 = top, 1 = bottom.
+    // For half-height blocks (currently `skinnyWide`), 0 = top, 1 = bottom.
     slot?: 0 | 1;
   };
 }

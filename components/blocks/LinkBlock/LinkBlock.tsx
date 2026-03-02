@@ -124,7 +124,7 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
   const isEditable = !!editor;
   const preset = block.styles?.widthPreset ?? "small";
   const showPreviewImage =
-    preset === "medium" || preset === "tall" || preset === "wide";
+    preset === "large" || preset === "tall" || preset === "wide";
 
   const displayUrl = (block.content?.url ?? "").trim();
   if (!isEditable && !displayUrl) return null;
