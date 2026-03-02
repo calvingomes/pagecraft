@@ -27,8 +27,10 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
         <div className={styles.avatar}>
           {username?.[0]?.toUpperCase() ?? "?"}
         </div>
-        <h2 className={styles.name}>{username ?? "—"}</h2>
-        <p className={styles.bio}>Your bio here</p>
+        <div className={styles.profileText}>
+          <h2 className={styles.name}>{username ?? "—"}</h2>
+          <p className={styles.bio}>Your bio here</p>
+        </div>
       </div>
     </aside>
   );

@@ -30,8 +30,16 @@
 }
 
 .profileCard {
-  text-align: center;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.profileText {
+  display: flex;
+  flex-direction: column;
 }
 
 .avatar {
@@ -57,4 +65,48 @@
   font-size: 0.875rem;
   color: #666;
   line-height: 1.4;
+}
+
+/* Position behaviors */
+.sidebarLeft {
+  align-items: flex-start;
+}
+
+.sidebarLeft .profileCard {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.sidebarLeft .avatar {
+  margin: 0 0 1rem 0;
+}
+
+.sidebarRight {
+  align-items: flex-end;
+}
+
+.sidebarRight .profileCard {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.sidebarRight .avatar {
+  margin: 0 0 1rem auto;
+}
+
+.sidebarCenter {
+  align-items: stretch;
+}
+
+.sidebarCenter .profileCard {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.sidebarCenter .avatar {
+  margin: 0;
+  flex-shrink: 0;
 }

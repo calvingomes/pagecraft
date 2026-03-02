@@ -1,13 +1,19 @@
 .pageLayout {
   display: flex;
   flex-direction: row;
+  justify-content: center;
   min-height: 100vh;
   padding-top: 100px;
   background: var(--color-page-bg-1);
 }
 
-.pageLayoutCenter {
+/* Sidebar position modes */
+.pageLayout[data-sidebar="center"] {
   flex-direction: column;
+}
+
+.pageLayout[data-sidebar="right"] {
+  flex-direction: row-reverse;
 }
 
 .sidebarSlot,
@@ -18,7 +24,8 @@
 }
 
 .contentSlot {
-  width: 445px;
+  flex: 1;
+  align-items: center;
 }
 
 .pageLayout[data-bg="page-bg-1"] {
