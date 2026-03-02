@@ -23,3 +23,11 @@ export type ToolbarLinkProps = {
 };
 
 export type PageBackgroundOption = { id: PageBackgroundId; cssVar: string };
+
+export type ToolbarPalatteProps = {
+  isOpen: boolean;
+  onChangeBackground?: (background: PageBackgroundId) => void;
+  onChangeSidebarPosition?: (position: SidebarPosition) => void;
+  background?: PageBackgroundId;
+  sidebarPosition?: SidebarPosition;
+};
