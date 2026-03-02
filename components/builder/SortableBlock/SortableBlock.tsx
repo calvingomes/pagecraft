@@ -125,20 +125,21 @@ export function SortableBlock({
         {...(!dndDisabled ? attributes : {})}
         {...(!dndDisabled ? listeners : {})}
       >
-        {editor && (
-          <BlockHoverToolbar
-            blockId={block.id}
-            currentPreset={widthPreset}
-            onWidthChange={handleWidthChange}
-            visible={toolbarVisible}
-          />
-        )}
         <div className={styles.content}>
           <div className={styles.blockContent}>
             <BlockRenderer block={block} />
           </div>
         </div>
       </div>
+
+      {editor && (
+        <BlockHoverToolbar
+          blockId={block.id}
+          currentPreset={widthPreset}
+          onWidthChange={handleWidthChange}
+          visible={toolbarVisible}
+        />
+      )}
     </div>
   );
 }
