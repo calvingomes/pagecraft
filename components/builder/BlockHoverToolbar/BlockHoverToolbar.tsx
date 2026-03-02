@@ -1,55 +1,49 @@
 "use client";
 
-import React from "react";
-import type { LucideIcon } from "lucide-react";
 import {
-  AlignLeft,
-  AlignCenter,
   Trash2,
   RectangleVertical,
   RectangleHorizontal,
-  RectangleEllipsis,
+  Square,
+  Minus,
 } from "lucide-react";
-import type { BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "./BlockHoverToolbar.module.css";
+import type {
+  BlockHoverToolbarProps,
+  BlockHoverToolbarIcons,
+} from "./BlockHoverToolbar.types";
 
-type BlockHoverToolbarProps = {
-  blockId: string;
-  currentPreset?: BlockWidthPreset;
-  onWidthChange: (preset: BlockWidthPreset) => void;
-  visible?: boolean;
-};
-
-const WIDTH_PRESETS: {
-  preset: BlockWidthPreset;
-  title: string;
-  Icon: LucideIcon;
-}[] = [
+const WIDTH_PRESETS: BlockHoverToolbarIcons[] = [
   {
     preset: "small",
-    title: "200×200",
-    Icon: AlignLeft,
+    title: "Small",
+    Icon: Square,
+    iconSize: 12,
   },
   {
-    preset: "medium",
-    title: "420×420",
-    Icon: AlignCenter,
-  },
-  {
-    preset: "tall",
-    title: "200×420",
-    Icon: RectangleVertical,
-  },
-  {
-    preset: "skinnyTall",
-    title: "420×100",
-    Icon: RectangleEllipsis,
+    preset: "skinnyWide",
+    title: "Skinny Wide",
+    Icon: Minus,
+    iconSize: 20,
   },
   {
     preset: "wide",
-    title: "420×200",
+    title: "Wide",
     Icon: RectangleHorizontal,
+    iconSize: 20,
+  },
+  {
+    preset: "tall",
+    title: "Tall",
+    Icon: RectangleVertical,
+    iconSize: 20,
+  },
+  {
+    preset: "large",
+    title: "Large",
+    Icon: Square,
+    iconSize: 24,
   },
 ];
 
@@ -73,7 +67,7 @@ export function BlockHoverToolbar({
       onTouchStart={(e) => e.stopPropagation()}
     >
       <div className={styles.sizeGroup}>
-        {WIDTH_PRESETS.map(({ preset, Icon, title }) => (
+        {WIDTH_PRESETS.map(({ preset, Icon, title, iconSize }) => (
           <button
             key={preset}
             type="button"
@@ -84,7 +78,7 @@ export function BlockHoverToolbar({
               currentPreset === preset ? styles.active : ""
             }`}
           >
-            <Icon className={styles.sizeIcon} />
+            <Icon size={iconSize} className={styles.sizeIcon} />
           </button>
         ))}
       </div>
@@ -96,7 +90,7 @@ export function BlockHoverToolbar({
         onClick={handleDelete}
         className={styles.deleteButton}
       >
-        <Trash2 className={styles.sizeIcon} />
+        <Trash2 size={20} className={styles.sizeIcon} />
       </button>
     </div>
   );
