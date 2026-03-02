@@ -12,6 +12,8 @@ type PageViewProps = {
   blocks: Block[];
   background?: PageBackgroundId;
   sidebarPosition?: SidebarPosition;
+  displayName?: string;
+  bioHtml?: string;
 };
 
 export function PageView({
@@ -20,6 +22,8 @@ export function PageView({
   blocks,
   background = "page-bg-1",
   sidebarPosition = "left",
+  displayName,
+  bioHtml,
 }: PageViewProps) {
   return (
     <PageLayout background={background} sidebarPosition={sidebarPosition}>
@@ -27,6 +31,8 @@ export function PageView({
         variant="view"
         username={username}
         position={sidebarPosition}
+        displayName={displayName}
+        bioHtml={bioHtml}
       />
       <BlockCanvas editable={false} blocks={blocks} title={title} />
     </PageLayout>

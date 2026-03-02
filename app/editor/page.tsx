@@ -41,6 +41,8 @@ export default function EditorPage() {
   const [background, setBackground] = useState<PageBackgroundId>("page-bg-1");
   const [sidebarPosition, setSidebarPosition] =
     useState<SidebarPosition>("left");
+  const [displayName, setDisplayName] = useState<string>("");
+  const [bioHtml, setBioHtml] = useState<string>("");
   const [pageSettingsLoaded, setPageSettingsLoaded] = useState(false);
 
   const isValidLayout = (
@@ -80,12 +82,16 @@ export default function EditorPage() {
     return () => unsub();
   }, [router, setUser, setUsername]);
 
-  /* load page metadata (background/sidebar) and blocks once the username is known */
+  /* load page settings and blocks once the username is known */
   useEffect(() => {
     if (!username) return;
 
     const loadPageData = async () => {
       setPageSettingsLoaded(false);
+
+      // Defaults (used if the page doc doesn't have these fields yet)
+      setDisplayName(username);
+      setBioHtml("");
 
       // load page settings first so the UI can render them as early as possible
       const pageRef = doc(db, "pages", username);
@@ -95,11 +101,17 @@ export default function EditorPage() {
           | {
               background?: PageBackgroundId;
               sidebarPosition?: SidebarPosition;
+              displayName?: string;
+              bioHtml?: string;
             }
           | undefined;
 
         if (data?.background) setBackground(data.background);
         if (data?.sidebarPosition) setSidebarPosition(data.sidebarPosition);
+        if (typeof data?.displayName === "string" && data.displayName.trim()) {
+          setDisplayName(data.displayName);
+        }
+        if (typeof data?.bioHtml === "string") setBioHtml(data.bioHtml);
       }
 
       setPageSettingsLoaded(true);
@@ -337,13 +349,40 @@ export default function EditorPage() {
     ).catch(console.error);
   }, [sidebarPosition, username, pageSettingsLoaded]);
 
+  /* persist profile changes (display name + bio) */
+  useEffect(() => {
+    if (!username || !pageSettingsLoaded) return;
+
+    const timeout = setTimeout(() => {
+      const pageRef = doc(db, "pages", username);
+      setDoc(
+        pageRef,
+        {
+          displayName,
+          bioHtml,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      ).catch(console.error);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [bioHtml, displayName, pageSettingsLoaded, username]);
+
   if (loading) {
     return <div>Loading editor…</div>;
   }
 
   return (
     <PageLayout background={background} sidebarPosition={sidebarPosition}>
-      <ProfileSidebar variant="editor" position={sidebarPosition} />
+      <ProfileSidebar
+        variant="editor"
+        position={sidebarPosition}
+        displayName={displayName}
+        bioHtml={bioHtml}
+        onChangeDisplayName={setDisplayName}
+        onChangeBioHtml={setBioHtml}
+      />
       <EditorProvider
         username={username ?? null}
         onUpdateBlock={handleUpdateBlock}

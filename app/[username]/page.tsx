@@ -124,6 +124,8 @@ export default async function UserPage({ params }: Props) {
         title?: string;
         background?: PageBackgroundId;
         sidebarPosition?: SidebarPosition;
+        displayName?: string;
+        bioHtml?: string;
       }
     | undefined;
 
@@ -133,6 +135,8 @@ export default async function UserPage({ params }: Props) {
       title={page?.title}
       background={page?.background}
       sidebarPosition={page?.sidebarPosition}
+      displayName={page?.displayName}
+      bioHtml={page?.bioHtml}
       blocks={blocks}
     />
   );

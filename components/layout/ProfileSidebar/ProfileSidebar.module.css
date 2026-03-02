@@ -6,11 +6,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  color: var(--color-text-primary);
 }
 
 .sidebarLeft,
 .sidebarRight {
-  width: 280px;
+  width: 400px;
 }
 
 .sidebarCenter {
@@ -42,6 +43,55 @@
   flex-direction: column;
 }
 
+.nameInput {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  outline: none;
+}
+
+.nameInput::placeholder {
+  color: var(--color-grey-dark);
+}
+
+.bioEditor {
+  width: 100%;
+}
+
+.bioEditor :global(.ProseMirror) {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  outline: none;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.bioEditor :global(.ProseMirror p.is-editor-empty:first-child::before) {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--color-grey-dark);
+  pointer-events: none;
+  height: 0;
+}
+
+.bio :global(p) {
+  margin: 0;
+}
+
+.bio :global(*) {
+  color: inherit;
+}
+
 .avatar {
   width: 80px;
   height: 80px;
@@ -63,7 +113,7 @@
 
 .bio {
   font-size: 0.875rem;
-  color: #666;
+  color: var(--color-grey-dark);
   line-height: 1.4;
 }
 
