@@ -34,7 +34,8 @@
   gap: 2px;
 }
 
-.sizeButton {
+.sizeButton,
+.deleteButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -56,13 +57,14 @@
   color: #fff;
 }
 
+.deleteButton:hover {
+  background: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
 .sizeButton.active {
   background: rgba(255, 200, 0, 0.3);
   color: #ffc800;
-}
-
-.sizeIcon {
-  display: block;
 }
 
 .divider {
@@ -70,26 +72,4 @@
   height: 20px;
   background: rgba(255, 255, 255, 0.2);
   margin: 0 4px;
-}
-
-.deleteButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: #fff;
-  border-radius: 6px;
-  cursor: pointer;
-  transition:
-    background 0.15s,
-    color 0.15s;
-}
-
-.deleteButton:hover {
-  background: rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
 }
