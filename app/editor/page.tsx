@@ -27,12 +27,18 @@ import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { BlockToolbar } from "@/components/builder/BlockToolbar/BlockToolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
-import { canPlaceBlockAt, findFirstFreeSpot } from "@/lib/blockPlacement";
+import { findFirstFreeSpot } from "@/lib/blockPlacement";
+import {
+  ensureBlocksHaveValidLayouts,
+  isValidLayout,
+  normalizeFirestoreBlocks,
+  type RawFirestoreBlock,
+} from "@/lib/normalizeBlocks";
 
 export default function EditorPage() {
   const router = useRouter();
 
-  const { user, username, loading, setUser, setUsername, setLoading } =
+  const { username, loading, setUser, setUsername, setLoading } =
     useAuthStore();
   const blocks = useEditorStore((s) => s.blocks);
   const setBlocks = useEditorStore((s) => s.setBlocks);
@@ -44,19 +50,6 @@ export default function EditorPage() {
   const [displayName, setDisplayName] = useState<string>("");
   const [bioHtml, setBioHtml] = useState<string>("");
   const [pageSettingsLoaded, setPageSettingsLoaded] = useState(false);
-
-  const isValidLayout = (
-    layout: unknown,
-  ): layout is { x: number; y: number; slot?: 0 | 1 } => {
-    if (!layout || typeof layout !== "object") return false;
-    const anyLayout = layout as Record<string, unknown>;
-    return (
-      typeof anyLayout.x === "number" &&
-      Number.isFinite(anyLayout.x) &&
-      typeof anyLayout.y === "number" &&
-      Number.isFinite(anyLayout.y)
-    );
-  };
 
   /* auth & username guard */
   useEffect(() => {
@@ -121,81 +114,16 @@ export default function EditorPage() {
       const q = query(blocksRef, orderBy("order"));
       const snap = await getDocs(q);
 
-      const rawBlocks: Array<{ id: string } & Record<string, unknown>> =
-        snap.docs.map((docSnap) => ({
-          id: docSnap.id,
-          ...docSnap.data(),
-        }));
+      const rawBlocks: RawFirestoreBlock[] = snap.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }));
 
-      // Normalize older Firestore shapes (e.g. `data` instead of `content`).
-      const normalizedBlocks: Block[] = rawBlocks.map((raw, index) => {
-        const type = raw.type as BlockType;
-        const order = typeof raw.order === "number" ? raw.order : index;
-
-        if (raw.content) {
-          return { ...(raw as unknown as Block), order } as Block;
-        }
-
-        const data =
-          raw.data && typeof raw.data === "object" && raw.data !== null
-            ? (raw.data as Record<string, unknown>)
-            : undefined;
-
-        switch (type) {
-          case "text":
-            return {
-              ...(raw as unknown as Block),
-              order,
-              content: {
-                text: typeof data?.text === "string" ? data.text : "",
-              },
-            } as Block;
-          case "link":
-            return {
-              ...(raw as unknown as Block),
-              order,
-              content: {
-                url: typeof data?.url === "string" ? data.url : "",
-                title: typeof data?.label === "string" ? data.label : "",
-              },
-            } as Block;
-          case "image":
-            return {
-              ...(raw as unknown as Block),
-              order,
-              content: {
-                url: typeof data?.url === "string" ? data.url : "",
-                alt: typeof data?.alt === "string" ? data.alt : "",
-              },
-            } as Block;
-          default:
-            return { ...(raw as unknown as Block), order } as Block;
-        }
-      });
+      const normalizedBlocks = normalizeFirestoreBlocks(rawBlocks);
 
       // Ensure every block has a stable grid position. Blocks keep their
       // own (x,y) independent of any previous block's size.
-      const placed: Block[] = [];
-      const withLayouts = [...normalizedBlocks]
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-        .map((b) => {
-          if (isValidLayout(b.layout)) {
-            const candidate = {
-              x: b.layout!.x,
-              y: b.layout!.y,
-              slot: b.layout!.slot,
-            };
-            if (canPlaceBlockAt(b, candidate, placed)) {
-              placed.push(b);
-              return b;
-            }
-          }
-
-          const pos = findFirstFreeSpot(b, placed);
-          const next = { ...b, layout: pos } as Block;
-          placed.push(next);
-          return next;
-        });
+      const withLayouts = ensureBlocksHaveValidLayouts(normalizedBlocks);
 
       const compactedAfterLoad = compactEmptyRows(withLayouts).blocks;
       setBlocks(compactedAfterLoad);
