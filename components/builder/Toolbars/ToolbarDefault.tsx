@@ -5,31 +5,21 @@ import {
   Type,
   Link2,
   Image as ImageIcon,
-  ArrowLeft,
   Palette,
   PanelLeft,
   PanelRight,
   LayoutTemplate,
-  Check,
 } from "lucide-react";
-import type { BlockType } from "@/types/editor";
-import type { PageBackgroundId, SidebarPosition } from "@/types/page";
-import styles from "./BlockToolbar.module.css";
+import styles from "./Toolbar.module.css";
+import { ToolbarLink } from "./ToolbarLink";
 
-type ToolbarMode = "default" | "link";
+import type {
+  PageBackgroundOption,
+  ToolbarMode,
+  ToolbarDefaultProps,
+} from "./Toolbar.types";
 
-export type BlockToolbarProps = {
-  onAddBlock?: (
-    type: BlockType,
-    options?: { url?: string; title?: string },
-  ) => void | Promise<void>;
-  onChangeBackground?: (background: PageBackgroundId) => void;
-  onChangeSidebarPosition?: (position: SidebarPosition) => void;
-  background?: PageBackgroundId;
-  sidebarPosition?: SidebarPosition;
-};
-
-const PAGE_BG_OPTIONS: { id: PageBackgroundId; cssVar: string }[] = [
+const PAGE_BG_OPTIONS: PageBackgroundOption[] = [
   { id: "page-bg-1", cssVar: "var(--color-page-bg-1)" },
   { id: "page-bg-2", cssVar: "var(--color-page-bg-2)" },
   { id: "page-bg-3", cssVar: "var(--color-page-bg-3)" },
@@ -38,13 +28,13 @@ const PAGE_BG_OPTIONS: { id: PageBackgroundId; cssVar: string }[] = [
   { id: "page-bg-6", cssVar: "var(--color-page-bg-6)" },
 ];
 
-export const BlockToolbar = ({
+export const ToolbarDefault = ({
   onAddBlock,
   onChangeBackground,
   onChangeSidebarPosition,
   background = "page-bg-1",
   sidebarPosition = "left",
-}: BlockToolbarProps) => {
+}: ToolbarDefaultProps) => {
   const [mode, setMode] = useState<ToolbarMode>("default");
   const [linkUrl, setLinkUrl] = useState("");
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
@@ -59,40 +49,12 @@ export const BlockToolbar = ({
 
   if (mode === "link") {
     return (
-      <div className={styles.toolbarContainer}>
-        <div className={styles.toolbarContentLink}>
-          <button
-            type="button"
-            className={styles.backButton}
-            onClick={() => setMode("default")}
-            aria-label="Back to toolbar"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div className={styles.linkInputWrapper}>
-            <input
-              className={styles.linkInput}
-              placeholder="Add link here"
-              value={linkUrl}
-              onChange={(e) => setLinkUrl(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  void handleCreateLink();
-                }
-              }}
-            />
-            <button
-              type="button"
-              className={styles.pasteButton}
-              onClick={() => void handleCreateLink()}
-              aria-label="Create link"
-            >
-              <Check size={18} />
-            </button>
-          </div>
-        </div>
-      </div>
+      <ToolbarLink
+        linkUrl={linkUrl}
+        onChangeLinkUrl={setLinkUrl}
+        onBack={() => setMode("default")}
+        onCreateLink={handleCreateLink}
+      />
     );
   }
 
