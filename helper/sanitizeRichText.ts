@@ -24,6 +24,12 @@ export function sanitizeMinimalRichTextHtml(input: string): string {
     .replace(/<\s*br\b[^>]*>/gi, "<br>")
     .replace(/<\s*\/\s*(p|strong|em|u)\s*>/gi, "</$1>");
 
+  // Normalize top-level <br> usage into empty paragraphs.
+  out = out
+    .replace(/^(?:\s*<br>\s*)+/i, "")
+    .replace(/(?:\s*<br>\s*)+$/i, "")
+    .replace(/<\/p>\s*(?:<br>\s*)+<p>/gi, "</p><p></p><p>");
+
   // If we have no block wrapper, wrap everything in a paragraph.
   const trimmed = out.trim();
   if (!trimmed) return "";
@@ -33,8 +39,44 @@ export function sanitizeMinimalRichTextHtml(input: string): string {
     return `<p>${trimmed}</p>`;
   }
 
-  // Drop empty paragraphs that can result from aggressive stripping.
-  out = out.replace(/<p>\s*<\/p>/gi, "");
+  const isEmptyParagraph = (inner: string) => {
+    const withoutInlineTags = inner.replace(/<\/?(?:strong|em|u)\s*>/gi, "");
+    const withoutBreaks = withoutInlineTags.replace(/<br\s*>/gi, "");
+    const withoutNbsp = withoutBreaks.replace(/&nbsp;/gi, " ");
+    return withoutNbsp.trim().length === 0;
+  };
 
-  return out.trim();
+  // Keep at most one empty paragraph between non-empty paragraphs.
+  const paragraphs = Array.from(out.matchAll(/<p>([\s\S]*?)<\/p>/gi)).map(
+    (m) => m[1] ?? "",
+  );
+
+  if (paragraphs.length === 0) return "";
+
+  const normalized: string[] = [];
+  let previousWasEmpty = false;
+
+  for (const inner of paragraphs) {
+    const empty = isEmptyParagraph(inner);
+
+    if (empty) {
+      if (normalized.length === 0) continue;
+      if (previousWasEmpty) continue;
+      previousWasEmpty = true;
+      normalized.push("<p></p>");
+      continue;
+    }
+
+    previousWasEmpty = false;
+    normalized.push(`<p>${inner}</p>`);
+  }
+
+  while (
+    normalized.length > 0 &&
+    normalized[normalized.length - 1] === "<p></p>"
+  ) {
+    normalized.pop();
+  }
+
+  return normalized.join("").trim();
 }
