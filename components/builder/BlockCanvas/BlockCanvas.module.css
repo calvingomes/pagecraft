@@ -8,6 +8,8 @@
   z-index: 0;
   pointer-events: none;
   border-radius: var(--radius-lg);
+  left: 0;
+  top: 0;
   background-color: color-mix(
     in srgb,
     var(--color-brand-primary) 12%,
@@ -16,6 +18,11 @@
   outline: 2px dashed
     color-mix(in srgb, var(--color-brand-primary) 55%, transparent);
   outline-offset: -2px;
+  will-change: transform, width, height;
+  transition:
+    transform var(--duration-base) var(--ease-standard),
+    width var(--duration-base) var(--ease-standard),
+    height var(--duration-base) var(--ease-standard);
 }
 
 .grid {

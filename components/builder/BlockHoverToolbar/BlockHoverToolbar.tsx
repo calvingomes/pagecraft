@@ -8,7 +8,6 @@ import {
   Trash2,
   RectangleVertical,
   RectangleHorizontal,
-  Columns3,
   RectangleEllipsis,
 } from "lucide-react";
 import type { BlockWidthPreset } from "@/types/editor";

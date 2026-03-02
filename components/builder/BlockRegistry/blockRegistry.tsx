@@ -1,5 +1,4 @@
 import {
-  Block,
   TextBlock as TextBlockType,
   LinkBlock as LinkBlockType,
   ImageBlock as ImageBlockType,

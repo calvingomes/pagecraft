@@ -12,7 +12,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useEditorStore } from "@/stores/editor-store";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
@@ -40,6 +40,9 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
   const storeBlocks = useEditorStore((s) => s.blocks);
   const updateBlock = useEditorStore((s) => s.updateBlock);
   const editor = useEditorContext();
+
+  const blockNodeByIdRef = useRef(new Map<string, HTMLDivElement>());
+  const flipRafRef = useRef<number | null>(null);
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [placementTarget, setPlacementTarget] = useState<GridLayout | null>(
@@ -126,9 +129,46 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
     );
     if (!nextLayouts) return;
 
+    const nextLayoutIds = Object.keys(nextLayouts);
+    const beforeRects = new Map<string, DOMRect>();
+    for (const id of nextLayoutIds) {
+      if (id === activeId) continue;
+      const el = blockNodeByIdRef.current.get(id);
+      if (!el) continue;
+      beforeRects.set(id, el.getBoundingClientRect());
+    }
+
     for (const [id, layout] of Object.entries(nextLayouts)) {
       updateBlock(id, { layout });
     }
+
+    if (flipRafRef.current) {
+      cancelAnimationFrame(flipRafRef.current);
+      flipRafRef.current = null;
+    }
+    flipRafRef.current = requestAnimationFrame(() => {
+      for (const [id, before] of beforeRects) {
+        const el = blockNodeByIdRef.current.get(id);
+        if (!el) continue;
+        const after = el.getBoundingClientRect();
+        const dx = before.left - after.left;
+        const dy = before.top - after.top;
+        if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue;
+
+        for (const anim of el.getAnimations()) anim.cancel();
+        el.animate(
+          [
+            { transform: `translate3d(${dx}px, ${dy}px, 0)` },
+            { transform: "translate3d(0px, 0px, 0)" },
+          ],
+          {
+            duration: 200,
+            easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+          },
+        );
+      }
+      flipRafRef.current = null;
+    });
 
     setPlacementTarget(clampedTarget);
     setDragSnapshot({ ...dragSnapshot, lastTargetKey: targetKey });
@@ -255,9 +295,11 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
     const slotOffsetY =
       isSkinnyTall && slot === 1 ? GRID_CELL_PX - heightPx : 0;
 
+    const xPx = placementTarget.x * GRID_STRIDE_PX;
+    const yPx = placementTarget.y * GRID_STRIDE_PX + slotOffsetY;
+
     return {
-      left: `${placementTarget.x * GRID_STRIDE_PX}px`,
-      top: `${placementTarget.y * GRID_STRIDE_PX + slotOffsetY}px`,
+      transform: `translate3d(${xPx}px, ${yPx}px, 0)`,
       width: `${widthPx}px`,
       height: `${heightPx}px`,
     };
@@ -315,6 +357,13 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
           return (
             <div
               key={block.id}
+              ref={(node) => {
+                if (!node) {
+                  blockNodeByIdRef.current.delete(block.id);
+                } else {
+                  blockNodeByIdRef.current.set(block.id, node);
+                }
+              }}
               style={{
                 gridColumnStart: x + 1,
                 gridRowStart: y + 1,
