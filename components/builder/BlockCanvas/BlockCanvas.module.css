@@ -3,13 +3,28 @@
   position: relative;
 }
 
+.placementHighlight {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: var(--radius-lg);
+  background-color: color-mix(
+    in srgb,
+    var(--color-brand-primary) 12%,
+    transparent
+  );
+  outline: 2px dashed
+    color-mix(in srgb, var(--color-brand-primary) 55%, transparent);
+  outline-offset: -2px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 200px);
   grid-auto-rows: 200px;
   gap: 20px;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .dropGrid {
@@ -19,7 +34,12 @@
   grid-template-columns: repeat(4, 200px);
   grid-auto-rows: 200px;
   gap: 20px;
-  z-index: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.dropGridActive {
+  pointer-events: auto;
 }
 
 .dropCell {

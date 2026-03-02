@@ -28,6 +28,7 @@ import {
   clamp,
   rectForBlock,
 } from "@/lib/blockGrid";
+import type { GridLayout } from "@/types/grid";
 import {
   computePushedLayouts,
   computeTargetFromOver,
@@ -41,6 +42,9 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
   const editor = useEditorContext();
 
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [placementTarget, setPlacementTarget] = useState<GridLayout | null>(
+    null,
+  );
   const [dragSnapshot, setDragSnapshot] = useState<null | {
     layouts: LayoutById;
     lastTargetKey: string | null;
@@ -58,6 +62,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
     if (!props.editable) return;
     const startedId = String(event.active.id);
     setActiveId(startedId);
+    setPlacementTarget(null);
     setDragSnapshot({
       layouts: Object.fromEntries(
         blocks.map((b) => [
@@ -78,6 +83,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
       }
     }
     setActiveId(null);
+    setPlacementTarget(null);
     setDragSnapshot(null);
   };
 
@@ -85,7 +91,11 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
     if (!props.editable) return;
     if (!activeId) return;
     if (!dragSnapshot) return;
-    if (!event.over) return;
+
+    if (!event.over) {
+      setPlacementTarget(null);
+      return;
+    }
 
     const activeBlock = blocks.find((b) => b.id === activeId);
     if (!activeBlock) return;
@@ -94,7 +104,10 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
     const { w: movingW } = spansForPreset(movingPreset);
     const overId = String(event.over.id);
     const target = computeTargetFromOver(overId, movingW, movingPreset, blocks);
-    if (!target) return;
+    if (!target) {
+      setPlacementTarget(null);
+      return;
+    }
 
     const maxStartY = maxStartYFor(blocks, activeId, dragSnapshot.layouts);
     const clampedTarget = {
@@ -117,6 +130,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
       updateBlock(id, { layout });
     }
 
+    setPlacementTarget(clampedTarget);
     setDragSnapshot({ ...dragSnapshot, lastTargetKey: targetKey });
   };
 
@@ -125,6 +139,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
     const snapshot = dragSnapshot;
 
     setActiveId(null);
+    setPlacementTarget(null);
     setDragSnapshot(null);
 
     const { active, over } = event;
@@ -225,11 +240,30 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
   // Render only what we need: occupied rows + 1 trailing empty row.
   const rows = Math.max(1, maxBottom + 1);
 
+  const GRID_CELL_PX = 200;
+  const GRID_GAP_PX = 20;
+  const GRID_STRIDE_PX = GRID_CELL_PX + GRID_GAP_PX;
+
+  const placementHighlightStyle = (() => {
+    if (!activeBlock) return null;
+    if (!placementTarget) return null;
+
+    const preset = activeBlock.styles?.widthPreset ?? "small";
+    const { widthPx, heightPx } = sizePxForPreset(preset);
+    const isSkinnyTall = preset === "skinnyTall";
+    const slot = isSkinnyTall ? (placementTarget.slot ?? 0) : 0;
+    const slotOffsetY =
+      isSkinnyTall && slot === 1 ? GRID_CELL_PX - heightPx : 0;
+
+    return {
+      left: `${placementTarget.x * GRID_STRIDE_PX}px`,
+      top: `${placementTarget.y * GRID_STRIDE_PX + slotOffsetY}px`,
+      width: `${widthPx}px`,
+      height: `${heightPx}px`,
+    };
+  })();
+
   const DroppableCell = ({ x, y }: { x: number; y: number }) => {
-    const { setNodeRef: setFullRef } = useDroppable({
-      id: `cell:${x}:${y}`,
-      data: { type: "cell", x, y },
-    });
     const { setNodeRef: setTopRef } = useDroppable({
       id: `cellHalf:${x}:${y}:0`,
       data: { type: "cellHalf", x, y, slot: 0 },
@@ -240,7 +274,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
     });
 
     return (
-      <div ref={setFullRef} className={styles.dropCell}>
+      <div className={styles.dropCell}>
         <div ref={setTopRef} className={styles.dropHalfTop} />
         <div ref={setBottomRef} className={styles.dropHalfBottom} />
       </div>
@@ -250,12 +284,18 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
   const content = (
     <div
       className={styles.canvas}
-      style={{ height: `${rows * 200 + (rows - 1) * 20}px` }}
+      style={{ height: `${rows * GRID_CELL_PX + (rows - 1) * GRID_GAP_PX}px` }}
     >
+      {props.editable && placementHighlightStyle && (
+        <div
+          className={styles.placementHighlight}
+          style={placementHighlightStyle}
+        />
+      )}
       {props.editable && (
         <div
-          className={styles.dropGrid}
-          style={{ gridTemplateRows: `repeat(${rows}, 200px)` }}
+          className={`${styles.dropGrid} ${activeId ? styles.dropGridActive : ""}`}
+          style={{ gridTemplateRows: `repeat(${rows}, ${GRID_CELL_PX}px)` }}
         >
           {Array.from({ length: rows }).flatMap((_, y) =>
             Array.from({ length: 4 }).map((__, x) => (
