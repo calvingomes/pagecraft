@@ -52,8 +52,8 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
       <Image
         src={block.content.url}
         alt={block.content.alt ?? ""}
-        width={600}
-        height={400}
+        fill
+        sizes="(max-width: 768px) 100vw, 600px"
         style={{ objectFit: "cover" }}
       />
     </div>

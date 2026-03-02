@@ -7,4 +7,7 @@ export type BlockCanvasProps =
 export type SortableBlockProps = {
   block: Block;
   activeDragId?: string | null;
+  fluid?: boolean;
+  dndDisabled?: boolean;
+  toolbarAlwaysVisible?: boolean;
 };

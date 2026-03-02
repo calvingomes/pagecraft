@@ -2,7 +2,6 @@
 
 import {
   DndContext,
-  DragOverlay,
   PointerSensor,
   closestCenter,
   useDroppable,
@@ -12,7 +11,13 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { useMemo, useRef, useState } from "react";
+import {
+  SortableContext,
+  rectSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useEditorStore } from "@/stores/editor-store";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
@@ -36,10 +41,79 @@ import {
   type LayoutById,
 } from "@/components/builder/BlockCanvas/blockCanvasLayout";
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const media = window.matchMedia("(max-width: 768px)");
+    const update = () => setIsMobile(media.matches);
+    update();
+
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", update);
+      return () => media.removeEventListener("change", update);
+    }
+
+    // Safari < 14
+    media.addListener(update);
+    return () => media.removeListener(update);
+  }, []);
+
+  return isMobile;
+};
+
+const mobileSpanForPreset = (preset: string | undefined): 1 | 2 => {
+  switch (preset) {
+    case "medium":
+    case "wide":
+    case "skinnyTall":
+      return 2;
+    default:
+      return 1;
+  }
+};
+
+function MobileSortableGridItem({ block }: { block: Block }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: block.id });
+
+  const preset = block.styles?.widthPreset;
+  const span = mobileSpanForPreset(preset);
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={styles.gridMobileItem}
+      style={{
+        gridColumn: `span ${span}`,
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.6 : 1,
+        touchAction: "manipulation",
+      }}
+      {...attributes}
+      {...listeners}
+    >
+      <SortableBlock block={block} fluid dndDisabled toolbarAlwaysVisible />
+    </div>
+  );
+}
+
 export const BlockCanvas = (props: BlockCanvasProps) => {
   const storeBlocks = useEditorStore((s) => s.blocks);
   const updateBlock = useEditorStore((s) => s.updateBlock);
+  const reorderBlocks = useEditorStore((s) => s.reorderBlocks);
   const editor = useEditorContext();
+
+  const isMobile = useIsMobile();
 
   const blockNodeByIdRef = useRef(new Map<string, HTMLDivElement>());
   const flipRafRef = useRef<number | null>(null);
@@ -58,6 +132,12 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 8 },
+    }),
+  );
+
+  const mobileSensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
     }),
   );
 
@@ -323,6 +403,65 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
     );
   };
 
+  // Mobile mode: 2-column responsive grid. In the editor, we support reorder-only.
+  if (isMobile) {
+    const ordered = [...blocks].slice().sort((a, b) => {
+      const ao = typeof a.order === "number" ? a.order : 0;
+      const bo = typeof b.order === "number" ? b.order : 0;
+      if (ao !== bo) return ao - bo;
+      return a.id.localeCompare(b.id);
+    });
+
+    const grid = (
+      <div className={styles.canvas}>
+        <div className={styles.gridMobile}>
+          {props.editable ? (
+            <SortableContext
+              items={ordered.map((b) => b.id)}
+              strategy={rectSortingStrategy}
+            >
+              {ordered.map((block) => (
+                <MobileSortableGridItem key={block.id} block={block} />
+              ))}
+            </SortableContext>
+          ) : (
+            ordered.map((block) => {
+              const span = mobileSpanForPreset(block.styles?.widthPreset);
+              return (
+                <div
+                  key={block.id}
+                  className={styles.gridMobileItem}
+                  style={{ gridColumn: `span ${span}` }}
+                >
+                  <SortableBlock block={block} fluid dndDisabled />
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    );
+
+    if (!props.editable) return grid;
+
+    return (
+      <DndContext
+        sensors={mobileSensors}
+        collisionDetection={closestCenter}
+        onDragEnd={(event) => {
+          const { active, over } = event;
+          if (!over) return;
+          const activeId = String(active.id);
+          const overId = String(over.id);
+          if (activeId === overId) return;
+          reorderBlocks(activeId, overId);
+        }}
+      >
+        {grid}
+      </DndContext>
+    );
+  }
+
   const content = (
     <div
       className={styles.canvas}
@@ -426,32 +565,6 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
       onDragEnd={handleDragEnd}
     >
       {content}
-
-      <DragOverlay adjustScale={false}>
-        {activeBlock
-          ? (() => {
-              const { widthPx, heightPx } = sizePxForPreset(
-                activeBlock.styles?.widthPreset ?? "small",
-              );
-              return (
-                <div
-                  className={sortableBlockStyles.wrapper}
-                  style={{
-                    pointerEvents: "none",
-                    width: `${widthPx}px`,
-                    height: `${heightPx}px`,
-                  }}
-                >
-                  <div className={sortableBlockStyles.content}>
-                    <div className={sortableBlockStyles.blockContent}>
-                      <BlockRenderer block={activeBlock} />
-                    </div>
-                  </div>
-                </div>
-              );
-            })()
-          : null}
-      </DragOverlay>
     </DndContext>
   );
 };

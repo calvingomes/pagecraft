@@ -67,6 +67,33 @@
   white-space: nowrap;
 }
 
+@media (max-width: 768px) {
+  .card {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .iconWrap {
+    width: 44px;
+    height: 44px;
+  }
+
+  .iconImg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .title,
+  .titleInput {
+    font-size: 18px;
+  }
+
+  .url,
+  .urlInput {
+    font-size: 12px;
+  }
+}
+
 .preview {
   flex: 1;
   min-height: 0;

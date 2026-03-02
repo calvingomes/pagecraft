@@ -7,6 +7,17 @@
   background: var(--color-page-bg-1);
 }
 
+@media (max-width: 768px) {
+  .pageLayout {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .contentSlot {
+    align-items: stretch;
+  }
+}
+
 /* Sidebar position modes */
 .pageLayout[data-sidebar="center"] {
   flex-direction: column;

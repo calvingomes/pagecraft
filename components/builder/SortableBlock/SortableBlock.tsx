@@ -18,14 +18,39 @@ import {
 } from "@/lib/blockGrid";
 import type { SortableBlockProps } from "@/types/builder";
 
-export function SortableBlock({ block, activeDragId }: SortableBlockProps) {
+const aspectRatioForPreset = (preset: BlockWidthPreset): string => {
+  switch (preset) {
+    case "tall":
+      return "1 / 2";
+    case "wide":
+      return "2 / 1";
+    case "medium":
+      return "1 / 1";
+    case "skinnyTall":
+      return "4 / 1";
+    case "small":
+    default:
+      return "1 / 1";
+  }
+};
+
+export function SortableBlock({
+  block,
+  activeDragId,
+  fluid = false,
+  dndDisabled = false,
+  toolbarAlwaysVisible = false,
+}: SortableBlockProps) {
   const editor = useEditorContext();
   const allBlocks = useEditorStore((s) => s.blocks);
   const [isHovered, setIsHovered] = useState(false);
 
+  const toolbarVisible = toolbarAlwaysVisible ? true : isHovered;
+
   const { setNodeRef: setDroppableRef } = useDroppable({
     id: `block:${block.id}`,
     data: { type: "block", blockId: block.id },
+    disabled: dndDisabled,
   });
 
   const {
@@ -37,6 +62,7 @@ export function SortableBlock({ block, activeDragId }: SortableBlockProps) {
   } = useDraggable({
     id: block.id,
     data: { type: "block", blockId: block.id },
+    disabled: dndDisabled,
   });
 
   const dndStyle: CSSProperties = {
@@ -206,12 +232,17 @@ export function SortableBlock({ block, activeDragId }: SortableBlockProps) {
   };
 
   const { widthPx, heightPx } = sizePxForPreset(widthPreset);
+  const aspectRatio = aspectRatioForPreset(widthPreset);
 
   return (
     <div
       className={styles.hoverZone}
       style={
-        isSkinnyTall && slot === 1 ? { alignItems: "flex-end" } : undefined
+        isSkinnyTall && slot === 1
+          ? { alignItems: "flex-end", ...(fluid ? { height: "auto" } : {}) }
+          : fluid
+            ? { height: "auto" }
+            : undefined
       }
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -224,21 +255,29 @@ export function SortableBlock({ block, activeDragId }: SortableBlockProps) {
         className={`${styles.wrapper} ${isDragging ? styles.dragging : ""}`}
         style={{
           ...(hideBecauseOverlay ? {} : dndStyle),
-          width: `${widthPx}px`,
-          height: `${heightPx}px`,
+          ...(fluid
+            ? {
+                width: "100%",
+                height: "auto",
+                aspectRatio,
+              }
+            : {
+                width: `${widthPx}px`,
+                height: `${heightPx}px`,
+              }),
           maxWidth: "100%",
           maxHeight: "100%",
           opacity: hideBecauseOverlay ? 0 : 1,
         }}
-        {...attributes}
-        {...listeners}
+        {...(!dndDisabled ? attributes : {})}
+        {...(!dndDisabled ? listeners : {})}
       >
         {editor && (
           <BlockHoverToolbar
             blockId={block.id}
             currentPreset={widthPreset}
             onWidthChange={handleWidthChange}
-            visible={isHovered}
+            visible={toolbarVisible}
           />
         )}
         <div className={styles.content}>
