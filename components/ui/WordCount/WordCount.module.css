@@ -1,0 +1,7 @@
+.wordCount {
+  font-size: 0.75rem;
+  line-height: 1;
+  color: var(--color-grey-dark);
+  user-select: none;
+  padding-top: 5px;
+}
