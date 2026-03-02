@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import {
   Type,
   Link2,
@@ -11,11 +11,8 @@ import {
   LayoutTemplate,
 } from "lucide-react";
 import styles from "./Toolbar.module.css";
-import { ToolbarLink } from "./ToolbarLink";
-
 import type {
   PageBackgroundOption,
-  ToolbarMode,
   ToolbarDefaultProps,
 } from "./Toolbar.types";
 
@@ -30,33 +27,13 @@ const PAGE_BG_OPTIONS: PageBackgroundOption[] = [
 
 export const ToolbarDefault = ({
   onAddBlock,
+  onOpenLink,
   onChangeBackground,
   onChangeSidebarPosition,
   background = "page-bg-1",
   sidebarPosition = "left",
 }: ToolbarDefaultProps) => {
-  const [mode, setMode] = useState<ToolbarMode>("default");
-  const [linkUrl, setLinkUrl] = useState("");
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
-
-  const handleCreateLink = useCallback(async () => {
-    const url = linkUrl.trim();
-    if (!url || !onAddBlock) return;
-    await onAddBlock("link", { url });
-    setLinkUrl("");
-    setMode("default");
-  }, [linkUrl, onAddBlock]);
-
-  if (mode === "link") {
-    return (
-      <ToolbarLink
-        linkUrl={linkUrl}
-        onChangeLinkUrl={setLinkUrl}
-        onBack={() => setMode("default")}
-        onCreateLink={handleCreateLink}
-      />
-    );
-  }
 
   return (
     <div className={styles.toolbarContainer}>
@@ -73,7 +50,7 @@ export const ToolbarDefault = ({
           className={styles.toolButton}
           title="Link"
           type="button"
-          onClick={() => setMode("link")}
+          onClick={onOpenLink}
         >
           <Link2 size={18} />
         </button>

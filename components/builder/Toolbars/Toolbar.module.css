@@ -3,14 +3,19 @@
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(30, 30, 30, 0.95);
   padding: 6px 12px;
   display: flex;
   align-items: center;
-  border-radius: 999px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
   z-index: 1000;
   backdrop-filter: blur(8px);
+  border-radius: 8px;
+  background: #2d2d2d;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  -webkit-overflow-scrolling: touch;
+  touch-action: manipulation;
+  transition:
+    opacity 0.15s,
+    visibility 0.15s;
 }
 
 .toolbarContent {

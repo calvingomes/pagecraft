@@ -24,7 +24,7 @@ import type { PageBackgroundId, SidebarPosition } from "@/types/page";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
 import { LogoutButton } from "@/components/layout/LogoutButton/LogoutButton";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
-import { ToolbarDefault } from "@/components/builder/Toolbars/ToolbarDefault";
+import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
 import { findFirstFreeSpot } from "@/lib/blockPlacement";
@@ -320,7 +320,7 @@ export default function EditorPage() {
       >
         <LogoutButton />
         <BlockCanvas editable />
-        <ToolbarDefault
+        <Toolbar
           onAddBlock={handleAddBlock}
           onChangeBackground={setBackground}
           onChangeSidebarPosition={setSidebarPosition}

@@ -8,6 +8,7 @@ export type ToolbarDefaultProps = {
     type: BlockType,
     options?: { url?: string; title?: string },
   ) => void | Promise<void>;
+  onOpenLink?: () => void;
   onChangeBackground?: (background: PageBackgroundId) => void;
   onChangeSidebarPosition?: (position: SidebarPosition) => void;
   background?: PageBackgroundId;
