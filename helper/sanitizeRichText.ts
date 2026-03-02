@@ -25,10 +25,14 @@ export function sanitizeMinimalRTH(input: string): string {
     .replace(/<\s*\/\s*(p|strong|em|u)\s*>/gi, "</$1>");
 
   // Normalize top-level <br> usage into empty paragraphs.
+  // (Keeps count, but never allows leading/trailing blank lines.)
   out = out
     .replace(/^(?:\s*<br>\s*)+/i, "")
     .replace(/(?:\s*<br>\s*)+$/i, "")
-    .replace(/<\/p>\s*(?:<br>\s*)+<p>/gi, "</p><p></p><p>");
+    .replace(/<\/p>\s*((?:<br>\s*)+)<p>/gi, (_m, brs: string) => {
+      const count = (brs.match(/<br>/gi) ?? []).length;
+      return `</p>${"<p><br></p>".repeat(count)}<p>`;
+    });
 
   // If we have no block wrapper, wrap everything in a paragraph.
   const trimmed = out.trim();
@@ -36,7 +40,7 @@ export function sanitizeMinimalRTH(input: string): string {
 
   const startsWithParagraph = /^<\s*p\b/i.test(trimmed);
   if (!startsWithParagraph) {
-    return `<p>${trimmed}</p>`;
+    out = `<p>${trimmed}</p>`;
   }
 
   const isEmptyParagraph = (inner: string) => {
@@ -46,39 +50,57 @@ export function sanitizeMinimalRTH(input: string): string {
     return withoutNbsp.trim().length === 0;
   };
 
-  // Keep at most one empty paragraph between non-empty paragraphs.
+  // Preserve any number of empty paragraphs between non-empty paragraphs.
   const paragraphs = Array.from(out.matchAll(/<p>([\s\S]*?)<\/p>/gi)).map(
     (m) => m[1] ?? "",
   );
 
   if (paragraphs.length === 0) return "";
 
-  const normalized: string[] = [];
-  let previousWasEmpty = false;
+  const withBreaks = paragraphs.map((inner) =>
+    inner.replace(/\r\n|\r|\n/g, "<br>"),
+  );
 
-  for (const inner of paragraphs) {
-    const empty = isEmptyParagraph(inner);
-
-    if (empty) {
-      if (normalized.length === 0) continue;
-      if (previousWasEmpty) continue;
-      previousWasEmpty = true;
-      normalized.push("<p></p>");
-      continue;
-    }
-
-    previousWasEmpty = false;
-    normalized.push(`<p>${inner}</p>`);
+  // Trim leading empty paragraphs.
+  while (withBreaks.length > 0 && isEmptyParagraph(withBreaks[0]!)) {
+    withBreaks.shift();
   }
 
+  // Trim trailing empty paragraphs.
   while (
-    normalized.length > 0 &&
-    normalized[normalized.length - 1] === "<p></p>"
+    withBreaks.length > 0 &&
+    isEmptyParagraph(withBreaks[withBreaks.length - 1]!)
   ) {
-    normalized.pop();
+    withBreaks.pop();
   }
 
-  return normalized.join("").trim();
+  if (withBreaks.length === 0) return "";
+
+  // Ensure the content doesn't start/end with blank lines caused by <br>.
+  // (We only strip <br> at the document edges.)
+  while (withBreaks.length > 0) {
+    const next = withBreaks[0]!.replace(/^(?:\s*<br>\s*)+/i, "");
+    withBreaks[0] = next;
+    if (!isEmptyParagraph(withBreaks[0]!)) break;
+    withBreaks.shift();
+  }
+
+  while (withBreaks.length > 0) {
+    const lastIdx = withBreaks.length - 1;
+    const next = withBreaks[lastIdx]!.replace(/(?:\s*<br>\s*)+$/i, "");
+    withBreaks[lastIdx] = next;
+    if (!isEmptyParagraph(withBreaks[lastIdx]!)) break;
+    withBreaks.pop();
+  }
+
+  if (withBreaks.length === 0) return "";
+
+  return withBreaks
+    .map((inner) =>
+      isEmptyParagraph(inner) ? "<p><br></p>" : `<p>${inner}</p>`,
+    )
+    .join("")
+    .trim();
 }
 
 /**
