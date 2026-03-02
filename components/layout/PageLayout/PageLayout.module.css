@@ -1,7 +1,7 @@
 .pageLayout {
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  min-height: 100vh;
   padding-top: 100px;
   background: var(--color-page-bg-1);
 }

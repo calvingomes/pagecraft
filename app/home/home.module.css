@@ -1,5 +1,5 @@
 .homeViewport {
-  height: 100vh;
+  min-height: 100vh;
 
   outline: 30px solid var(--color-white);
   outline-offset: -12px;
