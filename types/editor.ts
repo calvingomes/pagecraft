@@ -2,9 +2,9 @@ export type BlockType = "text" | "link" | "image";
 
 export type BlockWidthPreset =
   | "small" // 200x200
-  | "large" // 420x420 (2x2 including gap)
+  | "large" // 420x420
   | "tall" // 200x420
-  | "skinnyWide" // 420x100
+  | "skinnyWide" // 420x90
   | "wide"; // 420x200
 
 interface BaseBlock {

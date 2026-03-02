@@ -3,6 +3,8 @@ import type { GridLayout, GridRect } from "@/types/grid";
 
 // Keep in sync with the visual gap used by the canvas grid.
 const GRID_GAP_PX = 20;
+// Keep in sync with the desktop canvas grid row height.
+const GRID_CELL_PX = 200;
 
 export function spansForPreset(preset: BlockWidthPreset | undefined): {
   w: number;
@@ -35,7 +37,13 @@ export function sizePxForPreset(preset: BlockWidthPreset | undefined): {
     case "tall":
       return { widthPx: 200, heightPx: 420 };
     case "skinnyWide":
-      return { widthPx: 420, heightPx: Math.max(0, 100 - GRID_GAP_PX) };
+      // `skinnyWide` blocks are half-height within a single 200px row.
+      // Two stacked `skinnyWide` blocks should align with the grid gap between them.
+      // Example with default tokens: (200 - 20) / 2 = 90px.
+      return {
+        widthPx: 420,
+        heightPx: Math.max(0, (GRID_CELL_PX - GRID_GAP_PX) / 2),
+      };
     case "small":
     default:
       return { widthPx: 200, heightPx: 200 };

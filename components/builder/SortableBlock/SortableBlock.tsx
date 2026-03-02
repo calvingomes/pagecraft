@@ -3,7 +3,7 @@
 import { useState, type CSSProperties } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import type { Block, BlockWidthPreset } from "@/types/editor";
+import type { BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import { useEditorStore } from "@/stores/editor-store";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
@@ -87,16 +87,25 @@ export function SortableBlock({
   const { widthPx, heightPx } = sizePxForPreset(widthPreset);
   const aspectRatio = aspectRatioForPreset(widthPreset);
 
+  const DESKTOP_GRID_CELL_PX = 200;
+
+  const hoverZoneStyle: CSSProperties | undefined = (() => {
+    if (fluid) return { height: "auto" };
+    if (!isskinnyWide) return undefined;
+
+    const offsetY =
+      slot === 1 ? Math.max(0, DESKTOP_GRID_CELL_PX - heightPx) : 0;
+    return {
+      height: heightPx,
+      marginTop: offsetY,
+      alignItems: slot === 1 ? "flex-end" : "flex-start",
+    };
+  })();
+
   return (
     <div
       className={styles.hoverZone}
-      style={
-        isskinnyWide && slot === 1
-          ? { alignItems: "flex-end", ...(fluid ? { height: "auto" } : {}) }
-          : fluid
-            ? { height: "auto" }
-            : undefined
-      }
+      style={hoverZoneStyle}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -105,19 +114,9 @@ export function SortableBlock({
           setDroppableRef(node);
           setDraggableRef(node);
         }}
-        className={`${styles.wrapper} ${isDragging ? styles.dragging : ""}`}
+        className={styles.frame}
         style={{
           ...(hideBecauseOverlay ? {} : dndStyle),
-          ...(fluid
-            ? {
-                width: "100%",
-                height: "auto",
-                aspectRatio,
-              }
-            : {
-                width: `${widthPx}px`,
-                height: `${heightPx}px`,
-              }),
           maxWidth: "100%",
           maxHeight: "100%",
           opacity: hideBecauseOverlay ? 0 : 1,
@@ -125,21 +124,37 @@ export function SortableBlock({
         {...(!dndDisabled ? attributes : {})}
         {...(!dndDisabled ? listeners : {})}
       >
-        <div className={styles.content}>
-          <div className={styles.blockContent}>
-            <BlockRenderer block={block} />
+        <div
+          className={`${styles.wrapper} ${isDragging ? styles.dragging : ""}`}
+          style={
+            fluid
+              ? {
+                  width: "100%",
+                  height: "auto",
+                  aspectRatio,
+                }
+              : {
+                  width: `${widthPx}px`,
+                  height: `${heightPx}px`,
+                }
+          }
+        >
+          <div className={styles.content}>
+            <div className={styles.blockContent}>
+              <BlockRenderer block={block} />
+            </div>
           </div>
         </div>
-      </div>
 
-      {editor && (
-        <BlockHoverToolbar
-          blockId={block.id}
-          currentPreset={widthPreset}
-          onWidthChange={handleWidthChange}
-          visible={toolbarVisible}
-        />
-      )}
+        {editor && (
+          <BlockHoverToolbar
+            blockId={block.id}
+            currentPreset={widthPreset}
+            onWidthChange={handleWidthChange}
+            visible={toolbarVisible}
+          />
+        )}
+      </div>
     </div>
   );
 }
