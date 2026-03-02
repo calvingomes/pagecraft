@@ -10,9 +10,7 @@ import {
 } from "@dnd-kit/core";
 import { useMemo } from "react";
 import { useEditorStore } from "@/stores/editor-store";
-import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
-import sortableBlockStyles from "@/components/builder/SortableBlock/SortableBlock.module.css";
 import type { Block } from "@/types/editor";
 import type { BlockCanvasProps } from "@/types/builder";
 import styles from "./BlockCanvas.module.css";
@@ -26,6 +24,7 @@ import {
 import { useIsMobile } from "@/components/builder/BlockCanvas/hooks/useIsMobile";
 import { MobileCanvasGrid } from "@/components/builder/BlockCanvas/mobile/MobileCanvasGrid";
 import { useDesktopGridDnd } from "@/components/builder/BlockCanvas/hooks/useDesktopGridDnd";
+import { DesktopReadonlyBlock } from "@/components/builder/BlockCanvas/desktop/DesktopReadonlyBlock";
 
 export const BlockCanvas = (props: BlockCanvasProps) => {
   const storeBlocks = useEditorStore((s) => s.blocks);
@@ -175,38 +174,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
               {props.editable ? (
                 <SortableBlock block={block} activeDragId={activeId} />
               ) : (
-                (() => {
-                  const { widthPx, heightPx } = sizePxForPreset(preset);
-                  const slot = block.layout?.slot ?? 0;
-                  const isSkinnyTall = preset === "skinnyTall";
-                  return (
-                    <div
-                      className={sortableBlockStyles.hoverZone}
-                      style={
-                        isSkinnyTall && slot === 1
-                          ? { alignItems: "flex-end" }
-                          : undefined
-                      }
-                    >
-                      <div
-                        className={sortableBlockStyles.wrapper}
-                        style={{
-                          width: `${widthPx}px`,
-                          height: `${heightPx}px`,
-                          maxWidth: "100%",
-                          maxHeight: "100%",
-                          cursor: "default",
-                        }}
-                      >
-                        <div className={sortableBlockStyles.content}>
-                          <div className={sortableBlockStyles.blockContent}>
-                            <BlockRenderer block={block} />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()
+                <DesktopReadonlyBlock block={block} />
               )}
             </div>
           );
