@@ -5,7 +5,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import { TextBlock as TextBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import { sanitizeMinimalRichTextHtml } from "@/helper/sanitizeRichText";
-import { minimalRichTextExtensionsWithPlaceholder } from "@/lib/tiptap/minimalRichText";
+import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
 import styles from "./TextBlock.module.css";
 
 export const TextBlock = ({ block }: { block: TextBlockType }) => {
@@ -23,7 +23,7 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
         : styles.clampSmall;
 
   const editor = useEditor({
-    extensions: minimalRichTextExtensionsWithPlaceholder({
+    extensions: minimalRTEWithPlaceholder({
       placeholder: "Write something...",
       showOnlyWhenEditable: true,
     }),

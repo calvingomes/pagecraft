@@ -6,7 +6,7 @@ import Bold from "@tiptap/extension-bold";
 import Italic from "@tiptap/extension-italic";
 import Underline from "@tiptap/extension-underline";
 
-export const minimalRichTextExtensions = [
+export const minimalRTE = [
   Document,
   Paragraph,
   Text,
@@ -15,12 +15,12 @@ export const minimalRichTextExtensions = [
   Underline,
 ] as const;
 
-export function minimalRichTextExtensionsWithPlaceholder(options: {
+export function minimalRTEWithPlaceholder(options: {
   placeholder: string;
   showOnlyWhenEditable?: boolean;
 }) {
   return [
-    ...minimalRichTextExtensions,
+    ...minimalRTE,
     Placeholder.configure({
       placeholder: options.placeholder,
       showOnlyWhenEditable: options.showOnlyWhenEditable ?? true,

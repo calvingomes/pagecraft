@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { WordCount } from "@/components/ui/WordCount/WordCount";
 import { htmlToText } from "@/helper/htmlToText";
 import { sanitizeMinimalRichTextHtml } from "@/helper/sanitizeRichText";
-import { minimalRichTextExtensionsWithPlaceholder } from "@/lib/tiptap/minimalRichText";
+import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
 import type { ProfileSidebarProps } from "./ProfileSidebar.types";
 
 const DISPLAY_NAME_MAX_CHARS = 70;
@@ -42,7 +42,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
   })();
 
   const displayNameEditor = useEditor({
-    extensions: minimalRichTextExtensionsWithPlaceholder({
+    extensions: minimalRTEWithPlaceholder({
       placeholder: username ?? "Display name",
       showOnlyWhenEditable: true,
     }),
@@ -100,7 +100,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
   });
 
   const bioEditor = useEditor({
-    extensions: minimalRichTextExtensionsWithPlaceholder({
+    extensions: minimalRTEWithPlaceholder({
       placeholder: "Add a description…",
       showOnlyWhenEditable: true,
     }),
