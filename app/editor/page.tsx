@@ -82,13 +82,14 @@ export default function EditorPage() {
     const loadPageData = async () => {
       setPageSettingsLoaded(false);
 
-      // Defaults (used if the page doc doesn't have these fields yet)
       setDisplayName(username);
       setBioHtml("");
 
       // load page settings first so the UI can render them as early as possible
       const pageRef = doc(db, "pages", username);
       const pageSnap = await getDoc(pageRef);
+
+      let incomingDisplayName: string | undefined = undefined;
       if (pageSnap.exists()) {
         const data = pageSnap.data() as
           | {
@@ -101,11 +102,12 @@ export default function EditorPage() {
 
         if (data?.background) setBackground(data.background);
         if (data?.sidebarPosition) setSidebarPosition(data.sidebarPosition);
-        if (typeof data?.displayName === "string" && data.displayName.trim()) {
-          setDisplayName(data.displayName);
-        }
+        if (typeof data?.displayName === "string")
+          incomingDisplayName = data.displayName;
         if (typeof data?.bioHtml === "string") setBioHtml(data.bioHtml);
       }
+
+      setDisplayName(incomingDisplayName ?? username);
 
       setPageSettingsLoaded(true);
 

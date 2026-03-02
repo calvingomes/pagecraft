@@ -6,7 +6,10 @@ import styles from "./ProfileSidebar.module.css";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { WordCount } from "@/components/ui/WordCount/WordCount";
+
+const DISPLAY_NAME_MAX_CHARS = 70;
 
 type ProfileSidebarProps = (
   | {
@@ -29,12 +32,106 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
   const username = props.variant === "view" ? props.username : editorUsername;
   const position = props.position ?? "left";
 
-  const displayName =
-    props.displayName?.trim() ||
-    (props.variant === "view" ? username : username);
+  const displayNameRaw =
+    typeof props.displayName === "string"
+      ? props.displayName
+      : (username ?? "");
+
+  const htmlToText = (html: string) => {
+    const trimmed = html.trim();
+    if (!trimmed) return "";
+    if (typeof window === "undefined") {
+      return trimmed
+        .replace(/<[^>]*>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+    const el = document.createElement("div");
+    el.innerHTML = trimmed;
+    return (el.textContent ?? "").replace(/\s+/g, " ").trim();
+  };
+
+  const displayNameText = displayNameRaw.includes("<")
+    ? htmlToText(displayNameRaw)
+    : displayNameRaw;
 
   const lastSyncedBio = useRef(props.bioHtml ?? "");
+  const lastSyncedDisplayName = useRef(displayNameRaw);
   const editable = props.variant === "editor";
+
+  const [isDisplayNameActive, setIsDisplayNameActive] = useState(false);
+
+  const avatarLetter = (() => {
+    const source = (displayNameText || username || "?").trim();
+    return (source[0] ?? "?").toUpperCase();
+  })();
+
+  const displayNameEditor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        heading: false,
+        bulletList: false,
+        orderedList: false,
+        listItem: false,
+        codeBlock: false,
+        blockquote: false,
+        horizontalRule: false,
+      }),
+      Placeholder.configure({
+        placeholder: username ?? "Display name",
+        showOnlyWhenEditable: true,
+      }),
+    ],
+    content: displayNameRaw,
+    editable,
+    immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        "aria-label": "Display name",
+        spellcheck: "false",
+        autocorrect: "off",
+        autocapitalize: "off",
+      },
+      handleKeyDown: (_view, event) => {
+        if (event.key === "Enter") return true;
+        return false;
+      },
+      handleTextInput: (view, from, to, text) => {
+        const current = view.state.doc.textBetween(
+          0,
+          view.state.doc.content.size,
+          " ",
+        );
+        const selected = view.state.doc.textBetween(from, to, " ");
+        const nextLen = current.length - selected.length + text.length;
+        if (nextLen > DISPLAY_NAME_MAX_CHARS) return true;
+        return false;
+      },
+      handlePaste: (view, event) => {
+        const text = event.clipboardData?.getData("text/plain") ?? "";
+        if (!text) return false;
+        const { from, to } = view.state.selection;
+        const current = view.state.doc.textBetween(
+          0,
+          view.state.doc.content.size,
+          " ",
+        );
+        const selected = view.state.doc.textBetween(from, to, " ");
+        const nextLen = current.length - selected.length + text.length;
+        if (nextLen > DISPLAY_NAME_MAX_CHARS) return true;
+        return false;
+      },
+    },
+    onUpdate: ({ editor }) => {
+      if (props.variant !== "editor") return;
+      const html = editor.isEmpty ? "" : editor.getHTML();
+      if (html === lastSyncedDisplayName.current) return;
+      lastSyncedDisplayName.current = html;
+      props.onChangeDisplayName?.(html);
+    },
+    onFocus: () => setIsDisplayNameActive(true),
+    onBlur: () => setIsDisplayNameActive(false),
+  });
 
   const bioEditor = useEditor({
     extensions: [
@@ -69,12 +166,25 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
   }, [bioEditor, editable]);
 
   useEffect(() => {
+    if (!displayNameEditor) return;
+    displayNameEditor.setEditable(editable);
+  }, [displayNameEditor, editable]);
+
+  useEffect(() => {
     if (!bioEditor) return;
     const incoming = props.bioHtml ?? "";
     if (incoming === lastSyncedBio.current) return;
     lastSyncedBio.current = incoming;
     bioEditor.commands.setContent(incoming);
   }, [bioEditor, props.bioHtml]);
+
+  useEffect(() => {
+    if (!displayNameEditor) return;
+    const incoming = displayNameRaw;
+    if (incoming === lastSyncedDisplayName.current) return;
+    lastSyncedDisplayName.current = incoming;
+    displayNameEditor.commands.setContent(incoming);
+  }, [displayNameEditor, displayNameRaw]);
 
   const positionClass =
     position === "left"
@@ -86,21 +196,33 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
   return (
     <aside className={`${styles.sidebar} ${positionClass}`}>
       <div className={styles.profileCard}>
-        <div className={styles.avatar}>
-          {displayName?.[0]?.toUpperCase() ?? "?"}
-        </div>
+        <div className={styles.avatar}>{avatarLetter}</div>
         <div className={styles.profileText}>
           {props.variant === "editor" ? (
-            <input
-              className={styles.nameInput}
-              type="text"
-              value={props.displayName ?? ""}
-              onChange={(e) => props.onChangeDisplayName?.(e.target.value)}
-              placeholder={username ?? "Display name"}
-              aria-label="Display name"
-            />
+            <div className={styles.nameInput}>
+              <EditorContent editor={displayNameEditor} />
+
+              {props.variant === "editor" && isDisplayNameActive ? (
+                <WordCount
+                  value={displayNameEditor?.getText() ?? displayNameText}
+                  max={DISPLAY_NAME_MAX_CHARS}
+                  mode="characters"
+                  className={styles.displayNameCount}
+                  ariaLabel="Display name character count"
+                />
+              ) : null}
+            </div>
           ) : (
-            <h2 className={styles.name}>{displayName ?? "—"}</h2>
+            <div
+              className={styles.name}
+              role="heading"
+              aria-level={2}
+              {...(displayNameRaw.includes("<")
+                ? { dangerouslySetInnerHTML: { __html: displayNameRaw } }
+                : {})}
+            >
+              {!displayNameRaw.includes("<") ? displayNameRaw : null}
+            </div>
           )}
 
           {props.variant === "editor" ? (
