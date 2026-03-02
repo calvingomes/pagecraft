@@ -1,6 +1,22 @@
 .homeViewport {
   min-height: 100vh;
 
+  /* Scope landing palette to /home only */
+  --color-bg-page: var(--color-landing-bg);
+  --color-bg-surface: var(--color-landing-surface);
+  --color-bg-elevated: var(--color-landing-surface);
+  --color-text-primary: var(--color-landing-text-primary);
+  --color-text-secondary: var(--color-landing-text-secondary);
+  --color-brand-primary: var(--color-landing-brand-primary);
+  --color-brand-accent: var(--color-landing-brand-accent);
+  --color-border-subtle: var(--color-landing-border);
+  --color-border-strong: var(--color-landing-border);
+  --color-grey-light: var(--color-landing-bg);
+  --color-status-success: var(--color-landing-brand-primary);
+
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+
   outline: 30px solid var(--color-white);
   outline-offset: -12px;
 
@@ -8,4 +24,11 @@
   box-sizing: border-box;
 
   overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .homeViewport {
+    outline: none;
+    border-radius: 0;
+  }
 }

@@ -17,6 +17,7 @@
   --font-size-3xl: 36px;
 
   /* Shadows */
+  --shadow-xs: 0 1px 0 rgba(0, 0, 0, 0.04);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
 

@@ -5,8 +5,9 @@ import Image from "next/image";
 import styles from "./Navbar.module.css";
 
 const LEFT_ITEMS = [
-  { label: "Products", href: "/nothing1" },
-  { label: "Customers", href: "/nothing2" },
+  { label: "Products", href: "#products" },
+  { label: "Customers", href: "#customers" },
+  { label: "Careers", href: "#careers" },
 ];
 
 const Navbar = () => {
@@ -34,11 +35,11 @@ const Navbar = () => {
         </Link>
 
         <div className={styles.navItemsRight}>
-          <Link href="/nothing3" className={styles.navLink}>
-            See demo
+          <Link href="/auth" className={styles.navButton}>
+            Sign in
           </Link>
-          <Link href="/auth" className={styles.navCta}>
-            Claim your page
+          <Link href="/claim" className={styles.navCta}>
+            Book a demo
           </Link>
         </div>
       </nav>

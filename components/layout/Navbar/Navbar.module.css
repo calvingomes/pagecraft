@@ -4,6 +4,7 @@
   display: flex;
   justify-content: center;
   padding: 0 16px;
+  z-index: 10;
 }
 
 .cornerSvg {
@@ -25,12 +26,14 @@
   max-width: 900px;
   height: 84px;
   background: var(--color-white);
+  border: 1px solid var(--color-border-subtle);
   border-bottom-left-radius: var(--radius-xl);
   border-bottom-right-radius: var(--radius-xl);
   padding: 0 24px;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
+  box-shadow: var(--shadow-xs);
 }
 
 .navItemsLeft,
@@ -41,36 +44,92 @@
 }
 
 .navItemsRight {
-  justify-content: flex-start;
-}
-.navItemsRight {
   justify-content: flex-end;
 }
 
 .navLink {
   font-size: var(--font-size-md);
-  color: var(--color-text-secondary);
+  color: var(--color-text-primary);
   text-decoration: none;
   padding: 3px 14px;
   border-radius: var(--radius-xl);
 }
 
 .navLink:hover {
-  background-color: var(--color-grey-light);
+  background-color: var(--color-bg-hover);
 }
 
 .navLogo {
   font-size: var(--font-size-xl);
   font-weight: 600;
-  color: var(--color-brand-primary);
+  color: var(--color-text-primary);
+}
+
+.navButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border-subtle);
+  background: transparent;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.navButton:hover {
+  background-color: var(--color-bg-hover);
+}
+
+@media (max-width: 768px) {
+  .navWrapper {
+    top: 8px;
+    padding: 0 12px;
+  }
+
+  .nav {
+    height: 64px;
+    padding: 0 14px;
+  }
+
+  .navItemsLeft {
+    display: none;
+  }
+
+  .navItemsRight {
+    gap: 12px;
+  }
+
+  /* Keep just the CTA on small screens */
+  .navItemsRight a:first-child {
+    display: none;
+  }
+
+  .navCta {
+    padding: 10px 14px;
+    font-size: var(--font-size-sm);
+  }
+
+  .navLogo {
+    font-size: var(--font-size-lg);
+  }
+
+  .cornerSvg {
+    display: none;
+  }
 }
 
 .navCta {
-  background: var(--color-status-success);
-  color: var(--color-white);
+  background: var(--color-brand-accent);
+  color: var(--color-text-primary);
   padding: 12px 24px;
   border-radius: var(--radius-md);
   font-size: var(--font-size-md);
   text-decoration: none;
   white-space: nowrap;
+  font-weight: 700;
+  border: 1px solid
+    color-mix(in srgb, var(--color-text-primary) 12%, transparent);
 }

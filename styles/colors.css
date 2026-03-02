@@ -3,6 +3,15 @@
   --color-brand-primary: #6366f1;
   --color-brand-accent: #22d3ee;
 
+  /* Landing (Solidroad-like) palette */
+  --color-landing-bg: #f9f9f9;
+  --color-landing-surface: #ffffff;
+  --color-landing-border: #e5e7e5;
+  --color-landing-text-primary: #0e220e;
+  --color-landing-text-secondary: #235524;
+  --color-landing-brand-primary: #0e220e;
+  --color-landing-brand-accent: #f6d045;
+
   /* Backgrounds */
   --color-bg-page: #f5f5f5;
   --color-bg-surface: #020617;
@@ -22,6 +31,13 @@
   --color-text-inverse-primary: #e5e7eb;
   --color-text-inverse-secondary: #9ca3af;
 
+  /* Borders */
+  --color-border-focus: var(--color-brand-primary);
+  --color-border-subtle: rgba(0, 0, 0, 0.08);
+  --color-border-strong: rgba(0, 0, 0, 0.16);
+
+  /* UI */
+  --color-bg-hover: rgba(0, 0, 0, 0.04);
 
   /* Status */
   --color-status-error: #ef4444;
