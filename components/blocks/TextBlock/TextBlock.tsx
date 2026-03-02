@@ -4,14 +4,17 @@ import { useEffect, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { TextBlock as TextBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
-import { sanitizeMinimalRichTextHtml } from "@/helper/sanitizeRichText";
+import {
+  minimalRTHtmlToInlineForClamp,
+  sanitizeMinimalRTH,
+} from "@/helper/sanitizeRichText";
 import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
 import styles from "./TextBlock.module.css";
 
 export const TextBlock = ({ block }: { block: TextBlockType }) => {
   const contextEditor = useEditorContext();
   const editable = !!contextEditor;
-  const initialContent = sanitizeMinimalRichTextHtml(block.content?.text ?? "");
+  const initialContent = sanitizeMinimalRTH(block.content?.text ?? "");
   const lastSyncedContent = useRef(initialContent);
 
   const preset = block.styles?.widthPreset ?? "small";
@@ -41,7 +44,7 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
       if (!contextEditor?.onUpdateBlock) return;
 
       const html = editor.isEmpty ? "" : editor.getHTML();
-      const finalContent = sanitizeMinimalRichTextHtml(html);
+      const finalContent = sanitizeMinimalRTH(html);
 
       if (finalContent !== lastSyncedContent.current) {
         lastSyncedContent.current = finalContent;
@@ -55,7 +58,7 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
   useEffect(() => {
     if (!editor) return;
 
-    const incoming = sanitizeMinimalRichTextHtml(block.content?.text ?? "");
+    const incoming = sanitizeMinimalRTH(block.content?.text ?? "");
     if (incoming !== lastSyncedContent.current) {
       lastSyncedContent.current = incoming;
       editor.commands.setContent(incoming);
@@ -76,11 +79,12 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
   }
 
   const html = block.content?.text ?? "";
-  const safeHtml = sanitizeMinimalRichTextHtml(html);
-  return safeHtml ? (
+  const safeHtml = sanitizeMinimalRTH(html);
+  const clampedHtml = minimalRTHtmlToInlineForClamp(safeHtml);
+  return clampedHtml ? (
     <div
       className={`${styles.display} ${clampClass}`}
-      dangerouslySetInnerHTML={{ __html: safeHtml }}
+      dangerouslySetInnerHTML={{ __html: clampedHtml }}
     />
   ) : null;
 };

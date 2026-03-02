@@ -4,7 +4,7 @@
  *
  * Note: This is intentionally strict and isomorphic (no DOMParser).
  */
-export function sanitizeMinimalRichTextHtml(input: string): string {
+export function sanitizeMinimalRTH(input: string): string {
   const html = (input ?? "").trim();
   if (!html) return "";
 
@@ -79,4 +79,23 @@ export function sanitizeMinimalRichTextHtml(input: string): string {
   }
 
   return normalized.join("").trim();
+}
+
+/**
+ * Converts sanitized minimal rich-text HTML from paragraph blocks into a single
+ * inline flow using <br> separators.
+ *
+ * This improves reliability of multi-line clamping ellipsis, since
+ * `-webkit-line-clamp` can behave oddly with nested block elements.
+ */
+export function minimalRTHtmlToInlineForClamp(input: string): string {
+  const safe = sanitizeMinimalRTH(input);
+  if (!safe) return "";
+
+  const paragraphs = Array.from(safe.matchAll(/<p>([\s\S]*?)<\/p>/gi)).map(
+    (m) => m[1] ?? "",
+  );
+
+  if (paragraphs.length === 0) return safe;
+  return paragraphs.join("<br>").trim();
 }

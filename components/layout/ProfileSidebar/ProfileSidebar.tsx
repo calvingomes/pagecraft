@@ -6,7 +6,7 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import { useEffect, useRef, useState } from "react";
 import { WordCount } from "@/components/ui/WordCount/WordCount";
 import { htmlToText } from "@/helper/htmlToText";
-import { sanitizeMinimalRichTextHtml } from "@/helper/sanitizeRichText";
+import { sanitizeMinimalRTH } from "@/helper/sanitizeRichText";
 import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
 import type { ProfileSidebarProps } from "./ProfileSidebar.types";
 
@@ -22,13 +22,13 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
       ? props.displayName
       : (username ?? "");
 
-  const safeDisplayNameHtml = sanitizeMinimalRichTextHtml(displayNameRaw);
+  const safeDisplayNameHtml = sanitizeMinimalRTH(displayNameRaw);
 
   const displayNameText = displayNameRaw.includes("<")
     ? htmlToText(displayNameRaw)
     : displayNameRaw;
 
-  const safeBioHtml = sanitizeMinimalRichTextHtml(props.bioHtml ?? "");
+  const safeBioHtml = sanitizeMinimalRTH(props.bioHtml ?? "");
 
   const lastSyncedBio = useRef(safeBioHtml);
   const lastSyncedDisplayName = useRef(safeDisplayNameHtml);
@@ -88,9 +88,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
     },
     onUpdate: ({ editor }) => {
       if (props.variant !== "editor") return;
-      const html = editor.isEmpty
-        ? ""
-        : sanitizeMinimalRichTextHtml(editor.getHTML());
+      const html = editor.isEmpty ? "" : sanitizeMinimalRTH(editor.getHTML());
       if (html === lastSyncedDisplayName.current) return;
       lastSyncedDisplayName.current = html;
       props.onChangeDisplayName?.(html);
@@ -116,9 +114,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
     },
     onUpdate: ({ editor }) => {
       if (props.variant !== "editor") return;
-      const html = editor.isEmpty
-        ? ""
-        : sanitizeMinimalRichTextHtml(editor.getHTML());
+      const html = editor.isEmpty ? "" : sanitizeMinimalRTH(editor.getHTML());
       if (html === lastSyncedBio.current) return;
       lastSyncedBio.current = html;
       props.onChangeBioHtml?.(html);
@@ -137,7 +133,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
 
   useEffect(() => {
     if (!bioEditor) return;
-    const incoming = sanitizeMinimalRichTextHtml(props.bioHtml ?? "");
+    const incoming = sanitizeMinimalRTH(props.bioHtml ?? "");
     if (incoming === lastSyncedBio.current) return;
     lastSyncedBio.current = incoming;
     bioEditor.commands.setContent(incoming);
@@ -145,7 +141,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
 
   useEffect(() => {
     if (!displayNameEditor) return;
-    const incoming = sanitizeMinimalRichTextHtml(displayNameRaw);
+    const incoming = sanitizeMinimalRTH(displayNameRaw);
     if (incoming === lastSyncedDisplayName.current) return;
     lastSyncedDisplayName.current = incoming;
     displayNameEditor.commands.setContent(incoming);
