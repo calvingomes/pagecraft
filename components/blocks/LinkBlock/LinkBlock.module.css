@@ -23,7 +23,7 @@
 .iconWrap {
   width: 54px;
   height: 54px;
-  border-radius: 999px;
+  border-radius: 8px;
   background: rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;

@@ -29,17 +29,10 @@
   position: absolute;
   z-index: 0;
   pointer-events: none;
-  border-radius: var(--radius-lg);
+  border-radius: 8px;
   left: 0;
   top: 0;
-  background-color: color-mix(
-    in srgb,
-    var(--color-brand-primary) 12%,
-    transparent
-  );
-  outline: 2px dashed
-    color-mix(in srgb, var(--color-brand-primary) 55%, transparent);
-  outline-offset: -2px;
+  background-color: color-mix(in srgb, #515151 12%, transparent);
   will-change: transform, width, height;
   transition:
     transform var(--duration-base) var(--ease-standard),
