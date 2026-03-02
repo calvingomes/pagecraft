@@ -2,16 +2,17 @@
 
 import { useEffect, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
 import { TextBlock as TextBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
+import { sanitizeMinimalRichTextHtml } from "@/helper/sanitizeRichText";
+import { minimalRichTextExtensionsWithPlaceholder } from "@/lib/tiptap/minimalRichText";
 import styles from "./TextBlock.module.css";
 
 export const TextBlock = ({ block }: { block: TextBlockType }) => {
   const contextEditor = useEditorContext();
   const editable = !!contextEditor;
-  const lastSyncedContent = useRef(block.content?.text ?? "");
+  const initialContent = sanitizeMinimalRichTextHtml(block.content?.text ?? "");
+  const lastSyncedContent = useRef(initialContent);
 
   const preset = block.styles?.widthPreset ?? "small";
   const clampClass =
@@ -22,14 +23,11 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
         : styles.clampSmall;
 
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Placeholder.configure({
-        placeholder: "Write something...",
-        showOnlyWhenEditable: true,
-      }),
-    ],
-    content: block.content?.text ?? "",
+    extensions: minimalRichTextExtensionsWithPlaceholder({
+      placeholder: "Write something...",
+      showOnlyWhenEditable: true,
+    }),
+    content: initialContent,
     editable,
     immediatelyRender: false,
     editorProps: {
@@ -39,16 +37,11 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
         autocapitalize: "off",
       },
     },
-    onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      if (html !== lastSyncedContent.current && contextEditor?.onUpdateBlock) {
-      }
-    },
     onBlur: ({ editor }) => {
       if (!contextEditor?.onUpdateBlock) return;
 
-      const html = editor.getHTML();
-      const finalContent = editor.isEmpty ? "" : html;
+      const html = editor.isEmpty ? "" : editor.getHTML();
+      const finalContent = sanitizeMinimalRichTextHtml(html);
 
       if (finalContent !== lastSyncedContent.current) {
         lastSyncedContent.current = finalContent;
@@ -62,10 +55,10 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
   useEffect(() => {
     if (!editor) return;
 
-    if (block.content?.text !== lastSyncedContent.current) {
-      const newContent = block.content?.text ?? "";
-      lastSyncedContent.current = newContent;
-      editor.commands.setContent(newContent);
+    const incoming = sanitizeMinimalRichTextHtml(block.content?.text ?? "");
+    if (incoming !== lastSyncedContent.current) {
+      lastSyncedContent.current = incoming;
+      editor.commands.setContent(incoming);
     }
   }, [block.id, block.content?.text, editor]);
 
@@ -83,10 +76,11 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
   }
 
   const html = block.content?.text ?? "";
-  return html ? (
+  const safeHtml = sanitizeMinimalRichTextHtml(html);
+  return safeHtml ? (
     <div
       className={`${styles.display} ${clampClass}`}
-      dangerouslySetInnerHTML={{ __html: html }}
+      dangerouslySetInnerHTML={{ __html: safeHtml }}
     />
   ) : null;
 };

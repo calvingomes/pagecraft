@@ -3,11 +3,11 @@
 import { useAuthStore } from "@/stores/auth-store";
 import styles from "./ProfileSidebar.module.css";
 import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Placeholder from "@tiptap/extension-placeholder";
 import { useEffect, useRef, useState } from "react";
 import { WordCount } from "@/components/ui/WordCount/WordCount";
 import { htmlToText } from "@/helper/htmlToText";
+import { sanitizeMinimalRichTextHtml } from "@/helper/sanitizeRichText";
+import { minimalRichTextExtensionsWithPlaceholder } from "@/lib/tiptap/minimalRichText";
 import type { ProfileSidebarProps } from "./ProfileSidebar.types";
 
 const DISPLAY_NAME_MAX_CHARS = 70;
@@ -22,12 +22,16 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
       ? props.displayName
       : (username ?? "");
 
+  const safeDisplayNameHtml = sanitizeMinimalRichTextHtml(displayNameRaw);
+
   const displayNameText = displayNameRaw.includes("<")
     ? htmlToText(displayNameRaw)
     : displayNameRaw;
 
-  const lastSyncedBio = useRef(props.bioHtml ?? "");
-  const lastSyncedDisplayName = useRef(displayNameRaw);
+  const safeBioHtml = sanitizeMinimalRichTextHtml(props.bioHtml ?? "");
+
+  const lastSyncedBio = useRef(safeBioHtml);
+  const lastSyncedDisplayName = useRef(safeDisplayNameHtml);
   const editable = props.variant === "editor";
 
   const [isDisplayNameActive, setIsDisplayNameActive] = useState(false);
@@ -38,22 +42,11 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
   })();
 
   const displayNameEditor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: false,
-        bulletList: false,
-        orderedList: false,
-        listItem: false,
-        codeBlock: false,
-        blockquote: false,
-        horizontalRule: false,
-      }),
-      Placeholder.configure({
-        placeholder: username ?? "Display name",
-        showOnlyWhenEditable: true,
-      }),
-    ],
-    content: displayNameRaw,
+    extensions: minimalRichTextExtensionsWithPlaceholder({
+      placeholder: username ?? "Display name",
+      showOnlyWhenEditable: true,
+    }),
+    content: safeDisplayNameHtml,
     editable,
     immediatelyRender: false,
     editorProps: {
@@ -95,7 +88,9 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
     },
     onUpdate: ({ editor }) => {
       if (props.variant !== "editor") return;
-      const html = editor.isEmpty ? "" : editor.getHTML();
+      const html = editor.isEmpty
+        ? ""
+        : sanitizeMinimalRichTextHtml(editor.getHTML());
       if (html === lastSyncedDisplayName.current) return;
       lastSyncedDisplayName.current = html;
       props.onChangeDisplayName?.(html);
@@ -105,14 +100,11 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
   });
 
   const bioEditor = useEditor({
-    extensions: [
-      StarterKit,
-      Placeholder.configure({
-        placeholder: "Add a description…",
-        showOnlyWhenEditable: true,
-      }),
-    ],
-    content: props.bioHtml ?? "",
+    extensions: minimalRichTextExtensionsWithPlaceholder({
+      placeholder: "Add a description…",
+      showOnlyWhenEditable: true,
+    }),
+    content: safeBioHtml,
     editable,
     immediatelyRender: false,
     editorProps: {
@@ -124,7 +116,9 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
     },
     onUpdate: ({ editor }) => {
       if (props.variant !== "editor") return;
-      const html = editor.isEmpty ? "" : editor.getHTML();
+      const html = editor.isEmpty
+        ? ""
+        : sanitizeMinimalRichTextHtml(editor.getHTML());
       if (html === lastSyncedBio.current) return;
       lastSyncedBio.current = html;
       props.onChangeBioHtml?.(html);
@@ -143,7 +137,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
 
   useEffect(() => {
     if (!bioEditor) return;
-    const incoming = props.bioHtml ?? "";
+    const incoming = sanitizeMinimalRichTextHtml(props.bioHtml ?? "");
     if (incoming === lastSyncedBio.current) return;
     lastSyncedBio.current = incoming;
     bioEditor.commands.setContent(incoming);
@@ -151,7 +145,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
 
   useEffect(() => {
     if (!displayNameEditor) return;
-    const incoming = displayNameRaw;
+    const incoming = sanitizeMinimalRichTextHtml(displayNameRaw);
     if (incoming === lastSyncedDisplayName.current) return;
     lastSyncedDisplayName.current = incoming;
     displayNameEditor.commands.setContent(incoming);
@@ -188,11 +182,11 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
               className={styles.name}
               role="heading"
               aria-level={2}
-              {...(displayNameRaw.includes("<")
-                ? { dangerouslySetInnerHTML: { __html: displayNameRaw } }
+              {...(safeDisplayNameHtml.includes("<")
+                ? { dangerouslySetInnerHTML: { __html: safeDisplayNameHtml } }
                 : {})}
             >
-              {!displayNameRaw.includes("<") ? displayNameRaw : null}
+              {!safeDisplayNameHtml.includes("<") ? safeDisplayNameHtml : null}
             </div>
           )}
 
@@ -203,7 +197,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
           ) : props.bioHtml ? (
             <div
               className={styles.bio}
-              dangerouslySetInnerHTML={{ __html: props.bioHtml }}
+              dangerouslySetInnerHTML={{ __html: safeBioHtml }}
             />
           ) : null}
         </div>
