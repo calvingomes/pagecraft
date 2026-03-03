@@ -1,7 +1,6 @@
 .editor :global(.ProseMirror) {
   width: 100%;
   height: 100%;
-  padding: 0;
   border: none;
   background: transparent;
   color: var(--color-text-primary);
@@ -16,6 +15,8 @@
 
 .editor :global(.ProseMirror):focus-visible {
   background-color: rgb(240, 240, 240);
+  overflow: scroll;
+  /* padding: 8px; */
   transition:
     opacity 0.15s,
     visibility 0.15s;

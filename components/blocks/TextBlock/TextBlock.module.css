@@ -11,6 +11,7 @@
 .editor {
   width: 100%;
   height: 100%;
+  padding: 12px;
 }
 
 /* display mode */
@@ -18,7 +19,7 @@
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  padding: 0;
+  padding: 12px;
   margin: 0;
   line-height: 1.6;
   color: var(--color-text-primary);
@@ -32,12 +33,13 @@
 .clampSmall {
   line-clamp: 6;
   -webkit-line-clamp: 6;
+  max-height: calc(1.5em * 8);
 }
 
 .clampTall {
-  line-clamp: 14;
-  -webkit-line-clamp: 14;
-  max-height: calc(1.7em * 14);
+  line-clamp: 17;
+  -webkit-line-clamp: 17;
+  max-height: calc(1.45em * 17);
 }
 
 .display :global(p) {
