@@ -43,3 +43,20 @@ export async function convertFileToWebp(
     lastModified: Date.now(),
   });
 }
+
+export async function fileToDataUrl(file: File): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+
+      reject(new Error("Unable to read image file."));
+    };
+    reader.onerror = () =>
+      reject(reader.error ?? new Error("File read failed."));
+    reader.readAsDataURL(file);
+  });
+}

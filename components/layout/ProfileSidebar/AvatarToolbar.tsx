@@ -5,7 +5,6 @@ import { useRef, type ChangeEvent } from "react";
 import toolbarStyles from "@/components/builder/BlockHoverToolbar/BlockHoverToolbar.module.css";
 import type { AvatarToolbarProps } from "./ProfileSidebar.types";
 
-const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_INPUT_TYPES = new Set(["image/jpeg", "image/png"]);
 
 export function AvatarToolbar({
@@ -27,11 +26,6 @@ export function AvatarToolbar({
     if (!file) return;
 
     if (!ALLOWED_INPUT_TYPES.has(file.type)) {
-      event.currentTarget.value = "";
-      return;
-    }
-
-    if (file.size > MAX_FILE_SIZE_BYTES) {
       event.currentTarget.value = "";
       return;
     }

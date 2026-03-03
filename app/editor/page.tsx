@@ -30,6 +30,12 @@ import {
   uploadPageImage,
 } from "@/lib/uploads/pageImageStorage";
 import { avatarDataUrlToWebpFile } from "@/lib/uploads/avatarImage";
+import {
+  convertFileToWebp,
+  dataUrlToFile,
+  fileToDataUrl,
+} from "@/lib/uploads/imageProcessing";
+import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
 import styles from "./editor.module.css";
 
 type DbLikeError = {
@@ -208,12 +214,45 @@ export default function EditorPage() {
     loadPageData();
   }, [username, user?.id, setBlocks, setLoading]);
 
-  const handleAddBlock = (
+  const handleAddBlock = async (
     blockType: BlockType,
-    options?: { url?: string; title?: string },
+    options?: AddBlockOptions,
   ) => {
+    if (blockType === "image" && !options?.file) {
+      return;
+    }
+
     const id = crypto.randomUUID();
-    const defaultContent = getDefaultContent(blockType, options);
+    let resolvedOptions = options;
+
+    if (blockType === "image" && options?.file) {
+      try {
+        const webpFile = await convertFileToWebp(
+          options.file,
+          `block-${id}.webp`,
+          {
+            maxSizeMB: 2,
+            maxWidthOrHeight: 2000,
+            quality: 0.8,
+          },
+        );
+        const localDataUrl = await fileToDataUrl(webpFile);
+
+        resolvedOptions = {
+          ...options,
+          url: localDataUrl,
+        };
+      } catch (error) {
+        console.error(
+          "Image block prep failed:",
+          formatErrorMessage(error),
+          error,
+        );
+        return;
+      }
+    }
+
+    const defaultContent = getDefaultContent(blockType, resolvedOptions);
 
     const tempBlockForPlacement = {
       id,
@@ -237,7 +276,7 @@ export default function EditorPage() {
 
   const getDefaultContent = (
     type: BlockType,
-    options?: { url?: string; title?: string },
+    options?: AddBlockOptions,
   ): Block["content"] => {
     switch (type) {
       case "text":
@@ -248,7 +287,7 @@ export default function EditorPage() {
           title: options?.title ?? "",
         };
       case "image":
-        return { url: "", alt: "" };
+        return { url: options?.url ?? "", alt: options?.alt ?? "" };
     }
   };
 
@@ -331,7 +370,42 @@ export default function EditorPage() {
       }
       setPersistedAvatarUrl(resolvedAvatarUrl);
 
-      const blockRows = blocks.map((block, index) =>
+      const resolvedBlocks = await Promise.all(
+        blocks.map(async (block) => {
+          if (block.type !== "image") return block;
+
+          const contentUrl = block.content?.url ?? "";
+          if (!contentUrl || !isDataUrl(contentUrl)) {
+            return block;
+          }
+
+          try {
+            const file = dataUrlToFile(contentUrl, `block-${block.id}.webp`);
+            const uploaded = await uploadPageImage({
+              uid: user.id,
+              username,
+              file,
+              scope: { kind: "block-image", blockId: block.id },
+            });
+
+            return {
+              ...block,
+              content: {
+                ...block.content,
+                url: uploaded.downloadUrl,
+              },
+            } as Block;
+          } catch (error) {
+            throw new Error(
+              `Uploading image block failed (${block.id}): ${formatErrorMessage(error)}`,
+            );
+          }
+        }),
+      );
+
+      setBlocks(resolvedBlocks);
+
+      const blockRows = resolvedBlocks.map((block, index) =>
         stripUndefinedDeep({
           ...toBlockRow(block, username, user.id),
           order: index,
@@ -353,7 +427,7 @@ export default function EditorPage() {
           .eq("page_username", username);
       throwIfError(existingBlocksError, "Fetching existing blocks failed");
 
-      const currentBlockIds = new Set(blocks.map((block) => block.id));
+      const currentBlockIds = new Set(resolvedBlocks.map((block) => block.id));
       const staleIds = (existingBlockRows ?? [])
         .map((row) => String(row.id))
         .filter((id) => !currentBlockIds.has(id));
