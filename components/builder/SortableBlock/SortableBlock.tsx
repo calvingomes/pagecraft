@@ -100,8 +100,7 @@ export function SortableBlock({
             isParagraph
               ? {
                   width: fluid ? "100%" : `${widthPx}px`,
-                  height: "auto",
-                  minHeight: `${heightPx}px`,
+                  height: `${heightPx}px`,
                 }
               : fluid
                 ? {
@@ -115,12 +114,8 @@ export function SortableBlock({
                   }
           }
         >
-          <div
-            className={`${styles.content} ${isParagraph ? styles.paragraphContent : ""}`}
-          >
-            <div
-              className={`${styles.blockContent} ${isParagraph ? styles.paragraphBlockContent : ""}`}
-            >
+          <div className={styles.content}>
+            <div className={styles.blockContent}>
               <BlockRenderer block={block} />
             </div>
           </div>

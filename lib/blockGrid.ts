@@ -8,23 +8,52 @@ export const GRID_GAP_PX = 20;
 export const GRID_CANVAS_PX =
   GRID_COLS * GRID_CELL_PX + (GRID_COLS - 1) * GRID_GAP_PX;
 export const GRID_ROW_SCALE = 2;
-export const GRID_ROW_PX = (GRID_CELL_PX + GRID_GAP_PX) / GRID_ROW_SCALE;
-export const GRID_ROW_GAP_PX = 0;
-export const AUTO_HEIGHT_MIN_HEIGHT_PX = 100;
+export const GRID_ROW_PX = 90;
+export const GRID_ROW_GAP_PX = 20;
+export const AUTO_HEIGHT_MIN_HEIGHT_PX = 90;
 const AUTO_HEIGHT_BLOCK_TYPES: ReadonlySet<BlockType> = new Set([
   "paragraph",
   "sectionTitle",
 ]);
+const AUTO_HEIGHT_DEFAULT_HEIGHT_PX: Partial<Record<BlockType, number>> = {
+  paragraph: 90,
+  sectionTitle: 90,
+};
 
 export function supportsAutoHeight(block: Block): boolean {
   return AUTO_HEIGHT_BLOCK_TYPES.has(block.type);
 }
 
-export function normalizeAutoHeightPx(value: number | undefined): number {
+export function normalizeAutoHeightPx(
+  value: number | undefined,
+  blockType?: BlockType,
+): number {
+  const fallback =
+    (blockType ? AUTO_HEIGHT_DEFAULT_HEIGHT_PX[blockType] : undefined) ??
+    AUTO_HEIGHT_MIN_HEIGHT_PX;
   if (typeof value !== "number" || !Number.isFinite(value)) {
-    return AUTO_HEIGHT_MIN_HEIGHT_PX;
+    return fallback;
   }
-  return Math.max(AUTO_HEIGHT_MIN_HEIGHT_PX, Math.ceil(value));
+  return Math.max(fallback, Math.ceil(value));
+}
+
+function subRowsForAutoHeightPx(
+  value: number | undefined,
+  blockType?: BlockType,
+): number {
+  const normalized = normalizeAutoHeightPx(value, blockType);
+  return Math.max(
+    1,
+    Math.ceil((normalized + GRID_ROW_GAP_PX) / (GRID_ROW_PX + GRID_ROW_GAP_PX)),
+  );
+}
+
+export function quantizeAutoHeightPx(
+  value: number | undefined,
+  blockType?: BlockType,
+): number {
+  const subRows = subRowsForAutoHeightPx(value, blockType);
+  return subRows * GRID_ROW_PX + (subRows - 1) * GRID_ROW_GAP_PX;
 }
 
 // ── Preset → grid spans ─────────────────────────────────────────────
@@ -61,11 +90,14 @@ export function sizePxForPreset(preset: BlockWidthPreset | undefined): {
 }
 
 function autoHeightPx(block: Block): number {
-  return normalizeAutoHeightPx(block.styles?.height);
+  return normalizeAutoHeightPx(block.styles?.height, block.type);
 }
 
 function rowsForHeight(heightPx: number): number {
-  const subRows = Math.max(1, Math.ceil(heightPx / GRID_ROW_PX));
+  const subRows = Math.max(
+    1,
+    Math.ceil((heightPx + GRID_ROW_GAP_PX) / (GRID_ROW_PX + GRID_ROW_GAP_PX)),
+  );
   return subRows / GRID_ROW_SCALE;
 }
 
@@ -128,7 +160,13 @@ export function canPlaceBlockAt(
 
 export function findFirstFreeSpot(block: Block, placed: Block[]): GridLayout {
   const { w, h } = spansForBlock(block);
-  for (let y = 0; y < 200; y += 1 / GRID_ROW_SCALE) {
+  const maxPlacedBottom = placed.reduce((acc, p) => {
+    const r = rectForBlock(p);
+    return Math.max(acc, r.y + r.h);
+  }, 0);
+  const scanLimit = Math.max(200, Math.ceil(maxPlacedBottom) + 60);
+
+  for (let y = 0; y < scanLimit; y += 1 / GRID_ROW_SCALE) {
     for (let x = 0; x <= GRID_COLS - w; x++) {
       const rect: GridRect = { x, y, w, h };
       if (!placed.some((p) => overlaps(rect, rectForBlock(p)))) {
@@ -185,12 +223,26 @@ export function resolveCollisions(
     ).filter((cx) => cx !== nx);
     const orderedX = [nx, ...xCandidates];
 
-    for (let y = ny; y < 200; y += 1 / GRID_ROW_SCALE) {
+    const maxExistingBottom = allBlocks.reduce((acc, block) => {
+      const layout =
+        block.id === anchoredId
+          ? anchored
+          : (getLayout(block) ?? block.layout ?? { x: 0, y: 0 });
+      const rect = rectForBlock(block, layout);
+      return Math.max(acc, rect.y + rect.h);
+    }, anchored.y + ah);
+
+    const scanLimit = Math.max(
+      Math.ceil(maxExistingBottom) + 80,
+      Math.ceil(ny) + 40,
+    );
+
+    for (let y = ny; y < scanLimit; y += 1 / GRID_ROW_SCALE) {
       for (const x of orderedX) {
         if (isFree({ x, y, w, h })) return { x, y };
       }
     }
-    for (let y = 0; y < 200; y += 1 / GRID_ROW_SCALE) {
+    for (let y = 0; y < scanLimit; y += 1 / GRID_ROW_SCALE) {
       for (let x = 0; x <= GRID_COLS - w; x++) {
         if (isFree({ x, y, w, h })) return { x, y };
       }

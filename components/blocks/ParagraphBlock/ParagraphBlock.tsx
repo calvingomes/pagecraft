@@ -8,7 +8,7 @@ import { useEditorStore } from "@/stores/editor-store";
 import { sanitizeMinimalRTH } from "@/helper/sanitizeRichText";
 import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
 import { computeAutoHeightReflowUpdates } from "@/lib/autoHeightLayout";
-import { normalizeAutoHeightPx } from "@/lib/blockGrid";
+import { normalizeAutoHeightPx, quantizeAutoHeightPx } from "@/lib/blockGrid";
 import styles from "./ParagraphBlock.module.css";
 
 export const ParagraphBlock = ({ block }: { block: ParagraphBlockType }) => {
@@ -19,14 +19,22 @@ export const ParagraphBlock = ({ block }: { block: ParagraphBlockType }) => {
   const initialContent = sanitizeMinimalRTH(block.content?.text ?? "");
   const lastSyncedContent = useRef(initialContent);
   const lastSyncedHeight = useRef<number>(
-    normalizeAutoHeightPx(block.styles?.height),
+    normalizeAutoHeightPx(block.styles?.height, block.type),
   );
 
   const syncHeight = (nextHeightPx: number) => {
     if (!contextEditor?.onUpdateBlock) return;
 
-    const next = normalizeAutoHeightPx(nextHeightPx);
-    if (Math.abs(next - lastSyncedHeight.current) < 8) return;
+    const next = normalizeAutoHeightPx(nextHeightPx, block.type);
+    const prevOccupancy = quantizeAutoHeightPx(
+      lastSyncedHeight.current,
+      block.type,
+    );
+    const nextOccupancy = quantizeAutoHeightPx(next, block.type);
+    const occupancyChanged = prevOccupancy !== nextOccupancy;
+
+    if (!occupancyChanged && Math.abs(next - lastSyncedHeight.current) < 8)
+      return;
 
     lastSyncedHeight.current = next;
     const updates = computeAutoHeightReflowUpdates({
@@ -76,12 +84,12 @@ export const ParagraphBlock = ({ block }: { block: ParagraphBlockType }) => {
       }
 
       const root = editor.view.dom as HTMLElement;
-      syncHeight(root.scrollHeight + 24);
+      syncHeight(root.scrollHeight);
     },
     onUpdate: ({ editor }) => {
       if (!editable) return;
       const root = editor.view.dom as HTMLElement;
-      syncHeight(root.scrollHeight + 24);
+      syncHeight(root.scrollHeight);
     },
   });
 
@@ -103,7 +111,7 @@ export const ParagraphBlock = ({ block }: { block: ParagraphBlockType }) => {
   useEffect(() => {
     if (!editor || !editable) return;
     const root = editor.view.dom as HTMLElement;
-    syncHeight(root.scrollHeight + 24);
+    syncHeight(root.scrollHeight);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor, editable, block.id]);
 

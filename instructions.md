@@ -63,13 +63,15 @@ styles/         — Global CSS custom properties and media queries
 
 All grid constants are centralized in `lib/blockGrid.ts`:
 
-| Constant         | Value | Purpose                                    |
-| ---------------- | ----- | ------------------------------------------ |
-| `GRID_COLS`      | 4     | Number of columns                          |
-| `GRID_CELL_PX`   | 200   | Base cell size in pixels                   |
-| `GRID_GAP_PX`    | 20    | Gap between cells                          |
-| `GRID_CANVAS_PX` | 860   | Total canvas width                         |
-| `GRID_ROW_SCALE` | 2     | Vertical sub-row precision (0.5 row units) |
+| Constant          | Value | Purpose                                    |
+| ----------------- | ----- | ------------------------------------------ |
+| `GRID_COLS`       | 4     | Number of columns                          |
+| `GRID_CELL_PX`    | 200   | Base cell size in pixels                   |
+| `GRID_GAP_PX`     | 20    | Gap between cells                          |
+| `GRID_CANVAS_PX`  | 860   | Total canvas width                         |
+| `GRID_ROW_SCALE`  | 2     | Vertical sub-row precision (0.5 row units) |
+| `GRID_ROW_PX`     | 90    | Sub-row content height                     |
+| `GRID_ROW_GAP_PX` | 20    | Sub-row vertical gap                       |
 
 **Never hardcode these values** elsewhere. Import from `@/lib/blockGrid`.
 
@@ -77,6 +79,8 @@ All grid constants are centralized in `lib/blockGrid.ts`:
 - `spansForBlock(block, overridePreset?)` → block-aware spans (supports auto-height blocks)
 - `sizePxForPreset(preset)` → `{ widthPx, heightPx }` derived pixel sizes
 - `sizePxForBlock(block)` → block-aware pixel dimensions
+- `normalizeAutoHeightPx(value, blockType?)` → normalized raw content height per block type
+- `quantizeAutoHeightPx(value, blockType?)` → snapped occupancy height for half-row layout steps
 - `rectForBlock(block, layout?)` → full `PlacedRect` geometry
 - `canPlaceBlockAt`, `findFirstFreeSpot`, `resolveCollisions` — placement/collision logic
 
@@ -92,7 +96,8 @@ Do not duplicate these functions. If you need grid math, it belongs in `blockGri
 **Do / Don't**
 
 - **Do:** Keep block components focused on UI + editor events; call shared layout helpers from `lib/`.
-- **Do:** Reuse `normalizeAutoHeightPx`, `sizePxForBlock`, `spansForBlock`, and `computeAutoHeightReflowUpdates`.
+- **Do:** Reuse `normalizeAutoHeightPx`, `quantizeAutoHeightPx`, `sizePxForBlock`, `spansForBlock`, and `computeAutoHeightReflowUpdates`.
+- **Do:** Keep visual block height based on normalized content height; use quantized height for occupancy/reflow decisions.
 - **Don't:** Add per-block collision or compaction loops directly inside component files.
 - **Don't:** Hardcode row math (`0.5`, `200`, `20`) outside `lib/blockGrid.ts`.
 

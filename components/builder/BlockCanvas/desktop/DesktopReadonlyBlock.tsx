@@ -11,7 +11,6 @@ type Props = {
 
 export function DesktopReadonlyBlock({ block }: Props) {
   const { widthPx, heightPx } = sizePxForBlock(block);
-  const isParagraph = block.type === "paragraph";
 
   return (
     <div className={sortableBlockStyles.hoverZone}>
@@ -19,20 +18,14 @@ export function DesktopReadonlyBlock({ block }: Props) {
         className={`${sortableBlockStyles.wrapper} ${block.type === "sectionTitle" || block.type === "paragraph" ? sortableBlockStyles.emptyWrapper : ""}`}
         style={{
           width: `${widthPx}px`,
-          ...(isParagraph
-            ? { height: "auto", minHeight: `${heightPx}px` }
-            : { height: `${heightPx}px` }),
+          height: `${heightPx}px`,
           maxWidth: "100%",
           maxHeight: "100%",
           cursor: "default",
         }}
       >
-        <div
-          className={`${sortableBlockStyles.content} ${isParagraph ? sortableBlockStyles.paragraphContent : ""}`}
-        >
-          <div
-            className={`${sortableBlockStyles.blockContent} ${isParagraph ? sortableBlockStyles.paragraphBlockContent : ""}`}
-          >
+        <div className={sortableBlockStyles.content}>
+          <div className={sortableBlockStyles.blockContent}>
             <BlockRenderer block={block} />
           </div>
         </div>

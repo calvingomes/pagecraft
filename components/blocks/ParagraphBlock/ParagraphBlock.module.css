@@ -1,7 +1,6 @@
 .editorContainer {
   width: 100%;
-  height: auto;
-  min-height: 100px;
+  height: 100%;
   display: flex;
   align-items: stretch;
   justify-content: stretch;
@@ -15,8 +14,7 @@
 
 .editor :global(.ProseMirror) {
   width: 100%;
-  height: auto;
-  min-height: 100px;
+  height: 100%;
   border: none;
   background: transparent;
   color: var(--color-text-primary);
