@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
-import { Link2 } from "lucide-react";
+import { Link2, Trash2 } from "lucide-react";
 import { LinkBlock as LinkBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import {
@@ -29,13 +29,28 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
   const metadataFetchTimer = useRef<number | null>(null);
   const lastFetchedUrl = useRef<string>(content.metaUrl ?? "");
   const lastSyncedTitle = useRef(titleHtml);
+  const [isTitleEmpty, setIsTitleEmpty] = useState(
+    titleHtml.trim().length === 0,
+  );
 
   const urlTrimmed = useMemo(() => blockUrl.trim(), [blockUrl]);
   const canFetch = useMemo(() => isSupportedLinkUrl(urlTrimmed), [urlTrimmed]);
 
+  const handleRemoveMetaImage = () => {
+    if (!editor?.onUpdateBlock) return;
+
+    editor.onUpdateBlock(block.id, {
+      content: {
+        ...content,
+        imageUrl: "",
+        metaImageRemoved: true,
+      },
+    });
+  };
+
   const titleEditor = useEditor({
     extensions: minimalRTEWithPlaceholder({
-      placeholder: "Title",
+      placeholder: "Write Title...",
       showOnlyWhenEditable: true,
     }),
     content: titleHtml,
@@ -47,6 +62,12 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
         autocorrect: "off",
         autocapitalize: "off",
       },
+    },
+    onCreate: ({ editor: rte }) => {
+      setIsTitleEmpty(rte.isEmpty);
+    },
+    onUpdate: ({ editor: rte }) => {
+      setIsTitleEmpty(rte.isEmpty);
     },
     onBlur: ({ editor: rte }) => {
       if (!editor?.onUpdateBlock) return;
@@ -107,7 +128,6 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
         const nextMetaTitle = (meta.title ?? "").trim();
         const shouldUpdateTitle = shouldAutoApplyFetchedTitle({
           currentTitle: content.title,
-          legacyLabel: content.label,
           currentMetaTitle: content.metaTitle,
         });
 
@@ -116,9 +136,9 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
             ...content,
             url: urlTrimmed,
             metaUrl: urlTrimmed,
-            metaTitle: nextMetaTitle || undefined,
-            imageUrl: meta.imageUrl ?? undefined,
-            iconUrl: meta.iconUrl ?? undefined,
+            metaTitle: nextMetaTitle,
+            imageUrl: content.metaImageRemoved ? "" : (meta.imageUrl ?? ""),
+            iconUrl: meta.iconUrl ?? "",
             ...(shouldUpdateTitle && nextMetaTitle
               ? { title: sanitizeMinimalRTH(nextMetaTitle) }
               : {}),
@@ -143,7 +163,7 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
     content.metaUrl,
     content.metaTitle,
     content.title,
-    content.label,
+    content.metaImageRemoved,
   ]);
 
   const isEditable = !!editor;
@@ -179,6 +199,9 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
       {titleEditor ? (
         <EditorContent editor={titleEditor} className={styles.titleEditor} />
       ) : null}
+      {isTitleEmpty ? (
+        <span className={styles.titlePlaceholder}>Write Title...</span>
+      ) : null}
     </div>
   ) : clampedTitleHtml ? (
     <div
@@ -207,9 +230,25 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
 
   const PreviewElement =
     showPreviewImage && imageUrl ? (
-      <div className={styles.preview}>
+      <div
+        className={`${styles.preview} ${isEditable ? styles.previewEditable : ""}`}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className={styles.previewImg} src={imageUrl} alt="" />
+        {isEditable ? (
+          <>
+            <div className={styles.previewOverlay} aria-hidden />
+            <button
+              type="button"
+              className={styles.previewDeleteButton}
+              onClick={handleRemoveMetaImage}
+              aria-label="Remove preview image"
+              title="Remove preview image"
+            >
+              <Trash2 size={18} />
+            </button>
+          </>
+        ) : null}
       </div>
     ) : null;
 

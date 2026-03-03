@@ -6,8 +6,7 @@
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
-  padding: 18px;
-  gap: 14px;
+  gap: 12px;
   color: var(--color-text-primary);
   text-decoration: none;
   min-width: 0;
@@ -15,14 +14,14 @@
 
 .header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 14px;
   min-width: 0;
 }
 
 .iconWrap {
-  width: 54px;
-  height: 54px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.05);
   display: flex;
@@ -32,27 +31,27 @@
 }
 
 .iconImg {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
+  width: 26px;
+  height: 26px;
+  object-fit: cover;
   border-radius: 6px;
 }
 
 .iconFallback {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   opacity: 0.75;
 }
 
 .text {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
   min-width: 0;
 }
 
 .title {
-  font-size: 30px;
+  font-size: 18px;
   font-weight: 650;
   line-height: 1.1;
   color: rgba(0, 0, 0, 0.35);
@@ -61,7 +60,7 @@
 }
 
 .url {
-  font-size: 20px;
+  font-size: 16px;
   line-height: 1.1;
   color: rgba(0, 0, 0, 0.55);
   overflow: hidden;
@@ -99,7 +98,8 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  border-radius: 18px;
+  border-radius: 8px;
+  position: relative;
 }
 
 .previewImg {
@@ -109,23 +109,52 @@
   display: block;
 }
 
-/* editing */
-.card[data-editing] {
-  padding: 18px;
+.previewOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.previewDeleteButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.previewEditable:hover .previewOverlay,
+.previewEditable:hover .previewDeleteButton {
+  opacity: 1;
 }
 
 .titleEditorContainer {
   width: 100%;
+  position: relative;
 }
 
 .titleEditor {
   width: 100%;
 }
 
-.titleEditor :global(.ProseMirror) {
+.titleEditorContainer :global(.ProseMirror) {
   border: none;
   background: transparent;
-  font-size: 30px;
+  font-size: 18px;
   font-weight: 650;
   line-height: 1.1;
   color: rgba(0, 0, 0, 0.35);
@@ -137,10 +166,17 @@
 }
 
 .title :global(p),
-.titleEditor :global(p) {
+.titleEditorContainer :global(.ProseMirror p) {
   margin: 0;
 }
 
-.titleEditor :global(.ProseMirror p.is-editor-empty:first-child::before) {
+.titlePlaceholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.1;
   color: rgba(0, 0, 0, 0.25);
+  pointer-events: none;
 }

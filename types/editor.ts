@@ -31,15 +31,12 @@ export interface LinkBlock extends BaseBlock {
   type: "link";
   content: {
     url: string;
-    // User-editable title shown on the card.
     title?: string;
-    // Legacy field (older data) used as a fallback for title.
-    label?: string;
-    // Auto-fetched metadata (should not overwrite user edits).
     metaUrl?: string;
     metaTitle?: string;
     imageUrl?: string;
     iconUrl?: string;
+    metaImageRemoved?: boolean;
   };
 }
 

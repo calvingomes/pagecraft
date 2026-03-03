@@ -8,7 +8,7 @@ export type LinkMetadataResponse = {
 };
 
 export function resolveLinkTitle(content: LinkBlock["content"]): string {
-  return content?.title ?? content?.label ?? content?.metaTitle ?? "";
+  return content?.title ?? content?.metaTitle ?? "";
 }
 
 export function isSupportedLinkUrl(value: string): boolean {
@@ -38,11 +38,10 @@ export function shouldShowLinkPreviewImage(
 
 export function shouldAutoApplyFetchedTitle(args: {
   currentTitle?: string;
-  legacyLabel?: string;
   currentMetaTitle?: string;
 }): boolean {
   const prevMetaTitle = (args.currentMetaTitle ?? "").trim();
-  const prevTitleRaw = (args.currentTitle ?? args.legacyLabel ?? "").trim();
+  const prevTitleRaw = (args.currentTitle ?? "").trim();
   const prevTitle = htmlToText(prevTitleRaw);
 
   return (
