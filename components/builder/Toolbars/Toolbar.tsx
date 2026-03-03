@@ -9,14 +9,23 @@ import type { ToolbarDefaultProps, ToolbarMode } from "./Toolbar.types";
 export const Toolbar = (props: ToolbarDefaultProps) => {
   const [mode, setMode] = useState<ToolbarMode>("default");
   const [linkUrl, setLinkUrl] = useState("");
+  const [isCreatingLink, setIsCreatingLink] = useState(false);
 
   const handleCreateLink = async () => {
+    if (isCreatingLink) return;
+
     const url = linkUrl.trim();
     if (!url || !props.onAddBlock) return;
 
-    await props.onAddBlock("link", { url });
+    setIsCreatingLink(true);
     setLinkUrl("");
     setMode("default");
+
+    try {
+      await props.onAddBlock("link", { url });
+    } finally {
+      setIsCreatingLink(false);
+    }
   };
 
   if (mode === "link") {
