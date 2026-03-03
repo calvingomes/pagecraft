@@ -25,67 +25,13 @@ import {
   type RawStoredBlock,
 } from "@/lib/normalizeBlocks";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
-import {
-  deletePageImage,
-  uploadPageImage,
-} from "@/lib/uploads/pageImageStorage";
-import { avatarDataUrlToWebpFile } from "@/lib/uploads/avatarImage";
+import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
 import {
   convertFileToWebp,
-  dataUrlToFile,
   fileToDataUrl,
 } from "@/lib/uploads/imageProcessing";
-import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
+import { saveEditorPage } from "@/lib/editor/saveEditorPage";
 import styles from "./editor.module.css";
-
-type DbLikeError = {
-  message?: string;
-  details?: string;
-  hint?: string;
-  code?: string;
-};
-
-type UnknownRecord = Record<string, unknown>;
-
-function isPlainObject(value: unknown): value is UnknownRecord {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    Object.getPrototypeOf(value) === Object.prototype
-  );
-}
-
-function stripUndefinedDeep<T>(value: T): T {
-  if (Array.isArray(value)) {
-    return value
-      .map((item) => stripUndefinedDeep(item))
-      .filter((item) => item !== undefined) as T;
-  }
-
-  if (isPlainObject(value)) {
-    const out: UnknownRecord = {};
-    for (const [key, nested] of Object.entries(value)) {
-      if (nested === undefined) continue;
-      out[key] = stripUndefinedDeep(nested);
-    }
-    return out as T;
-  }
-
-  return value;
-}
-
-function toBlockRow(block: Block, username: string, uid?: string) {
-  return {
-    id: block.id,
-    page_username: username,
-    uid: uid ?? null,
-    type: block.type,
-    order: block.order,
-    content: block.content,
-    layout: block.layout ?? null,
-    styles: block.styles ?? null,
-  };
-}
 
 export default function EditorPage() {
   const { username, user, loading, setLoading } = useAuthStore();
@@ -104,40 +50,6 @@ export default function EditorPage() {
   const [avatarShape, setAvatarShape] = useState<AvatarShape>("circle");
   const [persistedAvatarUrl, setPersistedAvatarUrl] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
-
-  const isDataUrl = (value: string) => value.startsWith("data:");
-
-  const formatErrorMessage = (error: unknown) => {
-    if (error instanceof Error && error.message) {
-      return error.message;
-    }
-
-    if (typeof error === "string") {
-      return error;
-    }
-
-    if (error && typeof error === "object") {
-      const maybe = error as DbLikeError;
-      const parts = [maybe.message, maybe.details, maybe.hint].filter(
-        (value): value is string => Boolean(value),
-      );
-
-      if (maybe.code) {
-        parts.push(`code=${maybe.code}`);
-      }
-
-      if (parts.length > 0) {
-        return parts.join(" | ");
-      }
-    }
-
-    return "Unknown save error.";
-  };
-
-  const throwIfError = (error: DbLikeError | null, step: string) => {
-    if (!error) return;
-    throw new Error(`${step}: ${formatErrorMessage(error)}`);
-  };
 
   useEffect(() => {
     if (!username || !user?.id) return;
@@ -243,11 +155,9 @@ export default function EditorPage() {
           url: localDataUrl,
         };
       } catch (error) {
-        console.error(
-          "Image block prep failed:",
-          formatErrorMessage(error),
-          error,
-        );
+        const message =
+          error instanceof Error ? error.message : "Image block prep failed.";
+        console.error("Image block prep failed:", message, error);
         return;
       }
     }
@@ -307,142 +217,28 @@ export default function EditorPage() {
     setIsSaving(true);
 
     try {
-      const { error: profileError } = await supabase.from("profiles").upsert(
-        {
-          id: user.id,
-          username,
-        },
-        { onConflict: "id" },
-      );
-      throwIfError(profileError, "Saving profile failed");
+      const result = await saveEditorPage({
+        userId: user.id,
+        username,
+        background,
+        sidebarPosition,
+        displayName,
+        bioHtml,
+        avatarUrl,
+        persistedAvatarUrl,
+        avatarShape,
+        blocks,
+      });
 
-      let resolvedAvatarUrl = avatarUrl;
-
-      if (avatarUrl === "" && persistedAvatarUrl) {
-        try {
-          await deletePageImage({
-            uid: user.id,
-            username,
-            scope: { kind: "avatar" },
-          });
-        } catch (error) {
-          throw new Error(
-            `Deleting avatar failed: ${formatErrorMessage(error)}`,
-          );
-        }
-        resolvedAvatarUrl = "";
-      } else if (isDataUrl(avatarUrl)) {
-        const file = await avatarDataUrlToWebpFile(avatarUrl, username);
-        let upload;
-        try {
-          upload = await uploadPageImage({
-            uid: user.id,
-            username,
-            file,
-            scope: { kind: "avatar" },
-          });
-        } catch (error) {
-          throw new Error(
-            `Uploading avatar failed: ${formatErrorMessage(error)}`,
-          );
-        }
-        resolvedAvatarUrl = upload.downloadUrl;
+      if (result.avatarUrl !== avatarUrl) {
+        setAvatarUrl(result.avatarUrl);
       }
-
-      const { error: pageError } = await supabase.from("pages").upsert(
-        stripUndefinedDeep({
-          username,
-          uid: user.id,
-          published: true,
-          background,
-          sidebar_position: sidebarPosition,
-          display_name: displayName,
-          bio_html: bioHtml,
-          avatar_url: resolvedAvatarUrl,
-          avatar_shape: avatarShape,
-        }),
-        { onConflict: "username" },
-      );
-      throwIfError(pageError, "Saving page settings failed");
-
-      if (resolvedAvatarUrl !== avatarUrl) {
-        setAvatarUrl(resolvedAvatarUrl);
-      }
-      setPersistedAvatarUrl(resolvedAvatarUrl);
-
-      const resolvedBlocks = await Promise.all(
-        blocks.map(async (block) => {
-          if (block.type !== "image") return block;
-
-          const contentUrl = block.content?.url ?? "";
-          if (!contentUrl || !isDataUrl(contentUrl)) {
-            return block;
-          }
-
-          try {
-            const file = dataUrlToFile(contentUrl, `block-${block.id}.webp`);
-            const uploaded = await uploadPageImage({
-              uid: user.id,
-              username,
-              file,
-              scope: { kind: "block-image", blockId: block.id },
-            });
-
-            return {
-              ...block,
-              content: {
-                ...block.content,
-                url: uploaded.downloadUrl,
-              },
-            } as Block;
-          } catch (error) {
-            throw new Error(
-              `Uploading image block failed (${block.id}): ${formatErrorMessage(error)}`,
-            );
-          }
-        }),
-      );
-
-      setBlocks(resolvedBlocks);
-
-      const blockRows = resolvedBlocks.map((block, index) =>
-        stripUndefinedDeep({
-          ...toBlockRow(block, username, user.id),
-          order: index,
-        }),
-      );
-
-      if (blockRows.length > 0) {
-        const { error: upsertBlocksError } = await supabase
-          .from("blocks")
-          .upsert(blockRows, { onConflict: "id" });
-
-        throwIfError(upsertBlocksError, "Saving blocks failed");
-      }
-
-      const { data: existingBlockRows, error: existingBlocksError } =
-        await supabase
-          .from("blocks")
-          .select("id")
-          .eq("page_username", username);
-      throwIfError(existingBlocksError, "Fetching existing blocks failed");
-
-      const currentBlockIds = new Set(resolvedBlocks.map((block) => block.id));
-      const staleIds = (existingBlockRows ?? [])
-        .map((row) => String(row.id))
-        .filter((id) => !currentBlockIds.has(id));
-
-      if (staleIds.length > 0) {
-        const { error: deleteStaleError } = await supabase
-          .from("blocks")
-          .delete()
-          .eq("page_username", username)
-          .in("id", staleIds);
-
-        throwIfError(deleteStaleError, "Deleting removed blocks failed");
-      }
+      setPersistedAvatarUrl(result.avatarUrl);
+      setBlocks(result.blocks);
     } catch (error) {
-      console.error("Save failed:", formatErrorMessage(error), error);
+      const message =
+        error instanceof Error ? error.message : "Unknown save error.";
+      console.error("Save failed:", message, error);
     } finally {
       setIsSaving(false);
     }
