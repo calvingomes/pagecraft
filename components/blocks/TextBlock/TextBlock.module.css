@@ -1,5 +1,3 @@
-@import "./TextBlock.prosemirror.css";
-
 .editorContainer {
   width: 100%;
   height: 100%;
@@ -12,6 +10,42 @@
   width: 100%;
   height: 100%;
   padding: 12px;
+}
+
+.editor :global(.ProseMirror) {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.6;
+  outline: none;
+  overflow: hidden;
+  min-width: 0;
+  border-radius: 6px;
+}
+
+.editor :global(.ProseMirror):focus-visible {
+  background-color: rgb(240, 240, 240);
+  overflow: scroll;
+  transition:
+    opacity 0.15s,
+    visibility 0.15s;
+}
+
+.editor :global(.ProseMirror p.is-editor-empty:first-child::before) {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--color-text-inverse-secondary);
+  pointer-events: none;
+  height: 0;
+}
+
+.editor :global(.ProseMirror p) {
+  margin: 8px;
+  line-height: 1.6;
 }
 
 /* display mode */

@@ -10,6 +10,7 @@
   color: var(--color-text-primary);
   text-decoration: none;
   min-width: 0;
+  padding: 12px;
 }
 
 .header {
@@ -163,11 +164,20 @@
   outline: none;
   overflow-wrap: anywhere;
   word-break: break-word;
+  border-radius: 6px;
+}
+
+.titleEditorContainer :global(.ProseMirror):focus-visible {
+  background-color: rgb(240, 240, 240);
+  overflow: scroll;
+  transition:
+    opacity 0.15s,
+    visibility 0.15s;
 }
 
 .title :global(p),
 .titleEditorContainer :global(.ProseMirror p) {
-  margin: 0;
+  margin: 8px;
 }
 
 .titlePlaceholder {
