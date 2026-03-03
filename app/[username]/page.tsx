@@ -9,7 +9,11 @@ import {
 import { db } from "@/lib/firebase";
 
 import type { Block } from "@/types/editor";
-import type { PageBackgroundId, SidebarPosition } from "@/types/page";
+import type {
+  AvatarShape,
+  PageBackgroundId,
+  SidebarPosition,
+} from "@/types/page";
 import { PageView } from "@/components/views/PageView/PageView";
 import {
   ensureBlocksHaveValidLayouts,
@@ -52,6 +56,8 @@ export default async function UserPage({ params }: Props) {
         sidebarPosition?: SidebarPosition;
         displayName?: string;
         bioHtml?: string;
+        avatarUrl?: string;
+        avatarShape?: AvatarShape;
       }
     | undefined;
 
@@ -63,6 +69,8 @@ export default async function UserPage({ params }: Props) {
       sidebarPosition={page?.sidebarPosition}
       displayName={page?.displayName}
       bioHtml={page?.bioHtml}
+      avatarUrl={page?.avatarUrl}
+      avatarShape={page?.avatarShape}
       blocks={blocks}
     />
   );

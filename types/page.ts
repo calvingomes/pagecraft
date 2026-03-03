@@ -8,3 +8,4 @@ export type PageBackgroundId =
 
 export type SidebarPosition = "left" | "center" | "right";
 
+export type AvatarShape = "circle" | "square";

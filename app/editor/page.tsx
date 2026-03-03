@@ -20,7 +20,11 @@ import {
 } from "firebase/firestore";
 import type { Block, BlockType } from "@/types/editor";
 import { EditorProvider } from "@/contexts/EditorContext";
-import type { PageBackgroundId, SidebarPosition } from "@/types/page";
+import type {
+  AvatarShape,
+  PageBackgroundId,
+  SidebarPosition,
+} from "@/types/page";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
 import { LogoutButton } from "@/components/layout/LogoutButton/LogoutButton";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
@@ -50,6 +54,8 @@ export default function EditorPage() {
     useState<SidebarPosition>("left");
   const [displayName, setDisplayName] = useState<string>("");
   const [bioHtml, setBioHtml] = useState<string>("");
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const [avatarShape, setAvatarShape] = useState<AvatarShape>("circle");
   const [pageSettingsLoaded, setPageSettingsLoaded] = useState(false);
 
   /* auth & username guard */
@@ -85,6 +91,8 @@ export default function EditorPage() {
 
       setDisplayName(username);
       setBioHtml("");
+      setAvatarUrl("");
+      setAvatarShape("circle");
 
       // load page settings first so the UI can render them as early as possible
       const pageRef = doc(db, "pages", username);
@@ -98,6 +106,8 @@ export default function EditorPage() {
               sidebarPosition?: SidebarPosition;
               displayName?: string;
               bioHtml?: string;
+              avatarUrl?: string;
+              avatarShape?: AvatarShape;
             }
           | undefined;
 
@@ -106,6 +116,10 @@ export default function EditorPage() {
         if (typeof data?.displayName === "string")
           incomingDisplayName = data.displayName;
         if (typeof data?.bioHtml === "string") setBioHtml(data.bioHtml);
+        if (typeof data?.avatarUrl === "string") setAvatarUrl(data.avatarUrl);
+        if (data?.avatarShape === "circle" || data?.avatarShape === "square") {
+          setAvatarShape(data.avatarShape);
+        }
       }
 
       setDisplayName(incomingDisplayName ?? username);
@@ -286,7 +300,7 @@ export default function EditorPage() {
     ).catch(console.error);
   }, [sidebarPosition, username, pageSettingsLoaded]);
 
-  /* persist profile changes (display name + bio) */
+  /* persist profile changes (display name + bio + avatar) */
   useEffect(() => {
     if (!username || !pageSettingsLoaded) return;
 
@@ -297,6 +311,8 @@ export default function EditorPage() {
         stripUndefinedDeep({
           displayName,
           bioHtml,
+          avatarUrl,
+          avatarShape,
           updatedAt: serverTimestamp(),
         }),
         { merge: true },
@@ -304,7 +320,14 @@ export default function EditorPage() {
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [bioHtml, displayName, pageSettingsLoaded, username]);
+  }, [
+    avatarShape,
+    avatarUrl,
+    bioHtml,
+    displayName,
+    pageSettingsLoaded,
+    username,
+  ]);
 
   if (loading) {
     return <div>Loading editor…</div>;
@@ -319,6 +342,10 @@ export default function EditorPage() {
         bioHtml={bioHtml}
         onChangeDisplayName={setDisplayName}
         onChangeBioHtml={setBioHtml}
+        avatarUrl={avatarUrl}
+        avatarShape={avatarShape}
+        onChangeAvatarUrl={setAvatarUrl}
+        onChangeAvatarShape={setAvatarShape}
       />
       <EditorProvider
         username={username ?? null}

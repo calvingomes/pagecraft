@@ -9,6 +9,7 @@ import { htmlToText } from "@/helper/htmlToText";
 import { sanitizeMinimalRTH } from "@/helper/sanitizeRichText";
 import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
 import type { ProfileSidebarProps } from "./ProfileSidebar.types";
+import { AvatarToolbar } from "./AvatarToolbar";
 
 const DISPLAY_NAME_MAX_CHARS = 70;
 
@@ -33,8 +34,11 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
   const lastSyncedBio = useRef(safeBioHtml);
   const lastSyncedDisplayName = useRef(safeDisplayNameHtml);
   const editable = props.variant === "editor";
+  const avatarShape = props.avatarShape ?? "circle";
+  const avatarUrl = props.avatarUrl ?? "";
 
   const [isDisplayNameActive, setIsDisplayNameActive] = useState(false);
+  const [showAvatarToolbar, setShowAvatarToolbar] = useState(false);
 
   const avatarLetter = (() => {
     const source = (displayNameText || username || "?").trim();
@@ -154,10 +158,42 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
         ? styles.sidebarCenter
         : styles.sidebarRight;
 
+  const avatarClassName = `${styles.avatar} ${avatarShape === "square" ? styles.avatarSquare : ""}`;
+
   return (
     <aside className={`${styles.sidebar} ${positionClass}`}>
       <div className={styles.profileCard}>
-        <div className={styles.avatar}>{avatarLetter}</div>
+        <div
+          className={styles.avatarWrap}
+          onMouseEnter={() => setShowAvatarToolbar(true)}
+          onMouseLeave={() => setShowAvatarToolbar(false)}
+        >
+          <div className={avatarClassName}>
+            {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                className={styles.avatarImage}
+                src={avatarUrl}
+                alt="Profile image"
+              />
+            ) : (
+              avatarLetter
+            )}
+          </div>
+
+          {props.variant === "editor" ? (
+            <AvatarToolbar
+              visible={showAvatarToolbar}
+              currentShape={avatarShape}
+              onShapeChange={(nextShape) =>
+                props.onChangeAvatarShape?.(nextShape)
+              }
+              onDelete={() => props.onChangeAvatarUrl?.("")}
+              onUpload={(nextImage) => props.onChangeAvatarUrl?.(nextImage)}
+              className={styles.avatarToolbar}
+            />
+          ) : null}
+        </div>
         <div className={styles.profileText}>
           {props.variant === "editor" ? (
             <div className={styles.nameInput}>

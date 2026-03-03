@@ -21,6 +21,11 @@
   align-items: flex-start;
 }
 
+.avatarWrap {
+  position: relative;
+  margin: 0 0 40px;
+}
+
 .avatar {
   width: 200px;
   height: 200px;
@@ -31,7 +36,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 0 40px;
+  overflow: hidden;
+}
+
+.avatarSquare {
+  border-radius: 12px;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarToolbar {
+  bottom: -16px;
 }
 
 .bio :global(p) {
@@ -79,8 +98,11 @@
 }
 
 .sidebarCenter .avatar {
-  margin: 0;
   flex-shrink: 0;
+}
+
+.sidebarCenter .avatarWrap {
+  margin: 0;
 }
 
 /* Sidebar Mobile */

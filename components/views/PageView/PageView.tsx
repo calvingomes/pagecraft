@@ -1,7 +1,11 @@
 "use client";
 
 import type { Block } from "@/types/editor";
-import type { PageBackgroundId, SidebarPosition } from "@/types/page";
+import type {
+  AvatarShape,
+  PageBackgroundId,
+  SidebarPosition,
+} from "@/types/page";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
@@ -14,6 +18,8 @@ type PageViewProps = {
   sidebarPosition?: SidebarPosition;
   displayName?: string;
   bioHtml?: string;
+  avatarUrl?: string;
+  avatarShape?: AvatarShape;
 };
 
 export function PageView({
@@ -24,6 +30,8 @@ export function PageView({
   sidebarPosition = "left",
   displayName,
   bioHtml,
+  avatarUrl,
+  avatarShape,
 }: PageViewProps) {
   return (
     <PageLayout background={background} sidebarPosition={sidebarPosition}>
@@ -33,6 +41,8 @@ export function PageView({
         position={sidebarPosition}
         displayName={displayName}
         bioHtml={bioHtml}
+        avatarUrl={avatarUrl}
+        avatarShape={avatarShape}
       />
       <BlockCanvas editable={false} blocks={blocks} title={title} />
     </PageLayout>
