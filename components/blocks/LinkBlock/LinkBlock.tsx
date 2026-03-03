@@ -10,7 +10,6 @@ import {
   isSupportedLinkUrl,
   resolveLinkTitle,
   shouldAutoApplyFetchedTitle,
-  shouldShowLinkPreviewImage,
   type LinkMetadataResponse,
 } from "@/helper/linkBlock";
 import {
@@ -167,8 +166,7 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
   ]);
 
   const isEditable = !!editor;
-  const preset = block.styles?.widthPreset ?? "small";
-  const showPreviewImage = shouldShowLinkPreviewImage(preset);
+  const showPreviewImage = true;
 
   const displayUrl = blockUrl.trim();
   if (!isEditable && !displayUrl) return null;

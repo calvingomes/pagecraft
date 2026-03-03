@@ -30,12 +30,6 @@ export function getLinkHostOrUrl(value: string): string {
   }
 }
 
-export function shouldShowLinkPreviewImage(
-  preset: BlockWidthPreset | undefined,
-): boolean {
-  return preset === "large" || preset === "tall" || preset === "wide";
-}
-
 export function shouldAutoApplyFetchedTitle(args: {
   currentTitle?: string;
   currentMetaTitle?: string;
