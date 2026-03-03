@@ -1,6 +1,6 @@
 import type { Block, BlockType } from "@/types/editor";
 import type { GridLayout } from "@/types/grid";
-import { canPlaceBlockAt, findFirstFreeSpot } from "@/lib/blockPlacement";
+import { canPlaceBlockAt, findFirstFreeSpot } from "@/lib/blockGrid";
 
 export type RawStoredBlock = { id: string } & Record<string, unknown>;
 
@@ -55,6 +55,14 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
           content: {
             url: typeof data?.url === "string" ? data.url : "",
             alt: typeof data?.alt === "string" ? data.alt : "",
+          },
+        } as Block;
+      case "sectionTitle":
+        return {
+          ...(raw as unknown as Block),
+          order,
+          content: {
+            title: typeof data?.title === "string" ? data.title : "",
           },
         } as Block;
       default:

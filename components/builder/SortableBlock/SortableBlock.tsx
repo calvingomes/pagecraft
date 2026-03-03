@@ -13,20 +13,6 @@ import { sizePxForPreset } from "@/lib/blockGrid";
 import type { SortableBlockProps } from "@/types/builder";
 import { computeResizeAndPushUpdates } from "./resizeAndPush";
 
-const aspectRatioForPreset = (preset: BlockWidthPreset): string => {
-  switch (preset) {
-    case "tall":
-      return "1 / 2";
-    case "wide":
-      return "2 / 1";
-    case "large":
-      return "1 / 1";
-    case "small":
-    default:
-      return "1 / 1";
-  }
-};
-
 export function SortableBlock({
   block,
   activeDragId,
@@ -65,6 +51,7 @@ export function SortableBlock({
   const hideBecauseOverlay = activeDragId === block.id;
 
   const widthPreset = block.styles?.widthPreset ?? "small";
+  const showHoverToolbar = !!editor && block.type !== "sectionTitle";
 
   const handleWidthChange = (preset: BlockWidthPreset) => {
     if (!editor?.onUpdateBlock) return;
@@ -81,7 +68,7 @@ export function SortableBlock({
   };
 
   const { widthPx, heightPx } = sizePxForPreset(widthPreset);
-  const aspectRatio = aspectRatioForPreset(widthPreset);
+  const aspectRatio = `${widthPx} / ${heightPx}`;
 
   return (
     <div
@@ -127,7 +114,7 @@ export function SortableBlock({
           </div>
         </div>
 
-        {editor && (
+        {showHoverToolbar && (
           <BlockHoverToolbar
             blockId={block.id}
             currentPreset={widthPreset}

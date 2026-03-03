@@ -16,6 +16,9 @@ import type { BlockCanvasProps } from "@/types/builder";
 import styles from "./BlockCanvas.module.css";
 import { useEditorContext } from "@/contexts/EditorContext";
 import {
+  GRID_CELL_PX,
+  GRID_COLS,
+  GRID_GAP_PX,
   sizePxForPreset,
   spansForPreset,
   clamp,
@@ -66,11 +69,11 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
     const r = rectForBlock(b);
     return Math.max(acc, r.y + r.h);
   }, 0);
-  // Render only what we need: occupied rows + 1 trailing empty row.
-  const rows = Math.max(1, maxBottom + 1);
+  // Render occupied rows + trailing empty rows. During a drag, add more rows
+  // so the user can pull a block below the current grid extent.
+  const TRAILING_ROWS = activeId ? 4 : 1;
+  const rows = Math.max(1, maxBottom + TRAILING_ROWS);
 
-  const GRID_CELL_PX = 200;
-  const GRID_GAP_PX = 20;
   const GRID_STRIDE_PX = GRID_CELL_PX + GRID_GAP_PX;
 
   const placementHighlightStyle = (() => {
@@ -131,7 +134,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
           style={{ gridTemplateRows: `repeat(${rows}, ${GRID_CELL_PX}px)` }}
         >
           {Array.from({ length: rows }).flatMap((_, y) =>
-            Array.from({ length: 4 }).map((__, x) => (
+            Array.from({ length: GRID_COLS }).map((__, x) => (
               <DroppableCell key={`${x}-${y}`} x={x} y={y} />
             )),
           )}
@@ -141,9 +144,9 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
         {blocks.map((block: Block, index: number) => {
           const preset = block.styles?.widthPreset ?? "small";
           const { w: spanW, h: spanH } = spansForPreset(preset);
-          const xRaw = block.layout?.x ?? index % 4;
-          const yRaw = block.layout?.y ?? Math.floor(index / 4);
-          const x = clamp(xRaw, 0, 4 - spanW);
+          const xRaw = block.layout?.x ?? index % GRID_COLS;
+          const yRaw = block.layout?.y ?? Math.floor(index / GRID_COLS);
+          const x = clamp(xRaw, 0, GRID_COLS - spanW);
           const y = Math.max(0, yRaw);
           return (
             <div

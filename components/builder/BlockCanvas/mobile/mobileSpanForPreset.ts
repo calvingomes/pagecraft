@@ -4,6 +4,7 @@ export const mobileSpanForPreset = (
   preset: BlockWidthPreset | undefined,
 ): 1 | 2 => {
   switch (preset) {
+    case "full":
     case "large":
     case "wide":
       return 2;

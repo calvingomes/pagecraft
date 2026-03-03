@@ -18,7 +18,7 @@ import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
-import { findFirstFreeSpot } from "@/lib/blockPlacement";
+import { findFirstFreeSpot } from "@/lib/blockGrid";
 import {
   ensureBlocksHaveValidLayouts,
   normalizeStoredBlocks,
@@ -146,13 +146,14 @@ export default function EditorPage() {
     }
 
     const defaultContent = getDefaultContent(blockType, resolvedOptions);
+    const widthPreset = blockType === "sectionTitle" ? "full" : "small";
 
     const tempBlockForPlacement = {
       id,
       type: blockType,
       content: defaultContent,
       order: blocks.length,
-      styles: { widthPreset: "small" },
+      styles: { widthPreset },
     } as Block;
     const pos = findFirstFreeSpot(tempBlockForPlacement, blocks);
 
@@ -161,6 +162,7 @@ export default function EditorPage() {
       type: blockType,
       content: defaultContent,
       order: blocks.length,
+      styles: { widthPreset },
       layout: pos,
     } as Block;
 
@@ -181,6 +183,8 @@ export default function EditorPage() {
         };
       case "image":
         return { url: options?.url ?? "", alt: options?.alt ?? "" };
+      case "sectionTitle":
+        return { title: "" };
     }
   };
 

@@ -1,10 +1,11 @@
-export type BlockType = "text" | "link" | "image";
+export type BlockType = "text" | "link" | "image" | "sectionTitle";
 
 export type BlockWidthPreset =
   | "small" // 200x200
   | "large" // 420x420
   | "tall" // 200x420
-  | "wide"; // 420x200
+  | "wide" // 420x200
+  | "full"; // 1060x100
 
 interface BaseBlock {
   id: string;
@@ -45,4 +46,9 @@ export interface ImageBlock extends BaseBlock {
   content: { url: string; alt?: string; caption?: string };
 }
 
-export type Block = TextBlock | LinkBlock | ImageBlock;
+export interface SectionTitleBlock extends BaseBlock {
+  type: "sectionTitle";
+  content: { title: string };
+}
+
+export type Block = TextBlock | LinkBlock | ImageBlock | SectionTitleBlock;

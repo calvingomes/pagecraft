@@ -1,7 +1,13 @@
 "use client";
 
 import { useRef, useState, type ChangeEvent } from "react";
-import { Type, Link2, Image as ImageIcon, Palette } from "lucide-react";
+import {
+  Type,
+  Link2,
+  Image as ImageIcon,
+  Palette,
+  Heading,
+} from "lucide-react";
 import styles from "./Toolbar.module.css";
 import type { ToolbarDefaultProps } from "./Toolbar.types";
 import { ToolbarPalatte } from "./ToolbarPalatte";
@@ -55,6 +61,14 @@ export const ToolbarDefault = ({
           onClick={handleImageClick}
         >
           <ImageIcon size={18} />
+        </button>
+        <button
+          className={styles.toolButton}
+          title="Section title"
+          type="button"
+          onClick={() => onAddBlock?.("sectionTitle")}
+        >
+          <Heading size={18} />
         </button>
         <button
           className={`${styles.toolButton} ${styles.paletteTrigger}`}

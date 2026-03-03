@@ -12,9 +12,8 @@ import type { LayoutById } from "@/components/builder/BlockCanvas/blockCanvasLay
 import {
   computePushedLayouts,
   computeTargetFromOver,
-  maxStartYFor,
 } from "@/components/builder/BlockCanvas/blockCanvasLayout";
-import { clamp, spansForPreset } from "@/lib/blockGrid";
+import { spansForPreset } from "@/lib/blockGrid";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
 
 export type DesktopDndSnapshot = {
@@ -100,24 +99,18 @@ export function useDesktopGridDnd({
     const movingPreset = activeBlock.styles?.widthPreset ?? "small";
     const { w: movingW } = spansForPreset(movingPreset);
     const overId = String(event.over.id);
-    const target = computeTargetFromOver(overId, movingW, movingPreset, blocks);
+    const target = computeTargetFromOver(overId, movingW, blocks);
     if (!target) {
       setPlacementTarget(null);
       return;
     }
 
-    const maxStartY = maxStartYFor(blocks, activeId, dragSnapshot.layouts);
-    const clampedTarget = {
-      ...target,
-      y: clamp(target.y, 0, maxStartY),
-    };
-
-    const targetKey = `${activeId}:${clampedTarget.x}:${clampedTarget.y}`;
+    const targetKey = `${activeId}:${target.x}:${target.y}`;
     if (dragSnapshot.lastTargetKey === targetKey) return;
 
     const nextLayouts = computePushedLayouts(
       activeId,
-      clampedTarget,
+      target,
       blocks,
       dragSnapshot.layouts,
     );
@@ -164,7 +157,7 @@ export function useDesktopGridDnd({
       flipRafRef.current = null;
     });
 
-    setPlacementTarget(clampedTarget);
+    setPlacementTarget(target);
     setDragSnapshot({ ...dragSnapshot, lastTargetKey: targetKey });
   };
 
@@ -202,13 +195,8 @@ export function useDesktopGridDnd({
 
     const movingPreset = activeBlock.styles?.widthPreset ?? "small";
     const { w: movingW } = spansForPreset(movingPreset);
-    const targetRaw = computeTargetFromOver(
-      overId,
-      movingW,
-      movingPreset,
-      blocks,
-    );
-    if (!targetRaw) return;
+    const target = computeTargetFromOver(overId, movingW, blocks);
+    if (!target) return;
 
     const sourceLayouts =
       snapshot?.layouts ??
@@ -218,12 +206,6 @@ export function useDesktopGridDnd({
           b.layout ? { x: b.layout.x, y: b.layout.y } : undefined,
         ]),
       );
-
-    const maxStartY = maxStartYFor(blocks, activeBlockId, sourceLayouts);
-    const target = {
-      ...targetRaw,
-      y: clamp(targetRaw.y, 0, maxStartY),
-    };
 
     const nextLayouts = computePushedLayouts(
       activeBlockId,

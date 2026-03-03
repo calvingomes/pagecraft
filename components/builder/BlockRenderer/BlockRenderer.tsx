@@ -9,6 +9,8 @@ export default function BlockRenderer({ block }: { block: Block }) {
       return blockRegistry.link(block);
     case "image":
       return blockRegistry.image(block);
+    case "sectionTitle":
+      return blockRegistry.sectionTitle(block);
     default:
       return null;
   }
