@@ -1,10 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { signOut } from "firebase/auth";
 import { ArrowRight } from "lucide-react";
 
-import { auth } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth-store";
 import styles from "./LogoutButton.module.css";
 
@@ -13,7 +12,7 @@ export function LogoutButton() {
   const logout = useAuthStore((s) => s.logout);
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await supabase.auth.signOut();
     logout();
     router.replace("/auth");
   };

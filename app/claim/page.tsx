@@ -1,16 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/firebase";
-import {
-  doc,
-  getDoc,
-  collection,
-  runTransaction,
-  serverTimestamp,
-} from "firebase/firestore";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useAuthStore } from "@/stores/auth-store";
 
 /**
  * Normalize username:
@@ -26,38 +20,13 @@ const normalizeUsername = (value: string) =>
 
 export default function ClaimPage() {
   const router = useRouter();
+  const { authChecked } = useAuthGuard("claim");
+  const setUsernameInStore = useAuthStore((s) => s.setUsername);
 
   const [username, setUsername] = useState("");
   const [available, setAvailable] = useState<boolean | null>(null);
   const [checking, setChecking] = useState(false);
   const [claiming, setClaiming] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
-
-  /**
-   * Auth guard
-   */
-  useEffect(() => {
-    const unsub = auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        router.replace("/auth");
-        return;
-      }
-
-      // user is logged in → check if username exists
-      const userRef = doc(db, "users", user.uid);
-      const snap = await getDoc(userRef);
-
-      if (snap.exists() && snap.data().username) {
-        router.replace("/editor");
-        return;
-      }
-
-      // logged in AND no username → allowed on /claim
-      setAuthChecked(true);
-    });
-
-    return () => unsub();
-  }, [router]);
 
   /**
    * Live username availability check (debounced)
@@ -70,9 +39,12 @@ export default function ClaimPage() {
 
     const checkAvailability = async () => {
       setChecking(true);
-      const ref = doc(db, "usernames", username);
-      const snap = await getDoc(ref);
-      setAvailable(!snap.exists());
+      const { data } = await supabase
+        .from("usernames")
+        .select("username")
+        .eq("username", username)
+        .maybeSingle();
+      setAvailable(!data);
       setChecking(false);
     };
 
@@ -84,75 +56,89 @@ export default function ClaimPage() {
    * Claim username (atomic)
    */
   const claimUsername = async () => {
-    const user = auth.currentUser;
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user || !available || claiming) return;
 
     setClaiming(true);
 
     try {
-      await runTransaction(db, async (tx) => {
-        const usernameRef = doc(db, "usernames", username);
-        const userRef = doc(db, "users", user.uid);
-        const pageRef = doc(db, "pages", username);
+      const { error: usernameError } = await supabase.from("usernames").insert({
+        username,
+        uid: user.id,
+      });
 
-        const usernameSnap = await tx.get(usernameRef);
+      if (usernameError) {
+        throw usernameError;
+      }
 
-        if (usernameSnap.exists()) {
-          throw new Error("Username taken");
-        }
+      const { error: profileError } = await supabase.from("profiles").upsert(
+        {
+          id: user.id,
+          username,
+        },
+        { onConflict: "id" },
+      );
 
-        // 1. lock username
-        tx.set(usernameRef, {
-          uid: user.uid,
-          createdAt: serverTimestamp(),
-        });
+      if (profileError) {
+        throw profileError;
+      }
 
-        // 2. save user profile
-        tx.set(
-          userRef,
-          {
-            username,
-            createdAt: serverTimestamp(),
-          },
-          { merge: true },
-        );
-
-        // 3. create page
-        tx.set(pageRef, {
-          uid: user.uid,
+      const { error: pageError } = await supabase.from("pages").upsert(
+        {
+          username,
+          uid: user.id,
           published: true,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-          // set sensible defaults so editor and public view have initial values
           background: "page-bg-1",
-          sidebarPosition: "left",
-        });
+          sidebar_position: "left",
+        },
+        { onConflict: "username" },
+      );
 
-        // 4. create starter blocks
-        const introBlockRef = doc(collection(pageRef, "blocks"));
-        const linkBlockRef = doc(collection(pageRef, "blocks"));
+      if (pageError) {
+        throw pageError;
+      }
 
-        tx.set(introBlockRef, {
-          uid: user.uid,
+      const starterBlocks = [
+        {
+          id: crypto.randomUUID(),
+          page_username: username,
+          uid: user.id,
           type: "text",
           order: 0,
           content: {
             text: `<p>Hi, I'm ${username} 👋</p>`,
           },
           layout: { x: 0, y: 0 },
-        });
-
-        tx.set(linkBlockRef, {
-          uid: user.uid,
+        },
+        {
+          id: crypto.randomUUID(),
+          page_username: username,
+          uid: user.id,
           type: "link",
           order: 1,
           content: {
-            label: "My Website",
             url: "https://example.com",
+            title: "My Website",
           },
           layout: { x: 1, y: 0 },
-        });
+        },
+      ];
+
+      const { error: blockError } = await supabase
+        .from("blocks")
+        .insert(starterBlocks);
+
+      if (blockError) {
+        throw blockError;
+      }
+
+      await supabase.auth.updateUser({
+        data: { username },
       });
+
+      setUsernameInStore(username);
 
       router.push("/editor");
     } finally {

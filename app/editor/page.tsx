@@ -1,23 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useEditorStore } from "@/stores/editor-store";
 import { useAuthStore } from "@/stores/auth-store";
-import { auth } from "@/lib/auth";
-import { db } from "@/lib/firebase";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  collection,
-  getDocs,
-  orderBy,
-  query,
-  serverTimestamp,
-} from "firebase/firestore";
+import { supabase } from "@/lib/supabase";
 import type { Block, BlockType } from "@/types/editor";
 import { EditorProvider } from "@/contexts/EditorContext";
 import type {
@@ -39,16 +25,29 @@ import {
   normalizeFirestoreBlocks,
   type RawFirestoreBlock,
 } from "@/lib/normalizeBlocks";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+
+function toBlockRow(block: Block, username: string, uid?: string) {
+  return {
+    id: block.id,
+    page_username: username,
+    uid: uid ?? null,
+    type: block.type,
+    order: block.order,
+    content: block.content,
+    layout: block.layout ?? null,
+    styles: block.styles ?? null,
+  };
+}
 
 export default function EditorPage() {
-  const router = useRouter();
-
-  const { username, loading, setUser, setUsername, setLoading } =
-    useAuthStore();
+  const { username, user, loading, setLoading } = useAuthStore();
+  const { authChecked } = useAuthGuard("editor");
   const blocks = useEditorStore((s) => s.blocks);
   const setBlocks = useEditorStore((s) => s.setBlocks);
   const addBlock = useEditorStore((s) => s.addBlock);
   const updateBlock = useEditorStore((s) => s.updateBlock);
+
   const [background, setBackground] = useState<PageBackgroundId>("page-bg-1");
   const [sidebarPosition, setSidebarPosition] =
     useState<SidebarPosition>("left");
@@ -58,33 +57,8 @@ export default function EditorPage() {
   const [avatarShape, setAvatarShape] = useState<AvatarShape>("circle");
   const [pageSettingsLoaded, setPageSettingsLoaded] = useState(false);
 
-  /* auth & username guard */
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        router.replace("/auth");
-        return;
-      }
-
-      setUser(user);
-
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (!userSnap.exists() || !userSnap.data().username) {
-        router.replace("/claim");
-        return;
-      }
-
-      setUsername(userSnap.data().username);
-    });
-
-    return () => unsub();
-  }, [router, setUser, setUsername]);
-
-  /* load page settings and blocks once the username is known */
-  useEffect(() => {
-    if (!username) return;
+    if (!username || !user?.id) return;
 
     const loadPageData = async () => {
       setPageSettingsLoaded(false);
@@ -94,84 +68,148 @@ export default function EditorPage() {
       setAvatarUrl("");
       setAvatarShape("circle");
 
-      // load page settings first so the UI can render them as early as possible
-      const pageRef = doc(db, "pages", username);
-      const pageSnap = await getDoc(pageRef);
+      const { error: profileBootstrapError } = await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: user.id,
+            username,
+          },
+          { onConflict: "id" },
+        );
 
-      let incomingDisplayName: string | undefined = undefined;
-      if (pageSnap.exists()) {
-        const data = pageSnap.data() as
-          | {
-              background?: PageBackgroundId;
-              sidebarPosition?: SidebarPosition;
-              displayName?: string;
-              bioHtml?: string;
-              avatarUrl?: string;
-              avatarShape?: AvatarShape;
-            }
-          | undefined;
+      if (profileBootstrapError) {
+        console.error(profileBootstrapError);
+      }
 
-        if (data?.background) setBackground(data.background);
-        if (data?.sidebarPosition) setSidebarPosition(data.sidebarPosition);
-        if (typeof data?.displayName === "string")
-          incomingDisplayName = data.displayName;
-        if (typeof data?.bioHtml === "string") setBioHtml(data.bioHtml);
-        if (typeof data?.avatarUrl === "string") setAvatarUrl(data.avatarUrl);
-        if (data?.avatarShape === "circle" || data?.avatarShape === "square") {
-          setAvatarShape(data.avatarShape);
+      const { data: existingUsernameRow, error: usernameLookupError } =
+        await supabase
+          .from("usernames")
+          .select("uid")
+          .eq("username", username)
+          .maybeSingle();
+
+      if (usernameLookupError) {
+        console.error(usernameLookupError);
+      }
+
+      if (!existingUsernameRow) {
+        const { error: usernameBootstrapError } = await supabase
+          .from("usernames")
+          .insert({ username, uid: user.id });
+
+        if (usernameBootstrapError) {
+          console.error(usernameBootstrapError);
+        }
+      }
+
+      const { error: pageBootstrapError } = await supabase.from("pages").upsert(
+        {
+          username,
+          uid: user.id,
+          published: true,
+          background: "page-bg-1",
+          sidebar_position: "left",
+        },
+        { onConflict: "username" },
+      );
+
+      if (pageBootstrapError) {
+        console.error(pageBootstrapError);
+      }
+
+      const { data: pageData } = await supabase
+        .from("pages")
+        .select(
+          "background, sidebar_position, display_name, bio_html, avatar_url, avatar_shape",
+        )
+        .eq("username", username)
+        .maybeSingle();
+
+      let incomingDisplayName: string | undefined;
+
+      if (pageData) {
+        if (pageData.background) {
+          setBackground(pageData.background as PageBackgroundId);
+        }
+        if (pageData.sidebar_position) {
+          setSidebarPosition(pageData.sidebar_position as SidebarPosition);
+        }
+        if (typeof pageData.display_name === "string") {
+          incomingDisplayName = pageData.display_name;
+        }
+        if (typeof pageData.bio_html === "string") {
+          setBioHtml(pageData.bio_html);
+        }
+        if (typeof pageData.avatar_url === "string") {
+          setAvatarUrl(pageData.avatar_url);
+        }
+        if (
+          pageData.avatar_shape === "circle" ||
+          pageData.avatar_shape === "square"
+        ) {
+          setAvatarShape(pageData.avatar_shape);
         }
       }
 
       setDisplayName(incomingDisplayName ?? username);
-
       setPageSettingsLoaded(true);
 
-      // then load blocks
-      const blocksRef = collection(db, "pages", username, "blocks");
-      const q = query(blocksRef, orderBy("order"));
-      const snap = await getDocs(q);
+      const { data: blockRows } = await supabase
+        .from("blocks")
+        .select("id, type, order, content, layout, styles")
+        .eq("page_username", username)
+        .order("order", { ascending: true });
 
-      const rawBlocks: RawFirestoreBlock[] = snap.docs.map((docSnap) => ({
-        id: docSnap.id,
-        ...docSnap.data(),
+      const safeBlockRows = blockRows ?? [];
+
+      const rawBlocks: RawFirestoreBlock[] = safeBlockRows.map((row) => ({
+        id: String(row.id),
+        type: row.type,
+        order: row.order,
+        content: row.content,
+        layout: row.layout,
+        styles: row.styles,
       }));
 
       const normalizedBlocks = normalizeFirestoreBlocks(rawBlocks);
-
-      // Ensure every block has a stable grid position. Blocks keep their
-      // own (x,y) independent of any previous block's size.
       const withLayouts = ensureBlocksHaveValidLayouts(normalizedBlocks);
-
       const compactedAfterLoad = compactEmptyRows(withLayouts).blocks;
       setBlocks(compactedAfterLoad);
 
-      // Write back any missing/corrected layouts so public view stays consistent.
       await Promise.all(
-        compactedAfterLoad.map(async (b) => {
-          const orig = rawBlocks.find((o) => o.id === b.id);
-          const origLayout = orig?.layout;
+        compactedAfterLoad.map(async (block) => {
+          const original = rawBlocks.find((raw) => raw.id === block.id);
+          const originalLayout = original?.layout;
 
-          if (!isValidLayout(origLayout)) {
-            await updateDoc(doc(db, "pages", username, "blocks", b.id), {
-              layout: b.layout,
-            });
+          if (!isValidLayout(originalLayout)) {
+            await supabase
+              .from("blocks")
+              .update({ layout: block.layout })
+              .eq("id", block.id)
+              .eq("page_username", username);
             return;
           }
 
-          if (origLayout.x !== b.layout?.x || origLayout.y !== b.layout?.y) {
-            await updateDoc(doc(db, "pages", username, "blocks", b.id), {
-              layout: b.layout,
-            });
+          if (
+            originalLayout.x !== block.layout?.x ||
+            originalLayout.y !== block.layout?.y
+          ) {
+            await supabase
+              .from("blocks")
+              .update({ layout: block.layout })
+              .eq("id", block.id)
+              .eq("page_username", username);
           }
         }),
       );
+
       setLoading(false);
     };
 
     loadPageData();
-  }, [username, setBlocks, setLoading]);
+  }, [username, user?.id, setBlocks, setLoading]);
 
-  /* add‑block helper used by the toolbar */
   const handleAddBlock = async (
     blockType: BlockType,
     options?: { url?: string; title?: string },
@@ -199,10 +237,14 @@ export default function EditorPage() {
     } as Block;
 
     addBlock(newBlock);
-    await setDoc(
-      doc(db, "pages", username, "blocks", id),
-      stripUndefinedDeep(newBlock),
-    );
+
+    const { error } = await supabase
+      .from("blocks")
+      .insert(stripUndefinedDeep(toBlockRow(newBlock, username, user?.id)));
+
+    if (error) {
+      console.error(error);
+    }
   };
 
   const getDefaultContent = (
@@ -225,98 +267,138 @@ export default function EditorPage() {
   const handleUpdateBlock = async (id: string, updates: Partial<Block>) => {
     if (!username) return;
     updateBlock(id, updates);
-    const block = blocks.find((b) => b.id === id);
-    if (!block) return;
-    const updated = { ...block, ...updates };
-    await updateDoc(
-      doc(db, "pages", username, "blocks", id),
-      stripUndefinedDeep(updated),
-    );
+
+    const current = blocks.find((block) => block.id === id);
+    if (!current) return;
+
+    const updated = { ...current, ...updates } as Block;
+
+    const { error } = await supabase
+      .from("blocks")
+      .update(stripUndefinedDeep(toBlockRow(updated, username, user?.id)))
+      .eq("id", id)
+      .eq("page_username", username);
+
+    if (error) {
+      console.error(error);
+    }
   };
 
   const handleRemoveBlock = async (id: string) => {
     if (!username) return;
 
-    const remaining = blocks.filter((b) => b.id !== id);
+    const remaining = blocks.filter((block) => block.id !== id);
     const compacted = compactEmptyRows(remaining);
     setBlocks(compacted.blocks);
 
-    await deleteDoc(doc(db, "pages", username, "blocks", id));
+    const { error } = await supabase
+      .from("blocks")
+      .delete()
+      .eq("id", id)
+      .eq("page_username", username);
+
+    if (error) {
+      console.error(error);
+    }
 
     if (compacted.changedIds.size > 0) {
       await Promise.all(
         Array.from(compacted.changedIds).map(async (changedId) => {
-          const b = compacted.blocks.find((x) => x.id === changedId);
-          if (!b?.layout) return;
-          await updateDoc(doc(db, "pages", username, "blocks", changedId), {
-            layout: b.layout,
-          });
+          const block = compacted.blocks.find(
+            (entry) => entry.id === changedId,
+          );
+          if (!block?.layout) return;
+
+          await supabase
+            .from("blocks")
+            .update({ layout: block.layout })
+            .eq("id", changedId)
+            .eq("page_username", username);
         }),
       );
     }
   };
 
-  /* persist re‑ordering whenever blocks change */
   useEffect(() => {
     if (!username) return;
 
     const timeout = setTimeout(() => {
       blocks.forEach((block, index) => {
-        updateDoc(doc(db, "pages", username, "blocks", block.id), {
-          ...stripUndefinedDeep(block),
-          order: index,
-        });
+        supabase
+          .from("blocks")
+          .update({
+            ...stripUndefinedDeep(toBlockRow(block, username, user?.id)),
+            order: index,
+          })
+          .eq("id", block.id)
+          .eq("page_username", username);
       });
     }, 800);
 
     return () => clearTimeout(timeout);
-  }, [blocks, username]);
+  }, [blocks, username, user?.id]);
 
-  /* persist background changes */
   useEffect(() => {
     if (!username || !pageSettingsLoaded) return;
-    const pageRef = doc(db, "pages", username);
-    setDoc(
-      pageRef,
-      stripUndefinedDeep({
-        background,
-        updatedAt: serverTimestamp(),
-      }),
-      { merge: true },
-    ).catch(console.error);
+
+    const persistBackground = async () => {
+      const { error } = await supabase
+        .from("pages")
+        .update({ background, updated_at: new Date().toISOString() })
+        .eq("username", username);
+
+      if (error) {
+        console.error(error);
+      }
+    };
+
+    persistBackground();
   }, [background, username, pageSettingsLoaded]);
 
-  /* persist sidebar position changes */
   useEffect(() => {
     if (!username || !pageSettingsLoaded) return;
-    const pageRef = doc(db, "pages", username);
-    setDoc(
-      pageRef,
-      stripUndefinedDeep({
-        sidebarPosition,
-        updatedAt: serverTimestamp(),
-      }),
-      { merge: true },
-    ).catch(console.error);
+
+    const persistSidebar = async () => {
+      const { error } = await supabase
+        .from("pages")
+        .update({
+          sidebar_position: sidebarPosition,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("username", username);
+
+      if (error) {
+        console.error(error);
+      }
+    };
+
+    persistSidebar();
   }, [sidebarPosition, username, pageSettingsLoaded]);
 
-  /* persist profile changes (display name + bio + avatar) */
   useEffect(() => {
     if (!username || !pageSettingsLoaded) return;
 
     const timeout = setTimeout(() => {
-      const pageRef = doc(db, "pages", username);
-      setDoc(
-        pageRef,
-        stripUndefinedDeep({
-          displayName,
-          bioHtml,
-          avatarUrl,
-          avatarShape,
-          updatedAt: serverTimestamp(),
-        }),
-        { merge: true },
-      ).catch(console.error);
+      const persistProfile = async () => {
+        const { error } = await supabase
+          .from("pages")
+          .update(
+            stripUndefinedDeep({
+              display_name: displayName,
+              bio_html: bioHtml,
+              avatar_url: avatarUrl,
+              avatar_shape: avatarShape,
+              updated_at: new Date().toISOString(),
+            }),
+          )
+          .eq("username", username);
+
+        if (error) {
+          console.error(error);
+        }
+      };
+
+      persistProfile();
     }, 500);
 
     return () => clearTimeout(timeout);
@@ -329,7 +411,7 @@ export default function EditorPage() {
     username,
   ]);
 
-  if (loading) {
+  if (loading || !authChecked) {
     return <div>Loading editor…</div>;
   }
 
