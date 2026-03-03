@@ -7,6 +7,7 @@ export const mobileSpanForPreset = (
     case "full":
     case "large":
     case "wide":
+    case "skinnyWide":
       return 2;
     default:
       return 1;

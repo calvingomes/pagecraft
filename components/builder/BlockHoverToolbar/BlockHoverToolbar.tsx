@@ -27,6 +27,12 @@ const WIDTH_PRESETS: BlockHoverToolbarIcons[] = [
     iconSize: 20,
   },
   {
+    preset: "skinnyWide",
+    title: "Skinny Wide",
+    Icon: RectangleHorizontal,
+    iconSize: 16,
+  },
+  {
     preset: "tall",
     title: "Tall",
     Icon: RectangleVertical,
@@ -42,6 +48,7 @@ const WIDTH_PRESETS: BlockHoverToolbarIcons[] = [
 
 export function BlockHoverToolbar({
   blockId,
+  blockType,
   currentPreset = "small",
   onWidthChange,
   visible = false,
@@ -53,6 +60,11 @@ export function BlockHoverToolbar({
     editor.onRemoveBlock(blockId);
   };
 
+  const visiblePresets = WIDTH_PRESETS.filter((item) => {
+    if (item.preset !== "skinnyWide") return true;
+    return blockType === "text" || blockType === "link";
+  });
+
   return (
     <div
       className={`${styles.toolbar} ${visible ? styles.toolbarVisible : ""}`}
@@ -60,7 +72,7 @@ export function BlockHoverToolbar({
       onTouchStart={(e) => e.stopPropagation()}
     >
       <div className={styles.sizeGroup}>
-        {WIDTH_PRESETS.map(({ preset, Icon, title, iconSize }) => (
+        {visiblePresets.map(({ preset, Icon, title, iconSize }) => (
           <button
             key={preset}
             type="button"

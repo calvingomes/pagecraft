@@ -62,6 +62,8 @@ export function spansForPreset(preset: BlockWidthPreset | undefined): {
   h: number;
 } {
   switch (preset ?? "small") {
+    case "skinnyWide":
+      return { w: 2, h: 0.5 };
     case "full":
       return { w: 4, h: 1 };
     case "large":
@@ -85,7 +87,9 @@ export function sizePxForPreset(preset: BlockWidthPreset | undefined): {
   const widthPx = w * GRID_CELL_PX + (w - 1) * GRID_GAP_PX;
   // "full" uses half-height (100 px) instead of a full grid row
   const heightPx =
-    preset === "full" ? 100 : h * GRID_CELL_PX + (h - 1) * GRID_GAP_PX;
+    preset === "full"
+      ? 100
+      : Math.round(h * GRID_CELL_PX + (h - 1) * GRID_GAP_PX);
   return { widthPx, heightPx };
 }
 

@@ -75,6 +75,17 @@ All grid constants are centralized in `lib/blockGrid.ts`:
 
 **Never hardcode these values** elsewhere. Import from `@/lib/blockGrid`.
 
+### BlockWidthPreset Reference
+
+- `small` → `200x200`
+- `wide` → `420x200`
+- `skinnyWide` → `420x90` (half-row height preset)
+- `tall` → `200x420`
+- `large` → `420x420`
+- `full` → `860x100`
+
+Current product behavior: `skinnyWide` is supported in grid/layout logic, but the resize toolbar should show it only for `text` and `link` blocks.
+
 - `spansForPreset(preset)` → `{ w, h }` column/row spans for a `BlockWidthPreset`
 - `spansForBlock(block, overridePreset?)` → block-aware spans (supports auto-height blocks)
 - `sizePxForPreset(preset)` → `{ widthPx, heightPx }` derived pixel sizes
@@ -132,6 +143,7 @@ blocks/TextBlock/
 - `BlockRegistry/blockRegistry.tsx` is the single map from `BlockType → ReactNode`. When adding a new block type, add it here and in `types/editor.ts` — the `BlockRenderer` will pick it up automatically.
 - `BlockCanvas` handles desktop/mobile switching and droppable grid cells.
 - `SortableBlock` wraps each block with drag handles, resize toolbar, and hover detection.
+- Current product state: `ParagraphBlock` is fully implemented and supported by types/registry/layout code, but the **add Paragraph button is intentionally hidden in the editor toolbar** for now. Do not remove ParagraphBlock code paths; treat this as a temporary UX toggle.
 
 ---
 

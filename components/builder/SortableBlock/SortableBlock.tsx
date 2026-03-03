@@ -124,6 +124,7 @@ export function SortableBlock({
         {showHoverToolbar && (
           <BlockHoverToolbar
             blockId={block.id}
+            blockType={block.type}
             currentPreset={widthPreset}
             onWidthChange={handleWidthChange}
             visible={toolbarVisible}
