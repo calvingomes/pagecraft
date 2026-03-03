@@ -3,6 +3,7 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import {
   Type,
+  AlignJustify,
   Link2,
   Image as ImageIcon,
   Palette,
@@ -45,6 +46,14 @@ export const ToolbarDefault = ({
           onClick={() => onAddBlock?.("text")}
         >
           <Type size={18} />
+        </button>
+        <button
+          className={styles.toolButton}
+          title="Paragraph"
+          type="button"
+          onClick={() => onAddBlock?.("paragraph")}
+        >
+          <AlignJustify size={18} />
         </button>
         <button
           className={styles.toolButton}

@@ -15,7 +15,7 @@ stores/         — Zustand stores (thin — types live in types/)
 contexts/       — React contexts (thin — types live in types/)
 hooks/          — Shared React hooks (not tied to a single component)
 components/
-  blocks/       — Visual block components (TextBlock, LinkBlock, ImageBlock, SectionTitleBlock)
+  blocks/       — Visual block components (TextBlock, ParagraphBlock, LinkBlock, ImageBlock, SectionTitleBlock)
   builder/      — Editor infrastructure (canvas, toolbars, dnd, registry)
   layout/       — Page-level layout shells (Header, Navbar, PageLayout, ProfileSidebar)
   ui/           — Generic reusable UI primitives (WordCount, etc.)
@@ -32,7 +32,7 @@ styles/         — Global CSS custom properties and media queries
   Do not define types inline in stores, contexts, hooks, or lib files unless they are truly private to that file's implementation (e.g., a local helper type used nowhere else).
 
 - **One file per domain:**
-  - `types/editor.ts` — Block types, `EditorState`, `EditorContextValue`, `LinkMetadataResponse`
+  - `types/editor.ts` — Block types (`TextBlock`, `ParagraphBlock`, `LinkBlock`, `ImageBlock`, `SectionTitleBlock`), `EditorState`, `EditorContextValue`, `LinkMetadataResponse`
   - `types/grid.ts` — Grid geometry (`GridLayout`, `GridRect`, `PlacedRect`, `LayoutById`, `CompactResult`)
   - `types/page.ts` — Page-level enums (`PageBackgroundId`, `SidebarPosition`, `AvatarShape`)
   - `types/builder.ts` — Builder/component props (`BlockCanvasProps`, `SortableBlockProps`, DnD snapshot types)

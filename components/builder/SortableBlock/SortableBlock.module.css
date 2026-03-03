@@ -36,7 +36,7 @@
   overflow: hidden;
 }
 
-.wrapper.sectionTitleViewMode {
+.wrapper.emptyWrapper {
   background: transparent;
   box-shadow: none;
 }

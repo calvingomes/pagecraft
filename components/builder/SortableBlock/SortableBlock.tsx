@@ -51,7 +51,8 @@ export function SortableBlock({
   const hideBecauseOverlay = activeDragId === block.id;
 
   const widthPreset = block.styles?.widthPreset ?? "small";
-  const showHoverToolbar = !!editor && block.type !== "sectionTitle";
+  const showHoverToolbar =
+    !!editor && block.type !== "sectionTitle" && block.type !== "paragraph";
 
   const handleWidthChange = (preset: BlockWidthPreset) => {
     if (!editor?.onUpdateBlock) return;

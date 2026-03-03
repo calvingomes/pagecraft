@@ -39,6 +39,14 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
             text: typeof data?.text === "string" ? data.text : "",
           },
         } as Block;
+      case "paragraph":
+        return {
+          ...(raw as unknown as Block),
+          order,
+          content: {
+            text: typeof data?.text === "string" ? data.text : "",
+          },
+        } as Block;
       case "link":
         return {
           ...(raw as unknown as Block),

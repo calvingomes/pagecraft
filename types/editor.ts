@@ -1,4 +1,9 @@
-export type BlockType = "text" | "link" | "image" | "sectionTitle";
+export type BlockType =
+  | "text"
+  | "paragraph"
+  | "link"
+  | "image"
+  | "sectionTitle";
 
 export type BlockWidthPreset =
   | "small" // 200x200
@@ -28,6 +33,11 @@ export interface TextBlock extends BaseBlock {
   content: { text: string };
 }
 
+export interface ParagraphBlock extends BaseBlock {
+  type: "paragraph";
+  content: { text: string };
+}
+
 export interface LinkBlock extends BaseBlock {
   type: "link";
   content: {
@@ -51,7 +61,12 @@ export interface SectionTitleBlock extends BaseBlock {
   content: { title: string };
 }
 
-export type Block = TextBlock | LinkBlock | ImageBlock | SectionTitleBlock;
+export type Block =
+  | TextBlock
+  | ParagraphBlock
+  | LinkBlock
+  | ImageBlock
+  | SectionTitleBlock;
 
 export type LinkMetadataResponse = {
   title: string | null;
