@@ -3,18 +3,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import type { Block } from "@/types/editor";
-
-type EditorState = {
-  blocks: Block[];
-  selectedBlockId: string | null;
-
-  addBlock: (block: Block) => void;
-  updateBlock: (id: string, updates: Partial<Block>) => void;
-  removeBlock: (id: string) => void;
-  reorderBlocks: (activeId: string, overId: string) => void;
-  selectBlock: (id: string | null) => void;
-  setBlocks: (blocks: Block[]) => void;
-};
+import type { EditorState } from "@/types/editor";
 
 export const useEditorStore = create<EditorState>()(
   devtools((set, get) => ({

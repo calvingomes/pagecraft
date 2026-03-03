@@ -1,10 +1,6 @@
 import type { Block } from "@/types/editor";
+import type { CompactResult } from "@/types/grid";
 import { spansForPreset } from "@/lib/blockGrid";
-
-type CompactResult = {
-  blocks: Block[];
-  changedIds: Set<string>;
-};
 
 /**
  * Compacts the layout by removing *fully empty* grid rows (rows where no block

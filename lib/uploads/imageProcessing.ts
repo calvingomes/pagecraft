@@ -1,10 +1,5 @@
 import imageCompression from "browser-image-compression";
-
-type WebpConversionOptions = {
-  maxSizeMB?: number;
-  maxWidthOrHeight?: number;
-  quality?: number;
-};
+import type { WebpOptions } from "@/types/uploads";
 
 export function dataUrlToFile(dataUrl: string, fileName: string): File {
   const parts = dataUrl.split(",");
@@ -28,7 +23,7 @@ export function dataUrlToFile(dataUrl: string, fileName: string): File {
 export async function convertFileToWebp(
   file: File,
   fileName: string,
-  options: WebpConversionOptions = {},
+  options: WebpOptions = {},
 ): Promise<File> {
   const compressed = await imageCompression(file, {
     fileType: "image/webp",

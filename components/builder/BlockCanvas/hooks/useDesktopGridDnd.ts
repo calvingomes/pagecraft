@@ -8,28 +8,16 @@ import type {
 } from "@dnd-kit/core";
 import type { Block } from "@/types/editor";
 import type { GridLayout } from "@/types/grid";
-import type { LayoutById } from "@/components/builder/BlockCanvas/blockCanvasLayout";
+import type {
+  DesktopDndSnapshot,
+  UseDesktopGridDndArgs,
+} from "@/types/builder";
 import {
   computePushedLayouts,
   computeTargetFromOver,
 } from "@/components/builder/BlockCanvas/blockCanvasLayout";
 import { spansForPreset } from "@/lib/blockGrid";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
-
-export type DesktopDndSnapshot = {
-  layouts: LayoutById;
-  lastTargetKey: string | null;
-};
-
-type UseDesktopGridDndArgs = {
-  editable: boolean;
-  blocks: Block[];
-  updateBlock: (id: string, updates: Partial<Block>) => void;
-  onPersistBlockUpdate?: (
-    id: string,
-    updates: Partial<Block>,
-  ) => void | Promise<void>;
-};
 
 export function useDesktopGridDnd({
   editable,

@@ -3,12 +3,9 @@ import {
   dataUrlToFile,
   fileToDataUrl,
 } from "@/lib/uploads/imageProcessing";
+import type { WebpOptions } from "@/types/uploads";
 
-export type WebpOptions = {
-  maxSizeMB?: number;
-  maxWidthOrHeight?: number;
-  quality?: number;
-};
+export type { WebpOptions } from "@/types/uploads";
 
 const DEFAULT_WEBP_OPTIONS: Required<WebpOptions> = {
   maxSizeMB: 2,

@@ -1,8 +1,8 @@
 import type { Block } from "@/types/editor";
-import type { GridLayout } from "@/types/grid";
+import type { GridLayout, LayoutById } from "@/types/grid";
 import { clamp, GRID_COLS, resolveCollisions } from "@/lib/blockGrid";
 
-export type LayoutById = Record<string, GridLayout | undefined>;
+export type { LayoutById } from "@/types/grid";
 
 export function computeTargetFromOver(
   overId: string,

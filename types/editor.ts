@@ -52,3 +52,27 @@ export interface SectionTitleBlock extends BaseBlock {
 }
 
 export type Block = TextBlock | LinkBlock | ImageBlock | SectionTitleBlock;
+
+export type LinkMetadataResponse = {
+  title: string | null;
+  imageUrl: string | null;
+  iconUrl: string | null;
+};
+
+export type EditorContextValue = {
+  username: string | null;
+  onUpdateBlock: (id: string, updates: Partial<Block>) => Promise<void>;
+  onRemoveBlock: (id: string) => Promise<void>;
+};
+
+export type EditorState = {
+  blocks: Block[];
+  selectedBlockId: string | null;
+
+  addBlock: (block: Block) => void;
+  updateBlock: (id: string, updates: Partial<Block>) => void;
+  removeBlock: (id: string) => void;
+  reorderBlocks: (activeId: string, overId: string) => void;
+  selectBlock: (id: string | null) => void;
+  setBlocks: (blocks: Block[]) => void;
+};

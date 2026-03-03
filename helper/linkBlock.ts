@@ -1,11 +1,7 @@
 import type { LinkBlock } from "@/types/editor";
 import { htmlToText } from "@/helper/htmlToText";
 
-export type LinkMetadataResponse = {
-  title: string | null;
-  imageUrl: string | null;
-  iconUrl: string | null;
-};
+export type { LinkMetadataResponse } from "@/types/editor";
 
 export function resolveLinkTitle(content: LinkBlock["content"]): string {
   return content?.title ?? content?.metaTitle ?? "";

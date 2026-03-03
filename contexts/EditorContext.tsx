@@ -1,13 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import type { Block } from "@/types/editor";
-
-type EditorContextValue = {
-  username: string | null;
-  onUpdateBlock: (id: string, updates: Partial<Block>) => Promise<void>;
-  onRemoveBlock: (id: string) => Promise<void>;
-};
+import type { EditorContextValue } from "@/types/editor";
 
 const EditorContext = createContext<EditorContextValue | null>(null);
 
