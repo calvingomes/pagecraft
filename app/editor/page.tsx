@@ -19,11 +19,10 @@ import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
 import { findFirstFreeSpot } from "@/lib/blockPlacement";
-import { stripUndefinedDeep } from "@/lib/firestoreSafe";
 import {
   ensureBlocksHaveValidLayouts,
-  normalizeFirestoreBlocks,
-  type RawFirestoreBlock,
+  normalizeStoredBlocks,
+  type RawStoredBlock,
 } from "@/lib/normalizeBlocks";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import {
@@ -38,6 +37,35 @@ type DbLikeError = {
   hint?: string;
   code?: string;
 };
+
+type UnknownRecord = Record<string, unknown>;
+
+function isPlainObject(value: unknown): value is UnknownRecord {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    Object.getPrototypeOf(value) === Object.prototype
+  );
+}
+
+function stripUndefinedDeep<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => stripUndefinedDeep(item))
+      .filter((item) => item !== undefined) as T;
+  }
+
+  if (isPlainObject(value)) {
+    const out: UnknownRecord = {};
+    for (const [key, nested] of Object.entries(value)) {
+      if (nested === undefined) continue;
+      out[key] = stripUndefinedDeep(nested);
+    }
+    return out as T;
+  }
+
+  return value;
+}
 
 function toBlockRow(block: Block, username: string, uid?: string) {
   return {
@@ -178,7 +206,7 @@ export default function EditorPage() {
 
       const safeBlockRows = blockRows ?? [];
 
-      const rawBlocks: RawFirestoreBlock[] = safeBlockRows.map((row) => ({
+      const rawBlocks: RawStoredBlock[] = safeBlockRows.map((row) => ({
         id: String(row.id),
         type: row.type,
         order: row.order,
@@ -187,7 +215,7 @@ export default function EditorPage() {
         styles: row.styles,
       }));
 
-      const normalizedBlocks = normalizeFirestoreBlocks(rawBlocks);
+      const normalizedBlocks = normalizeStoredBlocks(rawBlocks);
       const withLayouts = ensureBlocksHaveValidLayouts(normalizedBlocks);
       const compactedAfterLoad = compactEmptyRows(withLayouts).blocks;
       setBlocks(compactedAfterLoad);

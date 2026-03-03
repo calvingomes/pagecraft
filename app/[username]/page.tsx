@@ -9,8 +9,8 @@ import type {
 import { PageView } from "@/components/views/PageView/PageView";
 import {
   ensureBlocksHaveValidLayouts,
-  normalizeFirestoreBlocks,
-  type RawFirestoreBlock,
+  normalizeStoredBlocks,
+  type RawStoredBlock,
 } from "@/lib/normalizeBlocks";
 
 type Props = {
@@ -51,7 +51,7 @@ export default async function UserPage({ params }: Props) {
 
   const safeBlockRows = blockRows ?? [];
 
-  const rawBlocks: RawFirestoreBlock[] = safeBlockRows.map(
+  const rawBlocks: RawStoredBlock[] = safeBlockRows.map(
     (row: {
       id: string;
       type: unknown;
@@ -69,7 +69,7 @@ export default async function UserPage({ params }: Props) {
     }),
   );
 
-  const normalizedBlocks = normalizeFirestoreBlocks(rawBlocks);
+  const normalizedBlocks = normalizeStoredBlocks(rawBlocks);
 
   // Ensure every block has a stable grid position matching the editor.
   const blocks: Block[] = ensureBlocksHaveValidLayouts(normalizedBlocks);

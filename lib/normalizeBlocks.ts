@@ -2,7 +2,7 @@ import type { Block, BlockType } from "@/types/editor";
 import type { GridLayout } from "@/types/grid";
 import { canPlaceBlockAt, findFirstFreeSpot } from "@/lib/blockPlacement";
 
-export type RawFirestoreBlock = { id: string } & Record<string, unknown>;
+export type RawStoredBlock = { id: string } & Record<string, unknown>;
 
 export function isValidLayout(layout: unknown): layout is GridLayout {
   if (!layout || typeof layout !== "object") return false;
@@ -15,10 +15,8 @@ export function isValidLayout(layout: unknown): layout is GridLayout {
   );
 }
 
-// Normalizes older Firestore shapes (e.g. `data` instead of `content`).
-export function normalizeFirestoreBlocks(
-  rawBlocks: RawFirestoreBlock[],
-): Block[] {
+// Normalizes older stored shapes (e.g. `data` instead of `content`).
+export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
   return rawBlocks.map((raw, index) => {
     const type = raw.type as BlockType;
     const order = typeof raw.order === "number" ? raw.order : index;
