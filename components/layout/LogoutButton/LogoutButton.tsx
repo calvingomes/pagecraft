@@ -18,11 +18,9 @@ export function LogoutButton() {
   };
 
   return (
-    <div className={styles.container}>
-      <button type="button" className={styles.button} onClick={handleLogout}>
-        Sign out
-        <ArrowRight className={styles.icon} />
-      </button>
-    </div>
+    <button type="button" className={styles.button} onClick={handleLogout}>
+      Sign out
+      <ArrowRight className={styles.icon} />
+    </button>
   );
 }

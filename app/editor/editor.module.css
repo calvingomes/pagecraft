@@ -38,3 +38,13 @@
   border-radius: 8px;
   font-family: inherit;
 }
+
+.actions {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
