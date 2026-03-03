@@ -42,7 +42,7 @@ export interface LinkBlock extends BaseBlock {
 
 export interface ImageBlock extends BaseBlock {
   type: "image";
-  content: { url: string; alt?: string };
+  content: { url: string; alt?: string; caption?: string };
 }
 
 export type Block = TextBlock | LinkBlock | ImageBlock;
