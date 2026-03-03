@@ -25,6 +25,7 @@
     "@tiptap/extension-underline": "^3.20.0",
     "@tiptap/pm": "^3.20.0",
     "@tiptap/react": "^3.20.0",
+    "browser-image-compression": "^2.0.2",
     "cheerio": "^1.2.0",
     "framer-motion": "^12.29.0",
     "lucide-react": "^0.575.0",

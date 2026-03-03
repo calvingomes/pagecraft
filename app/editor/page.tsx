@@ -29,6 +29,7 @@ import {
   deletePageImage,
   uploadPageImage,
 } from "@/lib/uploads/pageImageStorage";
+import { avatarDataUrlToWebpFile } from "@/lib/uploads/avatarImage";
 import styles from "./editor.module.css";
 
 type DbLikeError = {
@@ -130,25 +131,6 @@ export default function EditorPage() {
   const throwIfError = (error: DbLikeError | null, step: string) => {
     if (!error) return;
     throw new Error(`${step}: ${formatErrorMessage(error)}`);
-  };
-
-  const dataUrlToFile = (dataUrl: string, fileName: string) => {
-    const parts = dataUrl.split(",");
-    if (parts.length !== 2) {
-      throw new Error("Invalid image data URL.");
-    }
-
-    const mimeMatch = parts[0].match(/data:(.*?);base64/);
-    const mimeType = mimeMatch?.[1] ?? "image/png";
-    const base64 = parts[1];
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-
-    for (let i = 0; i < binary.length; i += 1) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-
-    return new File([bytes], fileName, { type: mimeType });
   };
 
   useEffect(() => {
@@ -298,20 +280,33 @@ export default function EditorPage() {
       let resolvedAvatarUrl = avatarUrl;
 
       if (avatarUrl === "" && persistedAvatarUrl) {
-        await deletePageImage({
-          uid: user.id,
-          username,
-          scope: { kind: "avatar" },
-        });
+        try {
+          await deletePageImage({
+            uid: user.id,
+            username,
+            scope: { kind: "avatar" },
+          });
+        } catch (error) {
+          throw new Error(
+            `Deleting avatar failed: ${formatErrorMessage(error)}`,
+          );
+        }
         resolvedAvatarUrl = "";
       } else if (isDataUrl(avatarUrl)) {
-        const file = dataUrlToFile(avatarUrl, `avatar-${username}.png`);
-        const upload = await uploadPageImage({
-          uid: user.id,
-          username,
-          file,
-          scope: { kind: "avatar" },
-        });
+        const file = await avatarDataUrlToWebpFile(avatarUrl, username);
+        let upload;
+        try {
+          upload = await uploadPageImage({
+            uid: user.id,
+            username,
+            file,
+            scope: { kind: "avatar" },
+          });
+        } catch (error) {
+          throw new Error(
+            `Uploading avatar failed: ${formatErrorMessage(error)}`,
+          );
+        }
         resolvedAvatarUrl = upload.downloadUrl;
       }
 

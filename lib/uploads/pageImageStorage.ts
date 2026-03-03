@@ -1,10 +1,12 @@
 import { supabase } from "@/lib/supabase";
 
 export const MAX_TOTAL_UPLOAD_BYTES = 25 * 1024 * 1024;
-const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png"]);
-const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png"];
+const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
 const STORAGE_BUCKET =
-  process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET ?? "pagecraft-media";
+  process.env.NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET ??
+  process.env.NEXT_PUBLIC_SUPABASE_BUCKET ??
+  "pagecraft-bucket";
 
 export type PageImageScope =
   | { kind: "avatar" }
@@ -39,7 +41,7 @@ function ensureAllowedImage(file: File) {
   );
 
   if (!ALLOWED_MIME_TYPES.has(file.type) || !hasAllowedExtension) {
-    throw new Error("Only .jpg and .png images are allowed.");
+    throw new Error("Only .jpg, .jpeg, .png, and .webp images are allowed.");
   }
 }
 

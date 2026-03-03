@@ -6,6 +6,7 @@ import toolbarStyles from "@/components/builder/BlockHoverToolbar/BlockHoverTool
 import type { AvatarToolbarProps } from "./ProfileSidebar.types";
 
 const MAX_FILE_SIZE_BYTES = 2 * 1024 * 1024;
+const ALLOWED_INPUT_TYPES = new Set(["image/jpeg", "image/png"]);
 
 export function AvatarToolbar({
   visible,
@@ -25,7 +26,7 @@ export function AvatarToolbar({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
+    if (!ALLOWED_INPUT_TYPES.has(file.type)) {
       event.currentTarget.value = "";
       return;
     }
@@ -100,7 +101,7 @@ export function AvatarToolbar({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/png,image/jpeg"
         onChange={handleFileChange}
         hidden
       />
