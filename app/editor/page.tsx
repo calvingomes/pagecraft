@@ -28,6 +28,7 @@ import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
 import { findFirstFreeSpot } from "@/lib/blockPlacement";
+import { stripUndefinedDeep } from "@/lib/firestoreSafe";
 import {
   ensureBlocksHaveValidLayouts,
   isValidLayout,
@@ -184,7 +185,10 @@ export default function EditorPage() {
     } as Block;
 
     addBlock(newBlock);
-    await setDoc(doc(db, "pages", username, "blocks", id), newBlock);
+    await setDoc(
+      doc(db, "pages", username, "blocks", id),
+      stripUndefinedDeep(newBlock),
+    );
   };
 
   const getDefaultContent = (
@@ -210,7 +214,10 @@ export default function EditorPage() {
     const block = blocks.find((b) => b.id === id);
     if (!block) return;
     const updated = { ...block, ...updates };
-    await updateDoc(doc(db, "pages", username, "blocks", id), updated);
+    await updateDoc(
+      doc(db, "pages", username, "blocks", id),
+      stripUndefinedDeep(updated),
+    );
   };
 
   const handleRemoveBlock = async (id: string) => {
@@ -242,7 +249,7 @@ export default function EditorPage() {
     const timeout = setTimeout(() => {
       blocks.forEach((block, index) => {
         updateDoc(doc(db, "pages", username, "blocks", block.id), {
-          ...block,
+          ...stripUndefinedDeep(block),
           order: index,
         });
       });
@@ -257,10 +264,10 @@ export default function EditorPage() {
     const pageRef = doc(db, "pages", username);
     setDoc(
       pageRef,
-      {
+      stripUndefinedDeep({
         background,
         updatedAt: serverTimestamp(),
-      },
+      }),
       { merge: true },
     ).catch(console.error);
   }, [background, username, pageSettingsLoaded]);
@@ -271,10 +278,10 @@ export default function EditorPage() {
     const pageRef = doc(db, "pages", username);
     setDoc(
       pageRef,
-      {
+      stripUndefinedDeep({
         sidebarPosition,
         updatedAt: serverTimestamp(),
-      },
+      }),
       { merge: true },
     ).catch(console.error);
   }, [sidebarPosition, username, pageSettingsLoaded]);
@@ -287,11 +294,11 @@ export default function EditorPage() {
       const pageRef = doc(db, "pages", username);
       setDoc(
         pageRef,
-        {
+        stripUndefinedDeep({
           displayName,
           bioHtml,
           updatedAt: serverTimestamp(),
-        },
+        }),
         { merge: true },
       ).catch(console.error);
     }, 500);

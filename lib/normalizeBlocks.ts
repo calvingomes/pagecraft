@@ -47,7 +47,7 @@ export function normalizeFirestoreBlocks(
           order,
           content: {
             url: typeof data?.url === "string" ? data.url : "",
-            title: typeof data?.label === "string" ? data.label : "",
+            title: typeof data?.title === "string" ? data.title : "",
           },
         } as Block;
       case "image":
