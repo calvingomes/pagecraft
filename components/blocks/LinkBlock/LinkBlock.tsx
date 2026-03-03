@@ -1,72 +1,92 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import { Link2 } from "lucide-react";
 import { LinkBlock as LinkBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
+import {
+  getLinkHostOrUrl,
+  isSupportedLinkUrl,
+  resolveLinkTitle,
+  shouldAutoApplyFetchedTitle,
+  shouldShowLinkPreviewImage,
+  type LinkMetadataResponse,
+} from "@/helper/linkBlock";
+import {
+  minimalRTHtmlToInlineForClamp,
+  sanitizeMinimalRTH,
+} from "@/helper/sanitizeRichText";
+import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
 import styles from "./LinkBlock.module.css";
 
 export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
   const editor = useEditorContext();
-  const blockUrl = block.content?.url ?? "";
-  const blockTitle =
-    block.content?.title ??
-    block.content?.label ??
-    block.content?.metaTitle ??
-    "";
-
-  const [draftUrl, setDraftUrl] = useState(blockUrl);
-  const [draftTitle, setDraftTitle] = useState(blockTitle);
-  const [urlDirty, setUrlDirty] = useState(false);
-  const [titleDirty, setTitleDirty] = useState(false);
+  const content = block.content;
+  const blockUrl = content.url ?? "";
+  const titleHtml = sanitizeMinimalRTH(resolveLinkTitle(content));
 
   const metadataFetchTimer = useRef<number | null>(null);
-  const lastFetchedUrl = useRef<string>(block.content?.metaUrl ?? "");
+  const lastFetchedUrl = useRef<string>(content.metaUrl ?? "");
+  const lastSyncedTitle = useRef(titleHtml);
 
   const urlTrimmed = useMemo(() => blockUrl.trim(), [blockUrl]);
-  const canFetch = useMemo(() => {
-    if (!urlTrimmed) return false;
-    try {
-      const u = new URL(urlTrimmed);
-      return u.protocol === "http:" || u.protocol === "https:";
-    } catch {
-      return false;
-    }
-  }, [urlTrimmed]);
+  const canFetch = useMemo(() => isSupportedLinkUrl(urlTrimmed), [urlTrimmed]);
 
-  const onSave = useCallback(() => {
-    if (!editor?.onUpdateBlock) return;
-
-    const nextUrl = (urlDirty ? draftUrl : blockUrl).trim();
-    const nextTitle = (titleDirty ? draftTitle : blockTitle).trim();
-
-    editor.onUpdateBlock(block.id, {
-      content: {
-        ...(block.content ?? {}),
-        url: nextUrl,
-        title: nextTitle,
+  const titleEditor = useEditor({
+    extensions: minimalRTEWithPlaceholder({
+      placeholder: "Title",
+      showOnlyWhenEditable: true,
+    }),
+    content: titleHtml,
+    editable: !!editor,
+    immediatelyRender: false,
+    editorProps: {
+      attributes: {
+        spellcheck: "false",
+        autocorrect: "off",
+        autocapitalize: "off",
       },
-    });
-    setUrlDirty(false);
-    setTitleDirty(false);
-  }, [
-    editor,
-    block.id,
-    block.content,
-    urlDirty,
-    titleDirty,
-    draftUrl,
-    draftTitle,
-    blockUrl,
-    blockTitle,
-  ]);
+    },
+    onBlur: ({ editor: rte }) => {
+      if (!editor?.onUpdateBlock) return;
+
+      const html = rte.isEmpty ? "" : rte.getHTML();
+      const finalTitle = sanitizeMinimalRTH(html);
+
+      if (finalTitle !== lastSyncedTitle.current) {
+        lastSyncedTitle.current = finalTitle;
+        editor.onUpdateBlock(block.id, {
+          content: {
+            ...content,
+            title: finalTitle,
+          },
+        });
+      }
+    },
+  });
+
+  useEffect(() => {
+    if (!titleEditor) return;
+
+    const incoming = sanitizeMinimalRTH(resolveLinkTitle(content));
+    if (incoming !== lastSyncedTitle.current) {
+      lastSyncedTitle.current = incoming;
+      titleEditor.commands.setContent(incoming);
+    }
+  }, [content, titleEditor, block.id]);
+
+  useEffect(() => {
+    if (!titleEditor) return;
+    titleEditor.setEditable(!!editor);
+  }, [titleEditor, editor]);
 
   useEffect(() => {
     if (!editor?.onUpdateBlock) return;
     if (!canFetch) return;
 
     // Avoid repeated fetches for the same url.
-    const currentMetaUrl = block.content?.metaUrl ?? "";
+    const currentMetaUrl = content.metaUrl ?? "";
     if (currentMetaUrl === urlTrimmed && lastFetchedUrl.current === urlTrimmed)
       return;
 
@@ -80,32 +100,27 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
           `/api/link-metadata?url=${encodeURIComponent(urlTrimmed)}`,
         );
         if (!res.ok) return;
-        const meta = (await res.json()) as {
-          title: string | null;
-          imageUrl: string | null;
-          iconUrl: string | null;
-        };
+        const meta = (await res.json()) as LinkMetadataResponse;
 
         lastFetchedUrl.current = urlTrimmed;
 
-        const prevMetaTitle = (block.content?.metaTitle ?? "").trim();
-        const prevTitle =
-          (block.content?.title ?? block.content?.label ?? "").trim() || "";
         const nextMetaTitle = (meta.title ?? "").trim();
-
-        const shouldUpdateTitle =
-          !prevTitle || (prevMetaTitle && prevTitle === prevMetaTitle);
+        const shouldUpdateTitle = shouldAutoApplyFetchedTitle({
+          currentTitle: content.title,
+          legacyLabel: content.label,
+          currentMetaTitle: content.metaTitle,
+        });
 
         editor.onUpdateBlock(block.id, {
           content: {
-            ...(block.content ?? {}),
+            ...content,
             url: urlTrimmed,
             metaUrl: urlTrimmed,
             metaTitle: nextMetaTitle || undefined,
             imageUrl: meta.imageUrl ?? undefined,
             iconUrl: meta.iconUrl ?? undefined,
             ...(shouldUpdateTitle && nextMetaTitle
-              ? { title: nextMetaTitle }
+              ? { title: sanitizeMinimalRTH(nextMetaTitle) }
               : {}),
           },
         });
@@ -119,105 +134,90 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
         window.clearTimeout(metadataFetchTimer.current);
       }
     };
-  }, [editor, canFetch, urlTrimmed, block.id, block.content]);
+  }, [
+    editor,
+    canFetch,
+    urlTrimmed,
+    block.id,
+    content,
+    content.metaUrl,
+    content.metaTitle,
+    content.title,
+    content.label,
+  ]);
 
   const isEditable = !!editor;
   const preset = block.styles?.widthPreset ?? "small";
-  const showPreviewImage =
-    preset === "large" || preset === "tall" || preset === "wide";
+  const showPreviewImage = shouldShowLinkPreviewImage(preset);
 
-  const displayUrl = (block.content?.url ?? "").trim();
+  const displayUrl = blockUrl.trim();
   if (!isEditable && !displayUrl) return null;
 
-  const titleText =
-    (
-      block.content?.title ??
-      block.content?.label ??
-      block.content?.metaTitle ??
-      ""
-    ).trim() || "";
-  const metaTitle = (block.content?.metaTitle ?? "").trim();
-  const imageUrl = block.content?.imageUrl;
-  const iconUrl = block.content?.iconUrl;
+  const titleText = resolveLinkTitle(content).trim();
+  const metaTitle = (content.metaTitle ?? "").trim();
+  const clampedTitleHtml = minimalRTHtmlToInlineForClamp(
+    titleText || metaTitle,
+  );
+  const imageUrl = content.imageUrl;
+  const iconUrl = content.iconUrl;
 
-  const effectiveTitle = titleDirty ? draftTitle : titleText || metaTitle;
-  const effectiveUrl = urlDirty ? draftUrl : displayUrl;
+  const urlSubtext = getLinkHostOrUrl(displayUrl);
 
-  const TitleElement = isEditable ? (
-    <input
-      type="text"
-      className={styles.titleInput}
-      placeholder="Title"
-      value={effectiveTitle}
-      onFocus={() => {
-        if (!titleDirty) setDraftTitle(titleText || metaTitle);
-      }}
-      onChange={(e) => {
-        setTitleDirty(true);
-        setDraftTitle(e.target.value);
-      }}
-      onBlur={() => {
-        if (!titleDirty) return;
-        onSave();
-      }}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          onSave();
-        }
-      }}
-    />
-  ) : (
-    <div className={styles.title} title={titleText || metaTitle}>
-      {titleText || metaTitle || displayUrl}
+  const IconElement = (
+    <div className={styles.iconWrap} aria-hidden>
+      {iconUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className={styles.iconImg} src={iconUrl} alt="" />
+      ) : (
+        <Link2 className={styles.iconFallback} />
+      )}
     </div>
   );
+
+  const TitleElement = isEditable ? (
+    <div className={styles.titleEditorContainer}>
+      {titleEditor ? (
+        <EditorContent editor={titleEditor} className={styles.titleEditor} />
+      ) : null}
+    </div>
+  ) : clampedTitleHtml ? (
+    <div
+      className={styles.title}
+      dangerouslySetInnerHTML={{ __html: clampedTitleHtml }}
+    />
+  ) : (
+    <div className={styles.title}>{displayUrl}</div>
+  );
+
+  const UrlElement = (
+    <div className={styles.url} title={displayUrl}>
+      {urlSubtext}
+    </div>
+  );
+
+  const HeaderElement = (
+    <div className={styles.header}>
+      {IconElement}
+      <div className={styles.text}>
+        {TitleElement}
+        {UrlElement}
+      </div>
+    </div>
+  );
+
+  const PreviewElement =
+    showPreviewImage && imageUrl ? (
+      <div className={styles.preview}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className={styles.previewImg} src={imageUrl} alt="" />
+      </div>
+    ) : null;
 
   if (isEditable) {
     return (
       <div className={styles.card} data-editing>
-        <div className={styles.header}>
-          <div className={styles.iconWrap} aria-hidden>
-            {iconUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img className={styles.iconImg} src={iconUrl} alt="" />
-            ) : (
-              <Link2 className={styles.iconFallback} />
-            )}
-          </div>
-          <div className={styles.text}>
-            {TitleElement}
-            <input
-              type="url"
-              className={styles.urlInput}
-              placeholder="https://example.com"
-              value={effectiveUrl}
-              onFocus={() => {
-                if (!urlDirty) setDraftUrl(displayUrl);
-              }}
-              onChange={(e) => {
-                setUrlDirty(true);
-                setDraftUrl(e.target.value);
-              }}
-              onBlur={() => {
-                if (!urlDirty) return;
-                onSave();
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  onSave();
-                }
-              }}
-            />
-          </div>
-        </div>
-        {showPreviewImage && imageUrl ? (
-          <div className={styles.preview}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className={styles.previewImg} src={imageUrl} alt="" />
-          </div>
-        ) : null}
+        {HeaderElement}
+        {PreviewElement}
       </div>
     );
   }
@@ -229,34 +229,8 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
       target="_blank"
       rel="noopener noreferrer"
     >
-      <div className={styles.header}>
-        <div className={styles.iconWrap} aria-hidden>
-          {iconUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className={styles.iconImg} src={iconUrl} alt="" />
-          ) : (
-            <Link2 className={styles.iconFallback} />
-          )}
-        </div>
-        <div className={styles.text}>
-          {TitleElement}
-          <div className={styles.url} title={displayUrl}>
-            {(() => {
-              try {
-                return new URL(displayUrl).host;
-              } catch {
-                return displayUrl;
-              }
-            })()}
-          </div>
-        </div>
-      </div>
-      {showPreviewImage && imageUrl ? (
-        <div className={styles.preview}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className={styles.previewImg} src={imageUrl} alt="" />
-        </div>
-      ) : null}
+      {HeaderElement}
+      {PreviewElement}
     </a>
   );
 };

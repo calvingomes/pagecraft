@@ -86,12 +86,11 @@
   }
 
   .title,
-  .titleInput {
+  .titleEditor {
     font-size: 18px;
   }
 
-  .url,
-  .urlInput {
+  .url {
     font-size: 12px;
   }
 }
@@ -115,11 +114,17 @@
   padding: 18px;
 }
 
-.titleInput {
+.titleEditorContainer {
   width: 100%;
+}
+
+.titleEditor {
+  width: 100%;
+}
+
+.titleEditor :global(.ProseMirror) {
   border: none;
   background: transparent;
-  font: inherit;
   font-size: 30px;
   font-weight: 650;
   line-height: 1.1;
@@ -131,20 +136,11 @@
   word-break: break-word;
 }
 
-.urlInput {
-  width: 100%;
-  border: none;
-  background: transparent;
-  font: inherit;
-  font-size: 20px;
-  line-height: 1.1;
-  color: rgba(0, 0, 0, 0.55);
-  padding: 0;
+.title :global(p),
+.titleEditor :global(p) {
   margin: 0;
-  outline: none;
 }
 
-.urlInput::placeholder,
-.titleInput::placeholder {
+.titleEditor :global(.ProseMirror p.is-editor-empty:first-child::before) {
   color: rgba(0, 0, 0, 0.25);
 }
