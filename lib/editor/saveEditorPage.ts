@@ -234,14 +234,37 @@ export async function saveEditorPage({
 
   const { data: existingBlockRows, error: existingBlocksError } = await supabase
     .from("blocks")
-    .select("id")
+    .select("id, type")
     .eq("page_username", username);
   throwIfError(existingBlocksError, "Fetching existing blocks failed");
 
   const currentBlockIds = new Set(resolvedBlocks.map((block) => block.id));
-  const staleIds = (existingBlockRows ?? [])
-    .map((row) => String(row.id))
-    .filter((id) => !currentBlockIds.has(id));
+  const staleRows = (existingBlockRows ?? []).filter(
+    (row) => !currentBlockIds.has(String(row.id)),
+  );
+  const staleIds = staleRows.map((row) => String(row.id));
+
+  const staleImageBlockIds = staleRows
+    .filter((row) => String(row.type) === "image")
+    .map((row) => String(row.id));
+
+  if (staleImageBlockIds.length > 0) {
+    try {
+      await Promise.all(
+        staleImageBlockIds.map(async (blockId) => {
+          await deletePageImage({
+            uid: userId,
+            username,
+            scope: { kind: "block-image", blockId },
+          });
+        }),
+      );
+    } catch (error) {
+      throw new Error(
+        `Deleting removed image assets failed: ${formatErrorMessage(error)}`,
+      );
+    }
+  }
 
   if (staleIds.length > 0) {
     const { error: deleteStaleError } = await supabase
