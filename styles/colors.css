@@ -25,6 +25,14 @@
   --color-page-bg-5: #fdf2ff;
   --color-page-bg-6: #fef2f2;
 
+  /* Page avatar palette (darker counterpart of page backgrounds) */
+  --color-page-avatar-1: #b8b8b8;
+  --color-page-avatar-2: #b7c9ad;
+  --color-page-avatar-3: #d1c578;
+  --color-page-avatar-4: #a9c2e8;
+  --color-page-avatar-5: #cfa6d6;
+  --color-page-avatar-6: #e0a7a7;
+
   /* Text */
   --color-text-primary: #000000;
   --color-text-secondary: #0e220e;

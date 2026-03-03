@@ -25,8 +25,8 @@
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  background: #ff7a00;
-  color: #fff;
+  background: var(--page-avatar-bg);
+  color: var(--color-text-primary);
   font-size: 2rem;
   display: flex;
   align-items: center;

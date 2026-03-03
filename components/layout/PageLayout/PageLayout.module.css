@@ -6,6 +6,7 @@
   --layout-content-max: 860px;
   --layout-gap: 40px;
   --layout-gutter: 24px;
+  --page-avatar-bg: var(--color-page-avatar-1);
 
   display: flex;
   justify-content: center;
@@ -103,24 +104,30 @@
 
 .pageLayout[data-bg="page-bg-1"] {
   background: var(--color-page-bg-1);
+  --page-avatar-bg: var(--color-page-avatar-1);
 }
 
 .pageLayout[data-bg="page-bg-2"] {
   background: var(--color-page-bg-2);
+  --page-avatar-bg: var(--color-page-avatar-2);
 }
 
 .pageLayout[data-bg="page-bg-3"] {
   background: var(--color-page-bg-3);
+  --page-avatar-bg: var(--color-page-avatar-3);
 }
 
 .pageLayout[data-bg="page-bg-4"] {
   background: var(--color-page-bg-4);
+  --page-avatar-bg: var(--color-page-avatar-4);
 }
 
 .pageLayout[data-bg="page-bg-5"] {
   background: var(--color-page-bg-5);
+  --page-avatar-bg: var(--color-page-avatar-5);
 }
 
 .pageLayout[data-bg="page-bg-6"] {
   background: var(--color-page-bg-6);
+  --page-avatar-bg: var(--color-page-avatar-6);
 }
