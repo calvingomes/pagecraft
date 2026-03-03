@@ -16,7 +16,7 @@ export function DesktopReadonlyBlock({ block }: Props) {
   return (
     <div className={sortableBlockStyles.hoverZone}>
       <div
-        className={sortableBlockStyles.wrapper}
+        className={`${sortableBlockStyles.wrapper} ${block.type === "sectionTitle" ? sortableBlockStyles.sectionTitleViewMode : ""}`}
         style={{
           width: `${widthPx}px`,
           height: `${heightPx}px`,

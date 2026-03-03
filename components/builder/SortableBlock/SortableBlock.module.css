@@ -36,6 +36,11 @@
   overflow: hidden;
 }
 
+.wrapper.sectionTitleViewMode {
+  background: transparent;
+  box-shadow: none;
+}
+
 .wrapper.dragging {
   z-index: 10;
   cursor: grabbing;
