@@ -24,8 +24,9 @@ export const SectionTitleBlock = ({
     <div className={styles.frame}>
       <input
         type="text"
+        name="section-title"
         className={styles.input}
-        placeholder="Add section title"
+        placeholder="Add section title..."
         value={title}
         onChange={(event) => {
           editor.onUpdateBlock(block.id, {
