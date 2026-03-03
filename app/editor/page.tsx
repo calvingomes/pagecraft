@@ -26,11 +26,8 @@ import {
 } from "@/lib/normalizeBlocks";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
-import {
-  convertFileToWebp,
-  fileToDataUrl,
-} from "@/lib/uploads/imageProcessing";
 import { saveEditorPage } from "@/lib/editor/saveEditorPage";
+import { prepareImageBlockOptions } from "@/lib/editor/prepareImageBlockOptions";
 import styles from "./editor.module.css";
 
 export default function EditorPage() {
@@ -139,21 +136,7 @@ export default function EditorPage() {
 
     if (blockType === "image" && options?.file) {
       try {
-        const webpFile = await convertFileToWebp(
-          options.file,
-          `block-${id}.webp`,
-          {
-            maxSizeMB: 2,
-            maxWidthOrHeight: 2000,
-            quality: 0.8,
-          },
-        );
-        const localDataUrl = await fileToDataUrl(webpFile);
-
-        resolvedOptions = {
-          ...options,
-          url: localDataUrl,
-        };
+        resolvedOptions = await prepareImageBlockOptions(id, options);
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "Image block prep failed.";

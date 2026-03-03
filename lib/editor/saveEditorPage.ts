@@ -9,8 +9,8 @@ import {
   deletePageImage,
   uploadPageImage,
 } from "@/lib/uploads/pageImageStorage";
-import { avatarDataUrlToWebpFile } from "@/lib/uploads/avatarImage";
 import { dataUrlToFile } from "@/lib/uploads/imageProcessing";
+import { dataUrlToWebpFile } from "@/lib/uploads/imageWebp";
 
 type DbLikeError = {
   message?: string;
@@ -152,7 +152,9 @@ export async function saveEditorPage({
     }
     resolvedAvatarUrl = "";
   } else if (isDataUrl(avatarUrl)) {
-    const file = await avatarDataUrlToWebpFile(avatarUrl, username);
+    const file = await dataUrlToWebpFile(avatarUrl, `avatar-${username}.webp`, {
+      maxWidthOrHeight: 1600,
+    });
     try {
       const upload = await uploadPageImage({
         uid: userId,
