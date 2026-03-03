@@ -47,14 +47,15 @@ export const ToolbarDefault = ({
         >
           <Type size={18} />
         </button>
-        <button
+        {/* Intentionally hidden */}
+        {/* <button
           className={styles.toolButton}
           title="Paragraph"
           type="button"
           onClick={() => onAddBlock?.("paragraph")}
         >
           <AlignJustify size={18} />
-        </button>
+        </button> */}
         <button
           className={styles.toolButton}
           title="Link"
