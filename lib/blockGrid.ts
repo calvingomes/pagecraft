@@ -11,7 +11,10 @@ export const GRID_ROW_SCALE = 2;
 export const GRID_ROW_PX = (GRID_CELL_PX + GRID_GAP_PX) / GRID_ROW_SCALE;
 export const GRID_ROW_GAP_PX = 0;
 export const AUTO_HEIGHT_MIN_HEIGHT_PX = 100;
-const AUTO_HEIGHT_BLOCK_TYPES: ReadonlySet<BlockType> = new Set(["paragraph"]);
+const AUTO_HEIGHT_BLOCK_TYPES: ReadonlySet<BlockType> = new Set([
+  "paragraph",
+  "sectionTitle",
+]);
 
 export function supportsAutoHeight(block: Block): boolean {
   return AUTO_HEIGHT_BLOCK_TYPES.has(block.type);

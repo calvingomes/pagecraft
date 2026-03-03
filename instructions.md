@@ -87,8 +87,7 @@ Do not duplicate these functions. If you need grid math, it belongs in `blockGri
 - Auto-height layout is generic and centralized; do **not** implement reflow/push logic inside individual block components.
 - Use `lib/autoHeightLayout.ts` (`computeAutoHeightReflowUpdates`) for grow-and-push behavior.
 - Enable block types for auto-height in `lib/blockGrid.ts` via `supportsAutoHeight` (internal allowlist).
-- Current enabled auto-height block type: `paragraph`.
-- `sectionTitle` is intentionally not enabled yet; when enabling it later, do it by updating the allowlist and wiring height updates in its block component.
+- Current enabled auto-height block types: `paragraph`, `sectionTitle`.
 
 **Do / Don't**
 
