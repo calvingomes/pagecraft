@@ -1,17 +1,24 @@
-export function htmlToText(html: string): string {
-  const trimmed = html.trim();
+/**
+ * Converts HTML to plain text.
+ * Uses DOM in the browser for accuracy and regex as a fallback for SSR.
+ */
+export function htmlToText(html: string | null | undefined): string {
+  const trimmed = html?.trim();
   if (!trimmed) return "";
 
-  // If called during SSR (or any non-DOM environment), fall back to a simple
-  // tag-stripper. Client-side uses DOM parsing for better entity handling.
+  let rawText: string;
+
+  // Environment Check
   if (typeof window === "undefined" || typeof document === "undefined") {
-    return trimmed
-      .replace(/<[^>]*>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
+    // SSR Fallback: Strip tags and replace with space
+    rawText = trimmed.replace(/<[^>]*>/g, " ");
+  } else {
+    // Client-side: Use DOM for entity decoding (e.g., &amp; -> &)
+    const el = document.createElement("div");
+    el.innerHTML = trimmed;
+    rawText = el.textContent ?? "";
   }
 
-  const el = document.createElement("div");
-  el.innerHTML = trimmed;
-  return (el.textContent ?? "").replace(/\s+/g, " ").trim();
+  // Final cleanup: collapse all whitespace/newlines into single spaces
+  return rawText.replace(/\s+/g, " ").trim();
 }

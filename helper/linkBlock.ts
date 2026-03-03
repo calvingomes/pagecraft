@@ -1,4 +1,4 @@
-import type { BlockWidthPreset, LinkBlock } from "@/types/editor";
+import type { LinkBlock } from "@/types/editor";
 import { htmlToText } from "@/helper/htmlToText";
 
 export type LinkMetadataResponse = {
@@ -13,10 +13,9 @@ export function resolveLinkTitle(content: LinkBlock["content"]): string {
 
 export function isSupportedLinkUrl(value: string): boolean {
   if (!value) return false;
-
   try {
-    const parsed = new URL(value);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
+    const { protocol } = new URL(value);
+    return protocol === "http:" || protocol === "https:";
   } catch {
     return false;
   }
@@ -35,8 +34,7 @@ export function shouldAutoApplyFetchedTitle(args: {
   currentMetaTitle?: string;
 }): boolean {
   const prevMetaTitle = (args.currentMetaTitle ?? "").trim();
-  const prevTitleRaw = (args.currentTitle ?? "").trim();
-  const prevTitle = htmlToText(prevTitleRaw);
+  const prevTitle = htmlToText(args.currentTitle);
 
   return (
     !prevTitle || (prevMetaTitle.length > 0 && prevTitle === prevMetaTitle)
