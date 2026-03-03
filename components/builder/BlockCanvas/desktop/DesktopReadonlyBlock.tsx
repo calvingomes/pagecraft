@@ -3,15 +3,15 @@
 import type { Block } from "@/types/editor";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import sortableBlockStyles from "@/components/builder/SortableBlock/SortableBlock.module.css";
-import { sizePxForPreset } from "@/lib/blockGrid";
+import { sizePxForBlock } from "@/lib/blockGrid";
 
 type Props = {
   block: Block;
 };
 
 export function DesktopReadonlyBlock({ block }: Props) {
-  const preset = block.styles?.widthPreset ?? "small";
-  const { widthPx, heightPx } = sizePxForPreset(preset);
+  const { widthPx, heightPx } = sizePxForBlock(block);
+  const isParagraph = block.type === "paragraph";
 
   return (
     <div className={sortableBlockStyles.hoverZone}>
@@ -19,14 +19,20 @@ export function DesktopReadonlyBlock({ block }: Props) {
         className={`${sortableBlockStyles.wrapper} ${block.type === "sectionTitle" || block.type === "paragraph" ? sortableBlockStyles.emptyWrapper : ""}`}
         style={{
           width: `${widthPx}px`,
-          height: `${heightPx}px`,
+          ...(isParagraph
+            ? { height: "auto", minHeight: `${heightPx}px` }
+            : { height: `${heightPx}px` }),
           maxWidth: "100%",
           maxHeight: "100%",
           cursor: "default",
         }}
       >
-        <div className={sortableBlockStyles.content}>
-          <div className={sortableBlockStyles.blockContent}>
+        <div
+          className={`${sortableBlockStyles.content} ${isParagraph ? sortableBlockStyles.paragraphContent : ""}`}
+        >
+          <div
+            className={`${sortableBlockStyles.blockContent} ${isParagraph ? sortableBlockStyles.paragraphBlockContent : ""}`}
+          >
             <BlockRenderer block={block} />
           </div>
         </div>

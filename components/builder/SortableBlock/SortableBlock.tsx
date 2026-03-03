@@ -9,7 +9,7 @@ import { useEditorStore } from "@/stores/editor-store";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import { BlockHoverToolbar } from "@/components/builder/BlockHoverToolbar/BlockHoverToolbar";
 import styles from "./SortableBlock.module.css";
-import { sizePxForPreset } from "@/lib/blockGrid";
+import { sizePxForBlock } from "@/lib/blockGrid";
 import type { SortableBlockProps } from "@/types/builder";
 import { computeResizeAndPushUpdates } from "./resizeAndPush";
 
@@ -68,8 +68,9 @@ export function SortableBlock({
     }
   };
 
-  const { widthPx, heightPx } = sizePxForPreset(widthPreset);
+  const { widthPx, heightPx } = sizePxForBlock(block);
   const aspectRatio = `${widthPx} / ${heightPx}`;
+  const isParagraph = block.type === "paragraph";
 
   return (
     <div
@@ -96,20 +97,30 @@ export function SortableBlock({
         <div
           className={`${styles.wrapper} ${isDragging ? styles.dragging : ""}`}
           style={
-            fluid
+            isParagraph
               ? {
-                  width: "100%",
+                  width: fluid ? "100%" : `${widthPx}px`,
                   height: "auto",
-                  aspectRatio,
+                  minHeight: `${heightPx}px`,
                 }
-              : {
-                  width: `${widthPx}px`,
-                  height: `${heightPx}px`,
-                }
+              : fluid
+                ? {
+                    width: "100%",
+                    height: "auto",
+                    aspectRatio,
+                  }
+                : {
+                    width: `${widthPx}px`,
+                    height: `${heightPx}px`,
+                  }
           }
         >
-          <div className={styles.content}>
-            <div className={styles.blockContent}>
+          <div
+            className={`${styles.content} ${isParagraph ? styles.paragraphContent : ""}`}
+          >
+            <div
+              className={`${styles.blockContent} ${isParagraph ? styles.paragraphBlockContent : ""}`}
+            >
               <BlockRenderer block={block} />
             </div>
           </div>

@@ -1,4 +1,4 @@
-import type { Block, BlockWidthPreset } from "@/types/editor";
+import type { Block, BlockType, BlockWidthPreset } from "@/types/editor";
 import type { GridLayout, GridRect, PlacedRect } from "@/types/grid";
 
 // ── Grid constants (single source of truth) ──────────────────────────
@@ -7,6 +7,22 @@ export const GRID_CELL_PX = 200;
 export const GRID_GAP_PX = 20;
 export const GRID_CANVAS_PX =
   GRID_COLS * GRID_CELL_PX + (GRID_COLS - 1) * GRID_GAP_PX;
+export const GRID_ROW_SCALE = 2;
+export const GRID_ROW_PX = (GRID_CELL_PX + GRID_GAP_PX) / GRID_ROW_SCALE;
+export const GRID_ROW_GAP_PX = 0;
+export const AUTO_HEIGHT_MIN_HEIGHT_PX = 100;
+const AUTO_HEIGHT_BLOCK_TYPES: ReadonlySet<BlockType> = new Set(["paragraph"]);
+
+export function supportsAutoHeight(block: Block): boolean {
+  return AUTO_HEIGHT_BLOCK_TYPES.has(block.type);
+}
+
+export function normalizeAutoHeightPx(value: number | undefined): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return AUTO_HEIGHT_MIN_HEIGHT_PX;
+  }
+  return Math.max(AUTO_HEIGHT_MIN_HEIGHT_PX, Math.ceil(value));
+}
 
 // ── Preset → grid spans ─────────────────────────────────────────────
 export function spansForPreset(preset: BlockWidthPreset | undefined): {
@@ -41,6 +57,42 @@ export function sizePxForPreset(preset: BlockWidthPreset | undefined): {
   return { widthPx, heightPx };
 }
 
+function autoHeightPx(block: Block): number {
+  return normalizeAutoHeightPx(block.styles?.height);
+}
+
+function rowsForHeight(heightPx: number): number {
+  const subRows = Math.max(1, Math.ceil(heightPx / GRID_ROW_PX));
+  return subRows / GRID_ROW_SCALE;
+}
+
+export function spansForBlock(
+  block: Block,
+  overridePreset?: BlockWidthPreset,
+): {
+  w: number;
+  h: number;
+} {
+  const base = spansForPreset(overridePreset ?? block.styles?.widthPreset);
+  if (!supportsAutoHeight(block)) return base;
+  return {
+    w: base.w,
+    h: rowsForHeight(autoHeightPx(block)),
+  };
+}
+
+export function sizePxForBlock(block: Block): {
+  widthPx: number;
+  heightPx: number;
+} {
+  const base = sizePxForPreset(block.styles?.widthPreset);
+  if (!supportsAutoHeight(block)) return base;
+  return {
+    widthPx: base.widthPx,
+    heightPx: autoHeightPx(block),
+  };
+}
+
 export function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
@@ -52,7 +104,7 @@ export function overlaps(a: GridRect, b: GridRect): boolean {
 }
 
 export function rectForBlock(block: Block, at?: GridLayout): GridRect {
-  const { w, h } = spansForPreset(block.styles?.widthPreset);
+  const { w, h } = spansForBlock(block);
   const x = at?.x ?? block.layout?.x ?? 0;
   const y = at?.y ?? block.layout?.y ?? 0;
   return { x, y, w, h };
@@ -72,8 +124,8 @@ export function canPlaceBlockAt(
 }
 
 export function findFirstFreeSpot(block: Block, placed: Block[]): GridLayout {
-  const { w, h } = spansForPreset(block.styles?.widthPreset);
-  for (let y = 0; y < 200; y++) {
+  const { w, h } = spansForBlock(block);
+  for (let y = 0; y < 200; y += 1 / GRID_ROW_SCALE) {
     for (let x = 0; x <= GRID_COLS - w; x++) {
       const rect: GridRect = { x, y, w, h };
       if (!placed.some((p) => overlaps(rect, rectForBlock(p)))) {
@@ -97,7 +149,10 @@ export function resolveCollisions(
   allBlocks: Block[],
   getLayout: (block: Block) => GridLayout,
 ): Record<string, GridLayout> {
-  const { w: aw, h: ah } = spansForPreset(anchoredPreset);
+  const anchoredBlock = allBlocks.find((b) => b.id === anchoredId);
+  const { w: aw, h: ah } = anchoredBlock
+    ? spansForBlock(anchoredBlock, anchoredPreset)
+    : spansForPreset(anchoredPreset);
   const anchored: GridLayout = {
     x: clamp(anchoredLayout.x, 0, GRID_COLS - aw),
     y: Math.max(0, anchoredLayout.y),
@@ -127,12 +182,12 @@ export function resolveCollisions(
     ).filter((cx) => cx !== nx);
     const orderedX = [nx, ...xCandidates];
 
-    for (let y = ny; y < 200; y++) {
+    for (let y = ny; y < 200; y += 1 / GRID_ROW_SCALE) {
       for (const x of orderedX) {
         if (isFree({ x, y, w, h })) return { x, y };
       }
     }
-    for (let y = 0; y < 200; y++) {
+    for (let y = 0; y < 200; y += 1 / GRID_ROW_SCALE) {
       for (let x = 0; x <= GRID_COLS - w; x++) {
         if (isFree({ x, y, w, h })) return { x, y };
       }
@@ -152,7 +207,7 @@ export function resolveCollisions(
   const result: Record<string, GridLayout> = { [anchoredId]: anchored };
 
   for (const other of others) {
-    const { w, h } = spansForPreset(other.styles?.widthPreset);
+    const { w, h } = spansForBlock(other);
     const pos = getLayout(other);
     const ox = clamp(pos.x, 0, GRID_COLS - w);
     const oy = Math.max(0, pos.y);

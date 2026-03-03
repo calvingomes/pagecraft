@@ -4,24 +4,48 @@ import { useEffect, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { ParagraphBlock as ParagraphBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
-import {
-  minimalRTHtmlToInlineForClamp,
-  sanitizeMinimalRTH,
-} from "@/helper/sanitizeRichText";
+import { useEditorStore } from "@/stores/editor-store";
+import { sanitizeMinimalRTH } from "@/helper/sanitizeRichText";
 import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
+import { computeAutoHeightReflowUpdates } from "@/lib/autoHeightLayout";
+import { normalizeAutoHeightPx } from "@/lib/blockGrid";
 import styles from "./ParagraphBlock.module.css";
 
 export const ParagraphBlock = ({ block }: { block: ParagraphBlockType }) => {
   const contextEditor = useEditorContext();
+  const allBlocks = useEditorStore((s) => s.blocks);
+  const updateBlock = useEditorStore((s) => s.updateBlock);
   const editable = !!contextEditor;
   const initialContent = sanitizeMinimalRTH(block.content?.text ?? "");
   const lastSyncedContent = useRef(initialContent);
+  const lastSyncedHeight = useRef<number>(
+    normalizeAutoHeightPx(block.styles?.height),
+  );
 
-  const preset = block.styles?.widthPreset ?? "small";
-  const clampClass =
-    preset === "tall" || preset === "large"
-      ? styles.clampTall
-      : styles.clampSmall;
+  const syncHeight = (nextHeightPx: number) => {
+    if (!contextEditor?.onUpdateBlock) return;
+
+    const next = normalizeAutoHeightPx(nextHeightPx);
+    if (Math.abs(next - lastSyncedHeight.current) < 8) return;
+
+    lastSyncedHeight.current = next;
+    const updates = computeAutoHeightReflowUpdates({
+      anchorBlock: block,
+      nextHeight: next,
+      allBlocks,
+    });
+
+    for (const { id, updates: nextUpdates } of updates) {
+      updateBlock(id, nextUpdates);
+    }
+
+    contextEditor?.onUpdateBlock(block.id, {
+      styles: {
+        ...block.styles,
+        height: next,
+      },
+    });
+  };
 
   const editor = useEditor({
     extensions: minimalRTEWithPlaceholder({
@@ -50,6 +74,14 @@ export const ParagraphBlock = ({ block }: { block: ParagraphBlockType }) => {
           content: { text: finalContent },
         });
       }
+
+      const root = editor.view.dom as HTMLElement;
+      syncHeight(root.scrollHeight + 24);
+    },
+    onUpdate: ({ editor }) => {
+      if (!editable) return;
+      const root = editor.view.dom as HTMLElement;
+      syncHeight(root.scrollHeight + 24);
     },
   });
 
@@ -68,6 +100,13 @@ export const ParagraphBlock = ({ block }: { block: ParagraphBlockType }) => {
     editor.setEditable(editable);
   }, [editor, editable]);
 
+  useEffect(() => {
+    if (!editor || !editable) return;
+    const root = editor.view.dom as HTMLElement;
+    syncHeight(root.scrollHeight + 24);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor, editable, block.id]);
+
   if (editable && editor) {
     return (
       <div className={styles.editorContainer}>
@@ -78,11 +117,11 @@ export const ParagraphBlock = ({ block }: { block: ParagraphBlockType }) => {
 
   const html = block.content?.text ?? "";
   const safeHtml = sanitizeMinimalRTH(html);
-  const clampedHtml = minimalRTHtmlToInlineForClamp(safeHtml);
-  return clampedHtml ? (
+  const renderedHtml = safeHtml;
+  return renderedHtml ? (
     <div
-      className={`${styles.display} ${clampClass}`}
-      dangerouslySetInnerHTML={{ __html: clampedHtml }}
+      className={styles.display}
+      dangerouslySetInnerHTML={{ __html: renderedHtml }}
     />
   ) : null;
 };

@@ -19,8 +19,11 @@ import {
   GRID_CELL_PX,
   GRID_COLS,
   GRID_GAP_PX,
-  sizePxForPreset,
-  spansForPreset,
+  GRID_ROW_GAP_PX,
+  GRID_ROW_PX,
+  GRID_ROW_SCALE,
+  sizePxForBlock,
+  spansForBlock,
   clamp,
   rectForBlock,
 } from "@/lib/blockGrid";
@@ -72,19 +75,22 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
   // Render occupied rows + trailing empty rows. During a drag, add more rows
   // so the user can pull a block below the current grid extent.
   const TRAILING_ROWS = activeId ? 4 : 1;
-  const rows = Math.max(1, maxBottom + TRAILING_ROWS);
+  const subRows = Math.max(
+    1,
+    Math.ceil(maxBottom * GRID_ROW_SCALE) + TRAILING_ROWS * GRID_ROW_SCALE,
+  );
 
-  const GRID_STRIDE_PX = GRID_CELL_PX + GRID_GAP_PX;
+  const GRID_X_STRIDE_PX = GRID_CELL_PX + GRID_GAP_PX;
+  const GRID_Y_STRIDE_PX = GRID_ROW_PX + GRID_ROW_GAP_PX;
 
   const placementHighlightStyle = (() => {
     if (!activeBlock) return null;
     if (!placementTarget) return null;
 
-    const preset = activeBlock.styles?.widthPreset ?? "small";
-    const { widthPx, heightPx } = sizePxForPreset(preset);
+    const { widthPx, heightPx } = sizePxForBlock(activeBlock);
 
-    const xPx = placementTarget.x * GRID_STRIDE_PX;
-    const yPx = placementTarget.y * GRID_STRIDE_PX;
+    const xPx = placementTarget.x * GRID_X_STRIDE_PX;
+    const yPx = placementTarget.y * GRID_ROW_SCALE * GRID_Y_STRIDE_PX;
 
     return {
       transform: `translate3d(${xPx}px, ${yPx}px, 0)`,
@@ -120,7 +126,9 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
   const content = (
     <div
       className={styles.canvas}
-      style={{ height: `${rows * GRID_CELL_PX + (rows - 1) * GRID_GAP_PX}px` }}
+      style={{
+        height: `${subRows * GRID_ROW_PX + (subRows - 1) * GRID_ROW_GAP_PX}px`,
+      }}
     >
       {props.editable && placementHighlightStyle && (
         <div
@@ -131,9 +139,11 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
       {props.editable && (
         <div
           className={`${styles.dropGrid} ${activeId ? styles.dropGridActive : ""}`}
-          style={{ gridTemplateRows: `repeat(${rows}, ${GRID_CELL_PX}px)` }}
+          style={{
+            gridTemplateRows: `repeat(${subRows}, ${GRID_ROW_PX}px)`,
+          }}
         >
-          {Array.from({ length: rows }).flatMap((_, y) =>
+          {Array.from({ length: subRows }).flatMap((_, y) =>
             Array.from({ length: GRID_COLS }).map((__, x) => (
               <DroppableCell key={`${x}-${y}`} x={x} y={y} />
             )),
@@ -142,8 +152,7 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
       )}
       <div className={styles.grid}>
         {blocks.map((block: Block, index: number) => {
-          const preset = block.styles?.widthPreset ?? "small";
-          const { w: spanW, h: spanH } = spansForPreset(preset);
+          const { w: spanW, h: spanH } = spansForBlock(block);
           const xRaw = block.layout?.x ?? index % GRID_COLS;
           const yRaw = block.layout?.y ?? Math.floor(index / GRID_COLS);
           const x = clamp(xRaw, 0, GRID_COLS - spanW);
@@ -156,9 +165,9 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
               }}
               style={{
                 gridColumnStart: x + 1,
-                gridRowStart: y + 1,
+                gridRowStart: Math.round(y * GRID_ROW_SCALE) + 1,
                 gridColumnEnd: `span ${spanW}`,
-                gridRowEnd: `span ${spanH}`,
+                gridRowEnd: `span ${Math.max(1, Math.round(spanH * GRID_ROW_SCALE))}`,
               }}
             >
               {props.editable ? (

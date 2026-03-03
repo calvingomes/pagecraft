@@ -63,21 +63,39 @@ styles/         — Global CSS custom properties and media queries
 
 All grid constants are centralized in `lib/blockGrid.ts`:
 
-| Constant         | Value | Purpose                  |
-| ---------------- | ----- | ------------------------ |
-| `GRID_COLS`      | 4     | Number of columns        |
-| `GRID_CELL_PX`   | 200   | Base cell size in pixels |
-| `GRID_GAP_PX`    | 20    | Gap between cells        |
-| `GRID_CANVAS_PX` | 860   | Total canvas width       |
+| Constant         | Value | Purpose                                    |
+| ---------------- | ----- | ------------------------------------------ |
+| `GRID_COLS`      | 4     | Number of columns                          |
+| `GRID_CELL_PX`   | 200   | Base cell size in pixels                   |
+| `GRID_GAP_PX`    | 20    | Gap between cells                          |
+| `GRID_CANVAS_PX` | 860   | Total canvas width                         |
+| `GRID_ROW_SCALE` | 2     | Vertical sub-row precision (0.5 row units) |
 
 **Never hardcode these values** elsewhere. Import from `@/lib/blockGrid`.
 
 - `spansForPreset(preset)` → `{ w, h }` column/row spans for a `BlockWidthPreset`
+- `spansForBlock(block, overridePreset?)` → block-aware spans (supports auto-height blocks)
 - `sizePxForPreset(preset)` → `{ widthPx, heightPx }` derived pixel sizes
+- `sizePxForBlock(block)` → block-aware pixel dimensions
 - `rectForBlock(block, layout?)` → full `PlacedRect` geometry
 - `canPlaceBlockAt`, `findFirstFreeSpot`, `resolveCollisions` — placement/collision logic
 
 Do not duplicate these functions. If you need grid math, it belongs in `blockGrid.ts`.
+
+### Auto-height Blocks (Generic)
+
+- Auto-height layout is generic and centralized; do **not** implement reflow/push logic inside individual block components.
+- Use `lib/autoHeightLayout.ts` (`computeAutoHeightReflowUpdates`) for grow-and-push behavior.
+- Enable block types for auto-height in `lib/blockGrid.ts` via `supportsAutoHeight` (internal allowlist).
+- Current enabled auto-height block type: `paragraph`.
+- `sectionTitle` is intentionally not enabled yet; when enabling it later, do it by updating the allowlist and wiring height updates in its block component.
+
+**Do / Don't**
+
+- **Do:** Keep block components focused on UI + editor events; call shared layout helpers from `lib/`.
+- **Do:** Reuse `normalizeAutoHeightPx`, `sizePxForBlock`, `spansForBlock`, and `computeAutoHeightReflowUpdates`.
+- **Don't:** Add per-block collision or compaction loops directly inside component files.
+- **Don't:** Hardcode row math (`0.5`, `200`, `20`) outside `lib/blockGrid.ts`.
 
 ---
 
@@ -167,5 +185,8 @@ blocks/TextBlock/
 3. Create `components/blocks/YourBlock/YourBlock.tsx` + `YourBlock.module.css`.
 4. Register it in `components/builder/BlockRegistry/blockRegistry.tsx`.
 5. Add span defaults in `lib/blockGrid.ts` → `spansForPreset` (if it uses a new preset).
+
+- If the block needs content-driven height, use the generic auto-height path (`supportsAutoHeight` + `computeAutoHeightReflowUpdates`) instead of custom per-block collision logic.
+
 6. Handle creation in `app/editor/page.tsx` toolbar action.
 7. Handle normalization in `lib/normalizeBlocks.ts` → `normalizeStoredBlocks`.

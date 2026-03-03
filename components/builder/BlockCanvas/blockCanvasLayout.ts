@@ -1,6 +1,11 @@
 import type { Block } from "@/types/editor";
 import type { GridLayout, LayoutById } from "@/types/grid";
-import { clamp, GRID_COLS, resolveCollisions } from "@/lib/blockGrid";
+import {
+  clamp,
+  GRID_COLS,
+  GRID_ROW_SCALE,
+  resolveCollisions,
+} from "@/lib/blockGrid";
 
 export type { LayoutById } from "@/types/grid";
 
@@ -16,7 +21,7 @@ export function computeTargetFromOver(
     if (!Number.isNaN(x) && !Number.isNaN(y)) {
       return {
         x: clamp(x, 0, GRID_COLS - movingW),
-        y: Math.max(0, y),
+        y: Math.max(0, y / GRID_ROW_SCALE),
       };
     }
   }
