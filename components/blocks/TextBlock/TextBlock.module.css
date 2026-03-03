@@ -40,12 +40,6 @@
   max-height: calc(1.7em * 14);
 }
 
-.clampskinnyWide {
-  line-clamp: 1;
-  -webkit-line-clamp: 2;
-  max-height: calc(1.6em * 2);
-}
-
 .display :global(p) {
   margin: 0;
 }

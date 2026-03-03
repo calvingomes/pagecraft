@@ -4,7 +4,6 @@ export type BlockWidthPreset =
   | "small" // 200x200
   | "large" // 420x420
   | "tall" // 200x420
-  | "skinnyWide" // 420x90
   | "wide"; // 420x200
 
 interface BaseBlock {
@@ -20,8 +19,6 @@ interface BaseBlock {
   layout?: {
     x: number;
     y: number;
-    // For half-height blocks (currently `skinnyWide`), 0 = top, 1 = bottom.
-    slot?: 0 | 1;
   };
 }
 

@@ -5,7 +5,6 @@ import {
   RectangleVertical,
   RectangleHorizontal,
   Square,
-  Minus,
 } from "lucide-react";
 import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "./BlockHoverToolbar.module.css";
@@ -20,12 +19,6 @@ const WIDTH_PRESETS: BlockHoverToolbarIcons[] = [
     title: "Small",
     Icon: Square,
     iconSize: 12,
-  },
-  {
-    preset: "skinnyWide",
-    title: "Skinny Wide",
-    Icon: Minus,
-    iconSize: 20,
   },
   {
     preset: "wide",

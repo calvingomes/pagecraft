@@ -1,11 +1,6 @@
 import type { Block, BlockWidthPreset } from "@/types/editor";
 import type { GridLayout, GridRect } from "@/types/grid";
 
-// Keep in sync with the visual gap used by the canvas grid.
-const GRID_GAP_PX = 20;
-// Keep in sync with the desktop canvas grid row height.
-const GRID_CELL_PX = 200;
-
 export function spansForPreset(preset: BlockWidthPreset | undefined): {
   w: number;
   h: number;
@@ -14,8 +9,6 @@ export function spansForPreset(preset: BlockWidthPreset | undefined): {
     case "large":
       return { w: 2, h: 2 };
     case "wide":
-      return { w: 2, h: 1 };
-    case "skinnyWide":
       return { w: 2, h: 1 };
     case "tall":
       return { w: 1, h: 2 };
@@ -36,14 +29,6 @@ export function sizePxForPreset(preset: BlockWidthPreset | undefined): {
       return { widthPx: 420, heightPx: 200 };
     case "tall":
       return { widthPx: 200, heightPx: 420 };
-    case "skinnyWide":
-      // `skinnyWide` blocks are half-height within a single 200px row.
-      // Two stacked `skinnyWide` blocks should align with the grid gap between them.
-      // Example with default tokens: (200 - 20) / 2 = 90px.
-      return {
-        widthPx: 420,
-        heightPx: Math.max(0, (GRID_CELL_PX - GRID_GAP_PX) / 2),
-      };
     case "small":
     default:
       return { widthPx: 200, heightPx: 200 };

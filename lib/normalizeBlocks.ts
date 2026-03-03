@@ -76,7 +76,6 @@ export function ensureBlocksHaveValidLayouts(blocks: Block[]): Block[] {
         const candidate = {
           x: block.layout.x,
           y: block.layout.y,
-          slot: block.layout.slot,
         };
         if (canPlaceBlockAt(block, candidate, placed)) {
           placed.push(block);

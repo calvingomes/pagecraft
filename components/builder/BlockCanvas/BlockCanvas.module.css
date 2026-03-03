@@ -67,15 +67,4 @@
 .dropCell {
   width: 100%;
   height: 100%;
-  position: relative;
-}
-
-.dropHalfTop {
-  position: absolute;
-  inset: 0 0 50% 0;
-}
-
-.dropHalfBottom {
-  position: absolute;
-  inset: 50% 0 0 0;
 }

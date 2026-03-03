@@ -66,9 +66,7 @@ export function useDesktopGridDnd({
       layouts: Object.fromEntries(
         blocks.map((b) => [
           b.id,
-          b.layout
-            ? { x: b.layout.x, y: b.layout.y, slot: b.layout.slot }
-            : undefined,
+          b.layout ? { x: b.layout.x, y: b.layout.y } : undefined,
         ]),
       ),
       lastTargetKey: null,
@@ -114,7 +112,7 @@ export function useDesktopGridDnd({
       y: clamp(target.y, 0, maxStartY),
     };
 
-    const targetKey = `${activeId}:${clampedTarget.x}:${clampedTarget.y}:${clampedTarget.slot ?? "_"}`;
+    const targetKey = `${activeId}:${clampedTarget.x}:${clampedTarget.y}`;
     if (dragSnapshot.lastTargetKey === targetKey) return;
 
     const nextLayouts = computePushedLayouts(
@@ -217,9 +215,7 @@ export function useDesktopGridDnd({
       Object.fromEntries(
         blocks.map((b) => [
           b.id,
-          b.layout
-            ? { x: b.layout.x, y: b.layout.y, slot: b.layout.slot }
-            : undefined,
+          b.layout ? { x: b.layout.x, y: b.layout.y } : undefined,
         ]),
       );
 

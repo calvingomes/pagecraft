@@ -21,8 +21,6 @@ const aspectRatioForPreset = (preset: BlockWidthPreset): string => {
       return "2 / 1";
     case "large":
       return "1 / 1";
-    case "skinnyWide":
-      return "4 / 1";
     case "small":
     default:
       return "1 / 1";
@@ -67,8 +65,6 @@ export function SortableBlock({
   const hideBecauseOverlay = activeDragId === block.id;
 
   const widthPreset = block.styles?.widthPreset ?? "small";
-  const slot = block.layout?.slot ?? 0;
-  const isskinnyWide = widthPreset === "skinnyWide";
 
   const handleWidthChange = (preset: BlockWidthPreset) => {
     if (!editor?.onUpdateBlock) return;
@@ -87,25 +83,10 @@ export function SortableBlock({
   const { widthPx, heightPx } = sizePxForPreset(widthPreset);
   const aspectRatio = aspectRatioForPreset(widthPreset);
 
-  const DESKTOP_GRID_CELL_PX = 200;
-
-  const hoverZoneStyle: CSSProperties | undefined = (() => {
-    if (fluid) return { height: "auto" };
-    if (!isskinnyWide) return undefined;
-
-    const offsetY =
-      slot === 1 ? Math.max(0, DESKTOP_GRID_CELL_PX - heightPx) : 0;
-    return {
-      height: heightPx,
-      marginTop: offsetY,
-      alignItems: slot === 1 ? "flex-end" : "flex-start",
-    };
-  })();
-
   return (
     <div
       className={styles.hoverZone}
-      style={hoverZoneStyle}
+      style={fluid ? { height: "auto" } : undefined}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

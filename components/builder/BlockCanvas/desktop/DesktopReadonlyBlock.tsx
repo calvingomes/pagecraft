@@ -13,16 +13,8 @@ export function DesktopReadonlyBlock({ block }: Props) {
   const preset = block.styles?.widthPreset ?? "small";
   const { widthPx, heightPx } = sizePxForPreset(preset);
 
-  const slot = block.layout?.slot ?? 0;
-  const isskinnyWide = preset === "skinnyWide";
-
   return (
-    <div
-      className={sortableBlockStyles.hoverZone}
-      style={
-        isskinnyWide && slot === 1 ? { alignItems: "flex-end" } : undefined
-      }
-    >
+    <div className={sortableBlockStyles.hoverZone}>
       <div
         className={sortableBlockStyles.wrapper}
         style={{

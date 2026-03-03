@@ -79,13 +79,9 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
 
     const preset = activeBlock.styles?.widthPreset ?? "small";
     const { widthPx, heightPx } = sizePxForPreset(preset);
-    const isskinnyWide = preset === "skinnyWide";
-    const slot = isskinnyWide ? (placementTarget.slot ?? 0) : 0;
-    const slotOffsetY =
-      isskinnyWide && slot === 1 ? GRID_CELL_PX - heightPx : 0;
 
     const xPx = placementTarget.x * GRID_STRIDE_PX;
-    const yPx = placementTarget.y * GRID_STRIDE_PX + slotOffsetY;
+    const yPx = placementTarget.y * GRID_STRIDE_PX;
 
     return {
       transform: `translate3d(${xPx}px, ${yPx}px, 0)`,
@@ -95,21 +91,12 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
   })();
 
   const DroppableCell = ({ x, y }: { x: number; y: number }) => {
-    const { setNodeRef: setTopRef } = useDroppable({
-      id: `cellHalf:${x}:${y}:0`,
-      data: { type: "cellHalf", x, y, slot: 0 },
-    });
-    const { setNodeRef: setBottomRef } = useDroppable({
-      id: `cellHalf:${x}:${y}:1`,
-      data: { type: "cellHalf", x, y, slot: 1 },
+    const { setNodeRef } = useDroppable({
+      id: `cell:${x}:${y}`,
+      data: { type: "cell", x, y },
     });
 
-    return (
-      <div className={styles.dropCell}>
-        <div ref={setTopRef} className={styles.dropHalfTop} />
-        <div ref={setBottomRef} className={styles.dropHalfBottom} />
-      </div>
-    );
+    return <div ref={setNodeRef} className={styles.dropCell} />;
   };
 
   // Mobile mode: 2-column responsive grid. In the editor, we support reorder-only.

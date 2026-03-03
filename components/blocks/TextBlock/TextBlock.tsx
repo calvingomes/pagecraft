@@ -19,11 +19,9 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
 
   const preset = block.styles?.widthPreset ?? "small";
   const clampClass =
-    preset === "skinnyWide"
-      ? styles.clampskinnyWide
-      : preset === "tall" || preset === "large"
-        ? styles.clampTall
-        : styles.clampSmall;
+    preset === "tall" || preset === "large"
+      ? styles.clampTall
+      : styles.clampSmall;
 
   const editor = useEditor({
     extensions: minimalRTEWithPlaceholder({

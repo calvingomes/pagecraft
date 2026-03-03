@@ -1,7 +1,6 @@
 export type GridLayout = {
   x: number;
   y: number;
-  slot?: 0 | 1;
 };
 
 export type GridRect = {
