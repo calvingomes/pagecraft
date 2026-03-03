@@ -2,7 +2,6 @@
   width: 100%;
   height: 100%;
   padding: 0;
-  /* box-sizing: border-box; */
   border: none;
   background: transparent;
   color: var(--color-text-primary);
@@ -12,10 +11,7 @@
   outline: none;
   overflow: hidden;
   min-width: 0;
-  /* overflow-wrap: anywhere; */
-  /* word-break: break-word; */
   border-radius: 6px;
-  padding: 7px;
 }
 
 .editor :global(.ProseMirror):focus-visible {
