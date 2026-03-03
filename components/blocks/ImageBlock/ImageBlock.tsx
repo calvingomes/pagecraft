@@ -44,7 +44,7 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
                 },
               });
             }}
-            placeholder="Add caption"
+            placeholder="Add caption..."
             className={styles.captionInput}
           />
         </div>
