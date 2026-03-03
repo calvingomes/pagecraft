@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { Type, Link2, Image as ImageIcon, Palette } from "lucide-react";
 import styles from "./Toolbar.module.css";
 import type { ToolbarDefaultProps } from "./Toolbar.types";
@@ -15,6 +15,19 @@ export const ToolbarDefault = ({
   sidebarPosition = "left",
 }: ToolbarDefaultProps) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const imageInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleImageClick = () => {
+    imageInputRef.current?.click();
+  };
+
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    onAddBlock?.("image", { file, alt: file.name });
+    event.currentTarget.value = "";
+  };
 
   return (
     <div className={styles.toolbarContainer}>
@@ -39,7 +52,7 @@ export const ToolbarDefault = ({
           className={styles.toolButton}
           title="Image"
           type="button"
-          onClick={() => onAddBlock?.("image")}
+          onClick={handleImageClick}
         >
           <ImageIcon size={18} />
         </button>
@@ -51,6 +64,13 @@ export const ToolbarDefault = ({
         >
           <Palette size={18} />
         </button>
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          onChange={handleImageChange}
+          hidden
+        />
       </div>
       <ToolbarPalatte
         isOpen={isPaletteOpen}

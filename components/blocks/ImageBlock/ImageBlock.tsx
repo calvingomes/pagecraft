@@ -23,6 +23,16 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
   if (isEditable) {
     return (
       <div className={styles.imageBlock} data-editing>
+        {localUrl.trim() ? (
+          <div className={styles.previewFrame}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={localUrl}
+              alt={localAlt ?? ""}
+              className={styles.previewImage}
+            />
+          </div>
+        ) : null}
         <input
           type="url"
           placeholder="https://example.com/image.jpg"

@@ -3,10 +3,17 @@ import type { PageBackgroundId, SidebarPosition } from "@/types/page";
 
 export type ToolbarMode = "default" | "link";
 
+export type AddBlockOptions = {
+  url?: string;
+  title?: string;
+  file?: File;
+  alt?: string;
+};
+
 export type ToolbarDefaultProps = {
   onAddBlock?: (
     type: BlockType,
-    options?: { url?: string; title?: string },
+    options?: AddBlockOptions,
   ) => void | Promise<void>;
   onOpenLink?: () => void;
   onChangeBackground?: (background: PageBackgroundId) => void;
