@@ -18,6 +18,7 @@ import { SaveButton } from "@/components/layout/SaveButton/SaveButton";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
+import { MobileEditorGuard } from "@/components/layout/MobileEditorGuard/MobileEditorGuard";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
 import { findFirstFreeSpot } from "@/lib/blockGrid";
 import {
@@ -65,6 +66,7 @@ export default function EditorPage() {
   const effectiveSidebarPosition: SidebarPosition = isDesktopEditing
     ? desktopSidebarPosition
     : "center";
+  const isMobileScreen = screenView === "mobile";
 
   useEffect(() => {
     if (!username || !user?.id) return;
@@ -318,6 +320,7 @@ export default function EditorPage() {
         sidebarPosition={desktopSidebarPosition}
         showSidebarPositionControls={isDesktopEditing}
       />
+      <MobileEditorGuard open={isMobileScreen} />
     </EditorProvider>
   );
 }
