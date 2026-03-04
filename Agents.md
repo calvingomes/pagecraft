@@ -18,7 +18,7 @@ components/
   blocks/       — Visual block components (TextBlock, LinkBlock, ImageBlock, SectionTitleBlock)
   builder/      — Editor infrastructure (canvas, toolbars, dnd, registry)
   layout/       — Page-level layout shells (Header, Navbar, PageLayout, ProfileSidebar)
-  ui/           — Generic reusable UI primitives (WordCount, etc.)
+  ui/           — Generic reusable UI primitives (Button, etc.)
   views/        — Full-page view compositions (AuthView, HomeLanding, PageView)
 app/            — Next.js App Router pages and API routes
 styles/         — Global CSS custom properties and media queries
@@ -55,6 +55,13 @@ styles/         — Global CSS custom properties and media queries
 - Use CSS custom properties from `styles/colors.css` and `styles/media.css` — never hardcode colors or breakpoints that are already defined as variables.
 - **Delete dead CSS immediately.** If a class is no longer referenced in the component, remove it. Do not leave commented-out rules.
 - **No duplicate selectors** across files. If two components need the same style, extract it to a shared module or use CSS custom properties.
+- **Avoid `composes` keyword** for cross-file composition. Import the style object in JS and concatenate class names:
+  ```tsx
+  import layoutStyles from "../../LandingLayout.module.css";
+  import styles from "./Section.module.css";
+  // ...
+  className={`${layoutStyles.container} ${styles.container}`}
+  ```
 - Use `@import "@styles/media.css"` at the top of any module that needs responsive breakpoints.
 
 ### Breakpoint Ranges
@@ -141,6 +148,7 @@ Do not duplicate these functions. If you need grid math, it belongs in `blockGri
 - **Do:** Pass the appropriate `GridConfig` (`DESKTOP_GRID` or `MOBILE_GRID`) when calling grid functions from viewport-specific code.
 - **Do:** Compute `BlockDimensions` in the parent canvas and pass as props — blocks should not call `sizePxForBlock` internally.
 - **Do:** Keep visual block height based on normalized content height; use quantized height for occupancy/reflow decisions.
+- **Do:** Use `snapToCursor` collision detection strategy (from `lib/dndKit.ts`) for all drag-and-drop operations to ensure items snap to the grid cell nearest the pointer.
 - **Don't:** Add per-block collision or compaction loops directly inside component files.
 - **Don't:** Hardcode grid math (`0.5`, `200`, `25`, etc.) outside `lib/blockGrid.ts`.
 - **Don't:** Import `MOBILE_GRID` in desktop-specific components or vice versa — keep viewport concerns separated at the component layer.
@@ -169,13 +177,15 @@ blocks/TextBlock/
 
 - Access editor capabilities via `useEditorContext()` — returns `null` in view mode.
 - Check `!!editor` to determine editability. Do not pass an `editable` prop separately.
+- **Use the `useBlockEditor` hook** for all Tiptap editor instances (`TextBlock`, `LinkBlock`, `ProfileSidebar`). Do not implement `useEditor` manually.
+- **Use the `useLinkMetadata` hook** for link metadata fetching logic.
 
 ### Builder Components (`components/builder/`)
 
 - `BlockRegistry/blockRegistry.tsx` is the single map from `BlockType → ReactNode`. When adding a new block type, add it here and in `types/editor.ts` — the `BlockRenderer` will pick it up automatically.
 - **`BlockCanvas`** is the top-level canvas entry point. It dispatches between `EditableBlockCanvas` (editor, backed by `editor-store`) and `ReadonlyBlockCanvas` (view page, pure props). Readonly mode receives a `renderMode` prop (`"desktop" | "mobile"`) from the parent — it never independently detects viewport.
 - **Canvas sub-components** are split by viewport:
-  - `BlockCanvas/desktop/DesktopBlockCanvas.tsx` — desktop grid with DnD (editable) or `DesktopReadonlyBlock` (readonly). Computes `sizePxForBlock(block)` and passes `dimensions` prop to children.
+  - `BlockCanvas/desktop/DesktopBlockCanvas.tsx` — desktop grid with DnD (editable) or `DesktopReadonlyBlock` (readonly). Computes `sizePxForBlock(block)` and passes `dimensions` prop to children. Memoizes expensive layout styles and extracts `DroppableCell` to prevent re-renders.
   - `BlockCanvas/desktop/DesktopReadonlyBlock.tsx` — lightweight readonly block for desktop grid layout. Receives `dimensions: BlockDimensions` as props.
   - `BlockCanvas/mobile/MobileBlockCanvas.tsx` — thin wrapper selecting editable or readonly `MobileCanvasGrid`
   - `BlockCanvas/mobile/MobileCanvasGrid.tsx` — mobile 2-column grid with SortableContext (editable) or `MobileReadonlyBlock` (readonly). Uses `MOBILE_GRID` for spans (`spansForBlock(block, undefined, MOBILE_GRID).w`) and pixel sizes (`sizePxForBlock(block, MOBILE_GRID)`).
