@@ -9,6 +9,7 @@ export type BlockHoverToolbarProps = {
   onWidthChange: (preset: BlockWidthPreset) => void;
   onToggleWrapperBackground?: () => void;
   visible?: boolean;
+  viewport?: "desktop" | "mobile";
 };
 
 export type BlockHoverToolbarIcons = {

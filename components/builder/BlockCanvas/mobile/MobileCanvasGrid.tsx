@@ -63,7 +63,6 @@ function MobileSortableGridItem({ block }: { block: Block }) {
         dimensions={dimensions}
         fluid
         dndDisabled
-        toolbarAlwaysVisible
         gridConfig={MOBILE_GRID}
       />
     </div>

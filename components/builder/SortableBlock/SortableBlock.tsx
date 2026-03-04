@@ -22,14 +22,13 @@ export function SortableBlock({
   activeDragId,
   fluid = false,
   dndDisabled = false,
-  toolbarAlwaysVisible = false,
   gridConfig,
 }: SortableBlockProps) {
   const editor = useEditorContext();
   const allBlocks = useEditorStore(selectActiveViewportBlocks);
   const [isHovered, setIsHovered] = useState(false);
 
-  const toolbarVisible = toolbarAlwaysVisible ? true : isHovered;
+  const toolbarVisible = isHovered;
 
   const { setNodeRef: setDroppableRef } = useDroppable({
     id: `block:${block.id}`,
@@ -58,6 +57,7 @@ export function SortableBlock({
   const widthPreset = block.styles?.widthPreset ?? "small";
   const showHoverToolbar = !!editor && block.type !== "sectionTitle";
   const isTransparentWrapper = shouldUseTransparentWrapper(block, "edit");
+  const viewport = gridConfig?.cols === 2 ? "mobile" : "desktop";
 
   const handleWidthChange = (preset: BlockWidthPreset) => {
     if (!editor?.onUpdateBlock) return;
@@ -105,6 +105,7 @@ export function SortableBlock({
         className={styles.frame}
         style={{
           ...(hideBecauseOverlay ? {} : dndStyle),
+          ...(fluid ? { width: "100%" } : {}),
           maxWidth: "100%",
           maxHeight: "100%",
           opacity: hideBecauseOverlay ? 0 : 1,
@@ -143,6 +144,7 @@ export function SortableBlock({
             onWidthChange={handleWidthChange}
             onToggleWrapperBackground={handleToggleWrapperBackground}
             visible={toolbarVisible}
+            viewport={viewport}
           />
         )}
       </div>

@@ -60,6 +60,7 @@ export function BlockHoverToolbar({
   onWidthChange,
   onToggleWrapperBackground,
   visible = false,
+  viewport = "desktop",
 }: BlockHoverToolbarProps) {
   const editor = useEditorContext();
   if (!editor) return null;
@@ -69,6 +70,9 @@ export function BlockHoverToolbar({
   };
 
   const visiblePresets = WIDTH_PRESETS.filter((item) => {
+    if (item.preset === "max" && viewport === "mobile") {
+      return false;
+    }
     if (item.preset === "skinnyWide") {
       return blockType === "text" || blockType === "link";
     }

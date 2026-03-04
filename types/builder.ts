@@ -23,7 +23,6 @@ export type SortableBlockProps = {
   activeDragId?: string | null;
   fluid?: boolean;
   dndDisabled?: boolean;
-  toolbarAlwaysVisible?: boolean;
   gridConfig?: GridConfig;
 };
 
