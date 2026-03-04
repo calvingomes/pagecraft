@@ -41,7 +41,7 @@ export default function EditorPage() {
   const updateBlock = useEditorStore((s) => s.updateBlock);
 
   const [background, setBackground] = useState<PageBackgroundId>("page-bg-1");
-  const [sidebarPosition, setSidebarPosition] =
+  const [desktopSidebarPosition, setDesktopSidebarPosition] =
     useState<SidebarPosition>("left");
   const [displayName, setDisplayName] = useState<string>("");
   const [bioHtml, setBioHtml] = useState<string>("");
@@ -49,7 +49,22 @@ export default function EditorPage() {
   const [avatarShape, setAvatarShape] = useState<AvatarShape>("circle");
   const [persistedAvatarUrl, setPersistedAvatarUrl] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
-  const { previewView, setPreviewView } = useEditorViewportPreview();
+  const { screenView, previewView, setPreviewView, canTogglePreview } =
+    useEditorViewportPreview();
+
+  const activeEditorMode =
+    screenView === "mobile"
+      ? "mobile"
+      : previewView === "mobile"
+        ? "mobile"
+        : screenView === "tablet"
+          ? "tablet"
+          : "desktop";
+
+  const isDesktopEditing = activeEditorMode === "desktop";
+  const effectiveSidebarPosition: SidebarPosition = isDesktopEditing
+    ? desktopSidebarPosition
+    : "center";
 
   useEffect(() => {
     if (!username || !user?.id) return;
@@ -76,7 +91,9 @@ export default function EditorPage() {
           setBackground(pageData.background as PageBackgroundId);
         }
         if (pageData.sidebar_position) {
-          setSidebarPosition(pageData.sidebar_position as SidebarPosition);
+          setDesktopSidebarPosition(
+            pageData.sidebar_position as SidebarPosition,
+          );
         }
         if (typeof pageData.display_name === "string") {
           incomingDisplayName = pageData.display_name;
@@ -211,7 +228,7 @@ export default function EditorPage() {
         userId: user.id,
         username,
         background,
-        sidebarPosition,
+        sidebarPosition: desktopSidebarPosition,
         displayName,
         bioHtml,
         avatarUrl,
@@ -248,38 +265,40 @@ export default function EditorPage() {
         <SaveButton onSave={handleSave} saving={isSaving} />
         <LogoutButton />
       </div>
-      <div className={styles.previewToggle}>
-        <button
-          type="button"
-          className={`${styles.previewToggleBtn} ${
-            previewView === "desktop" ? styles.previewToggleBtnActive : ""
-          }`}
-          onClick={() => setPreviewView("desktop")}
-          aria-label="Preview desktop view"
-          title="Preview desktop view"
-        >
-          <Laptop size={20} />
-        </button>
-        <button
-          type="button"
-          className={`${styles.previewToggleBtn} ${
-            previewView === "mobile" ? styles.previewToggleBtnActive : ""
-          }`}
-          onClick={() => setPreviewView("mobile")}
-          aria-label="Preview mobile view"
-          title="Preview mobile view"
-        >
-          <Smartphone size={20} />
-        </button>
-      </div>
+      {canTogglePreview && (
+        <div className={styles.previewToggle}>
+          <button
+            type="button"
+            className={`${styles.previewToggleBtn} ${
+              previewView === "desktop" ? styles.previewToggleBtnActive : ""
+            }`}
+            onClick={() => setPreviewView("desktop")}
+            aria-label="Preview desktop view"
+            title="Preview desktop view"
+          >
+            <Laptop size={20} />
+          </button>
+          <button
+            type="button"
+            className={`${styles.previewToggleBtn} ${
+              previewView === "mobile" ? styles.previewToggleBtnActive : ""
+            }`}
+            onClick={() => setPreviewView("mobile")}
+            aria-label="Preview mobile view"
+            title="Preview mobile view"
+          >
+            <Smartphone size={20} />
+          </button>
+        </div>
+      )}
       <PageLayout
         background={background}
-        sidebarPosition={sidebarPosition}
+        sidebarPosition={effectiveSidebarPosition}
         previewViewport={previewView}
       >
         <ProfileSidebar
           variant="editor"
-          position={sidebarPosition}
+          position={effectiveSidebarPosition}
           displayName={displayName}
           bioHtml={bioHtml}
           onChangeDisplayName={setDisplayName}
@@ -294,9 +313,10 @@ export default function EditorPage() {
       <Toolbar
         onAddBlock={handleAddBlock}
         onChangeBackground={setBackground}
-        onChangeSidebarPosition={setSidebarPosition}
+        onChangeSidebarPosition={setDesktopSidebarPosition}
         background={background}
-        sidebarPosition={sidebarPosition}
+        sidebarPosition={desktopSidebarPosition}
+        showSidebarPositionControls={isDesktopEditing}
       />
     </EditorProvider>
   );

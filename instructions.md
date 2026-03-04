@@ -151,10 +151,14 @@ blocks/TextBlock/
 ### Editor Preview Modes (`app/editor/page.tsx` + `components/layout/PageLayout/`)
 
 - Screen buckets are defined as: desktop `>=1360`, tablet `960-1359`, mobile `<960`.
-- The editor has a **desktop/mobile preview toggle** for visual editing without resizing the browser window.
+- Viewport logic should be centralized in shared utilities (`lib/viewportMode.ts`) and hooks (`hooks/useViewportMode.ts`, `hooks/useEditorViewportPreview.ts`) instead of being hardcoded in page components.
+- The editor has a **desktop/mobile preview toggle** for visual editing without resizing the browser window, but only when screen width is `>=960`.
 - In mobile preview mode, only page content is previewed: `ProfileSidebar` + `BlockCanvas`.
 - Editor controls stay outside the preview window: `SaveButton`, `LogoutButton`, preview toggle, and bottom toolbar.
 - Mobile preview window is capped to `540px` max width and should remain visually distinct (framed/background) so start/end are clear.
+- Tablet mode (`960-1359`) should force profile position to `center` in editor and hide the profile-position section from the toolbar palette.
+- Mobile editor mode should also hide the profile-position section; profile positioning is a desktop-only editing feature.
+- View page tablet mode should keep desktop-like layout behavior but render profile at the top (`center` sidebar position).
 
 ---
 

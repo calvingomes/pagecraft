@@ -1,70 +1,37 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-
-export type ScreenView = "mobile" | "tablet" | "desktop";
-export type PreviewView = "mobile" | "desktop";
-
-const MOBILE_MAX = 959;
-const TABLET_MAX = 1359;
-
-function resolveScreenView(width: number): ScreenView {
-  if (width < 960) return "mobile";
-  if (width <= TABLET_MAX) return "tablet";
-  return "desktop";
-}
+import { useMemo, useState } from "react";
+import { getEditorViewportCapabilities } from "@/lib/viewportMode";
+import { useViewportMode } from "@/hooks/useViewportMode";
+import type { PreviewViewport } from "@/types/page";
 
 export function useEditorViewportPreview() {
-  const [screenView, setScreenView] = useState<ScreenView>("desktop");
-  const [overrideView, setOverrideView] = useState<PreviewView | null>(null);
+  const viewportMode = useViewportMode();
+  const [overrideView, setOverrideView] = useState<PreviewViewport | null>(
+    null,
+  );
+  const capabilities = getEditorViewportCapabilities(viewportMode);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  const effectiveOverrideView = capabilities.allowManualPreviewToggle
+    ? overrideView
+    : null;
 
-    const update = () => setScreenView(resolveScreenView(window.innerWidth));
-    update();
-
-    const mobileMedia = window.matchMedia(`(max-width: ${MOBILE_MAX}px)`);
-    const tabletMedia = window.matchMedia(
-      `(min-width: 960px) and (max-width: ${TABLET_MAX}px)`,
-    );
-
-    if (typeof mobileMedia.addEventListener === "function") {
-      mobileMedia.addEventListener("change", update);
-      tabletMedia.addEventListener("change", update);
-      window.addEventListener("resize", update);
-
-      return () => {
-        mobileMedia.removeEventListener("change", update);
-        tabletMedia.removeEventListener("change", update);
-        window.removeEventListener("resize", update);
-      };
-    }
-
-    mobileMedia.addListener(update);
-    tabletMedia.addListener(update);
-    window.addEventListener("resize", update);
-
-    return () => {
-      mobileMedia.removeListener(update);
-      tabletMedia.removeListener(update);
-      window.removeEventListener("resize", update);
-    };
-  }, []);
-
-  const autoPreviewView: PreviewView =
-    screenView === "mobile" ? "mobile" : "desktop";
+  const autoPreviewView = capabilities.defaultPreviewViewport;
 
   const previewView = useMemo(
-    () => overrideView ?? autoPreviewView,
-    [overrideView, autoPreviewView],
+    () => effectiveOverrideView ?? autoPreviewView,
+    [effectiveOverrideView, autoPreviewView],
   );
 
   return {
-    screenView,
+    screenView: viewportMode,
     previewView,
-    setPreviewView: setOverrideView,
+    setPreviewView: (next: PreviewViewport | null) => {
+      if (!capabilities.allowManualPreviewToggle) return;
+      setOverrideView(next);
+    },
     clearPreviewOverride: () => setOverrideView(null),
-    isOverrideActive: overrideView !== null,
+    isOverrideActive: effectiveOverrideView !== null,
+    canTogglePreview: capabilities.allowManualPreviewToggle,
   };
 }

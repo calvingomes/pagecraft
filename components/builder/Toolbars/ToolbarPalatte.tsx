@@ -22,6 +22,7 @@ export const ToolbarPalatte = ({
   onChangeSidebarPosition,
   background = "page-bg-1",
   sidebarPosition = "left",
+  showSidebarPositionControls = true,
 }: ToolbarPalatteProps) => {
   if (!isOpen) return null;
 
@@ -44,45 +45,55 @@ export const ToolbarPalatte = ({
           ))}
         </div>
       </div>
-      <div className={styles.paletteDivider} />
-      <div className={styles.paletteSection}>
-        <span className={styles.paletteLabel}>Profile position</span>
-        <div className={styles.sidebarPositionGroup}>
-          <button
-            type="button"
-            className={`${styles.sidebarPositionBtn} ${
-              sidebarPosition === "left" ? styles.sidebarPositionSelected : ""
-            }`}
-            onClick={() => onChangeSidebarPosition?.("left")}
-            title="Profile on left"
-            aria-label="Profile on left"
-          >
-            <PanelLeft size={18} />
-          </button>
-          <button
-            type="button"
-            className={`${styles.sidebarPositionBtn} ${
-              sidebarPosition === "center" ? styles.sidebarPositionSelected : ""
-            }`}
-            onClick={() => onChangeSidebarPosition?.("center")}
-            title="Profile in center"
-            aria-label="Profile in center"
-          >
-            <LayoutTemplate size={18} />
-          </button>
-          <button
-            type="button"
-            className={`${styles.sidebarPositionBtn} ${
-              sidebarPosition === "right" ? styles.sidebarPositionSelected : ""
-            }`}
-            onClick={() => onChangeSidebarPosition?.("right")}
-            title="Profile on right"
-            aria-label="Profile on right"
-          >
-            <PanelRight size={18} />
-          </button>
-        </div>
-      </div>
+      {showSidebarPositionControls && (
+        <>
+          <div className={styles.paletteDivider} />
+          <div className={styles.paletteSection}>
+            <span className={styles.paletteLabel}>Profile position</span>
+            <div className={styles.sidebarPositionGroup}>
+              <button
+                type="button"
+                className={`${styles.sidebarPositionBtn} ${
+                  sidebarPosition === "left"
+                    ? styles.sidebarPositionSelected
+                    : ""
+                }`}
+                onClick={() => onChangeSidebarPosition?.("left")}
+                title="Profile on left"
+                aria-label="Profile on left"
+              >
+                <PanelLeft size={18} />
+              </button>
+              <button
+                type="button"
+                className={`${styles.sidebarPositionBtn} ${
+                  sidebarPosition === "center"
+                    ? styles.sidebarPositionSelected
+                    : ""
+                }`}
+                onClick={() => onChangeSidebarPosition?.("center")}
+                title="Profile in center"
+                aria-label="Profile in center"
+              >
+                <LayoutTemplate size={18} />
+              </button>
+              <button
+                type="button"
+                className={`${styles.sidebarPositionBtn} ${
+                  sidebarPosition === "right"
+                    ? styles.sidebarPositionSelected
+                    : ""
+                }`}
+                onClick={() => onChangeSidebarPosition?.("right")}
+                title="Profile on right"
+                aria-label="Profile on right"
+              >
+                <PanelRight size={18} />
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

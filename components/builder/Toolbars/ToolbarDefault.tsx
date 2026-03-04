@@ -19,6 +19,7 @@ export const ToolbarDefault = ({
   onChangeSidebarPosition,
   background = "page-bg-1",
   sidebarPosition = "left",
+  showSidebarPositionControls = true,
 }: ToolbarDefaultProps) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
@@ -92,6 +93,7 @@ export const ToolbarDefault = ({
         sidebarPosition={sidebarPosition}
         onChangeBackground={onChangeBackground}
         onChangeSidebarPosition={onChangeSidebarPosition}
+        showSidebarPositionControls={showSidebarPositionControls}
       />
     </div>
   );

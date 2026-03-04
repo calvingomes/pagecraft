@@ -20,6 +20,7 @@ export type ToolbarDefaultProps = {
   onChangeSidebarPosition?: (position: SidebarPosition) => void;
   background?: PageBackgroundId;
   sidebarPosition?: SidebarPosition;
+  showSidebarPositionControls?: boolean;
 };
 
 export type ToolbarLinkProps = {
@@ -37,4 +38,5 @@ export type ToolbarPalatteProps = {
   onChangeSidebarPosition?: (position: SidebarPosition) => void;
   background?: PageBackgroundId;
   sidebarPosition?: SidebarPosition;
+  showSidebarPositionControls?: boolean;
 };

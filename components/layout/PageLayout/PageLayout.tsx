@@ -1,12 +1,16 @@
 import React, { ReactNode } from "react";
-import type { PageBackgroundId, SidebarPosition } from "@/types/page";
+import type {
+  PageBackgroundId,
+  PreviewViewport,
+  SidebarPosition,
+} from "@/types/page";
 import styles from "./PageLayout.module.css";
 
 type PageLayoutProps = {
   children: ReactNode;
   background?: PageBackgroundId;
   sidebarPosition?: SidebarPosition;
-  previewViewport?: "desktop" | "mobile";
+  previewViewport?: PreviewViewport;
 };
 
 export function PageLayout({

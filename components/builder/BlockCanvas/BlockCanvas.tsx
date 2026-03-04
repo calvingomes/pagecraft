@@ -27,10 +27,10 @@ import {
   clamp,
   rectForBlock,
 } from "@/lib/blockGrid";
-import { useIsMobile } from "@/components/builder/BlockCanvas/hooks/useIsMobile";
 import { MobileCanvasGrid } from "@/components/builder/BlockCanvas/mobile/MobileCanvasGrid";
 import { useDesktopGridDnd } from "@/components/builder/BlockCanvas/hooks/useDesktopGridDnd";
 import { DesktopReadonlyBlock } from "@/components/builder/BlockCanvas/desktop/DesktopReadonlyBlock";
+import { useViewportMode } from "@/hooks/useViewportMode";
 
 export const BlockCanvas = (props: BlockCanvasProps) => {
   const storeBlocks = useEditorStore((s) => s.blocks);
@@ -38,7 +38,8 @@ export const BlockCanvas = (props: BlockCanvasProps) => {
   const reorderBlocks = useEditorStore((s) => s.reorderBlocks);
   const editor = useEditorContext();
 
-  const isMobile = useIsMobile(768);
+  const viewportMode = useViewportMode();
+  const isMobile = viewportMode === "mobile";
 
   const blocks = props.editable ? storeBlocks : props.blocks;
 

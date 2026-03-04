@@ -9,6 +9,8 @@ import type {
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
+import { getViewEffectiveSidebarPosition } from "@/lib/viewportMode";
+import { useViewportMode } from "@/hooks/useViewportMode";
 
 type PageViewProps = {
   username: string;
@@ -33,12 +35,21 @@ export function PageView({
   avatarUrl,
   avatarShape,
 }: PageViewProps) {
+  const viewportMode = useViewportMode();
+  const effectiveSidebarPosition = getViewEffectiveSidebarPosition(
+    viewportMode,
+    sidebarPosition,
+  );
+
   return (
-    <PageLayout background={background} sidebarPosition={sidebarPosition}>
+    <PageLayout
+      background={background}
+      sidebarPosition={effectiveSidebarPosition}
+    >
       <ProfileSidebar
         variant="view"
         username={username}
-        position={sidebarPosition}
+        position={effectiveSidebarPosition}
         displayName={displayName}
         bioHtml={bioHtml}
         avatarUrl={avatarUrl}
