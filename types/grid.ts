@@ -1,3 +1,14 @@
+export type GridConfig = {
+  cols: number;
+  cellPx: number;
+  gapXPx: number;
+  gapYPx: number;
+  canvasPx: number;
+  rowScale: number;
+  subRowPx: number;
+  subRowGapPx: number;
+};
+
 export type GridLayout = {
   x: number;
   y: number;

@@ -1,4 +1,5 @@
 export type BlockType = "text" | "link" | "image" | "sectionTitle";
+export type BlockViewportMode = "desktop" | "mobile";
 
 export type BlockWidthPreset =
   | "small" // 200x200
@@ -62,6 +63,11 @@ export type LinkMetadataResponse = {
   iconUrl: string | null;
 };
 
+export type BlocksByViewport = {
+  desktop: Block[];
+  mobile: Block[];
+};
+
 export type EditorContextValue = {
   username: string | null;
   onUpdateBlock: (id: string, updates: Partial<Block>) => Promise<void>;
@@ -69,13 +75,25 @@ export type EditorContextValue = {
 };
 
 export type EditorState = {
-  blocks: Block[];
+  desktopBlocks: Block[];
+  mobileBlocks: Block[];
+  activeViewportMode: BlockViewportMode;
   selectedBlockId: string | null;
 
-  addBlock: (block: Block) => void;
-  updateBlock: (id: string, updates: Partial<Block>) => void;
-  removeBlock: (id: string) => void;
-  reorderBlocks: (activeId: string, overId: string) => void;
+  addBlock: (block: Block, mode?: BlockViewportMode) => void;
+  updateBlock: (
+    id: string,
+    updates: Partial<Block>,
+    mode?: BlockViewportMode,
+  ) => void;
+  removeBlock: (id: string, mode?: BlockViewportMode) => void;
+  reorderBlocks: (
+    activeId: string,
+    overId: string,
+    mode?: BlockViewportMode,
+  ) => void;
   selectBlock: (id: string | null) => void;
-  setBlocks: (blocks: Block[]) => void;
+  setBlocksForViewport: (mode: BlockViewportMode, blocks: Block[]) => void;
+  setAllBlocks: (blocks: BlocksByViewport) => void;
+  setActiveViewportMode: (mode: BlockViewportMode) => void;
 };

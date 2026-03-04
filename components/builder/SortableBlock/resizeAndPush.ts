@@ -1,13 +1,20 @@
 import type { Block, BlockWidthPreset } from "@/types/editor";
+import type { GridConfig } from "@/types/grid";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
-import { resolveCollisions } from "@/lib/blockGrid";
+import { DESKTOP_GRID, resolveCollisions } from "@/lib/blockGrid";
 
 export function computeResizeAndPushUpdates(args: {
   targetBlock: Block;
   allBlocks: Block[];
   nextPreset: BlockWidthPreset;
+  gridConfig?: GridConfig;
 }): Array<{ id: string; updates: Partial<Block> }> {
-  const { targetBlock, allBlocks, nextPreset } = args;
+  const {
+    targetBlock,
+    allBlocks,
+    nextPreset,
+    gridConfig = DESKTOP_GRID,
+  } = args;
   const currentLayout = targetBlock.layout ?? { x: 0, y: 0 };
 
   const nextLayouts = resolveCollisions(
@@ -16,6 +23,7 @@ export function computeResizeAndPushUpdates(args: {
     nextPreset,
     allBlocks,
     (b) => b.layout ?? { x: 0, y: 0 },
+    gridConfig,
   );
 
   // Apply new layouts + preset change, then compact empty rows.
@@ -31,7 +39,7 @@ export function computeResizeAndPushUpdates(args: {
     return layout ? ({ ...b, layout } as Block) : b;
   });
 
-  const compacted = compactEmptyRows(nextBlocks);
+  const compacted = compactEmptyRows(nextBlocks, gridConfig);
 
   // Build update list (only blocks that actually changed).
   const updates: Array<{ id: string; updates: Partial<Block> }> = [];

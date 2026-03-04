@@ -105,6 +105,7 @@ export default function ClaimPage() {
           id: crypto.randomUUID(),
           page_username: username,
           uid: user.id,
+          viewport_mode: "desktop",
           type: "text",
           order: 0,
           content: {
@@ -116,6 +117,7 @@ export default function ClaimPage() {
           id: crypto.randomUUID(),
           page_username: username,
           uid: user.id,
+          viewport_mode: "desktop",
           type: "link",
           order: 1,
           content: {

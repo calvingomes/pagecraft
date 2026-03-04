@@ -17,7 +17,8 @@ import { CSS } from "@dnd-kit/utilities";
 import type { Block } from "@/types/editor";
 import styles from "../BlockCanvas.module.css";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
-import { mobileSpanForPreset } from "./mobileSpanForPreset";
+import { MobileReadonlyBlock } from "./MobileReadonlyBlock";
+import { MOBILE_GRID, sizePxForBlock, spansForBlock } from "@/lib/blockGrid";
 
 type MobileCanvasGridProps =
   | {
@@ -40,7 +41,8 @@ function MobileSortableGridItem({ block }: { block: Block }) {
     isDragging,
   } = useSortable({ id: block.id });
 
-  const span = mobileSpanForPreset(block.styles?.widthPreset);
+  const span = spansForBlock(block, undefined, MOBILE_GRID).w;
+  const dimensions = sizePxForBlock(block, MOBILE_GRID);
 
   return (
     <div
@@ -56,13 +58,20 @@ function MobileSortableGridItem({ block }: { block: Block }) {
       {...attributes}
       {...listeners}
     >
-      <SortableBlock block={block} fluid dndDisabled toolbarAlwaysVisible />
+      <SortableBlock
+        block={block}
+        dimensions={dimensions}
+        fluid
+        dndDisabled
+        toolbarAlwaysVisible
+        gridConfig={MOBILE_GRID}
+      />
     </div>
   );
 }
 
 const orderByStableOrder = (blocks: Block[]) =>
-  [...blocks].slice().sort((a, b) => {
+  [...blocks].sort((a, b) => {
     const ao = typeof a.order === "number" ? a.order : 0;
     const bo = typeof b.order === "number" ? b.order : 0;
     if (ao !== bo) return ao - bo;
@@ -72,43 +81,33 @@ const orderByStableOrder = (blocks: Block[]) =>
 export function MobileCanvasGrid(props: MobileCanvasGridProps) {
   const ordered = orderByStableOrder(props.blocks);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { delay: 250, tolerance: 5 },
-    }),
-  );
-
-  const grid = (
-    <div className={styles.canvas}>
-      <div className={styles.gridMobile}>
-        {props.editable ? (
-          <SortableContext
-            items={ordered.map((b) => b.id)}
-            strategy={rectSortingStrategy}
-          >
-            {ordered.map((block) => (
-              <MobileSortableGridItem key={block.id} block={block} />
-            ))}
-          </SortableContext>
-        ) : (
-          ordered.map((block) => {
-            const span = mobileSpanForPreset(block.styles?.widthPreset);
+  if (!props.editable) {
+    return (
+      <div className={styles.canvas}>
+        <div className={styles.gridMobile}>
+          {ordered.map((block) => {
+            const span = spansForBlock(block, undefined, MOBILE_GRID).w;
+            const dimensions = sizePxForBlock(block, MOBILE_GRID);
             return (
               <div
                 key={block.id}
                 className={styles.gridMobileItem}
                 style={{ gridColumn: `span ${span}` }}
               >
-                <SortableBlock block={block} fluid dndDisabled />
+                <MobileReadonlyBlock block={block} dimensions={dimensions} />
               </div>
             );
-          })
-        )}
+          })}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
-  if (!props.editable) return grid;
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    }),
+  );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -125,7 +124,18 @@ export function MobileCanvasGrid(props: MobileCanvasGridProps) {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      {grid}
+      <div className={styles.canvas}>
+        <div className={styles.gridMobile}>
+          <SortableContext
+            items={ordered.map((b) => b.id)}
+            strategy={rectSortingStrategy}
+          >
+            {ordered.map((block) => (
+              <MobileSortableGridItem key={block.id} block={block} />
+            ))}
+          </SortableContext>
+        </div>
+      </div>
     </DndContext>
   );
 }

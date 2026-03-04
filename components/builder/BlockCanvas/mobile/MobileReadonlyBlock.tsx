@@ -11,19 +11,19 @@ type Props = {
   dimensions: BlockDimensions;
 };
 
-export function DesktopReadonlyBlock({ block, dimensions }: Props) {
+export function MobileReadonlyBlock({ block, dimensions }: Props) {
   const { widthPx, heightPx } = dimensions;
   const isTransparentWrapper = shouldUseTransparentWrapper(block, "view");
+  const aspectRatio = `${widthPx} / ${heightPx}`;
 
   return (
-    <div className={sortableBlockStyles.hoverZone}>
+    <div className={sortableBlockStyles.hoverZone} style={{ height: "auto" }}>
       <div
         className={`${sortableBlockStyles.wrapper} ${isTransparentWrapper ? sortableBlockStyles.emptyWrapper : ""}`}
         style={{
-          width: `${widthPx}px`,
-          height: `${heightPx}px`,
-          maxWidth: "100%",
-          maxHeight: "100%",
+          width: "100%",
+          height: "auto",
+          aspectRatio,
           cursor: "default",
         }}
       >

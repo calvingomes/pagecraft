@@ -1,16 +1,30 @@
 import type { Block } from "@/types/editor";
-import type { LayoutById } from "@/types/grid";
+import type { GridConfig, LayoutById } from "@/types/grid";
+
+export type BlockCanvasRenderMode = "desktop" | "mobile";
+
+export type BlockDimensions = {
+  widthPx: number;
+  heightPx: number;
+};
 
 export type BlockCanvasProps =
   | { editable: true }
-  | { editable: false; blocks: Block[]; title?: string };
+  | {
+      editable: false;
+      blocks: Block[];
+      renderMode: BlockCanvasRenderMode;
+      title?: string;
+    };
 
 export type SortableBlockProps = {
   block: Block;
+  dimensions: BlockDimensions;
   activeDragId?: string | null;
   fluid?: boolean;
   dndDisabled?: boolean;
   toolbarAlwaysVisible?: boolean;
+  gridConfig?: GridConfig;
 };
 
 export type DesktopDndSnapshot = {

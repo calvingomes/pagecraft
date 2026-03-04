@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-import type { Block } from "@/types/editor";
+import type { BlocksByViewport } from "@/types/editor";
 import type {
   AvatarShape,
   PageBackgroundId,
@@ -45,34 +45,45 @@ export default async function UserPage({ params }: Props) {
 
   const { data: blockRows } = await supabase
     .from("blocks")
-    .select("id, type, order, content, layout, styles")
+    .select("id, type, order, content, layout, styles, viewport_mode")
     .eq("page_username", username)
     .order("order", { ascending: true });
 
   const safeBlockRows = blockRows ?? [];
 
-  const rawBlocks: RawStoredBlock[] = safeBlockRows.map(
-    (row: {
-      id: string;
-      type: unknown;
-      order: unknown;
-      content: unknown;
-      layout: unknown;
-      styles: unknown;
-    }) => ({
-      id: row.id,
-      type: row.type,
-      order: row.order,
-      content: row.content,
-      layout: row.layout,
-      styles: row.styles,
-    }),
-  );
+  const toRawStoredBlock = (row: {
+    id: string;
+    type: unknown;
+    order: unknown;
+    content: unknown;
+    layout: unknown;
+    styles: unknown;
+  }): RawStoredBlock => ({
+    id: row.id,
+    type: row.type,
+    order: row.order,
+    content: row.content,
+    layout: row.layout,
+    styles: row.styles,
+  });
 
-  const normalizedBlocks = normalizeStoredBlocks(rawBlocks);
+  const normalizeForViewport = (rows: RawStoredBlock[]) => {
+    const normalizedBlocks = normalizeStoredBlocks(rows);
+    return ensureBlocksHaveValidLayouts(normalizedBlocks);
+  };
 
-  // Ensure every block has a stable grid position matching the editor.
-  const blocks: Block[] = ensureBlocksHaveValidLayouts(normalizedBlocks);
+  const desktopRows = safeBlockRows
+    .filter((row) => row.viewport_mode !== "mobile")
+    .map(toRawStoredBlock);
+
+  const mobileRows = safeBlockRows
+    .filter((row) => row.viewport_mode === "mobile")
+    .map(toRawStoredBlock);
+
+  const blocksByViewport: BlocksByViewport = {
+    desktop: normalizeForViewport(desktopRows),
+    mobile: normalizeForViewport(mobileRows),
+  };
 
   return (
     <PageView
@@ -88,7 +99,7 @@ export default async function UserPage({ params }: Props) {
       bioHtml={(page.bio_html as string | undefined) ?? undefined}
       avatarUrl={(page.avatar_url as string | undefined) ?? undefined}
       avatarShape={(page.avatar_shape as AvatarShape | undefined) ?? undefined}
-      blocks={blocks}
+      blocksByViewport={blocksByViewport}
     />
   );
 }

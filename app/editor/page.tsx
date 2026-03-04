@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Laptop, Smartphone } from "lucide-react";
-import { useEditorStore } from "@/stores/editor-store";
+import {
+  selectActiveViewportBlocks,
+  useEditorStore,
+} from "@/stores/editor-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { supabase } from "@/lib/supabase";
-import type { Block, BlockType } from "@/types/editor";
+import type { Block, BlockType, BlockViewportMode } from "@/types/editor";
 import { EditorProvider } from "@/contexts/EditorContext";
 import type {
   AvatarShape,
@@ -37,8 +40,12 @@ import styles from "./editor.module.css";
 export default function EditorPage() {
   const { username, user, loading, setLoading } = useAuthStore();
   const { authChecked } = useAuthGuard("editor");
-  const blocks = useEditorStore((s) => s.blocks);
-  const setBlocks = useEditorStore((s) => s.setBlocks);
+  const desktopBlocks = useEditorStore((s) => s.desktopBlocks);
+  const mobileBlocks = useEditorStore((s) => s.mobileBlocks);
+  const activeBlocks = useEditorStore(selectActiveViewportBlocks);
+  const setAllBlocks = useEditorStore((s) => s.setAllBlocks);
+  const setBlocksForViewport = useEditorStore((s) => s.setBlocksForViewport);
+  const setActiveViewportMode = useEditorStore((s) => s.setActiveViewportMode);
   const addBlock = useEditorStore((s) => s.addBlock);
   const updateBlock = useEditorStore((s) => s.updateBlock);
 
@@ -64,11 +71,18 @@ export default function EditorPage() {
           ? "tablet"
           : "desktop";
 
+  const activeBlockViewportMode: BlockViewportMode =
+    previewView === "mobile" ? "mobile" : "desktop";
+
   const isDesktopEditing = activeEditorMode === "desktop";
   const effectiveSidebarPosition: SidebarPosition = isDesktopEditing
     ? desktopSidebarPosition
     : "center";
   const isMobileScreen = screenView === "mobile";
+
+  useEffect(() => {
+    setActiveViewportMode(activeBlockViewportMode);
+  }, [activeBlockViewportMode, setActiveViewportMode]);
 
   useEffect(() => {
     if (!username || !user?.id) return;
@@ -121,31 +135,52 @@ export default function EditorPage() {
 
       const { data: blockRows } = await supabase
         .from("blocks")
-        .select("id, type, order, content, layout, styles")
+        .select("id, type, order, content, layout, styles, viewport_mode")
         .eq("page_username", username)
         .order("order", { ascending: true });
 
       const safeBlockRows = blockRows ?? [];
 
-      const rawBlocks: RawStoredBlock[] = safeBlockRows.map((row) => ({
+      const toRawStoredBlock = (row: {
+        id: unknown;
+        type: unknown;
+        order: unknown;
+        content: unknown;
+        layout: unknown;
+        styles: unknown;
+      }): RawStoredBlock => ({
         id: String(row.id),
         type: row.type,
         order: row.order,
         content: row.content,
         layout: row.layout,
         styles: row.styles,
-      }));
+      });
 
-      const normalizedBlocks = normalizeStoredBlocks(rawBlocks);
-      const withLayouts = ensureBlocksHaveValidLayouts(normalizedBlocks);
-      const compactedAfterLoad = compactEmptyRows(withLayouts).blocks;
-      setBlocks(compactedAfterLoad);
+      const normalizeBlocksForViewport = (rawBlocks: RawStoredBlock[]) => {
+        const normalizedBlocks = normalizeStoredBlocks(rawBlocks);
+        const withLayouts = ensureBlocksHaveValidLayouts(normalizedBlocks);
+        return compactEmptyRows(withLayouts).blocks;
+      };
+
+      const desktopRawBlocks = safeBlockRows
+        .filter((row) => row.viewport_mode !== "mobile")
+        .map(toRawStoredBlock);
+
+      const mobileRawBlocks = safeBlockRows
+        .filter((row) => row.viewport_mode === "mobile")
+        .map(toRawStoredBlock);
+
+      setAllBlocks({
+        desktop: normalizeBlocksForViewport(desktopRawBlocks),
+        mobile: normalizeBlocksForViewport(mobileRawBlocks),
+      });
 
       setLoading(false);
     };
 
     loadPageData();
-  }, [username, user?.id, setBlocks, setLoading]);
+  }, [username, user?.id, setAllBlocks, setLoading]);
 
   const handleAddBlock = async (
     blockType: BlockType,
@@ -176,21 +211,21 @@ export default function EditorPage() {
       id,
       type: blockType,
       content: defaultContent,
-      order: blocks.length,
+      order: activeBlocks.length,
       styles: { widthPreset },
     } as Block;
-    const pos = findFirstFreeSpot(tempBlockForPlacement, blocks);
+    const pos = findFirstFreeSpot(tempBlockForPlacement, activeBlocks);
 
     const newBlock: Block = {
       id,
       type: blockType,
       content: defaultContent,
-      order: blocks.length,
+      order: activeBlocks.length,
       styles: { widthPreset },
       layout: pos,
     } as Block;
 
-    addBlock(newBlock);
+    addBlock(newBlock, activeBlockViewportMode);
   };
 
   const getDefaultContent = (
@@ -213,13 +248,13 @@ export default function EditorPage() {
   };
 
   const handleUpdateBlock = async (id: string, updates: Partial<Block>) => {
-    updateBlock(id, updates);
+    updateBlock(id, updates, activeBlockViewportMode);
   };
 
   const handleRemoveBlock = async (id: string) => {
-    const remaining = blocks.filter((block) => block.id !== id);
+    const remaining = activeBlocks.filter((block) => block.id !== id);
     const compacted = compactEmptyRows(remaining);
-    setBlocks(compacted.blocks);
+    setBlocksForViewport(activeBlockViewportMode, compacted.blocks);
   };
 
   const handleSave = async () => {
@@ -239,14 +274,17 @@ export default function EditorPage() {
         avatarUrl,
         persistedAvatarUrl,
         avatarShape,
-        blocks,
+        blocksByViewport: {
+          desktop: desktopBlocks,
+          mobile: mobileBlocks,
+        },
       });
 
       if (result.avatarUrl !== avatarUrl) {
         setAvatarUrl(result.avatarUrl);
       }
       setPersistedAvatarUrl(result.avatarUrl);
-      setBlocks(result.blocks);
+      setAllBlocks(result.blocksByViewport);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unknown save error.";

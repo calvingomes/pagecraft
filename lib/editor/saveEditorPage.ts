@@ -4,7 +4,11 @@ import type {
   PageBackgroundId,
   SidebarPosition,
 } from "@/types/page";
-import type { Block } from "@/types/editor";
+import type {
+  Block,
+  BlocksByViewport,
+  BlockViewportMode,
+} from "@/types/editor";
 import {
   deletePageImage,
   uploadPageImage,
@@ -31,12 +35,12 @@ export type SaveEditorPageInput = {
   avatarUrl: string;
   persistedAvatarUrl: string;
   avatarShape: AvatarShape;
-  blocks: Block[];
+  blocksByViewport: BlocksByViewport;
 };
 
 export type SaveEditorPageResult = {
   avatarUrl: string;
-  blocks: Block[];
+  blocksByViewport: BlocksByViewport;
 };
 
 function isPlainObject(value: unknown): value is UnknownRecord {
@@ -104,11 +108,17 @@ function isDataUrl(value: string) {
   return value.startsWith("data:");
 }
 
-function toBlockRow(block: Block, username: string, userId: string) {
+function toBlockRow(
+  block: Block,
+  username: string,
+  userId: string,
+  viewportMode: BlockViewportMode,
+) {
   return {
     id: block.id,
     page_username: username,
     uid: userId,
+    viewport_mode: viewportMode,
     type: block.type,
     order: block.order,
     content: block.content,
@@ -127,7 +137,7 @@ export async function saveEditorPage({
   avatarUrl,
   persistedAvatarUrl,
   avatarShape,
-  blocks,
+  blocksByViewport,
 }: SaveEditorPageInput): Promise<SaveEditorPageResult> {
   const { error: profileError } = await supabase.from("profiles").upsert(
     {
@@ -184,45 +194,60 @@ export async function saveEditorPage({
   );
   throwIfError(pageError, "Saving page settings failed");
 
-  const resolvedBlocks = await Promise.all(
-    blocks.map(async (block) => {
-      if (block.type !== "image") return block;
+  const resolveViewportBlocks = async (blocks: Block[]) => {
+    return Promise.all(
+      blocks.map(async (block) => {
+        if (block.type !== "image") return block;
 
-      const contentUrl = block.content?.url ?? "";
-      if (!contentUrl || !isDataUrl(contentUrl)) {
-        return block;
-      }
+        const contentUrl = block.content?.url ?? "";
+        if (!contentUrl || !isDataUrl(contentUrl)) {
+          return block;
+        }
 
-      try {
-        const file = dataUrlToFile(contentUrl, `block-${block.id}.webp`);
-        const uploaded = await uploadPageImage({
-          uid: userId,
-          username,
-          file,
-          scope: { kind: "block-image", blockId: block.id },
-        });
+        try {
+          const file = dataUrlToFile(contentUrl, `block-${block.id}.webp`);
+          const uploaded = await uploadPageImage({
+            uid: userId,
+            username,
+            file,
+            scope: { kind: "block-image", blockId: block.id },
+          });
 
-        return {
-          ...block,
-          content: {
-            ...block.content,
-            url: uploaded.downloadUrl,
-          },
-        } as Block;
-      } catch (error) {
-        throw new Error(
-          `Uploading image block failed (${block.id}): ${formatErrorMessage(error)}`,
-        );
-      }
-    }),
-  );
+          return {
+            ...block,
+            content: {
+              ...block.content,
+              url: uploaded.downloadUrl,
+            },
+          } as Block;
+        } catch (error) {
+          throw new Error(
+            `Uploading image block failed (${block.id}): ${formatErrorMessage(error)}`,
+          );
+        }
+      }),
+    );
+  };
 
-  const blockRows = resolvedBlocks.map((block, index) =>
-    stripUndefinedDeep({
-      ...toBlockRow(block, username, userId),
-      order: index,
-    }),
-  );
+  const resolvedBlocksByViewport: BlocksByViewport = {
+    desktop: await resolveViewportBlocks(blocksByViewport.desktop),
+    mobile: await resolveViewportBlocks(blocksByViewport.mobile),
+  };
+
+  const blockRows = [
+    ...resolvedBlocksByViewport.desktop.map((block, index) =>
+      stripUndefinedDeep({
+        ...toBlockRow(block, username, userId, "desktop"),
+        order: index,
+      }),
+    ),
+    ...resolvedBlocksByViewport.mobile.map((block, index) =>
+      stripUndefinedDeep({
+        ...toBlockRow(block, username, userId, "mobile"),
+        order: index,
+      }),
+    ),
+  ];
 
   if (blockRows.length > 0) {
     const { error: upsertBlocksError } = await supabase
@@ -232,52 +257,67 @@ export async function saveEditorPage({
     throwIfError(upsertBlocksError, "Saving blocks failed");
   }
 
-  const { data: existingBlockRows, error: existingBlocksError } = await supabase
-    .from("blocks")
-    .select("id, type")
-    .eq("page_username", username);
-  throwIfError(existingBlocksError, "Fetching existing blocks failed");
+  const viewportModes: BlockViewportMode[] = ["desktop", "mobile"];
 
-  const currentBlockIds = new Set(resolvedBlocks.map((block) => block.id));
-  const staleRows = (existingBlockRows ?? []).filter(
-    (row) => !currentBlockIds.has(String(row.id)),
-  );
-  const staleIds = staleRows.map((row) => String(row.id));
+  for (const viewportMode of viewportModes) {
+    const { data: existingBlockRows, error: existingBlocksError } =
+      await supabase
+        .from("blocks")
+        .select("id, type")
+        .eq("page_username", username)
+        .eq("viewport_mode", viewportMode);
+    throwIfError(
+      existingBlocksError,
+      `Fetching existing ${viewportMode} blocks failed`,
+    );
 
-  const staleImageBlockIds = staleRows
-    .filter((row) => String(row.type) === "image")
-    .map((row) => String(row.id));
+    const currentBlockIds = new Set(
+      resolvedBlocksByViewport[viewportMode].map((block) => block.id),
+    );
+    const staleRows = (existingBlockRows ?? []).filter(
+      (row) => !currentBlockIds.has(String(row.id)),
+    );
+    const staleIds = staleRows.map((row) => String(row.id));
 
-  if (staleImageBlockIds.length > 0) {
-    try {
-      await Promise.all(
-        staleImageBlockIds.map(async (blockId) => {
-          await deletePageImage({
-            uid: userId,
-            username,
-            scope: { kind: "block-image", blockId },
-          });
-        }),
-      );
-    } catch (error) {
-      throw new Error(
-        `Deleting removed image assets failed: ${formatErrorMessage(error)}`,
+    const staleImageBlockIds = staleRows
+      .filter((row) => String(row.type) === "image")
+      .map((row) => String(row.id));
+
+    if (staleImageBlockIds.length > 0) {
+      try {
+        await Promise.all(
+          staleImageBlockIds.map(async (blockId) => {
+            await deletePageImage({
+              uid: userId,
+              username,
+              scope: { kind: "block-image", blockId },
+            });
+          }),
+        );
+      } catch (error) {
+        throw new Error(
+          `Deleting removed image assets failed: ${formatErrorMessage(error)}`,
+        );
+      }
+    }
+
+    if (staleIds.length > 0) {
+      const { error: deleteStaleError } = await supabase
+        .from("blocks")
+        .delete()
+        .eq("page_username", username)
+        .eq("viewport_mode", viewportMode)
+        .in("id", staleIds);
+
+      throwIfError(
+        deleteStaleError,
+        `Deleting removed ${viewportMode} blocks failed`,
       );
     }
   }
 
-  if (staleIds.length > 0) {
-    const { error: deleteStaleError } = await supabase
-      .from("blocks")
-      .delete()
-      .eq("page_username", username)
-      .in("id", staleIds);
-
-    throwIfError(deleteStaleError, "Deleting removed blocks failed");
-  }
-
   return {
     avatarUrl: resolvedAvatarUrl,
-    blocks: resolvedBlocks,
+    blocksByViewport: resolvedBlocksByViewport,
   };
 }

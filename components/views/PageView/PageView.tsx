@@ -1,6 +1,6 @@
 "use client";
 
-import type { Block } from "@/types/editor";
+import type { BlocksByViewport } from "@/types/editor";
 import type {
   AvatarShape,
   PageBackgroundId,
@@ -15,7 +15,7 @@ import { useViewportMode } from "@/hooks/useViewportMode";
 type PageViewProps = {
   username: string;
   title?: string;
-  blocks: Block[];
+  blocksByViewport: BlocksByViewport;
   background?: PageBackgroundId;
   sidebarPosition?: SidebarPosition;
   displayName?: string;
@@ -27,7 +27,7 @@ type PageViewProps = {
 export function PageView({
   username,
   title,
-  blocks,
+  blocksByViewport,
   background = "page-bg-1",
   sidebarPosition = "left",
   displayName,
@@ -36,10 +36,17 @@ export function PageView({
   avatarShape,
 }: PageViewProps) {
   const viewportMode = useViewportMode();
+
   const effectiveSidebarPosition = getViewEffectiveSidebarPosition(
     viewportMode,
     sidebarPosition,
   );
+
+  const isMobile = viewportMode === "mobile";
+  const visibleBlocks = isMobile
+    ? blocksByViewport.mobile
+    : blocksByViewport.desktop;
+  const renderMode = isMobile ? "mobile" : "desktop";
 
   return (
     <PageLayout
@@ -55,7 +62,12 @@ export function PageView({
         avatarUrl={avatarUrl}
         avatarShape={avatarShape}
       />
-      <BlockCanvas editable={false} blocks={blocks} title={title} />
+      <BlockCanvas
+        editable={false}
+        blocks={visibleBlocks}
+        renderMode={renderMode}
+        title={title}
+      />
     </PageLayout>
   );
 }

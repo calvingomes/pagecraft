@@ -5,24 +5,28 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import type { BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
-import { useEditorStore } from "@/stores/editor-store";
+import {
+  selectActiveViewportBlocks,
+  useEditorStore,
+} from "@/stores/editor-store";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import { BlockHoverToolbar } from "@/components/builder/BlockHoverToolbar/BlockHoverToolbar";
 import styles from "./SortableBlock.module.css";
-import { sizePxForBlock } from "@/lib/blockGrid";
 import { shouldUseTransparentWrapper } from "@/lib/blockWrapper";
 import type { SortableBlockProps } from "@/types/builder";
 import { computeResizeAndPushUpdates } from "./resizeAndPush";
 
 export function SortableBlock({
   block,
+  dimensions,
   activeDragId,
   fluid = false,
   dndDisabled = false,
   toolbarAlwaysVisible = false,
+  gridConfig,
 }: SortableBlockProps) {
   const editor = useEditorContext();
-  const allBlocks = useEditorStore((s) => s.blocks);
+  const allBlocks = useEditorStore(selectActiveViewportBlocks);
   const [isHovered, setIsHovered] = useState(false);
 
   const toolbarVisible = toolbarAlwaysVisible ? true : isHovered;
@@ -62,6 +66,7 @@ export function SortableBlock({
       targetBlock: block,
       allBlocks,
       nextPreset: preset,
+      gridConfig,
     });
 
     for (const { id, updates: blockUpdates } of updates) {
@@ -82,7 +87,7 @@ export function SortableBlock({
     });
   };
 
-  const { widthPx, heightPx } = sizePxForBlock(block);
+  const { widthPx, heightPx } = dimensions;
   const aspectRatio = `${widthPx} / ${heightPx}`;
 
   return (

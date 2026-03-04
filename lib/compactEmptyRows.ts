@@ -1,21 +1,24 @@
 import type { Block } from "@/types/editor";
-import type { CompactResult } from "@/types/grid";
-import { GRID_ROW_SCALE, spansForBlock } from "@/lib/blockGrid";
+import type { CompactResult, GridConfig } from "@/types/grid";
+import { DESKTOP_GRID, spansForBlock } from "@/lib/blockGrid";
 
 /**
  * Compacts the layout by removing *fully empty* grid rows (rows where no block
  * covers any cell). This prevents gaps like y=0, y=3 which render as blank rows.
  */
-export function compactEmptyRows(blocks: Block[]): CompactResult {
+export function compactEmptyRows(
+  blocks: Block[],
+  config: GridConfig = DESKTOP_GRID,
+): CompactResult {
   if (blocks.length === 0) return { blocks, changedIds: new Set() };
 
   const rects = blocks.map((b) => {
-    const { h } = spansForBlock(b);
+    const { h } = spansForBlock(b, undefined, config);
     const y = Math.max(0, b.layout?.y ?? 0);
     return {
       id: b.id,
-      ySub: Math.round(y * GRID_ROW_SCALE),
-      hSub: Math.max(1, Math.round(h * GRID_ROW_SCALE)),
+      ySub: Math.round(y * config.rowScale),
+      hSub: Math.max(1, Math.round(h * config.rowScale)),
     };
   });
 
@@ -50,11 +53,11 @@ export function compactEmptyRows(blocks: Block[]): CompactResult {
   const changedIds = new Set<string>();
   const nextBlocks = blocks.map((b) => {
     const currentYSub = Math.round(
-      Math.max(0, b.layout?.y ?? 0) * GRID_ROW_SCALE,
+      Math.max(0, b.layout?.y ?? 0) * config.rowScale,
     );
     const shiftSub = blanksBeforeRow[Math.min(currentYSub, maxBottomSub)] ?? 0;
     const nextYSub = Math.max(0, currentYSub - shiftSub);
-    const nextY = nextYSub / GRID_ROW_SCALE;
+    const nextY = nextYSub / config.rowScale;
 
     if (!b.layout) return b;
     if (nextY === b.layout.y) return b;
