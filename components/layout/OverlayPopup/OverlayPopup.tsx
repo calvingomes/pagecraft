@@ -2,18 +2,11 @@
 
 import { useEffect } from "react";
 import styles from "./OverlayPopup.module.css";
+import type { OverlayPopupProps } from "./OverlayPopup.types";
 
 const LOCK_COUNT_ATTR = "data-overlay-lock-count";
 const PREV_OVERFLOW_ATTR = "data-overlay-prev-overflow";
 const PREV_TOUCH_ACTION_ATTR = "data-overlay-prev-touch-action";
-
-type OverlayPopupProps = {
-  open: boolean;
-  title: string;
-  message: string;
-  showCloseButton?: boolean;
-  onClose?: () => void;
-};
 
 export const OverlayPopup = ({
   open,
