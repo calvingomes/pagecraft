@@ -18,15 +18,6 @@
   justify-content: center;
 }
 
-.authViewContentContainer {
-  width: 80%;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
 .welcomeText {
   font-size: 56px;
   margin-bottom: 8px;

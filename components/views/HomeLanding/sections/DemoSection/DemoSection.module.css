@@ -1,16 +1,5 @@
 @import "@styles/media.css";
 
-.section {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.container {
-  width: 100%;
-  max-width: 980px;
-}
-
 .panel {
   background: var(--color-white);
   border-radius: 28px;
@@ -49,30 +38,11 @@
 }
 
 .primaryCta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 18px;
-  border-radius: var(--radius-md);
   background: var(--color-status-success);
-  color: var(--color-white);
-  font-size: var(--font-size-md);
-  font-weight: 600;
-  white-space: nowrap;
 }
 
 .secondaryCta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 18px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(0, 0, 0, 0.14);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-md);
-  font-weight: 600;
   background: transparent;
-  white-space: nowrap;
 }
 
 .phone {
