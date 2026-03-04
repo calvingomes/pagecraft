@@ -58,6 +58,9 @@ create table if not exists public.blocks (
   id text primary key,
   page_username text not null references public.pages(username) on delete cascade,
   uid uuid references auth.users(id) on delete set null,
+  viewport_mode text not null default 'desktop',
+  constraint blocks_viewport_mode_check
+    check (viewport_mode in ('desktop', 'mobile')),
   type text not null,
   "order" integer not null default 0,
   content jsonb not null default '{}'::jsonb,
@@ -96,6 +99,12 @@ execute function public.handle_updated_at();
 
 create index if not exists blocks_page_username_order_idx
   on public.blocks (page_username, "order");
+
+create index if not exists blocks_page_username_viewport_order_idx
+  on public.blocks (page_username, viewport_mode, "order");
+
+create index if not exists blocks_page_username_viewport_idx
+  on public.blocks (page_username, viewport_mode);
 
 -- RLS
 alter table public.profiles enable row level security;
