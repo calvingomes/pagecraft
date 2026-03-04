@@ -33,6 +33,12 @@ const WIDTH_PRESETS: BlockHoverToolbarIcons[] = [
     iconSize: 16,
   },
   {
+    preset: "max",
+    title: "Max",
+    Icon: RectangleHorizontal,
+    iconSize: 24,
+  },
+  {
     preset: "tall",
     title: "Tall",
     Icon: RectangleVertical,
@@ -63,8 +69,13 @@ export function BlockHoverToolbar({
   };
 
   const visiblePresets = WIDTH_PRESETS.filter((item) => {
-    if (item.preset !== "skinnyWide") return true;
-    return blockType === "text" || blockType === "link";
+    if (item.preset === "skinnyWide") {
+      return blockType === "text" || blockType === "link";
+    }
+    if (item.preset === "max") {
+      return blockType === "text";
+    }
+    return true;
   });
   const canToggleWrapperBackground =
     blockType === "text" || blockType === "link";

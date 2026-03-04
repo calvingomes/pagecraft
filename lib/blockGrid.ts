@@ -62,6 +62,8 @@ export function spansForPreset(preset: BlockWidthPreset | undefined): {
   h: number;
 } {
   switch (preset ?? "small") {
+    case "max":
+      return { w: 4, h: 1 };
     case "skinnyWide":
       return { w: 2, h: 0.5 };
     case "full":

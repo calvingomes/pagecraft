@@ -5,6 +5,7 @@ export const mobileSpanForPreset = (
 ): 1 | 2 => {
   switch (preset) {
     case "full":
+    case "max":
     case "large":
     case "wide":
     case "skinnyWide":

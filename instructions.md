@@ -80,11 +80,15 @@ All grid constants are centralized in `lib/blockGrid.ts`:
 - `small` → `200x200`
 - `wide` → `420x200`
 - `skinnyWide` → `420x90` (half-row height preset)
+- `max` → `860x200`
 - `tall` → `200x420`
 - `large` → `420x420`
 - `full` → `860x100`
 
-Current product behavior: `skinnyWide` is supported in grid/layout logic, but the resize toolbar should show it only for `text` and `link` blocks.
+Current product behavior:
+
+- `skinnyWide` is supported in grid/layout logic, but the resize toolbar should show it only for `text` and `link` blocks.
+- `max` is supported in grid/layout logic, but the resize toolbar should show it only for `text` blocks.
 
 - `spansForPreset(preset)` → `{ w, h }` column/row spans for a `BlockWidthPreset`
 - `spansForBlock(block, overridePreset?)` → block-aware spans (supports auto-height blocks)
@@ -146,7 +150,8 @@ blocks/TextBlock/
 - Current product state: `ParagraphBlock` is fully implemented and supported by types/registry/layout code, but the **add Paragraph button is intentionally hidden in the editor toolbar** for now. Do not remove ParagraphBlock code paths; treat this as a temporary UX toggle.
 - Hover toolbar background toggle: only `text` and `link` blocks should show the `BG` toggle control.
 - Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.
-- `sectionTitle` and `paragraph` should continue using transparent wrappers through the same shared wrapper decision path (avoid separate one-off checks).
+- `paragraph` should always use transparent wrapper styling.
+- `sectionTitle` should use transparent wrapper styling only in **view mode** (not editor mode), via the same shared wrapper decision path.
 
 ---
 

@@ -11,7 +11,8 @@ export type BlockWidthPreset =
   | "tall" // 200x420
   | "wide" // 420x200
   | "skinnyWide" // 420x90
-  | "full"; // 1060x100
+  | "max" // 860x200
+  | "full"; // 860x100
 
 interface BaseBlock {
   id: string;
