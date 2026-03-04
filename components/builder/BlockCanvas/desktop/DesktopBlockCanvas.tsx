@@ -3,7 +3,6 @@
 import {
   DndContext,
   PointerSensor,
-  closestCenter,
   useDroppable,
   useSensor,
   useSensors,
@@ -21,6 +20,7 @@ import {
 } from "@/lib/blockGrid";
 import { useDesktopGridDnd } from "@/components/builder/BlockCanvas/hooks/useDesktopGridDnd";
 import { DesktopReadonlyBlock } from "@/components/builder/BlockCanvas/desktop/DesktopReadonlyBlock";
+import { snapToCursor } from "@/lib/dndKit";
 import styles from "../BlockCanvas.module.css";
 
 type DesktopBlockCanvasProps = {
@@ -173,7 +173,7 @@ export const DesktopBlockCanvas = ({
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={snapToCursor}
       onDragStart={handleDragStart}
       onDragCancel={handleDragCancel}
       onDragOver={handleDragOver}

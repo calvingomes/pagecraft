@@ -3,7 +3,6 @@
 import {
   DndContext,
   PointerSensor,
-  closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -19,6 +18,7 @@ import styles from "../BlockCanvas.module.css";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
 import { MobileReadonlyBlock } from "./MobileReadonlyBlock";
 import { MOBILE_GRID, sizePxForBlock, spansForBlock } from "@/lib/blockGrid";
+import { snapToCursor } from "@/lib/dndKit";
 
 type MobileCanvasGridProps =
   | {
@@ -120,7 +120,7 @@ export function MobileCanvasGrid(props: MobileCanvasGridProps) {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={snapToCursor}
       onDragEnd={handleDragEnd}
     >
       <div className={styles.canvas}>
