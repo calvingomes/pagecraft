@@ -68,7 +68,7 @@ All grid constants are centralized in `lib/blockGrid.ts`:
 | `GRID_COLS`       | 4     | Number of columns                          |
 | `GRID_CELL_PX`    | 200   | Base cell size in pixels                   |
 | `GRID_GAP_PX`     | 20    | Gap between cells                          |
-| `GRID_CANVAS_PX`  | 860   | Total canvas width                         |
+| `GRID_CANVAS_PX`  | 875   | Total canvas width                         |
 | `GRID_ROW_SCALE`  | 2     | Vertical sub-row precision (0.5 row units) |
 | `GRID_ROW_PX`     | 90    | Sub-row content height                     |
 | `GRID_ROW_GAP_PX` | 20    | Sub-row vertical gap                       |
@@ -80,10 +80,10 @@ All grid constants are centralized in `lib/blockGrid.ts`:
 - `small` → `200x200`
 - `wide` → `420x200`
 - `skinnyWide` → `420x90` (half-row height preset)
-- `max` → `860x200`
+- `max` → `875x200`
 - `tall` → `200x420`
 - `large` → `420x420`
-- `full` → `860x100`
+- `full` → `875x100`
 
 Current product behavior:
 
@@ -140,7 +140,7 @@ blocks/TextBlock/
 - Hover toolbar background toggle: only `text` and `link` blocks should show the `BG` toggle control.
 - Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.
 - `sectionTitle` should use transparent wrapper styling only in **view mode** (not editor mode), via the same shared wrapper decision path.
-- `sectionTitle` size is fixed to `860x90` at render level and should occupy **half-row grid height** (`h = 0.5`) to avoid dead space below.
+- `sectionTitle` size is fixed to `875x90` at render level and should occupy **half-row grid height** (`h = 0.5`) to avoid dead space below.
 
 ---
 
