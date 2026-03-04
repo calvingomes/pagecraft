@@ -1,4 +1,4 @@
-import type { Block, BlockType, BlockWidthPreset } from "@/types/editor";
+import type { Block, BlockWidthPreset } from "@/types/editor";
 import type { GridLayout, GridRect, PlacedRect } from "@/types/grid";
 
 // ── Grid constants (single source of truth) ──────────────────────────
@@ -10,49 +10,6 @@ export const GRID_CANVAS_PX =
 export const GRID_ROW_SCALE = 2;
 export const GRID_ROW_PX = 90;
 export const GRID_ROW_GAP_PX = 20;
-export const AUTO_HEIGHT_MIN_HEIGHT_PX = 90;
-const AUTO_HEIGHT_BLOCK_TYPES: ReadonlySet<BlockType> = new Set([
-  "sectionTitle",
-]);
-const AUTO_HEIGHT_DEFAULT_HEIGHT_PX: Partial<Record<BlockType, number>> = {
-  sectionTitle: 90,
-};
-
-export function supportsAutoHeight(block: Block): boolean {
-  return AUTO_HEIGHT_BLOCK_TYPES.has(block.type);
-}
-
-export function normalizeAutoHeightPx(
-  value: number | undefined,
-  blockType?: BlockType,
-): number {
-  const fallback =
-    (blockType ? AUTO_HEIGHT_DEFAULT_HEIGHT_PX[blockType] : undefined) ??
-    AUTO_HEIGHT_MIN_HEIGHT_PX;
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    return fallback;
-  }
-  return Math.max(fallback, Math.ceil(value));
-}
-
-function subRowsForAutoHeightPx(
-  value: number | undefined,
-  blockType?: BlockType,
-): number {
-  const normalized = normalizeAutoHeightPx(value, blockType);
-  return Math.max(
-    1,
-    Math.ceil((normalized + GRID_ROW_GAP_PX) / (GRID_ROW_PX + GRID_ROW_GAP_PX)),
-  );
-}
-
-export function quantizeAutoHeightPx(
-  value: number | undefined,
-  blockType?: BlockType,
-): number {
-  const subRows = subRowsForAutoHeightPx(value, blockType);
-  return subRows * GRID_ROW_PX + (subRows - 1) * GRID_ROW_GAP_PX;
-}
 
 // ── Preset → grid spans ─────────────────────────────────────────────
 export function spansForPreset(preset: BlockWidthPreset | undefined): {
@@ -93,18 +50,6 @@ export function sizePxForPreset(preset: BlockWidthPreset | undefined): {
   return { widthPx, heightPx };
 }
 
-function autoHeightPx(block: Block): number {
-  return normalizeAutoHeightPx(block.styles?.height, block.type);
-}
-
-function rowsForHeight(heightPx: number): number {
-  const subRows = Math.max(
-    1,
-    Math.ceil((heightPx + GRID_ROW_GAP_PX) / (GRID_ROW_PX + GRID_ROW_GAP_PX)),
-  );
-  return subRows / GRID_ROW_SCALE;
-}
-
 export function spansForBlock(
   block: Block,
   overridePreset?: BlockWidthPreset,
@@ -112,24 +57,27 @@ export function spansForBlock(
   w: number;
   h: number;
 } {
-  const base = spansForPreset(overridePreset ?? block.styles?.widthPreset);
-  if (!supportsAutoHeight(block)) return base;
-  return {
-    w: base.w,
-    h: rowsForHeight(autoHeightPx(block)),
-  };
+  if (block.type === "sectionTitle") {
+    return { w: 4, h: 0.5 };
+  }
+
+  const preset = overridePreset ?? block.styles?.widthPreset;
+  return spansForPreset(preset);
 }
 
 export function sizePxForBlock(block: Block): {
   widthPx: number;
   heightPx: number;
 } {
-  const base = sizePxForPreset(block.styles?.widthPreset);
-  if (!supportsAutoHeight(block)) return base;
-  return {
-    widthPx: base.widthPx,
-    heightPx: autoHeightPx(block),
-  };
+  if (block.type === "sectionTitle") {
+    return {
+      widthPx: GRID_CANVAS_PX,
+      heightPx: GRID_ROW_PX,
+    };
+  }
+
+  const preset = block.styles?.widthPreset;
+  return sizePxForPreset(preset);
 }
 
 export function clamp(value: number, min: number, max: number): number {

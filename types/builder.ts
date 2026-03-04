@@ -15,7 +15,6 @@ export type SortableBlockProps = {
 
 export type DesktopDndSnapshot = {
   layouts: LayoutById;
-  lastTargetKey: string | null;
 };
 
 export type UseDesktopGridDndArgs = {

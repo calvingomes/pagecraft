@@ -27,6 +27,7 @@ export function useDesktopGridDnd({
 }: UseDesktopGridDndArgs) {
   const blockNodeByIdRef = useRef(new Map<string, HTMLDivElement>());
   const flipRafRef = useRef<number | null>(null);
+  const lastTargetKeyRef = useRef<string | null>(null);
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [placementTarget, setPlacementTarget] = useState<GridLayout | null>(
@@ -49,6 +50,7 @@ export function useDesktopGridDnd({
     const startedId = String(event.active.id);
     setActiveId(startedId);
     setPlacementTarget(null);
+    lastTargetKeyRef.current = null;
     setDragSnapshot({
       layouts: Object.fromEntries(
         blocks.map((b) => [
@@ -56,7 +58,6 @@ export function useDesktopGridDnd({
           b.layout ? { x: b.layout.x, y: b.layout.y } : undefined,
         ]),
       ),
-      lastTargetKey: null,
     });
   };
 
@@ -66,6 +67,7 @@ export function useDesktopGridDnd({
         updateBlock(id, { layout });
       }
     }
+    lastTargetKeyRef.current = null;
     setActiveId(null);
     setPlacementTarget(null);
     setDragSnapshot(null);
@@ -94,7 +96,7 @@ export function useDesktopGridDnd({
     }
 
     const targetKey = `${activeId}:${target.x}:${target.y}`;
-    if (dragSnapshot.lastTargetKey === targetKey) return;
+    if (lastTargetKeyRef.current === targetKey) return;
 
     const nextLayouts = computePushedLayouts(
       activeId,
@@ -103,6 +105,20 @@ export function useDesktopGridDnd({
       dragSnapshot.layouts,
     );
     if (!nextLayouts) return;
+
+    let changedIds = 0;
+    for (const [id, layout] of Object.entries(nextLayouts)) {
+      const current = blocks.find((b) => b.id === id)?.layout;
+      if (!current || current.x !== layout.x || current.y !== layout.y) {
+        changedIds += 1;
+      }
+    }
+
+    if (changedIds === 0) {
+      lastTargetKeyRef.current = targetKey;
+      setPlacementTarget(target);
+      return;
+    }
 
     const nextLayoutIds = Object.keys(nextLayouts);
     const beforeRects = new Map<string, DOMRect>();
@@ -114,6 +130,10 @@ export function useDesktopGridDnd({
     }
 
     for (const [id, layout] of Object.entries(nextLayouts)) {
+      const current = blocks.find((b) => b.id === id)?.layout;
+      if (current && current.x === layout.x && current.y === layout.y) {
+        continue;
+      }
       updateBlock(id, { layout });
     }
 
@@ -146,7 +166,7 @@ export function useDesktopGridDnd({
     });
 
     setPlacementTarget(target);
-    setDragSnapshot({ ...dragSnapshot, lastTargetKey: targetKey });
+    lastTargetKeyRef.current = targetKey;
   };
 
   const handleDragEnd = async (event: DragEndEvent) => {
@@ -156,6 +176,7 @@ export function useDesktopGridDnd({
     setActiveId(null);
     setPlacementTarget(null);
     setDragSnapshot(null);
+    lastTargetKeyRef.current = null;
 
     const { active, over } = event;
     if (!over) {

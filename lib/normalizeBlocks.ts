@@ -22,6 +22,22 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
     const order = typeof raw.order === "number" ? raw.order : index;
 
     if (raw.content) {
+      if (type === "sectionTitle") {
+        const rawStyles =
+          raw.styles && typeof raw.styles === "object" && raw.styles !== null
+            ? (raw.styles as Record<string, unknown>)
+            : undefined;
+
+        return {
+          ...(raw as unknown as Block),
+          order,
+          styles: {
+            ...(rawStyles as object),
+            widthPreset: "full",
+          },
+        } as Block;
+      }
+
       return { ...(raw as unknown as Block), order } as Block;
     }
 
@@ -61,6 +77,10 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
         return {
           ...(raw as unknown as Block),
           order,
+          styles: {
+            ...((raw.styles as Record<string, unknown> | undefined) ?? {}),
+            widthPreset: "full",
+          },
           content: {
             title: typeof data?.title === "string" ? data.title : "",
           },

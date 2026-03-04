@@ -91,27 +91,18 @@ Current product behavior:
 - `max` is supported in grid/layout logic, but the resize toolbar should show it only for `text` blocks.
 
 - `spansForPreset(preset)` → `{ w, h }` column/row spans for a `BlockWidthPreset`
-- `spansForBlock(block, overridePreset?)` → block-aware spans (supports auto-height blocks)
+- `spansForBlock(block, overridePreset?)` → block-aware spans
 - `sizePxForPreset(preset)` → `{ widthPx, heightPx }` derived pixel sizes
 - `sizePxForBlock(block)` → block-aware pixel dimensions
-- `normalizeAutoHeightPx(value, blockType?)` → normalized raw content height per block type
-- `quantizeAutoHeightPx(value, blockType?)` → snapped occupancy height for half-row layout steps
 - `rectForBlock(block, layout?)` → full `PlacedRect` geometry
 - `canPlaceBlockAt`, `findFirstFreeSpot`, `resolveCollisions` — placement/collision logic
 
 Do not duplicate these functions. If you need grid math, it belongs in `blockGrid.ts`.
 
-### Auto-height Blocks (Generic)
-
-- Auto-height layout is generic and centralized; do **not** implement reflow/push logic inside individual block components.
-- Use `lib/autoHeightLayout.ts` (`computeAutoHeightReflowUpdates`) for grow-and-push behavior.
-- Enable block types for auto-height in `lib/blockGrid.ts` via `supportsAutoHeight` (internal allowlist).
-- Current enabled auto-height block types: `sectionTitle`.
-
 **Do / Don't**
 
 - **Do:** Keep block components focused on UI + editor events; call shared layout helpers from `lib/`.
-- **Do:** Reuse `normalizeAutoHeightPx`, `quantizeAutoHeightPx`, `sizePxForBlock`, `spansForBlock`, and `computeAutoHeightReflowUpdates`.
+- **Do:** Reuse `sizePxForBlock`, and `spansForBlock`.
 - **Do:** Keep visual block height based on normalized content height; use quantized height for occupancy/reflow decisions.
 - **Don't:** Add per-block collision or compaction loops directly inside component files.
 - **Don't:** Hardcode row math (`0.5`, `200`, `20`) outside `lib/blockGrid.ts`.
@@ -136,7 +127,6 @@ Each block type has its own folder:
 blocks/TextBlock/
   TextBlock.tsx
   TextBlock.module.css
-  TextBlock.prosemirror.css   (if using TipTap)
 ```
 
 - Access editor capabilities via `useEditorContext()` — returns `null` in view mode.
@@ -150,6 +140,7 @@ blocks/TextBlock/
 - Hover toolbar background toggle: only `text` and `link` blocks should show the `BG` toggle control.
 - Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.
 - `sectionTitle` should use transparent wrapper styling only in **view mode** (not editor mode), via the same shared wrapper decision path.
+- `sectionTitle` size is fixed to `860x90` at render level and should occupy **half-row grid height** (`h = 0.5`) to avoid dead space below.
 
 ---
 
@@ -207,8 +198,6 @@ blocks/TextBlock/
 3. Create `components/blocks/YourBlock/YourBlock.tsx` + `YourBlock.module.css`.
 4. Register it in `components/builder/BlockRegistry/blockRegistry.tsx`.
 5. Add span defaults in `lib/blockGrid.ts` → `spansForPreset` (if it uses a new preset).
-
-- If the block needs content-driven height, use the generic auto-height path (`supportsAutoHeight` + `computeAutoHeightReflowUpdates`) instead of custom per-block collision logic.
 
 6. Handle creation in `app/editor/page.tsx` toolbar action.
 7. Handle normalization in `lib/normalizeBlocks.ts` → `normalizeStoredBlocks`.
