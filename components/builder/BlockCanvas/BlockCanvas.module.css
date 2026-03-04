@@ -1,7 +1,7 @@
 @import "@styles/media.css";
 
 .canvas {
-  width: 860px;
+  width: 875px;
   max-width: 100%;
   position: relative;
 }
@@ -44,8 +44,7 @@
   display: grid;
   grid-template-columns: repeat(4, 200px);
   grid-auto-rows: 90px;
-  column-gap: 20px;
-  row-gap: 20px;
+  gap: 25px;
   position: relative;
   z-index: 2;
 }
@@ -56,8 +55,7 @@
   display: grid;
   grid-template-columns: repeat(4, 200px);
   grid-auto-rows: 90px;
-  column-gap: 20px;
-  row-gap: 20px;
+  gap: 25px;
   z-index: 1;
   pointer-events: none;
 }

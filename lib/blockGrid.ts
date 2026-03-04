@@ -4,12 +4,12 @@ import type { GridLayout, GridRect, PlacedRect } from "@/types/grid";
 // ── Grid constants (single source of truth) ──────────────────────────
 export const GRID_COLS = 4;
 export const GRID_CELL_PX = 200;
-export const GRID_GAP_PX = 20;
+export const GRID_GAP_PX = 25;
 export const GRID_CANVAS_PX =
   GRID_COLS * GRID_CELL_PX + (GRID_COLS - 1) * GRID_GAP_PX;
 export const GRID_ROW_SCALE = 2;
 export const GRID_ROW_PX = 90;
-export const GRID_ROW_GAP_PX = 20;
+export const GRID_ROW_GAP_PX = 25;
 
 // ── Preset → grid spans ─────────────────────────────────────────────
 export function spansForPreset(preset: BlockWidthPreset | undefined): {

@@ -1,12 +1,12 @@
 @import "@styles/media.css";
 
 .pageLayout {
-  --layout-body-max: 1250px;
-  --layout-profile-max: 300px;
-  --layout-content-max: 860px;
+  --layout-body-max: 1350px;
+  --layout-profile-max: 400px;
+  --layout-content-max: 875px;
   --layout-gap: 40px;
   --layout-gutter: 24px;
-  --page-avatar-bg: var(--color-page-avatar-1);
+  --page-avatar-bg: rgb(15, 15, 15);
 
   display: flex;
   justify-content: center;
