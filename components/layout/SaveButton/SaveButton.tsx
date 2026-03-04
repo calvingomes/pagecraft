@@ -17,7 +17,7 @@ export function SaveButton({ onSave, saving }: SaveButtonProps) {
       onClick={onSave}
       disabled={saving}
     >
-      {saving ? "Saving..." : "Save"}
+      Save
       <Save className={styles.icon} />
     </button>
   );

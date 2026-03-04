@@ -19,6 +19,7 @@ import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 import { MobileEditorGuard } from "@/components/layout/MobileEditorGuard/MobileEditorGuard";
+import { OverlayPopup } from "@/components/layout/OverlayPopup/OverlayPopup";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
 import { findFirstFreeSpot } from "@/lib/blockGrid";
 import {
@@ -50,6 +51,7 @@ export default function EditorPage() {
   const [avatarShape, setAvatarShape] = useState<AvatarShape>("circle");
   const [persistedAvatarUrl, setPersistedAvatarUrl] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
+  const [showSaveOverlay, setShowSaveOverlay] = useState(false);
   const { screenView, previewView, setPreviewView, canTogglePreview } =
     useEditorViewportPreview();
 
@@ -224,6 +226,7 @@ export default function EditorPage() {
     if (!username || !user?.id || isSaving) return;
 
     setIsSaving(true);
+    setShowSaveOverlay(true);
 
     try {
       const result = await saveEditorPage({
@@ -250,6 +253,7 @@ export default function EditorPage() {
       console.error("Save failed:", message, error);
     } finally {
       setIsSaving(false);
+      setShowSaveOverlay(false);
     }
   };
 
@@ -319,6 +323,11 @@ export default function EditorPage() {
         background={background}
         sidebarPosition={desktopSidebarPosition}
         showSidebarPositionControls={isDesktopEditing}
+      />
+      <OverlayPopup
+        open={showSaveOverlay}
+        title="Saving changes"
+        message="Your page is being saved."
       />
       <MobileEditorGuard open={isMobileScreen} />
     </EditorProvider>
