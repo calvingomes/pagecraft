@@ -81,6 +81,12 @@ const orderByStableOrder = (blocks: Block[]) =>
 export function MobileCanvasGrid(props: MobileCanvasGridProps) {
   const ordered = orderByStableOrder(props.blocks);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    }),
+  );
+
   if (!props.editable) {
     return (
       <div className={styles.canvas}>
@@ -102,12 +108,6 @@ export function MobileCanvasGrid(props: MobileCanvasGridProps) {
       </div>
     );
   }
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { delay: 250, tolerance: 5 },
-    }),
-  );
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
