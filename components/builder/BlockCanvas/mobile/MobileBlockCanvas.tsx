@@ -6,18 +6,24 @@ import { MobileCanvasGrid } from "@/components/builder/BlockCanvas/mobile/Mobile
 type MobileBlockCanvasProps = {
   editable: boolean;
   blocks: Block[];
-  onReorder?: (activeId: string, overId: string) => void;
+  onUpdateBlock?: (id: string, updates: Partial<Block>) => void;
 };
 
 export const MobileBlockCanvas = ({
   editable,
   blocks,
-  onReorder,
+  onUpdateBlock,
 }: MobileBlockCanvasProps) => {
   if (editable) {
-    if (!onReorder) return null;
+    if (!onUpdateBlock) return null;
 
-    return <MobileCanvasGrid editable blocks={blocks} onReorder={onReorder} />;
+    return (
+      <MobileCanvasGrid
+        editable
+        blocks={blocks}
+        onUpdateBlock={onUpdateBlock}
+      />
+    );
   }
 
   return <MobileCanvasGrid editable={false} blocks={blocks} />;

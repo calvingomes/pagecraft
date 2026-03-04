@@ -22,7 +22,7 @@ export function computeTargetFromOver(
     }
   }
 
-  if (overId.startsWith("block:")) {
+  if (overId.startsWith("block:") || !overId.includes(":")) {
     const id = overId.replace("block:", "");
     const b = blocks.find((bl) => bl.id === id);
     if (b) {

@@ -7,7 +7,7 @@ import type {
   DragStartEvent,
 } from "@dnd-kit/core";
 import type { Block } from "@/types/editor";
-import type { GridLayout } from "@/types/grid";
+import type { GridConfig, GridLayout } from "@/types/grid";
 import type {
   DesktopDndSnapshot,
   UseDesktopGridDndArgs,
@@ -19,12 +19,18 @@ import {
 import { spansForPreset } from "@/lib/blockGrid";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
 
-export function useDesktopGridDnd({
+interface UseGridDndArgs extends Omit<UseDesktopGridDndArgs, "blocks"> {
+  blocks: Block[];
+  gridConfig: GridConfig;
+}
+
+export function useGridDnd({
   editable,
   blocks,
   updateBlock,
   onPersistBlockUpdate,
-}: UseDesktopGridDndArgs) {
+  gridConfig,
+}: UseGridDndArgs) {
   const blockNodeByIdRef = useRef(new Map<string, HTMLDivElement>());
   const flipRafRef = useRef<number | null>(null);
   const lastTargetKeyRef = useRef<string | null>(null);
@@ -83,13 +89,21 @@ export function useDesktopGridDnd({
       return;
     }
 
+    const overId = String(event.over.id);
+
+    // Fix: If we are over the active block itself (the placeholder), ignore it.
+    // This prevents self-collision jitter where the cursor snaps to the block being dragged
+    // instead of the cell underneath it.
+    if (overId === activeId || overId === `block:${activeId}`) {
+      return;
+    }
+
     const activeBlock = blocks.find((b) => b.id === activeId);
     if (!activeBlock) return;
 
     const movingPreset = activeBlock.styles?.widthPreset ?? "small";
-    const { w: movingW } = spansForPreset(movingPreset);
-    const overId = String(event.over.id);
-    const target = computeTargetFromOver(overId, movingW, blocks);
+    const { w: movingW } = spansForPreset(movingPreset, gridConfig);
+    const target = computeTargetFromOver(overId, movingW, blocks, gridConfig);
     if (!target) {
       setPlacementTarget(null);
       return;
@@ -98,11 +112,22 @@ export function useDesktopGridDnd({
     const targetKey = `${activeId}:${target.x}:${target.y}`;
     if (lastTargetKeyRef.current === targetKey) return;
 
+    // Throttle updates to avoid rapid-fire layout shifts during fast scrolls
+    // or when hovering between two rows.
+    // We can use a simple timestamp check if needed, but for now let's rely on
+    // the targetKey check and maybe adding a small delay if it feels too jittery.
+    // But the user said "jumps to top or bottom". This usually happens when
+    // `computeTargetFromOver` returns (0,0) or a very large Y unexpectedly.
+
+    // Let's verify target validity.
+    if (target.y < 0) return;
+
     const nextLayouts = computePushedLayouts(
       activeId,
       target,
       blocks,
       dragSnapshot.layouts,
+      gridConfig,
     );
     if (!nextLayouts) return;
 
@@ -203,8 +228,8 @@ export function useDesktopGridDnd({
     if (!activeBlock) return;
 
     const movingPreset = activeBlock.styles?.widthPreset ?? "small";
-    const { w: movingW } = spansForPreset(movingPreset);
-    const target = computeTargetFromOver(overId, movingW, blocks);
+    const { w: movingW } = spansForPreset(movingPreset, gridConfig);
+    const target = computeTargetFromOver(overId, movingW, blocks, gridConfig);
     if (!target) return;
 
     const sourceLayouts =
@@ -221,6 +246,7 @@ export function useDesktopGridDnd({
       target,
       blocks,
       sourceLayouts,
+      gridConfig,
     );
     if (!nextLayouts) return;
 
@@ -229,7 +255,7 @@ export function useDesktopGridDnd({
       return layout ? ({ ...b, layout } as Block) : b;
     });
 
-    const compacted = compactEmptyRows(postMoveBlocks);
+    const compacted = compactEmptyRows(postMoveBlocks, gridConfig);
 
     for (const b of compacted.blocks) {
       const current = blocks.find((x) => x.id === b.id);

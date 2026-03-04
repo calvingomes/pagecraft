@@ -5,136 +5,183 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  type DragEndEvent,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  rectSortingStrategy,
-  useSortable,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { useMemo } from "react";
 import type { Block } from "@/types/editor";
-import styles from "../BlockCanvas.module.css";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
+import { useEditorContext } from "@/contexts/EditorContext";
+import {
+  MOBILE_GRID,
+  clamp,
+  rectForBlock,
+  sizePxForBlock,
+  spansForBlock,
+} from "@/lib/blockGrid";
+import { useGridDnd } from "@/components/builder/BlockCanvas/hooks/useGridDnd";
 import { MobileReadonlyBlock } from "./MobileReadonlyBlock";
-import { MOBILE_GRID, sizePxForBlock, spansForBlock } from "@/lib/blockGrid";
 import { snapToCursor } from "@/lib/dndKit";
+import { DroppableCell } from "../DroppableCell";
+import styles from "../BlockCanvas.module.css";
 
 type MobileCanvasGridProps =
   | {
       editable: true;
       blocks: Block[];
-      onReorder: (activeId: string, overId: string) => void;
+      onUpdateBlock: (id: string, updates: Partial<Block>) => void;
     }
   | {
       editable: false;
       blocks: Block[];
     };
 
-function MobileSortableGridItem({ block }: { block: Block }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: block.id });
+export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
+  const { editable, blocks } = props;
+  const editor = useEditorContext();
 
-  const span = spansForBlock(block, undefined, MOBILE_GRID).w;
-  const dimensions = sizePxForBlock(block, MOBILE_GRID);
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={styles.gridMobileItem}
-      style={{
-        gridColumn: `span ${span}`,
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.6 : 1,
-        touchAction: "manipulation",
-      }}
-      {...attributes}
-      {...listeners}
-    >
-      <SortableBlock
-        block={block}
-        dimensions={dimensions}
-        fluid
-        dndDisabled
-        gridConfig={MOBILE_GRID}
-      />
-    </div>
-  );
-}
-
-const orderByStableOrder = (blocks: Block[]) =>
-  [...blocks].sort((a, b) => {
-    const ao = typeof a.order === "number" ? a.order : 0;
-    const bo = typeof b.order === "number" ? b.order : 0;
-    if (ao !== bo) return ao - bo;
-    return a.id.localeCompare(b.id);
-  });
-
-export function MobileCanvasGrid(props: MobileCanvasGridProps) {
-  const ordered = orderByStableOrder(props.blocks);
+  const applyUpdate =
+    editable && props.onUpdateBlock ? props.onUpdateBlock : () => undefined;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { delay: 250, tolerance: 5 },
+      activationConstraint: { distance: 8 },
     }),
   );
 
-  if (!props.editable) {
-    return (
-      <div className={styles.canvas}>
-        <div className={styles.gridMobile}>
-          {ordered.map((block) => {
-            const span = spansForBlock(block, undefined, MOBILE_GRID).w;
-            const dimensions = sizePxForBlock(block, MOBILE_GRID);
-            return (
-              <div
-                key={block.id}
-                className={styles.gridMobileItem}
-                style={{ gridColumn: `span ${span}` }}
-              >
-                <MobileReadonlyBlock block={block} dimensions={dimensions} />
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  }
+  const {
+    activeId,
+    placementTarget,
+    registerBlockNode,
+    handleDragStart,
+    handleDragCancel,
+    handleDragOver,
+    handleDragEnd,
+  } = useGridDnd({
+    editable,
+    blocks,
+    updateBlock: applyUpdate,
+    onPersistBlockUpdate: editor?.onUpdateBlock,
+    gridConfig: MOBILE_GRID,
+  });
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over) return;
-    const activeId = String(active.id);
-    const overId = String(over.id);
-    if (activeId === overId) return;
-    props.onReorder(activeId, overId);
-  };
+  const activeBlock = useMemo(() => {
+    if (!activeId) return null;
+    return blocks.find((block) => block.id === activeId) ?? null;
+  }, [activeId, blocks]);
+
+  const maxBottom = blocks.reduce((acc, block) => {
+    const rect = rectForBlock(block, undefined, MOBILE_GRID);
+    return Math.max(acc, rect.y + rect.h);
+  }, 0);
+
+  const trailingRows = activeId ? 4 : 1;
+  const subRows = Math.max(
+    1,
+    Math.ceil(maxBottom * MOBILE_GRID.rowScale) +
+      trailingRows * MOBILE_GRID.rowScale,
+  );
+
+  const gridXStridePx = MOBILE_GRID.cellPx + MOBILE_GRID.gapXPx;
+  const gridYStridePx = MOBILE_GRID.subRowPx + MOBILE_GRID.subRowGapPx;
+
+  const placementHighlightStyle = useMemo(() => {
+    if (!activeBlock || !placementTarget) return null;
+
+    const { widthPx, heightPx } = sizePxForBlock(activeBlock, MOBILE_GRID);
+
+    return {
+      transform: `translate3d(${placementTarget.x * gridXStridePx}px, ${placementTarget.y * MOBILE_GRID.rowScale * gridYStridePx}px, 0)`,
+      width: `${widthPx}px`,
+      height: `${heightPx}px`,
+    };
+  }, [activeBlock, placementTarget, gridXStridePx, gridYStridePx]);
+
+  const content = (
+    <div
+      className={styles.canvas}
+      style={{
+        height: `${subRows * MOBILE_GRID.subRowPx + (subRows - 1) * MOBILE_GRID.subRowGapPx}px`,
+      }}
+    >
+      {editable && placementHighlightStyle && (
+        <div
+          className={styles.placementHighlight}
+          style={placementHighlightStyle}
+        />
+      )}
+
+      {editable && (
+        <div
+          className={`${styles.dropGrid} ${styles.dropGridMobile} ${activeId ? styles.dropGridActive : ""}`}
+          style={{
+            gridTemplateRows: `repeat(${subRows}, ${MOBILE_GRID.subRowPx}px)`,
+            // Override grid template columns for mobile (2 cols)
+            gridTemplateColumns: `repeat(${MOBILE_GRID.cols}, ${MOBILE_GRID.cellPx}px)`,
+            gap: `${MOBILE_GRID.subRowGapPx}px ${MOBILE_GRID.gapXPx}px`,
+          }}
+        >
+          {Array.from({ length: subRows }).flatMap((_, y) =>
+            Array.from({ length: MOBILE_GRID.cols }).map((__, x) => (
+              <DroppableCell key={`${x}-${y}`} x={x} y={y} />
+            )),
+          )}
+        </div>
+      )}
+
+      <div className={styles.gridMobile}>
+        {blocks.map((block, index) => {
+          const { w: spanW, h: spanH } = spansForBlock(
+            block,
+            undefined,
+            MOBILE_GRID,
+          );
+          const xRaw = block.layout?.x ?? index % MOBILE_GRID.cols;
+          const yRaw = block.layout?.y ?? Math.floor(index / MOBILE_GRID.cols);
+          const x = clamp(xRaw, 0, MOBILE_GRID.cols - spanW);
+          const y = Math.max(0, yRaw);
+          const dimensions = sizePxForBlock(block, MOBILE_GRID);
+
+          return (
+            <div
+              key={block.id}
+              ref={(node) => {
+                registerBlockNode(block.id, node);
+              }}
+              style={{
+                gridColumnStart: x + 1,
+                gridRowStart: Math.round(y * MOBILE_GRID.rowScale) + 1,
+                gridColumnEnd: `span ${spanW}`,
+                gridRowEnd: `span ${Math.max(1, Math.round(spanH * MOBILE_GRID.rowScale))}`,
+              }}
+            >
+              {editable ? (
+                <SortableBlock
+                  block={block}
+                  dimensions={dimensions}
+                  activeDragId={activeId}
+                  gridConfig={MOBILE_GRID}
+                />
+              ) : (
+                <MobileReadonlyBlock block={block} dimensions={dimensions} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  if (!editable) return content;
 
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={snapToCursor}
+      onDragStart={handleDragStart}
+      onDragCancel={handleDragCancel}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
-      <div className={styles.canvas}>
-        <div className={styles.gridMobile}>
-          <SortableContext
-            items={ordered.map((b) => b.id)}
-            strategy={rectSortingStrategy}
-          >
-            {ordered.map((block) => (
-              <MobileSortableGridItem key={block.id} block={block} />
-            ))}
-          </SortableContext>
-        </div>
-      </div>
+      {content}
     </DndContext>
   );
-}
+};

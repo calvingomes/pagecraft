@@ -188,10 +188,11 @@ blocks/TextBlock/
   - `BlockCanvas/desktop/DesktopBlockCanvas.tsx` — desktop grid with DnD (editable) or `DesktopReadonlyBlock` (readonly). Computes `sizePxForBlock(block)` and passes `dimensions` prop to children. Memoizes expensive layout styles and extracts `DroppableCell` to prevent re-renders.
   - `BlockCanvas/desktop/DesktopReadonlyBlock.tsx` — lightweight readonly block for desktop grid layout. Receives `dimensions: BlockDimensions` as props.
   - `BlockCanvas/mobile/MobileBlockCanvas.tsx` — thin wrapper selecting editable or readonly `MobileCanvasGrid`
-  - `BlockCanvas/mobile/MobileCanvasGrid.tsx` — mobile 2-column grid with SortableContext (editable) or `MobileReadonlyBlock` (readonly). Uses `MOBILE_GRID` for spans (`spansForBlock(block, undefined, MOBILE_GRID).w`) and pixel sizes (`sizePxForBlock(block, MOBILE_GRID)`).
+  - `BlockCanvas/mobile/MobileCanvasGrid.tsx` — mobile 2-column grid. Uses `useGridDnd` for 2D drag-and-drop placement (similar to Desktop). Uses `MOBILE_GRID` for spans (`spansForBlock(block, undefined, MOBILE_GRID).w`) and pixel sizes (`sizePxForBlock(block, MOBILE_GRID)`).
   - `BlockCanvas/mobile/MobileReadonlyBlock.tsx` — lightweight readonly block for mobile (no editor store or DnD deps). Receives `dimensions: BlockDimensions` as props.
 - **Readonly canvas paths must never import `editor-store` or DnD hooks.** Use `DesktopReadonlyBlock` / `MobileReadonlyBlock` for view pages.
 - `SortableBlock` wraps each block with drag handles, resize toolbar, and hover detection. It subscribes to `editor-store` — only use in editable paths. Receives `dimensions: BlockDimensions` and optional `gridConfig: GridConfig` as props from the parent canvas — it never calls `sizePxForBlock` internally.
+- `useGridDnd` hook (shared) — handles 2D grid collision detection, placement highlighting, and layout compaction for both Desktop and Mobile editors. Accepts `GridConfig` to adapt to different grid structures.
 - `BlockHoverToolbar` uses a shared preset list and viewport-aware filtering. `max` stays available in desktop editor only; mobile editor hides `max`.
 - Hover toolbar background toggle: only `text` and `link` blocks should show the `BG` toggle control.
 - Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.

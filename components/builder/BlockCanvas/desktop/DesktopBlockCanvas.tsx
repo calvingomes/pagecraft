@@ -3,11 +3,10 @@
 import {
   DndContext,
   PointerSensor,
-  useDroppable,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useMemo, memo } from "react";
+import { useMemo } from "react";
 import type { Block } from "@/types/editor";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
 import { useEditorContext } from "@/contexts/EditorContext";
@@ -18,9 +17,10 @@ import {
   sizePxForBlock,
   spansForBlock,
 } from "@/lib/blockGrid";
-import { useDesktopGridDnd } from "@/components/builder/BlockCanvas/hooks/useDesktopGridDnd";
+import { useGridDnd } from "@/components/builder/BlockCanvas/hooks/useGridDnd";
 import { DesktopReadonlyBlock } from "@/components/builder/BlockCanvas/desktop/DesktopReadonlyBlock";
 import { snapToCursor } from "@/lib/dndKit";
+import { DroppableCell } from "../DroppableCell";
 import styles from "../BlockCanvas.module.css";
 
 type DesktopBlockCanvasProps = {
@@ -28,17 +28,6 @@ type DesktopBlockCanvasProps = {
   blocks: Block[];
   onUpdateBlock?: (id: string, updates: Partial<Block>) => void;
 };
-
-const DroppableCell = memo(({ x, y }: { x: number; y: number }) => {
-  const { setNodeRef } = useDroppable({
-    id: `cell:${x}:${y}`,
-    data: { type: "cell", x, y },
-  });
-
-  return <div ref={setNodeRef} className={styles.dropCell} />;
-});
-
-DroppableCell.displayName = "DroppableCell";
 
 export const DesktopBlockCanvas = ({
   editable,
@@ -62,11 +51,12 @@ export const DesktopBlockCanvas = ({
     handleDragCancel,
     handleDragOver,
     handleDragEnd,
-  } = useDesktopGridDnd({
+  } = useGridDnd({
     editable,
     blocks,
     updateBlock: applyUpdate,
     onPersistBlockUpdate: editor?.onUpdateBlock,
+    gridConfig: DESKTOP_GRID,
   });
 
   const activeBlock = useMemo(() => {
@@ -75,7 +65,7 @@ export const DesktopBlockCanvas = ({
   }, [activeId, blocks]);
 
   const maxBottom = blocks.reduce((acc, block) => {
-    const rect = rectForBlock(block);
+    const rect = rectForBlock(block, undefined, DESKTOP_GRID);
     return Math.max(acc, rect.y + rect.h);
   }, 0);
 
@@ -92,7 +82,7 @@ export const DesktopBlockCanvas = ({
   const placementHighlightStyle = useMemo(() => {
     if (!activeBlock || !placementTarget) return null;
 
-    const { widthPx, heightPx } = sizePxForBlock(activeBlock);
+    const { widthPx, heightPx } = sizePxForBlock(activeBlock, DESKTOP_GRID);
 
     return {
       transform: `translate3d(${placementTarget.x * gridXStridePx}px, ${placementTarget.y * DESKTOP_GRID.rowScale * gridYStridePx}px, 0)`,
@@ -132,12 +122,16 @@ export const DesktopBlockCanvas = ({
 
       <div className={styles.grid}>
         {blocks.map((block, index) => {
-          const { w: spanW, h: spanH } = spansForBlock(block);
+          const { w: spanW, h: spanH } = spansForBlock(
+            block,
+            undefined,
+            DESKTOP_GRID,
+          );
           const xRaw = block.layout?.x ?? index % DESKTOP_GRID.cols;
           const yRaw = block.layout?.y ?? Math.floor(index / DESKTOP_GRID.cols);
           const x = clamp(xRaw, 0, DESKTOP_GRID.cols - spanW);
           const y = Math.max(0, yRaw);
-          const dimensions = sizePxForBlock(block);
+          const dimensions = sizePxForBlock(block, DESKTOP_GRID);
 
           return (
             <div
@@ -157,6 +151,7 @@ export const DesktopBlockCanvas = ({
                   block={block}
                   dimensions={dimensions}
                   activeDragId={activeId}
+                  gridConfig={DESKTOP_GRID}
                 />
               ) : (
                 <DesktopReadonlyBlock block={block} dimensions={dimensions} />

@@ -22,8 +22,8 @@ const EditableBlockCanvas = () => {
       <MobileBlockCanvas
         editable
         blocks={blocks}
-        onReorder={(activeId: string, overId: string) =>
-          reorderBlocks(activeId, overId, "mobile")
+        onUpdateBlock={(id: string, updates: Partial<Block>) =>
+          updateBlock(id, updates, "mobile")
         }
       />
     );
