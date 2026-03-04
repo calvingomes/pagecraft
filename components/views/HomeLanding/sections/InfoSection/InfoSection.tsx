@@ -1,9 +1,10 @@
+import layoutStyles from "../../LandingLayout.module.css";
 import styles from "./InfoSection.module.css";
 
 export function InfoSection() {
   return (
-    <section className={styles.section} aria-label="Product info">
-      <div className={styles.container}>
+    <section className={layoutStyles.section} aria-label="Product info">
+      <div className={`${layoutStyles.containerNarrow} ${styles.container}`}>
         <div id="products" className={styles.panel}>
           <h2 className={styles.title}>Products</h2>
           <p className={styles.subtitle}>

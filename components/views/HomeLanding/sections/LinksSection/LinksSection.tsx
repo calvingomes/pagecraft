@@ -1,4 +1,5 @@
 import Link from "next/link";
+import layoutStyles from "../../LandingLayout.module.css";
 import styles from "./LinksSection.module.css";
 
 type HomeLink = {
@@ -32,8 +33,8 @@ const LINKS: HomeLink[] = [
 
 export function LinksSection() {
   return (
-    <section className={styles.section} aria-label="Quick links">
-      <div className={styles.container}>
+    <section className={layoutStyles.section} aria-label="Quick links">
+      <div className={`${layoutStyles.containerNarrow} ${styles.container}`}>
         <div className={styles.headerRow}>
           <h2 className={styles.title}>Start here</h2>
           <p className={styles.subtitle}>

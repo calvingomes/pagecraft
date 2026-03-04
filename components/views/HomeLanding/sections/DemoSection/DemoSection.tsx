@@ -1,14 +1,15 @@
 import Link from "next/link";
+import layoutStyles from "../../LandingLayout.module.css";
 import styles from "./DemoSection.module.css";
 
 export function DemoSection() {
   return (
     <section
       id="demo"
-      className={styles.section}
+      className={layoutStyles.section}
       aria-labelledby="home-demo-title"
     >
-      <div className={styles.container}>
+      <div className={layoutStyles.containerNarrow}>
         <div className={styles.panel}>
           <div className={styles.text}>
             <h2 id="home-demo-title" className={styles.title}>
@@ -20,10 +21,10 @@ export function DemoSection() {
             </p>
 
             <div className={styles.actions}>
-              <Link className={styles.secondaryCta} href="/home">
+              <Link className={`${layoutStyles.secondaryCta} ${styles.secondaryCta}`} href="/home">
                 Refresh preview
               </Link>
-              <Link className={styles.primaryCta} href="/claim">
+              <Link className={`${layoutStyles.primaryCta} ${styles.primaryCta}`} href="/claim">
                 Build yours
               </Link>
             </div>
