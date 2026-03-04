@@ -11,6 +11,7 @@ type PageLayoutProps = {
   background?: PageBackgroundId;
   sidebarPosition?: SidebarPosition;
   previewViewport?: PreviewViewport;
+  framedMobilePreview?: boolean;
 };
 
 export function PageLayout({
@@ -18,6 +19,7 @@ export function PageLayout({
   background = "page-bg-1",
   sidebarPosition = "left",
   previewViewport = "desktop",
+  framedMobilePreview = false,
 }: PageLayoutProps) {
   const [sidebar, content] = React.Children.toArray(children);
 
@@ -27,6 +29,7 @@ export function PageLayout({
       data-bg={background}
       data-sidebar={sidebarPosition}
       data-preview={previewViewport}
+      data-framed-mobile-preview={framedMobilePreview ? "true" : "false"}
     >
       <div className={styles.inner}>
         <aside className={styles.sidebarSlot}>{sidebar}</aside>

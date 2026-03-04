@@ -339,6 +339,7 @@ export default function EditorPage() {
         background={background}
         sidebarPosition={effectiveSidebarPosition}
         previewViewport={previewView}
+        framedMobilePreview
       >
         <ProfileSidebar
           variant="editor"

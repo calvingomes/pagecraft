@@ -52,6 +52,7 @@ export function PageView({
     <PageLayout
       background={background}
       sidebarPosition={effectiveSidebarPosition}
+      previewViewport={renderMode}
     >
       <ProfileSidebar
         variant="view"

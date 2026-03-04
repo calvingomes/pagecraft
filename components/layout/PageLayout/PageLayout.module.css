@@ -13,6 +13,7 @@
   min-height: 100vh;
   padding-top: 100px;
   background: var(--color-page-bg-1);
+  padding-bottom: 80px;
 }
 
 .inner {
@@ -44,7 +45,7 @@
   }
 }
 
-.pageLayout[data-preview="mobile"] .inner {
+.pageLayout[data-preview="mobile"][data-framed-mobile-preview="true"] .inner {
   flex-direction: column;
   justify-content: flex-start;
   gap: 0;
@@ -58,11 +59,13 @@
   background: #fcf8ff;
 }
 
-.pageLayout[data-preview="mobile"] .contentSlot {
+.pageLayout[data-preview="mobile"][data-framed-mobile-preview="true"]
+  .contentSlot {
   align-items: stretch;
 }
 
-.pageLayout[data-preview="mobile"][data-sidebar="right"] .inner {
+.pageLayout[data-preview="mobile"][data-framed-mobile-preview="true"][data-sidebar="right"]
+  .inner {
   flex-direction: column;
 }
 
@@ -117,8 +120,8 @@
   align-items: center;
 }
 
-/* Sticky side profile on desktop only */
-.pageLayout:not([data-sidebar="center"]) .sidebarSlot {
+/* Sticky side profile only in desktop viewport mode */
+.pageLayout[data-preview="desktop"]:not([data-sidebar="center"]) .sidebarSlot {
   position: sticky;
   top: 100px;
   align-self: flex-start;
@@ -145,7 +148,8 @@
   }
 }
 
-.pageLayout[data-preview="mobile"] .sidebarSlot {
+.pageLayout[data-preview="mobile"][data-framed-mobile-preview="true"]
+  .sidebarSlot {
   position: static;
   top: auto;
   align-self: auto;
@@ -153,7 +157,8 @@
   max-width: 100%;
 }
 
-.pageLayout[data-preview="mobile"] .contentSlot {
+.pageLayout[data-preview="mobile"][data-framed-mobile-preview="true"]
+  .contentSlot {
   max-width: 100%;
 }
 
