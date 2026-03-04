@@ -146,10 +146,7 @@ export default function EditorPage() {
     }
 
     const defaultContent = getDefaultContent(blockType, resolvedOptions);
-    const widthPreset =
-      blockType === "sectionTitle" || blockType === "paragraph"
-        ? "full"
-        : "small";
+    const widthPreset = blockType === "sectionTitle" ? "full" : "small";
 
     const tempBlockForPlacement = {
       id,
@@ -178,8 +175,6 @@ export default function EditorPage() {
   ): Block["content"] => {
     switch (type) {
       case "text":
-        return { text: "" };
-      case "paragraph":
         return { text: "" };
       case "link":
         return {

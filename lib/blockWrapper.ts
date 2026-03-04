@@ -6,10 +6,6 @@ export function shouldUseTransparentWrapper(
   block: Block,
   mode: WrapperRenderMode,
 ): boolean {
-  if (block.type === "paragraph") {
-    return true;
-  }
-
   if (block.type === "sectionTitle") {
     return mode === "view";
   }

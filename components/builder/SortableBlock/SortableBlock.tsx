@@ -52,8 +52,7 @@ export function SortableBlock({
   const hideBecauseOverlay = activeDragId === block.id;
 
   const widthPreset = block.styles?.widthPreset ?? "small";
-  const showHoverToolbar =
-    !!editor && block.type !== "sectionTitle" && block.type !== "paragraph";
+  const showHoverToolbar = !!editor && block.type !== "sectionTitle";
   const isTransparentWrapper = shouldUseTransparentWrapper(block, "edit");
 
   const handleWidthChange = (preset: BlockWidthPreset) => {
@@ -85,7 +84,6 @@ export function SortableBlock({
 
   const { widthPx, heightPx } = sizePxForBlock(block);
   const aspectRatio = `${widthPx} / ${heightPx}`;
-  const isParagraph = block.type === "paragraph";
 
   return (
     <div
@@ -112,21 +110,16 @@ export function SortableBlock({
         <div
           className={`${styles.wrapper} ${isTransparentWrapper ? styles.emptyWrapper : ""} ${isDragging ? styles.dragging : ""}`}
           style={
-            isParagraph
+            fluid
               ? {
-                  width: fluid ? "100%" : `${widthPx}px`,
+                  width: "100%",
+                  height: "auto",
+                  aspectRatio,
+                }
+              : {
+                  width: `${widthPx}px`,
                   height: `${heightPx}px`,
                 }
-              : fluid
-                ? {
-                    width: "100%",
-                    height: "auto",
-                    aspectRatio,
-                  }
-                : {
-                    width: `${widthPx}px`,
-                    height: `${heightPx}px`,
-                  }
           }
         >
           <div className={styles.content}>

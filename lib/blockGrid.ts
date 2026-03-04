@@ -12,11 +12,9 @@ export const GRID_ROW_PX = 90;
 export const GRID_ROW_GAP_PX = 20;
 export const AUTO_HEIGHT_MIN_HEIGHT_PX = 90;
 const AUTO_HEIGHT_BLOCK_TYPES: ReadonlySet<BlockType> = new Set([
-  "paragraph",
   "sectionTitle",
 ]);
 const AUTO_HEIGHT_DEFAULT_HEIGHT_PX: Partial<Record<BlockType, number>> = {
-  paragraph: 90,
   sectionTitle: 90,
 };
 

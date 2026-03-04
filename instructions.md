@@ -15,7 +15,7 @@ stores/         — Zustand stores (thin — types live in types/)
 contexts/       — React contexts (thin — types live in types/)
 hooks/          — Shared React hooks (not tied to a single component)
 components/
-  blocks/       — Visual block components (TextBlock, ParagraphBlock, LinkBlock, ImageBlock, SectionTitleBlock)
+  blocks/       — Visual block components (TextBlock, LinkBlock, ImageBlock, SectionTitleBlock)
   builder/      — Editor infrastructure (canvas, toolbars, dnd, registry)
   layout/       — Page-level layout shells (Header, Navbar, PageLayout, ProfileSidebar)
   ui/           — Generic reusable UI primitives (WordCount, etc.)
@@ -32,7 +32,7 @@ styles/         — Global CSS custom properties and media queries
   Do not define types inline in stores, contexts, hooks, or lib files unless they are truly private to that file's implementation (e.g., a local helper type used nowhere else).
 
 - **One file per domain:**
-  - `types/editor.ts` — Block types (`TextBlock`, `ParagraphBlock`, `LinkBlock`, `ImageBlock`, `SectionTitleBlock`), `EditorState`, `EditorContextValue`, `LinkMetadataResponse`
+  - `types/editor.ts` — Block types (`TextBlock`, `LinkBlock`, `ImageBlock`, `SectionTitleBlock`), `EditorState`, `EditorContextValue`, `LinkMetadataResponse`
   - `types/grid.ts` — Grid geometry (`GridLayout`, `GridRect`, `PlacedRect`, `LayoutById`, `CompactResult`)
   - `types/page.ts` — Page-level enums (`PageBackgroundId`, `SidebarPosition`, `AvatarShape`)
   - `types/builder.ts` — Builder/component props (`BlockCanvasProps`, `SortableBlockProps`, DnD snapshot types)
@@ -106,7 +106,7 @@ Do not duplicate these functions. If you need grid math, it belongs in `blockGri
 - Auto-height layout is generic and centralized; do **not** implement reflow/push logic inside individual block components.
 - Use `lib/autoHeightLayout.ts` (`computeAutoHeightReflowUpdates`) for grow-and-push behavior.
 - Enable block types for auto-height in `lib/blockGrid.ts` via `supportsAutoHeight` (internal allowlist).
-- Current enabled auto-height block types: `paragraph`, `sectionTitle`.
+- Current enabled auto-height block types: `sectionTitle`.
 
 **Do / Don't**
 
@@ -147,10 +147,8 @@ blocks/TextBlock/
 - `BlockRegistry/blockRegistry.tsx` is the single map from `BlockType → ReactNode`. When adding a new block type, add it here and in `types/editor.ts` — the `BlockRenderer` will pick it up automatically.
 - `BlockCanvas` handles desktop/mobile switching and droppable grid cells.
 - `SortableBlock` wraps each block with drag handles, resize toolbar, and hover detection.
-- Current product state: `ParagraphBlock` is fully implemented and supported by types/registry/layout code, but the **add Paragraph button is intentionally hidden in the editor toolbar** for now. Do not remove ParagraphBlock code paths; treat this as a temporary UX toggle.
 - Hover toolbar background toggle: only `text` and `link` blocks should show the `BG` toggle control.
 - Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.
-- `paragraph` should always use transparent wrapper styling.
 - `sectionTitle` should use transparent wrapper styling only in **view mode** (not editor mode), via the same shared wrapper decision path.
 
 ---
