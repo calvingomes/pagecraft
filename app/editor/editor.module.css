@@ -39,3 +39,40 @@
   align-items: center;
   gap: 10px;
 }
+
+.previewToggle {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: color-mix(in srgb, #252525 12%, white);
+  border: 1px solid #d6d6d6;
+  border-radius: 12px;
+}
+
+.previewToggleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: #7b7b7b;
+  background: transparent;
+  cursor: pointer;
+}
+
+.previewToggleBtn:hover {
+  background: color-mix(in srgb, black 4%, white);
+}
+
+.previewToggleBtnActive {
+  color: #2a2a2a;
+  background: #ffffff;
+  border-color: #d8d8d8;
+}

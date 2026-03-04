@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Laptop, Smartphone } from "lucide-react";
 import { useEditorStore } from "@/stores/editor-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { supabase } from "@/lib/supabase";
@@ -25,6 +26,7 @@ import {
   type RawStoredBlock,
 } from "@/lib/normalizeBlocks";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
+import { useEditorViewportPreview } from "@/hooks/useEditorViewportPreview";
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
 import { saveEditorPage } from "@/lib/editor/saveEditorPage";
 import { prepareImageBlockOptions } from "@/lib/editor/prepareImageBlockOptions";
@@ -47,6 +49,7 @@ export default function EditorPage() {
   const [avatarShape, setAvatarShape] = useState<AvatarShape>("circle");
   const [persistedAvatarUrl, setPersistedAvatarUrl] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
+  const { previewView, setPreviewView } = useEditorViewportPreview();
 
   useEffect(() => {
     if (!username || !user?.id) return;
@@ -236,37 +239,65 @@ export default function EditorPage() {
   }
 
   return (
-    <PageLayout background={background} sidebarPosition={sidebarPosition}>
-      <ProfileSidebar
-        variant="editor"
-        position={sidebarPosition}
-        displayName={displayName}
-        bioHtml={bioHtml}
-        onChangeDisplayName={setDisplayName}
-        onChangeBioHtml={setBioHtml}
-        avatarUrl={avatarUrl}
-        avatarShape={avatarShape}
-        onChangeAvatarUrl={setAvatarUrl}
-        onChangeAvatarShape={setAvatarShape}
-      />
-      <EditorProvider
-        username={username ?? null}
-        onUpdateBlock={handleUpdateBlock}
-        onRemoveBlock={handleRemoveBlock}
+    <EditorProvider
+      username={username ?? null}
+      onUpdateBlock={handleUpdateBlock}
+      onRemoveBlock={handleRemoveBlock}
+    >
+      <div className={styles.actions}>
+        <SaveButton onSave={handleSave} saving={isSaving} />
+        <LogoutButton />
+      </div>
+      <div className={styles.previewToggle}>
+        <button
+          type="button"
+          className={`${styles.previewToggleBtn} ${
+            previewView === "desktop" ? styles.previewToggleBtnActive : ""
+          }`}
+          onClick={() => setPreviewView("desktop")}
+          aria-label="Preview desktop view"
+          title="Preview desktop view"
+        >
+          <Laptop size={20} />
+        </button>
+        <button
+          type="button"
+          className={`${styles.previewToggleBtn} ${
+            previewView === "mobile" ? styles.previewToggleBtnActive : ""
+          }`}
+          onClick={() => setPreviewView("mobile")}
+          aria-label="Preview mobile view"
+          title="Preview mobile view"
+        >
+          <Smartphone size={20} />
+        </button>
+      </div>
+      <PageLayout
+        background={background}
+        sidebarPosition={sidebarPosition}
+        previewViewport={previewView}
       >
-        <div className={styles.actions}>
-          <SaveButton onSave={handleSave} saving={isSaving} />
-          <LogoutButton />
-        </div>
-        <BlockCanvas editable />
-        <Toolbar
-          onAddBlock={handleAddBlock}
-          onChangeBackground={setBackground}
-          onChangeSidebarPosition={setSidebarPosition}
-          background={background}
-          sidebarPosition={sidebarPosition}
+        <ProfileSidebar
+          variant="editor"
+          position={sidebarPosition}
+          displayName={displayName}
+          bioHtml={bioHtml}
+          onChangeDisplayName={setDisplayName}
+          onChangeBioHtml={setBioHtml}
+          avatarUrl={avatarUrl}
+          avatarShape={avatarShape}
+          onChangeAvatarUrl={setAvatarUrl}
+          onChangeAvatarShape={setAvatarShape}
         />
-      </EditorProvider>
-    </PageLayout>
+        <BlockCanvas editable />
+      </PageLayout>
+      <Toolbar
+        onAddBlock={handleAddBlock}
+        onChangeBackground={setBackground}
+        onChangeSidebarPosition={setSidebarPosition}
+        background={background}
+        sidebarPosition={sidebarPosition}
+      />
+    </EditorProvider>
   );
 }

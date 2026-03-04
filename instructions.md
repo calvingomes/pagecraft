@@ -148,6 +148,14 @@ blocks/TextBlock/
 - `sectionTitle` should use transparent wrapper styling only in **view mode** (not editor mode), via the same shared wrapper decision path.
 - `sectionTitle` size is fixed to `875x90` at render level and should occupy **half-row grid height** (`h = 0.5`) to avoid dead space below.
 
+### Editor Preview Modes (`app/editor/page.tsx` + `components/layout/PageLayout/`)
+
+- Screen buckets are defined as: desktop `>=1360`, tablet `960-1359`, mobile `<960`.
+- The editor has a **desktop/mobile preview toggle** for visual editing without resizing the browser window.
+- In mobile preview mode, only page content is previewed: `ProfileSidebar` + `BlockCanvas`.
+- Editor controls stay outside the preview window: `SaveButton`, `LogoutButton`, preview toggle, and bottom toolbar.
+- Mobile preview window is capped to `540px` max width and should remain visually distinct (framed/background) so start/end are clear.
+
 ---
 
 ## 6. State Management
