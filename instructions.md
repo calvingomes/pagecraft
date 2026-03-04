@@ -144,6 +144,9 @@ blocks/TextBlock/
 - `BlockCanvas` handles desktop/mobile switching and droppable grid cells.
 - `SortableBlock` wraps each block with drag handles, resize toolbar, and hover detection.
 - Current product state: `ParagraphBlock` is fully implemented and supported by types/registry/layout code, but the **add Paragraph button is intentionally hidden in the editor toolbar** for now. Do not remove ParagraphBlock code paths; treat this as a temporary UX toggle.
+- Hover toolbar background toggle: only `text` and `link` blocks should show the `BG` toggle control.
+- Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.
+- `sectionTitle` and `paragraph` should continue using transparent wrappers through the same shared wrapper decision path (avoid separate one-off checks).
 
 ---
 

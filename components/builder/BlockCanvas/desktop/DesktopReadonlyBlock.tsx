@@ -4,6 +4,7 @@ import type { Block } from "@/types/editor";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import sortableBlockStyles from "@/components/builder/SortableBlock/SortableBlock.module.css";
 import { sizePxForBlock } from "@/lib/blockGrid";
+import { shouldUseTransparentWrapper } from "@/lib/blockWrapper";
 
 type Props = {
   block: Block;
@@ -11,11 +12,12 @@ type Props = {
 
 export function DesktopReadonlyBlock({ block }: Props) {
   const { widthPx, heightPx } = sizePxForBlock(block);
+  const isTransparentWrapper = shouldUseTransparentWrapper(block, "view");
 
   return (
     <div className={sortableBlockStyles.hoverZone}>
       <div
-        className={`${sortableBlockStyles.wrapper} ${block.type === "sectionTitle" || block.type === "paragraph" ? sortableBlockStyles.emptyWrapper : ""}`}
+        className={`${sortableBlockStyles.wrapper} ${isTransparentWrapper ? sortableBlockStyles.emptyWrapper : ""}`}
         style={{
           width: `${widthPx}px`,
           height: `${heightPx}px`,

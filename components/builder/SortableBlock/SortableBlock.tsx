@@ -10,6 +10,7 @@ import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import { BlockHoverToolbar } from "@/components/builder/BlockHoverToolbar/BlockHoverToolbar";
 import styles from "./SortableBlock.module.css";
 import { sizePxForBlock } from "@/lib/blockGrid";
+import { shouldUseTransparentWrapper } from "@/lib/blockWrapper";
 import type { SortableBlockProps } from "@/types/builder";
 import { computeResizeAndPushUpdates } from "./resizeAndPush";
 
@@ -53,6 +54,7 @@ export function SortableBlock({
   const widthPreset = block.styles?.widthPreset ?? "small";
   const showHoverToolbar =
     !!editor && block.type !== "sectionTitle" && block.type !== "paragraph";
+  const isTransparentWrapper = shouldUseTransparentWrapper(block, "edit");
 
   const handleWidthChange = (preset: BlockWidthPreset) => {
     if (!editor?.onUpdateBlock) return;
@@ -66,6 +68,19 @@ export function SortableBlock({
     for (const { id, updates: blockUpdates } of updates) {
       editor.onUpdateBlock(id, blockUpdates);
     }
+  };
+
+  const handleToggleWrapperBackground = () => {
+    if (!editor?.onUpdateBlock) return;
+    const canToggleBackground = block.type === "text" || block.type === "link";
+    if (!canToggleBackground) return;
+
+    editor.onUpdateBlock(block.id, {
+      styles: {
+        ...block.styles,
+        transparentWrapper: !isTransparentWrapper,
+      },
+    });
   };
 
   const { widthPx, heightPx } = sizePxForBlock(block);
@@ -95,7 +110,7 @@ export function SortableBlock({
         {...(!dndDisabled ? listeners : {})}
       >
         <div
-          className={`${styles.wrapper} ${isDragging ? styles.dragging : ""}`}
+          className={`${styles.wrapper} ${isTransparentWrapper ? styles.emptyWrapper : ""} ${isDragging ? styles.dragging : ""}`}
           style={
             isParagraph
               ? {
@@ -126,7 +141,9 @@ export function SortableBlock({
             blockId={block.id}
             blockType={block.type}
             currentPreset={widthPreset}
+            currentTransparentWrapper={isTransparentWrapper}
             onWidthChange={handleWidthChange}
+            onToggleWrapperBackground={handleToggleWrapperBackground}
             visible={toolbarVisible}
           />
         )}

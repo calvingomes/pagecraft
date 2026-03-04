@@ -50,7 +50,9 @@ export function BlockHoverToolbar({
   blockId,
   blockType,
   currentPreset = "small",
+  currentTransparentWrapper = false,
   onWidthChange,
+  onToggleWrapperBackground,
   visible = false,
 }: BlockHoverToolbarProps) {
   const editor = useEditorContext();
@@ -64,6 +66,8 @@ export function BlockHoverToolbar({
     if (item.preset !== "skinnyWide") return true;
     return blockType === "text" || blockType === "link";
   });
+  const canToggleWrapperBackground =
+    blockType === "text" || blockType === "link";
 
   return (
     <div
@@ -87,6 +91,22 @@ export function BlockHoverToolbar({
           </button>
         ))}
       </div>
+      {canToggleWrapperBackground && onToggleWrapperBackground && (
+        <>
+          <div className={styles.divider} />
+          <button
+            type="button"
+            title="Toggle wrapper background"
+            aria-label="Toggle wrapper background"
+            onClick={onToggleWrapperBackground}
+            className={`${styles.sizeButton} ${
+              currentTransparentWrapper ? styles.active : ""
+            }`}
+          >
+            BG
+          </button>
+        </>
+      )}
       <div className={styles.divider} />
       <button
         type="button"

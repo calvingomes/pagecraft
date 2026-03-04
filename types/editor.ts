@@ -20,6 +20,7 @@ interface BaseBlock {
     width?: number;
     height?: number;
     widthPreset?: BlockWidthPreset;
+    transparentWrapper?: boolean;
   };
   // Fixed grid position (independent of block order). Measured in 4-column
   // grid cells. (0-based)
