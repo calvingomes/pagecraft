@@ -1,7 +1,10 @@
-@custom-media --bp-mobile (max-width: 768px);
-@custom-media --bp-desktop (min-width: 769px);
+@custom-media --bp-mobile (max-width: 959px);
+@custom-media --bp-tablet (min-width: 960px) and (max-width: 1359px);
+@custom-media --bp-desktop (min-width: 1360px);
 
 :root {
-  --bp-mobile-max: 768px;
-  --bp-desktop-min: 769px;
+  --bp-mobile-max: 959px;
+  --bp-tablet-min: 960px;
+  --bp-tablet-max: 1359px;
+  --bp-desktop-min: 1360px;
 }

@@ -57,6 +57,12 @@ styles/         — Global CSS custom properties and media queries
 - **No duplicate selectors** across files. If two components need the same style, extract it to a shared module or use CSS custom properties.
 - Use `@import "@styles/media.css"` at the top of any module that needs responsive breakpoints.
 
+### Breakpoint Ranges
+
+- Desktop view: `1360px` and above
+- Tablet view: `960px` to `1359px`
+- Mobile view: below `960px`
+
 ---
 
 ## 4. Grid System Constants
