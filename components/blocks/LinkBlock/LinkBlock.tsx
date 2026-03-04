@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { EditorContent, useEditor } from "@tiptap/react";
+import { useMemo, useCallback } from "react";
+import { EditorContent } from "@tiptap/react";
 import { Link2, Trash2 } from "lucide-react";
 import { LinkBlock as LinkBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
@@ -16,7 +16,8 @@ import {
   minimalRTHtmlToInlineForClamp,
   sanitizeMinimalRTH,
 } from "@/helper/sanitizeRichText";
-import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
+import { useLinkMetadata } from "@/hooks/useLinkMetadata";
+import { useBlockEditor } from "@/hooks/useBlockEditor";
 import styles from "./LinkBlock.module.css";
 
 export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
@@ -24,13 +25,6 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
   const content = block.content;
   const blockUrl = content.url ?? "";
   const titleHtml = sanitizeMinimalRTH(resolveLinkTitle(content));
-
-  const metadataFetchTimer = useRef<number | null>(null);
-  const lastFetchedUrl = useRef<string>(content.metaUrl ?? "");
-  const lastSyncedTitle = useRef(titleHtml);
-  const [isTitleEmpty, setIsTitleEmpty] = useState(
-    titleHtml.trim().length === 0,
-  );
 
   const urlTrimmed = useMemo(() => blockUrl.trim(), [blockUrl]);
   const canFetch = useMemo(() => isSupportedLinkUrl(urlTrimmed), [urlTrimmed]);
@@ -47,123 +41,53 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
     });
   };
 
-  const titleEditor = useEditor({
-    extensions: minimalRTEWithPlaceholder({
-      placeholder: "Write Title...",
-      showOnlyWhenEditable: true,
-    }),
+  const { editor: titleEditor, isEmpty: isTitleEmpty } = useBlockEditor({
     content: titleHtml,
+    placeholder: "Write Title...",
     editable: !!editor,
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        spellcheck: "false",
-        autocorrect: "off",
-        autocapitalize: "off",
-      },
-    },
-    onCreate: ({ editor: rte }) => {
-      setIsTitleEmpty(rte.isEmpty);
-    },
-    onUpdate: ({ editor: rte }) => {
-      setIsTitleEmpty(rte.isEmpty);
-    },
-    onBlur: ({ editor: rte }) => {
-      if (!editor?.onUpdateBlock) return;
-
-      const html = rte.isEmpty ? "" : rte.getHTML();
-      const finalTitle = sanitizeMinimalRTH(html);
-
-      if (finalTitle !== lastSyncedTitle.current) {
-        lastSyncedTitle.current = finalTitle;
-        editor.onUpdateBlock(block.id, {
-          content: {
-            ...content,
-            title: finalTitle,
-          },
-        });
-      }
+    onUpdate: (html) => {
+      editor?.onUpdateBlock(block.id, {
+        content: {
+          ...content,
+          title: html,
+        },
+      });
     },
   });
 
-  useEffect(() => {
-    if (!titleEditor) return;
+  const handleMetadataSuccess = useCallback(
+    (meta: LinkMetadataResponse) => {
+      if (!editor?.onUpdateBlock) return;
 
-    const incoming = sanitizeMinimalRTH(resolveLinkTitle(content));
-    if (incoming !== lastSyncedTitle.current) {
-      lastSyncedTitle.current = incoming;
-      titleEditor.commands.setContent(incoming);
-    }
-  }, [content, titleEditor, block.id]);
+      const nextMetaTitle = (meta.title ?? "").trim();
+      const shouldUpdateTitle = shouldAutoApplyFetchedTitle({
+        currentTitle: content.title,
+        currentMetaTitle: content.metaTitle,
+      });
 
-  useEffect(() => {
-    if (!titleEditor) return;
-    titleEditor.setEditable(!!editor);
-  }, [titleEditor, editor]);
+      editor.onUpdateBlock(block.id, {
+        content: {
+          ...content,
+          url: urlTrimmed,
+          metaUrl: urlTrimmed,
+          metaTitle: nextMetaTitle,
+          imageUrl: content.metaImageRemoved ? "" : (meta.imageUrl ?? ""),
+          iconUrl: meta.iconUrl ?? "",
+          ...(shouldUpdateTitle && nextMetaTitle
+            ? { title: sanitizeMinimalRTH(nextMetaTitle) }
+            : {}),
+        },
+      });
+    },
+    [editor, block.id, content, urlTrimmed],
+  );
 
-  useEffect(() => {
-    if (!editor?.onUpdateBlock) return;
-    if (!canFetch) return;
-
-    // Avoid repeated fetches for the same url.
-    const currentMetaUrl = content.metaUrl ?? "";
-    if (currentMetaUrl === urlTrimmed && lastFetchedUrl.current === urlTrimmed)
-      return;
-
-    if (metadataFetchTimer.current) {
-      window.clearTimeout(metadataFetchTimer.current);
-    }
-
-    metadataFetchTimer.current = window.setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `/api/link-metadata?url=${encodeURIComponent(urlTrimmed)}`,
-        );
-        if (!res.ok) return;
-        const meta = (await res.json()) as LinkMetadataResponse;
-
-        lastFetchedUrl.current = urlTrimmed;
-
-        const nextMetaTitle = (meta.title ?? "").trim();
-        const shouldUpdateTitle = shouldAutoApplyFetchedTitle({
-          currentTitle: content.title,
-          currentMetaTitle: content.metaTitle,
-        });
-
-        editor.onUpdateBlock(block.id, {
-          content: {
-            ...content,
-            url: urlTrimmed,
-            metaUrl: urlTrimmed,
-            metaTitle: nextMetaTitle,
-            imageUrl: content.metaImageRemoved ? "" : (meta.imageUrl ?? ""),
-            iconUrl: meta.iconUrl ?? "",
-            ...(shouldUpdateTitle && nextMetaTitle
-              ? { title: sanitizeMinimalRTH(nextMetaTitle) }
-              : {}),
-          },
-        });
-      } catch {
-        // ignore
-      }
-    }, 400);
-
-    return () => {
-      if (metadataFetchTimer.current) {
-        window.clearTimeout(metadataFetchTimer.current);
-      }
-    };
-  }, [
-    editor,
-    canFetch,
-    urlTrimmed,
-    block.id,
-    content,
-    content.metaUrl,
-    content.metaTitle,
-    content.title,
-    content.metaImageRemoved,
-  ]);
+  useLinkMetadata({
+    url: urlTrimmed,
+    initialUrl: content.metaUrl,
+    enabled: !!editor && canFetch,
+    onSuccess: handleMetadataSuccess,
+  });
 
   const isEditable = !!editor;
   const showPreviewImage = true;

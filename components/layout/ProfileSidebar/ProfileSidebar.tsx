@@ -2,16 +2,13 @@
 
 import { useAuthStore } from "@/stores/auth-store";
 import styles from "./ProfileSidebar.module.css";
-import { EditorContent, useEditor } from "@tiptap/react";
-import { useEffect, useRef, useState } from "react";
-import { WordCount } from "@/components/ui/WordCount/WordCount";
+import { EditorContent } from "@tiptap/react";
+import { useState } from "react";
 import { htmlToText } from "@/helper/htmlToText";
 import { sanitizeMinimalRTH } from "@/helper/sanitizeRichText";
-import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
 import type { ProfileSidebarProps } from "./ProfileSidebar.types";
 import { AvatarToolbar } from "./AvatarToolbar";
-
-const DISPLAY_NAME_MAX_CHARS = 70;
+import { useBlockEditor } from "@/hooks/useBlockEditor";
 
 export const ProfileSidebar = (props: ProfileSidebarProps) => {
   const { username: editorUsername } = useAuthStore();
@@ -31,13 +28,10 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
 
   const safeBioHtml = sanitizeMinimalRTH(props.bioHtml ?? "");
 
-  const lastSyncedBio = useRef(safeBioHtml);
-  const lastSyncedDisplayName = useRef(safeDisplayNameHtml);
   const editable = props.variant === "editor";
   const avatarShape = props.avatarShape ?? "circle";
   const avatarUrl = props.avatarUrl ?? "";
 
-  const [isDisplayNameActive, setIsDisplayNameActive] = useState(false);
   const [showAvatarToolbar, setShowAvatarToolbar] = useState(false);
 
   const avatarLetter = (() => {
@@ -45,111 +39,34 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
     return (source[0] ?? "?").toUpperCase();
   })();
 
-  const displayNameEditor = useEditor({
-    extensions: minimalRTEWithPlaceholder({
-      placeholder: username ?? "Display name",
-      showOnlyWhenEditable: true,
-    }),
+  const { editor: displayNameEditor } = useBlockEditor({
     content: safeDisplayNameHtml,
+    placeholder: username ?? "Display name",
     editable,
-    immediatelyRender: false,
+    onUpdate: (html) => {
+      if (props.variant !== "editor") return;
+      props.onChangeDisplayName?.(html);
+    },
     editorProps: {
       attributes: {
         "aria-label": "Display name",
-        spellcheck: "false",
-        autocorrect: "off",
-        autocapitalize: "off",
       },
       handleKeyDown: (_view, event) => {
         if (event.key === "Enter") return true;
         return false;
       },
-      handleTextInput: (view, from, to, text) => {
-        const current = view.state.doc.textBetween(
-          0,
-          view.state.doc.content.size,
-          " ",
-        );
-        const selected = view.state.doc.textBetween(from, to, " ");
-        const nextLen = current.length - selected.length + text.length;
-        if (nextLen > DISPLAY_NAME_MAX_CHARS) return true;
-        return false;
-      },
-      handlePaste: (view, event) => {
-        const text = event.clipboardData?.getData("text/plain") ?? "";
-        if (!text) return false;
-        const { from, to } = view.state.selection;
-        const current = view.state.doc.textBetween(
-          0,
-          view.state.doc.content.size,
-          " ",
-        );
-        const selected = view.state.doc.textBetween(from, to, " ");
-        const nextLen = current.length - selected.length + text.length;
-        if (nextLen > DISPLAY_NAME_MAX_CHARS) return true;
-        return false;
-      },
     },
-    onUpdate: ({ editor }) => {
-      if (props.variant !== "editor") return;
-      const html = editor.isEmpty ? "" : sanitizeMinimalRTH(editor.getHTML());
-      if (html === lastSyncedDisplayName.current) return;
-      lastSyncedDisplayName.current = html;
-      props.onChangeDisplayName?.(html);
-    },
-    onFocus: () => setIsDisplayNameActive(true),
-    onBlur: () => setIsDisplayNameActive(false),
   });
 
-  const bioEditor = useEditor({
-    extensions: minimalRTEWithPlaceholder({
-      placeholder: "Add a description…",
-      showOnlyWhenEditable: true,
-    }),
+  const { editor: bioEditor } = useBlockEditor({
     content: safeBioHtml,
+    placeholder: "Add a description…",
     editable,
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        spellcheck: "false",
-        autocorrect: "off",
-        autocapitalize: "off",
-      },
-    },
-    onUpdate: ({ editor }) => {
+    onUpdate: (html) => {
       if (props.variant !== "editor") return;
-      const html = editor.isEmpty ? "" : sanitizeMinimalRTH(editor.getHTML());
-      if (html === lastSyncedBio.current) return;
-      lastSyncedBio.current = html;
       props.onChangeBioHtml?.(html);
     },
   });
-
-  useEffect(() => {
-    if (!bioEditor) return;
-    bioEditor.setEditable(editable);
-  }, [bioEditor, editable]);
-
-  useEffect(() => {
-    if (!displayNameEditor) return;
-    displayNameEditor.setEditable(editable);
-  }, [displayNameEditor, editable]);
-
-  useEffect(() => {
-    if (!bioEditor) return;
-    const incoming = sanitizeMinimalRTH(props.bioHtml ?? "");
-    if (incoming === lastSyncedBio.current) return;
-    lastSyncedBio.current = incoming;
-    bioEditor.commands.setContent(incoming);
-  }, [bioEditor, props.bioHtml]);
-
-  useEffect(() => {
-    if (!displayNameEditor) return;
-    const incoming = sanitizeMinimalRTH(displayNameRaw);
-    if (incoming === lastSyncedDisplayName.current) return;
-    lastSyncedDisplayName.current = incoming;
-    displayNameEditor.commands.setContent(incoming);
-  }, [displayNameEditor, displayNameRaw]);
 
   const positionClass =
     position === "left"
@@ -198,16 +115,6 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
           {props.variant === "editor" ? (
             <div className={styles.nameInput}>
               <EditorContent editor={displayNameEditor} />
-
-              {props.variant === "editor" && isDisplayNameActive ? (
-                <WordCount
-                  value={displayNameEditor?.getText() ?? displayNameText}
-                  max={DISPLAY_NAME_MAX_CHARS}
-                  mode="characters"
-                  className={styles.displayNameCount}
-                  ariaLabel="Display name character count"
-                />
-              ) : null}
             </div>
           ) : (
             <div

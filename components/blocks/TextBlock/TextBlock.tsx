@@ -1,21 +1,19 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { EditorContent } from "@tiptap/react";
 import { TextBlock as TextBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import {
   minimalRTHtmlToInlineForClamp,
   sanitizeMinimalRTH,
 } from "@/helper/sanitizeRichText";
-import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
+import { useBlockEditor } from "@/hooks/useBlockEditor";
 import styles from "./TextBlock.module.css";
 
 export const TextBlock = ({ block }: { block: TextBlockType }) => {
   const contextEditor = useEditorContext();
   const editable = !!contextEditor;
-  const initialContent = sanitizeMinimalRTH(block.content?.text ?? "");
-  const lastSyncedContent = useRef(initialContent);
+  const initialContent = block.content?.text ?? "";
 
   const preset = block.styles?.widthPreset ?? "small";
   const clampClass =
@@ -23,50 +21,16 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
       ? styles.clampTall
       : styles.clampSmall;
 
-  const editor = useEditor({
-    extensions: minimalRTEWithPlaceholder({
-      placeholder: "Write something...",
-      showOnlyWhenEditable: true,
-    }),
+  const { editor } = useBlockEditor({
     content: initialContent,
+    placeholder: "Write something...",
     editable,
-    immediatelyRender: false,
-    editorProps: {
-      attributes: {
-        spellcheck: "false",
-        autocorrect: "off",
-        autocapitalize: "off",
-      },
-    },
-    onBlur: ({ editor }) => {
-      if (!contextEditor?.onUpdateBlock) return;
-
-      const html = editor.isEmpty ? "" : editor.getHTML();
-      const finalContent = sanitizeMinimalRTH(html);
-
-      if (finalContent !== lastSyncedContent.current) {
-        lastSyncedContent.current = finalContent;
-        contextEditor.onUpdateBlock(block.id, {
-          content: { text: finalContent },
-        });
-      }
+    onUpdate: (html) => {
+      contextEditor?.onUpdateBlock(block.id, {
+        content: { text: html },
+      });
     },
   });
-
-  useEffect(() => {
-    if (!editor) return;
-
-    const incoming = sanitizeMinimalRTH(block.content?.text ?? "");
-    if (incoming !== lastSyncedContent.current) {
-      lastSyncedContent.current = incoming;
-      editor.commands.setContent(incoming);
-    }
-  }, [block.id, block.content?.text, editor]);
-
-  useEffect(() => {
-    if (!editor) return;
-    editor.setEditable(editable);
-  }, [editor, editable]);
 
   if (editable && editor) {
     return (
