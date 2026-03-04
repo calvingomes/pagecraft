@@ -1,8 +1,7 @@
 "use client";
 
 import { Save } from "lucide-react";
-
-import styles from "./SaveButton.module.css";
+import { Button } from "@/components/ui/Button/Button";
 
 type SaveButtonProps = {
   onSave: () => Promise<void>;
@@ -11,14 +10,13 @@ type SaveButtonProps = {
 
 export function SaveButton({ onSave, saving }: SaveButtonProps) {
   return (
-    <button
-      type="button"
-      className={styles.button}
+    <Button
+      variant="secondary"
       onClick={onSave}
-      disabled={saving}
+      isLoading={saving}
+      rightIcon={!saving ? <Save size={18} /> : undefined}
     >
       Save
-      <Save className={styles.icon} />
-    </button>
+    </Button>
   );
 }

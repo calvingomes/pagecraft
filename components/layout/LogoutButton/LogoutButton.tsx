@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth-store";
-import styles from "./LogoutButton.module.css";
+import { Button } from "@/components/ui/Button/Button";
 
 export function LogoutButton() {
   const router = useRouter();
@@ -18,9 +18,12 @@ export function LogoutButton() {
   };
 
   return (
-    <button type="button" className={styles.button} onClick={handleLogout}>
+    <Button
+      variant="secondary"
+      onClick={handleLogout}
+      rightIcon={<ArrowRight size={18} />}
+    >
       Sign out
-      <ArrowRight className={styles.icon} />
-    </button>
+    </Button>
   );
 }
