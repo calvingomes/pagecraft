@@ -8,7 +8,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useMemo } from "react";
+import { useMemo, memo } from "react";
 import type { Block } from "@/types/editor";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
 import { useEditorContext } from "@/contexts/EditorContext";
@@ -22,11 +22,23 @@ import {
 import { useDesktopGridDnd } from "@/components/builder/BlockCanvas/hooks/useDesktopGridDnd";
 import { DesktopReadonlyBlock } from "@/components/builder/BlockCanvas/desktop/DesktopReadonlyBlock";
 import styles from "../BlockCanvas.module.css";
+
 type DesktopBlockCanvasProps = {
   editable: boolean;
   blocks: Block[];
   onUpdateBlock?: (id: string, updates: Partial<Block>) => void;
 };
+
+const DroppableCell = memo(({ x, y }: { x: number; y: number }) => {
+  const { setNodeRef } = useDroppable({
+    id: `cell:${x}:${y}`,
+    data: { type: "cell", x, y },
+  });
+
+  return <div ref={setNodeRef} className={styles.dropCell} />;
+});
+
+DroppableCell.displayName = "DroppableCell";
 
 export const DesktopBlockCanvas = ({
   editable,
@@ -77,7 +89,7 @@ export const DesktopBlockCanvas = ({
   const gridXStridePx = DESKTOP_GRID.cellPx + DESKTOP_GRID.gapXPx;
   const gridYStridePx = DESKTOP_GRID.subRowPx + DESKTOP_GRID.subRowGapPx;
 
-  const placementHighlightStyle = (() => {
+  const placementHighlightStyle = useMemo(() => {
     if (!activeBlock || !placementTarget) return null;
 
     const { widthPx, heightPx } = sizePxForBlock(activeBlock);
@@ -87,16 +99,7 @@ export const DesktopBlockCanvas = ({
       width: `${widthPx}px`,
       height: `${heightPx}px`,
     };
-  })();
-
-  const DroppableCell = ({ x, y }: { x: number; y: number }) => {
-    const { setNodeRef } = useDroppable({
-      id: `cell:${x}:${y}`,
-      data: { type: "cell", x, y },
-    });
-
-    return <div ref={setNodeRef} className={styles.dropCell} />;
-  };
+  }, [activeBlock, placementTarget, gridXStridePx, gridYStridePx]);
 
   const content = (
     <div
