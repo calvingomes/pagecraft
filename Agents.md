@@ -5,7 +5,35 @@ Follow them when adding features, fixing bugs, or refactoring.
 
 ---
 
-## 1. Project Structure
+## 1. Project Overview
+
+PageCraft is a "link-in-bio" style page builder that allows users to create a single-page profile with draggable blocks (text, links, images). It features a dual-viewport system where users can customize their layout independently for Desktop and Mobile views.
+
+### Core Concepts
+
+- **Viewport-Aware Block System**: Blocks are stored with a `viewport_mode` ('desktop' or 'mobile'). The editor loads both sets but only renders/edits the active one.
+  - **Desktop**: 4-column grid, free drag-and-drop placement.
+  - **Mobile**: 2-column grid, free drag-and-drop placement (uses same `useGridDnd` logic as desktop).
+- **Editor vs. View Mode**:
+  - **Editor** (`/editor`): Uses `zustand` stores, `dnd-kit`, and Tiptap editors.
+  - **View Page** (`/[username]`): Server Component fetches data via `ServerPageService`, passes to `PageView` (Client Component). No stores, no heavy libraries. Pure React props.
+
+### Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **State Management**: Zustand (`editor-store`, `auth-store`)
+- **Database & Auth**: Supabase (via `lib/services/`)
+- **Core Logic**: `lib/editor-engine/` (Grid, Layout, Normalization)
+- **Styling**: CSS Modules with PostCSS (using CSS variables for theming)
+- **Drag & Drop**: @dnd-kit (Core, Sortable, Utilities)
+- **Rich Text**: Tiptap (Headless wrapper around ProseMirror)
+- **Icons**: Lucide React
+- **Image Processing**: browser-image-compression (client-side WebP conversion)
+
+---
+
+## 2. Project Structure
 
 ```
 types/          — All shared TypeScript types (no runtime code)
@@ -14,7 +42,14 @@ lib/
     grid/        — Grid configuration and math
     layout/      — Drag placement, resizing, collision detection
     data/        — Block normalization and viewport logic
-  services/      — Supabase service wrappers (auth, page, block)
+  services/      — Data access layer (Supabase wrappers)
+    auth.client.ts
+    page.client.ts
+    block.client.ts
+    page.server.ts
+  supabase/      — Supabase client factories
+    client.ts    — Client-side singleton
+    server.ts    — Server-side client factory
   uploads/       — Image processing and storage
 helper/         — Small pure-function helpers (no side-effects, no imports from lib/)
 stores/         — Zustand stores (thin — types live in types/)
@@ -32,7 +67,7 @@ styles/         — Global CSS custom properties and media queries
 
 ---
 
-## 2. Type Definitions
+## 3. Type Definitions
 
 - **All shared types live in `types/`.**  
   Do not define types inline in stores, contexts, hooks, or lib files unless they are truly private to that file's implementation (e.g., a local helper type used nowhere else).
@@ -54,7 +89,7 @@ styles/         — Global CSS custom properties and media queries
 
 ---
 
-## 3. CSS Modules
+## 4. CSS Modules
 
 - **Every component gets its own `*.module.css`** — no global utility classes.
 - **ProseMirror overrides** go in a co-located `*.prosemirror.css` file imported from the module CSS.
@@ -78,7 +113,7 @@ styles/         — Global CSS custom properties and media queries
 
 ---
 
-## 4. Grid System Constants
+## 5. Grid System Constants
 
 Grid logic is centralized in `lib/editor-engine/` and parameterized via `GridConfig` objects.
 
@@ -163,7 +198,7 @@ Current product behavior:
 
 ---
 
-## 5. Components
+## 6. Components
 
 ### General Rules
 
@@ -222,24 +257,27 @@ blocks/TextBlock/
 
 ---
 
-## 6. State Management & Data Services
+## 7. State Management & Data Services
 
 - **Data Services** (`lib/services/`) handle all Supabase interactions.
-  - `auth-service.ts`: Auth operations.
-  - `page-service.ts`: Page data fetching and updates.
-  - `block-service.ts`: Block fetching and initial setup.
-  - `server-page-service.ts`: Server-side specific fetching for public pages.
+  - `auth.client.ts`: Client-side auth operations.
+  - `page.client.ts`: Client-side page fetching/claiming.
+  - `block.client.ts`: Client-side block operations.
+  - `page.server.ts`: Server-side page data fetching.
+- **Supabase Clients** (`lib/supabase/`)
+  - `client.ts`: Exports `supabase` singleton for client components.
+  - `server.ts`: Exports `createSupabaseServerClient` for server components.
 - **Zustand stores** hold transient editor and auth state.
   - `editor-store.ts` — dual block arrays (`desktopBlocks`, `mobileBlocks`), `activeViewportMode`, and viewport-scoped actions. Exports `selectActiveViewportBlocks` selector.
   - `auth-store.ts` — auth/user state.
 - Store files should be thin — just `create<StoreType>()(...)` with the type imported from `types/`.
 - Derived/computed values can use Zustand selectors in components.
 - **EditorContext** provides `onUpdateBlock` and `onRemoveBlock` to block components so they don't import the store directly.
-- **View pages (`/[username]`) must not use any Zustand store.** The server component fetches all blocks using `ServerPageService`, splits by `viewport_mode`, normalizes, and passes `blocksByViewport` as props. The client `PageView` component selects visible blocks from props based on `useViewportMode()` — no store hydration needed.
+- **View pages (`/[username]`) must not use any Zustand store.** The server component fetches all blocks using `ServerPageService` (`lib/services/page.server.ts`), splits by `viewport_mode`, normalizes, and passes `blocksByViewport` as props. The client `PageView` component selects visible blocks from props based on `useViewportMode()` — no store hydration needed.
 
 ---
 
-## 7. File & Image Uploads
+## 8. File & Image Uploads
 
 - All image processing flows through `lib/uploads/`:
   - `imageProcessing.ts` — low-level WebP conversion using `browser-image-compression`
@@ -250,7 +288,7 @@ blocks/TextBlock/
 
 ---
 
-## 8. Code Style
+## 9. Code Style
 
 - **No duplicate logic.** If a function exists in `lib/`, use it. Check before writing new utilities.
 - **Imports**: use `@/` path aliases. Group: external → `@/types` → `@/lib` → `@/stores` → `@/contexts` → `@/components` → relative.
@@ -261,7 +299,7 @@ blocks/TextBlock/
 
 ---
 
-## 9. Naming Conventions
+## 10. Naming Conventions
 
 | Item             | Convention            | Example                         |
 | ---------------- | --------------------- | ------------------------------- |
@@ -277,7 +315,7 @@ blocks/TextBlock/
 
 ---
 
-## 10. Viewport-Aware Block System
+## 11. Viewport-Aware Block System
 
 Blocks are stored and rendered per viewport mode (`"desktop"` | `"mobile"`).
 
@@ -310,7 +348,7 @@ Used in: `EditorState.setAllBlocks`, `saveEditorPage`, server component → `Pag
 
 ---
 
-## 11. Adding a New Block Type
+## 12. Adding a New Block Type
 
 1. Add the interface to `types/editor.ts` and include it in the `Block` union.
 2. Add the `type` string to `BlockType`.
