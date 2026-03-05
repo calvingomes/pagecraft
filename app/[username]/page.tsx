@@ -1,4 +1,4 @@
-import { ServerPageService } from "@/lib/services/server-page-service";
+import { ServerPageService } from "@/lib/services/page.server";
 import type {
   AvatarShape,
   PageBackgroundId,

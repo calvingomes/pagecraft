@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthService } from "@/lib/services/auth-service";
+import { AuthService } from "@/lib/services/auth.client";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 
 import AuthView from "@/components/views/AuthView/AuthView";

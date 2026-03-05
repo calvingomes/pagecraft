@@ -1,5 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
-import type { PageData } from "@/lib/services/page-service";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { PageData } from "@/lib/services/page.client";
 import type { BlocksByViewport } from "@/types/editor";
 import {
   ensureBlocksHaveValidLayouts,
@@ -12,21 +12,8 @@ import {
  * (bypassing client-side singletons)
  */
 export const ServerPageService = {
-  getClient: () => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey =
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error("Supabase environment variables are missing");
-    }
-
-    return createClient(supabaseUrl, supabaseKey);
-  },
-
   getPageByUsername: async (username: string): Promise<PageData | null> => {
-    const supabase = ServerPageService.getClient();
+    const supabase = createSupabaseServerClient();
     const { data } = await supabase
       .from("pages")
       .select(
@@ -39,7 +26,7 @@ export const ServerPageService = {
   },
 
   getBlocksForPage: async (username: string): Promise<BlocksByViewport> => {
-    const supabase = ServerPageService.getClient();
+    const supabase = createSupabaseServerClient();
     const { data: blockRows } = await supabase
       .from("blocks")
       .select("id, type, order, content, layout, styles, viewport_mode")

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
-import { AuthService } from "@/lib/services/auth-service";
+import { AuthService } from "@/lib/services/auth.client";
 import { useAuthStore } from "@/stores/auth-store";
 import { Button } from "@/components/ui/Button/Button";
 

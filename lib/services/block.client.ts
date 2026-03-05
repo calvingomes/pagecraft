@@ -1,5 +1,4 @@
-import { supabase } from "@/lib/supabase";
-import type { Block } from "@/types/editor";
+import { supabase } from "@/lib/supabase/client";
 import {
   ensureBlocksHaveValidLayouts,
   normalizeStoredBlocks,

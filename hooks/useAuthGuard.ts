@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
-import { AuthService } from "@/lib/services/auth-service";
+import { AuthService } from "@/lib/services/auth.client";
 import { useAuthStore } from "@/stores/auth-store";
 
 type AuthGuardMode = "auth" | "claim" | "editor";

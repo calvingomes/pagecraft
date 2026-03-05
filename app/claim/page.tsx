@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useAuthStore } from "@/stores/auth-store";
-import { AuthService } from "@/lib/services/auth-service";
-import { PageService } from "@/lib/services/page-service";
-import { BlockService } from "@/lib/services/block-service";
+import { AuthService } from "@/lib/services/auth.client";
+import { PageService } from "@/lib/services/page.client";
+import { BlockService } from "@/lib/services/block.client";
 
 /**
  * Normalize username:

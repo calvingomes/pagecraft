@@ -7,8 +7,8 @@ import {
   useEditorStore,
 } from "@/stores/editor-store";
 import { useAuthStore } from "@/stores/auth-store";
-import { PageService } from "@/lib/services/page-service";
-import { BlockService } from "@/lib/services/block-service";
+import { PageService } from "@/lib/services/page.client";
+import { BlockService } from "@/lib/services/block.client";
 import type { Block, BlockType, BlockViewportMode } from "@/types/editor";
 import { EditorProvider } from "@/contexts/EditorContext";
 import type {
