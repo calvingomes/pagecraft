@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
-import { supabase } from "@/lib/supabase";
+import { AuthService } from "@/lib/services/auth-service";
 import { useAuthStore } from "@/stores/auth-store";
 import { Button } from "@/components/ui/Button/Button";
 
@@ -12,7 +12,7 @@ export function LogoutButton() {
   const logout = useAuthStore((s) => s.logout);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await AuthService.signOut();
     logout();
     router.replace("/auth");
   };

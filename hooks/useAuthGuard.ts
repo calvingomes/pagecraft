@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { AuthService } from "@/lib/services/auth-service";
 import { useAuthStore } from "@/stores/auth-store";
 
 type AuthGuardMode = "auth" | "claim" | "editor";
@@ -74,13 +74,13 @@ export function useAuthGuard(mode: AuthGuardMode) {
 
     setLoading(true);
 
-    supabase.auth.getUser().then(({ data }) => {
-      applyGuard(data.user ?? null);
+    AuthService.getUser().then((user) => {
+      applyGuard(user ?? null);
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = AuthService.onAuthStateChange((_event, session) => {
       applyGuard(session?.user ?? null);
     });
 

@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useAuthStore } from "@/stores/auth-store";
+import { AuthService } from "@/lib/services/auth-service";
+import { PageService } from "@/lib/services/page-service";
+import { BlockService } from "@/lib/services/block-service";
 
 /**
  * Normalize username:
@@ -39,12 +41,8 @@ export default function ClaimPage() {
 
     const checkAvailability = async () => {
       setChecking(true);
-      const { data } = await supabase
-        .from("usernames")
-        .select("username")
-        .eq("username", username)
-        .maybeSingle();
-      setAvailable(!data);
+      const isAvailable = await PageService.checkUsernameAvailability(username);
+      setAvailable(isAvailable);
       setChecking(false);
     };
 
@@ -56,89 +54,15 @@ export default function ClaimPage() {
    * Claim username (atomic)
    */
   const claimUsername = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const user = await AuthService.getUser();
     if (!user || !available || claiming) return;
 
     setClaiming(true);
 
     try {
-      const { error: usernameError } = await supabase.from("usernames").insert({
-        username,
-        uid: user.id,
-      });
-
-      if (usernameError) {
-        throw usernameError;
-      }
-
-      const { error: profileError } = await supabase.from("profiles").upsert(
-        {
-          id: user.id,
-          username,
-        },
-        { onConflict: "id" },
-      );
-
-      if (profileError) {
-        throw profileError;
-      }
-
-      const { error: pageError } = await supabase.from("pages").upsert(
-        {
-          username,
-          uid: user.id,
-          published: true,
-          background: "page-bg-1",
-          sidebar_position: "left",
-        },
-        { onConflict: "username" },
-      );
-
-      if (pageError) {
-        throw pageError;
-      }
-
-      const starterBlocks = [
-        {
-          id: crypto.randomUUID(),
-          page_username: username,
-          uid: user.id,
-          viewport_mode: "desktop",
-          type: "text",
-          order: 0,
-          content: {
-            text: `<p>Hi, I'm ${username} 👋</p>`,
-          },
-          layout: { x: 0, y: 0 },
-        },
-        {
-          id: crypto.randomUUID(),
-          page_username: username,
-          uid: user.id,
-          viewport_mode: "desktop",
-          type: "link",
-          order: 1,
-          content: {
-            url: "https://example.com",
-            title: "My Website",
-          },
-          layout: { x: 1, y: 0 },
-        },
-      ];
-
-      const { error: blockError } = await supabase
-        .from("blocks")
-        .insert(starterBlocks);
-
-      if (blockError) {
-        throw blockError;
-      }
-
-      await supabase.auth.updateUser({
-        data: { username },
-      });
+      await PageService.claimUsername(username, user.id);
+      await BlockService.createStarterBlocks(username, user.id);
+      await AuthService.updateUserMetadata({ username });
 
       setUsernameInStore(username);
 

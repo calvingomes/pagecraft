@@ -1,17 +1,10 @@
-import { createClient } from "@supabase/supabase-js";
-
-import type { BlocksByViewport } from "@/types/editor";
+import { ServerPageService } from "@/lib/services/server-page-service";
 import type {
   AvatarShape,
   PageBackgroundId,
   SidebarPosition,
 } from "@/types/page";
 import { PageView } from "@/components/views/PageView/PageView";
-import {
-  ensureBlocksHaveValidLayouts,
-  normalizeStoredBlocks,
-  type RawStoredBlock,
-} from "@/lib/normalizeBlocks";
 
 type Props = {
   params: Promise<{ username: string }>;
@@ -20,70 +13,27 @@ type Props = {
 export default async function UserPage({ params }: Props) {
   const { username } = await params;
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    return <div>Supabase environment variables are missing</div>;
+  // Use the dedicated server service to fetch data
+  // This handles the server-side supabase client creation internally
+  let page;
+  try {
+    page = await ServerPageService.getPageByUsername(username);
+  } catch (error) {
+    console.error("Failed to fetch page:", error);
+    return <div>Error loading page configuration</div>;
   }
-
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
-  const { data: page } = await supabase
-    .from("pages")
-    .select(
-      "title, background, sidebar_position, display_name, bio_html, avatar_url, avatar_shape",
-    )
-    .eq("username", username)
-    .maybeSingle();
 
   if (!page) {
     return <div>Page not found</div>;
   }
 
-  const { data: blockRows } = await supabase
-    .from("blocks")
-    .select("id, type, order, content, layout, styles, viewport_mode")
-    .eq("page_username", username)
-    .order("order", { ascending: true });
-
-  const safeBlockRows = blockRows ?? [];
-
-  const toRawStoredBlock = (row: {
-    id: string;
-    type: unknown;
-    order: unknown;
-    content: unknown;
-    layout: unknown;
-    styles: unknown;
-  }): RawStoredBlock => ({
-    id: row.id,
-    type: row.type,
-    order: row.order,
-    content: row.content,
-    layout: row.layout,
-    styles: row.styles,
-  });
-
-  const normalizeForViewport = (rows: RawStoredBlock[]) => {
-    const normalizedBlocks = normalizeStoredBlocks(rows);
-    return ensureBlocksHaveValidLayouts(normalizedBlocks);
-  };
-
-  const desktopRows = safeBlockRows
-    .filter((row) => row.viewport_mode !== "mobile")
-    .map(toRawStoredBlock);
-
-  const mobileRows = safeBlockRows
-    .filter((row) => row.viewport_mode === "mobile")
-    .map(toRawStoredBlock);
-
-  const blocksByViewport: BlocksByViewport = {
-    desktop: normalizeForViewport(desktopRows),
-    mobile: normalizeForViewport(mobileRows),
-  };
+  let blocksByViewport;
+  try {
+    blocksByViewport = await ServerPageService.getBlocksForPage(username);
+  } catch (error) {
+    console.error("Failed to fetch blocks:", error);
+    return <div>Error loading page content</div>;
+  }
 
   return (
     <PageView

@@ -7,7 +7,8 @@ import {
   useEditorStore,
 } from "@/stores/editor-store";
 import { useAuthStore } from "@/stores/auth-store";
-import { supabase } from "@/lib/supabase";
+import { PageService } from "@/lib/services/page-service";
+import { BlockService } from "@/lib/services/block-service";
 import type { Block, BlockType, BlockViewportMode } from "@/types/editor";
 import { EditorProvider } from "@/contexts/EditorContext";
 import type {
@@ -25,11 +26,6 @@ import { MobileEditorGuard } from "@/components/layout/MobileEditorGuard/MobileE
 import { OverlayPopup } from "@/components/layout/OverlayPopup/OverlayPopup";
 import { compactEmptyRows } from "@/lib/compactEmptyRows";
 import { findFirstFreeSpot } from "@/lib/blockGrid";
-import {
-  ensureBlocksHaveValidLayouts,
-  normalizeStoredBlocks,
-  type RawStoredBlock,
-} from "@/lib/normalizeBlocks";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEditorViewportPreview } from "@/hooks/useEditorViewportPreview";
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
@@ -94,32 +90,24 @@ export default function EditorPage() {
       setPersistedAvatarUrl("");
       setAvatarShape("circle");
 
-      const { data: pageData } = await supabase
-        .from("pages")
-        .select(
-          "background, sidebar_position, display_name, bio_html, avatar_url, avatar_shape",
-        )
-        .eq("username", username)
-        .maybeSingle();
+      const pageData = await PageService.getPageByUsername(username);
 
       let incomingDisplayName: string | undefined;
 
       if (pageData) {
         if (pageData.background) {
-          setBackground(pageData.background as PageBackgroundId);
+          setBackground(pageData.background);
         }
         if (pageData.sidebar_position) {
-          setDesktopSidebarPosition(
-            pageData.sidebar_position as SidebarPosition,
-          );
+          setDesktopSidebarPosition(pageData.sidebar_position);
         }
-        if (typeof pageData.display_name === "string") {
+        if (pageData.display_name) {
           incomingDisplayName = pageData.display_name;
         }
-        if (typeof pageData.bio_html === "string") {
+        if (pageData.bio_html) {
           setBioHtml(pageData.bio_html);
         }
-        if (typeof pageData.avatar_url === "string") {
+        if (pageData.avatar_url) {
           setAvatarUrl(pageData.avatar_url);
           setPersistedAvatarUrl(pageData.avatar_url);
         }
@@ -133,48 +121,9 @@ export default function EditorPage() {
 
       setDisplayName(incomingDisplayName ?? username);
 
-      const { data: blockRows } = await supabase
-        .from("blocks")
-        .select("id, type, order, content, layout, styles, viewport_mode")
-        .eq("page_username", username)
-        .order("order", { ascending: true });
+      const blocks = await BlockService.getBlocksForPage(username);
 
-      const safeBlockRows = blockRows ?? [];
-
-      const toRawStoredBlock = (row: {
-        id: unknown;
-        type: unknown;
-        order: unknown;
-        content: unknown;
-        layout: unknown;
-        styles: unknown;
-      }): RawStoredBlock => ({
-        id: String(row.id),
-        type: row.type,
-        order: row.order,
-        content: row.content,
-        layout: row.layout,
-        styles: row.styles,
-      });
-
-      const normalizeBlocksForViewport = (rawBlocks: RawStoredBlock[]) => {
-        const normalizedBlocks = normalizeStoredBlocks(rawBlocks);
-        const withLayouts = ensureBlocksHaveValidLayouts(normalizedBlocks);
-        return compactEmptyRows(withLayouts).blocks;
-      };
-
-      const desktopRawBlocks = safeBlockRows
-        .filter((row) => row.viewport_mode !== "mobile")
-        .map(toRawStoredBlock);
-
-      const mobileRawBlocks = safeBlockRows
-        .filter((row) => row.viewport_mode === "mobile")
-        .map(toRawStoredBlock);
-
-      setAllBlocks({
-        desktop: normalizeBlocksForViewport(desktopRawBlocks),
-        mobile: normalizeBlocksForViewport(mobileRawBlocks),
-      });
+      setAllBlocks(blocks);
 
       setLoading(false);
     };
