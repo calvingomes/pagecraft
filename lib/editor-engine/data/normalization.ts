@@ -1,6 +1,6 @@
 import type { Block, BlockType } from "@/types/editor";
 import type { GridLayout } from "@/types/grid";
-import { canPlaceBlockAt, findFirstFreeSpot } from "@/lib/blockGrid";
+import { canPlaceBlockAt, findFirstFreeSpot } from "../layout/collision";
 
 export type RawStoredBlock = { id: string } & Record<string, unknown>;
 

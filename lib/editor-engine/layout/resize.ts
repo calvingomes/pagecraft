@@ -1,7 +1,8 @@
 import type { Block, BlockWidthPreset } from "@/types/editor";
 import type { GridConfig } from "@/types/grid";
-import { compactEmptyRows } from "@/lib/compactEmptyRows";
-import { DESKTOP_GRID, resolveCollisions } from "@/lib/blockGrid";
+import { DESKTOP_GRID } from "../grid/grid-config";
+import { compactEmptyRows } from "../grid/compact";
+import { resolveCollisions } from "./collision";
 
 export function computeResizeAndPushUpdates(args: {
   targetBlock: Block;

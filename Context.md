@@ -7,7 +7,8 @@ PageCraft is a "link-in-bio" style page builder that allows users to create a si
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
 - **State Management**: Zustand (`editor-store`, `auth-store`)
-- **Database & Auth**: Supabase
+- **Database & Auth**: Supabase (via `lib/services/`)
+- **Core Logic**: `lib/editor-engine/` (Grid, Layout, Normalization)
 - **Styling**: CSS Modules with PostCSS (using CSS variables for theming)
 - **Drag & Drop**: @dnd-kit (Core, Sortable, Utilities)
 - **Rich Text**: Tiptap (Headless wrapper around ProseMirror)
@@ -24,12 +25,12 @@ Blocks are stored with a `viewport_mode` ('desktop' or 'mobile'). The editor loa
 ### Grid System
 - **Desktop**: 4 columns (200px cells), 25px gaps.
 - **Mobile**: 2 columns (250px cells), 40px gaps.
-- **Logic**: Centralized in `lib/blockGrid.ts`. Blocks snap to a grid.
+- **Logic**: Centralized in `lib/editor-engine/`. Blocks snap to a grid.
 - **DnD**: Shared `useGridDnd` hook handles layout, collision, and compaction for both viewports.
 
 ### Editor vs. View Mode
 - **Editor** (`/editor`): Uses `zustand` stores, `dnd-kit`, and Tiptap editors.
-- **View Page** (`/[username]`): Server Component fetches data, passes to `PageView` (Client Component). No stores, no heavy libraries. Pure React props.
+- **View Page** (`/[username]`): Server Component fetches data via `ServerPageService`, passes to `PageView` (Client Component). No stores, no heavy libraries. Pure React props.
 
 ---
 
@@ -39,7 +40,10 @@ Blocks are stored with a `viewport_mode` ('desktop' or 'mobile'). The editor loa
 
 ```
 types/          — All shared TypeScript types (no runtime code)
-lib/            — Pure logic, utilities, and external service wrappers
+lib/
+  editor-engine/ — Core editor logic (grid math, layout, collision, normalization)
+  services/      — Supabase service wrappers (auth, page, block)
+  uploads/       — Image processing and storage
 helper/         — Small pure-function helpers (no side-effects, no imports from lib/)
 stores/         — Zustand stores (thin — types live in types/)
 contexts/       — React contexts (thin — types live in types/)
@@ -81,7 +85,7 @@ styles/         — Global CSS custom properties and media queries
 
 ## 4. Grid System Constants
 
-Grid logic is centralized in `lib/blockGrid.ts`.
+Grid logic is centralized in `lib/editor-engine/`.
 
 | Field         | `DESKTOP_GRID` | `MOBILE_GRID` |
 | ------------- | -------------- | ------------- |
@@ -92,7 +96,7 @@ Grid logic is centralized in `lib/blockGrid.ts`.
 | `canvasPx`    | 875            | 540           |
 
 **Key Rules:**
-- Access grid config via `DESKTOP_GRID` or `MOBILE_GRID` imports.
+- Access grid config via `DESKTOP_GRID` or `MOBILE_GRID` imports from `lib/editor-engine/grid/grid-config.ts`.
 - Use `snapToCursor` collision detection for DnD.
 - Do not hardcode pixel values in components.
 
@@ -113,7 +117,7 @@ Grid logic is centralized in `lib/blockGrid.ts`.
 ### Editor Preview
 - The editor has a **desktop/mobile preview toggle**.
 - `PageLayout` handles the preview frame logic (`framedMobilePreview`).
-- Viewport logic is in `lib/viewportMode.ts`.
+- Viewport logic is in `lib/editor-engine/data/viewport.ts`.
 
 ## 6. State Management
 
@@ -144,5 +148,5 @@ Grid logic is centralized in `lib/blockGrid.ts`.
 1. Add interface to `types/editor.ts`.
 2. Create component in `components/blocks/`.
 3. Register in `components/builder/BlockRegistry/blockRegistry.tsx`.
-4. Add span defaults in `lib/blockGrid.ts`.
+4. Add span defaults in `lib/editor-engine/grid/grid-math.ts`.
 5. Handle toolbar action in `app/editor/page.tsx`.

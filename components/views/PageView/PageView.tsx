@@ -9,7 +9,7 @@ import type {
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
-import { getViewEffectiveSidebarPosition } from "@/lib/viewportMode";
+import { getViewEffectiveSidebarPosition } from "@/lib/editor-engine/data/viewport";
 import { useViewportMode } from "@/hooks/useViewportMode";
 
 type PageViewProps = {

@@ -1,6 +1,8 @@
 import type { Block } from "@/types/editor";
 import type { GridConfig, GridLayout, LayoutById } from "@/types/grid";
-import { clamp, DESKTOP_GRID, resolveCollisions } from "@/lib/blockGrid";
+import { DESKTOP_GRID } from "../grid/grid-config";
+import { clamp } from "../grid/grid-math";
+import { resolveCollisions } from "./collision";
 
 export type { LayoutById } from "@/types/grid";
 
@@ -12,9 +14,13 @@ export function computeTargetFromOver(
 ): GridLayout | null {
   if (overId.startsWith("cell:")) {
     const parts = overId.split(":");
+    // cell:x:y format from DroppableCell
     const x = Number(parts[1]);
     const y = Number(parts[2]);
     if (!Number.isNaN(x) && !Number.isNaN(y)) {
+      // The cell Y is in grid rows, but we need to account for rowScale (sub-rows) if applicable.
+      // DroppableCell receives y from the loop index, which corresponds to sub-rows directly.
+      // So we divide by rowScale to get logical Y.
       return {
         x: clamp(x, 0, config.cols - movingW),
         y: Math.max(0, y / config.rowScale),
@@ -22,6 +28,7 @@ export function computeTargetFromOver(
     }
   }
 
+  // If we are over a block, we target that block's position
   if (overId.startsWith("block:") || !overId.includes(":")) {
     const id = overId.replace("block:", "");
     const b = blocks.find((bl) => bl.id === id);

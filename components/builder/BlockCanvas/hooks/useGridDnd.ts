@@ -15,9 +15,9 @@ import type {
 import {
   computePushedLayouts,
   computeTargetFromOver,
-} from "@/components/builder/BlockCanvas/blockCanvasLayout";
-import { spansForPreset } from "@/lib/blockGrid";
-import { compactEmptyRows } from "@/lib/compactEmptyRows";
+} from "@/lib/editor-engine/layout/drag-placement";
+import { spansForPreset } from "@/lib/editor-engine/grid/grid-math";
+import { compactEmptyRows } from "@/lib/editor-engine/grid/compact";
 
 interface UseGridDndArgs extends Omit<UseDesktopGridDndArgs, "blocks"> {
   blocks: Block[];

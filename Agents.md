@@ -9,7 +9,13 @@ Follow them when adding features, fixing bugs, or refactoring.
 
 ```
 types/          — All shared TypeScript types (no runtime code)
-lib/            — Pure logic, utilities, and external service wrappers
+lib/
+  editor-engine/ — Core editor logic (grid math, layout, collision, normalization)
+    grid/        — Grid configuration and math
+    layout/      — Drag placement, resizing, collision detection
+    data/        — Block normalization and viewport logic
+  services/      — Supabase service wrappers (auth, page, block)
+  uploads/       — Image processing and storage
 helper/         — Small pure-function helpers (no side-effects, no imports from lib/)
 stores/         — Zustand stores (thin — types live in types/)
 contexts/       — React contexts (thin — types live in types/)
@@ -74,7 +80,7 @@ styles/         — Global CSS custom properties and media queries
 
 ## 4. Grid System Constants
 
-Grid logic is centralized in `lib/blockGrid.ts` and parameterized via `GridConfig` objects.
+Grid logic is centralized in `lib/editor-engine/` and parameterized via `GridConfig` objects.
 
 ### GridConfig Type (`types/grid.ts`)
 
@@ -104,7 +110,7 @@ type GridConfig = {
 | `subRowPx`    | 90             | 120           |
 | `subRowGapPx` | 25             | 15            |
 
-Both configs are exported from `lib/blockGrid.ts`. All code should access grid values via `DESKTOP_GRID.*` or `MOBILE_GRID.*` property access — no standalone constant aliases.
+Configs are exported from `lib/editor-engine/grid/grid-config.ts`. All code should access grid values via `DESKTOP_GRID.*` or `MOBILE_GRID.*` property access.
 
 ### BlockWidthPreset Reference (Desktop)
 
@@ -125,32 +131,34 @@ Current product behavior:
 
 ### Grid Functions (all accept optional `config: GridConfig = DESKTOP_GRID`)
 
+**Located in `lib/editor-engine/grid/grid-math.ts`:**
 - `spansForPreset(preset, config?)` → `{ w, h }` column/row spans (width clamped to `config.cols`)
 - `spansForBlock(block, overridePreset?, config?)` → block-aware spans
 - `sizePxForPreset(preset, config?)` → `{ widthPx, heightPx }` derived pixel sizes
 - `sizePxForBlock(block, config?)` → block-aware pixel dimensions (`BlockDimensions`)
 - `rectForBlock(block, layout?, config?)` → full `GridRect` geometry
+
+**Located in `lib/editor-engine/layout/collision.ts`:**
 - `canPlaceBlockAt(block, at, placed, config?)` — bounds + collision check
 - `findFirstFreeSpot(block, placed, config?)` — first available grid position
 - `resolveCollisions(anchoredId, layout, preset, blocks, getLayout, config?)` — push all blocks to non-overlapping positions
 
-Supporting parameterized files:
+**Located in `lib/editor-engine/grid/compact.ts`:**
+- `compactEmptyRows(blocks, config?)` — remove empty rows
 
-- `lib/compactEmptyRows.ts` — `compactEmptyRows(blocks, config?)` uses `config.rowScale`
-- `blockCanvasLayout.ts` — `computeTargetFromOver` and `computePushedLayouts` accept optional config
-- `resizeAndPush.ts` — `computeResizeAndPushUpdates` accepts `gridConfig` in args object
-
-Do not duplicate these functions. If you need grid math, it belongs in `blockGrid.ts`.
+**Located in `lib/editor-engine/layout/drag-placement.ts`:**
+- `computeTargetFromOver` — determine grid target from drop event
+- `computePushedLayouts` — calculate new layouts during drag
 
 **Do / Don't**
 
-- **Do:** Keep block components focused on UI + editor events; call shared layout helpers from `lib/`.
+- **Do:** Keep block components focused on UI + editor events; call shared layout helpers from `lib/editor-engine`.
 - **Do:** Pass the appropriate `GridConfig` (`DESKTOP_GRID` or `MOBILE_GRID`) when calling grid functions from viewport-specific code.
 - **Do:** Compute `BlockDimensions` in the parent canvas and pass as props — blocks should not call `sizePxForBlock` internally.
 - **Do:** Keep visual block height based on normalized content height; use quantized height for occupancy/reflow decisions.
 - **Do:** Use `snapToCursor` collision detection strategy (from `lib/dndKit.ts`) for all drag-and-drop operations to ensure items snap to the grid cell nearest the pointer.
 - **Don't:** Add per-block collision or compaction loops directly inside component files.
-- **Don't:** Hardcode grid math (`0.5`, `200`, `25`, etc.) outside `lib/blockGrid.ts`.
+- **Don't:** Hardcode grid math (`0.5`, `200`, `25`, etc.) outside `lib/editor-engine`.
 - **Don't:** Import `MOBILE_GRID` in desktop-specific components or vice versa — keep viewport concerns separated at the component layer.
 
 ---
@@ -192,7 +200,7 @@ blocks/TextBlock/
   - `BlockCanvas/mobile/MobileReadonlyBlock.tsx` — lightweight readonly block for mobile (no editor store or DnD deps). Receives `dimensions: BlockDimensions` as props.
 - **Readonly canvas paths must never import `editor-store` or DnD hooks.** Use `DesktopReadonlyBlock` / `MobileReadonlyBlock` for view pages.
 - `SortableBlock` wraps each block with drag handles, resize toolbar, and hover detection. It subscribes to `editor-store` — only use in editable paths. Receives `dimensions: BlockDimensions` and optional `gridConfig: GridConfig` as props from the parent canvas — it never calls `sizePxForBlock` internally.
-- `useGridDnd` hook (shared) — handles 2D grid collision detection, placement highlighting, and layout compaction for both Desktop and Mobile editors. Accepts `GridConfig` to adapt to different grid structures.
+- `useGridDnd` hook (shared) — handles 2D grid collision detection, placement highlighting, and layout compaction for both Desktop and Mobile editors. Consumes logic from `lib/editor-engine`.
 - `BlockHoverToolbar` uses a shared preset list and viewport-aware filtering. `max` stays available in desktop editor only; mobile editor hides `max`.
 - Hover toolbar background toggle: only `text` and `link` blocks should show the `BG` toggle control.
 - Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.
@@ -202,7 +210,7 @@ blocks/TextBlock/
 ### Editor Preview Modes (`app/editor/page.tsx` + `components/layout/PageLayout/`)
 
 - Screen buckets are defined as: desktop `>=1360`, tablet `960-1359`, mobile `<960`.
-- Viewport logic should be centralized in shared utilities (`lib/viewportMode.ts`) and hooks (`hooks/useViewportMode.ts`, `hooks/useEditorViewportPreview.ts`) instead of being hardcoded in page components.
+- Viewport logic should be centralized in `lib/editor-engine/data/viewport.ts` and hooks (`hooks/useViewportMode.ts`, `hooks/useEditorViewportPreview.ts`).
 - The editor has a **desktop/mobile preview toggle** for visual editing without resizing the browser window, but only when screen width is `>=960`.
 - `PageLayout` exposes `previewViewport` (`"desktop" | "mobile"`) and `framedMobilePreview` (boolean): editor passes `framedMobilePreview={true}` for the framed mobile preview, while view pages keep it `false` for clean public mobile layout.
 - In mobile preview mode, only page content is previewed (`ProfileSidebar` + `BlockCanvas`); editor controls (`SaveButton`, `LogoutButton`, preview toggle, bottom toolbar) remain outside the preview frame.
@@ -214,15 +222,20 @@ blocks/TextBlock/
 
 ---
 
-## 6. State Management
+## 6. State Management & Data Services
 
+- **Data Services** (`lib/services/`) handle all Supabase interactions.
+  - `auth-service.ts`: Auth operations.
+  - `page-service.ts`: Page data fetching and updates.
+  - `block-service.ts`: Block fetching and initial setup.
+  - `server-page-service.ts`: Server-side specific fetching for public pages.
 - **Zustand stores** hold transient editor and auth state.
   - `editor-store.ts` — dual block arrays (`desktopBlocks`, `mobileBlocks`), `activeViewportMode`, and viewport-scoped actions. Exports `selectActiveViewportBlocks` selector.
   - `auth-store.ts` — auth/user state.
 - Store files should be thin — just `create<StoreType>()(...)` with the type imported from `types/`.
 - Derived/computed values can use Zustand selectors in components.
 - **EditorContext** provides `onUpdateBlock` and `onRemoveBlock` to block components so they don't import the store directly.
-- **View pages (`/[username]`) must not use any Zustand store.** The server component fetches all blocks, splits by `viewport_mode`, normalizes, and passes `blocksByViewport` as props. The client `PageView` component selects visible blocks from props based on `useViewportMode()` — no store hydration needed.
+- **View pages (`/[username]`) must not use any Zustand store.** The server component fetches all blocks using `ServerPageService`, splits by `viewport_mode`, normalizes, and passes `blocksByViewport` as props. The client `PageView` component selects visible blocks from props based on `useViewportMode()` — no store hydration needed.
 
 ---
 
@@ -303,7 +316,7 @@ Used in: `EditorState.setAllBlocks`, `saveEditorPage`, server component → `Pag
 2. Add the `type` string to `BlockType`.
 3. Create `components/blocks/YourBlock/YourBlock.tsx` + `YourBlock.module.css`.
 4. Register it in `components/builder/BlockRegistry/blockRegistry.tsx`.
-5. Add span defaults in `lib/blockGrid.ts` → `spansForPreset` (if it uses a new preset).
+5. Add span defaults in `lib/editor-engine/grid/grid-math.ts` → `spansForPreset` (if it uses a new preset).
 6. Handle creation in `app/editor/page.tsx` toolbar action.
-7. Handle normalization in `lib/normalizeBlocks.ts` → `normalizeStoredBlocks`.
+7. Handle normalization in `lib/editor-engine/data/normalization.ts` → `normalizeStoredBlocks`.
 8. If the block has viewport-specific rendering, handle it in both `DesktopBlockCanvas` and `MobileCanvasGrid`.

@@ -7,7 +7,7 @@ import {
   TABLET_MAX_WIDTH,
   TABLET_MIN_WIDTH,
   resolveViewportMode,
-} from "@/lib/viewportMode";
+} from "@/lib/editor-engine/data/viewport";
 import type { ViewportMode } from "@/types/page";
 
 export function useViewportMode() {

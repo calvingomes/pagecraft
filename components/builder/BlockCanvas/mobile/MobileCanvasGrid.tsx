@@ -12,11 +12,13 @@ import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock"
 import { useEditorContext } from "@/contexts/EditorContext";
 import {
   MOBILE_GRID,
+} from "@/lib/editor-engine/grid/grid-config";
+import {
   clamp,
   rectForBlock,
   sizePxForBlock,
   spansForBlock,
-} from "@/lib/blockGrid";
+} from "@/lib/editor-engine/grid/grid-math";
 import { useGridDnd } from "@/components/builder/BlockCanvas/hooks/useGridDnd";
 import { MobileReadonlyBlock } from "./MobileReadonlyBlock";
 import { snapToCursor } from "@/lib/dndKit";

@@ -5,7 +5,7 @@ import {
   ensureBlocksHaveValidLayouts,
   normalizeStoredBlocks,
   type RawStoredBlock,
-} from "@/lib/normalizeBlocks";
+} from "@/lib/editor-engine/data/normalization";
 
 /**
  * Server-side service to fetch page data directly

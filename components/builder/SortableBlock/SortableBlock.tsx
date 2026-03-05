@@ -14,7 +14,7 @@ import { BlockHoverToolbar } from "@/components/builder/BlockHoverToolbar/BlockH
 import styles from "./SortableBlock.module.css";
 import { shouldUseTransparentWrapper } from "@/lib/blockWrapper";
 import type { SortableBlockProps } from "@/types/builder";
-import { computeResizeAndPushUpdates } from "./resizeAndPush";
+import { computeResizeAndPushUpdates } from "@/lib/editor-engine/layout/resize";
 
 export function SortableBlock({
   block,

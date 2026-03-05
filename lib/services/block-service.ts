@@ -4,8 +4,8 @@ import {
   ensureBlocksHaveValidLayouts,
   normalizeStoredBlocks,
   type RawStoredBlock,
-} from "@/lib/normalizeBlocks";
-import { compactEmptyRows } from "@/lib/compactEmptyRows";
+} from "@/lib/editor-engine/data/normalization";
+import { compactEmptyRows } from "@/lib/editor-engine/grid/compact";
 
 export const BlockService = {
   /**

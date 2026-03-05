@@ -1,6 +1,7 @@
 import type { Block } from "@/types/editor";
 import type { CompactResult, GridConfig } from "@/types/grid";
-import { DESKTOP_GRID, spansForBlock } from "@/lib/blockGrid";
+import { DESKTOP_GRID } from "./grid-config";
+import { spansForBlock } from "./grid-math";
 
 /**
  * Compacts the layout by removing *fully empty* grid rows (rows where no block

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { getEditorViewportCapabilities } from "@/lib/viewportMode";
+import { getEditorViewportCapabilities } from "@/lib/editor-engine/data/viewport";
 import { useViewportMode } from "@/hooks/useViewportMode";
 import type { PreviewViewport } from "@/types/page";
 

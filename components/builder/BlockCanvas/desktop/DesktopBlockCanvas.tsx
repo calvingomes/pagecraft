@@ -10,13 +10,13 @@ import { useMemo } from "react";
 import type { Block } from "@/types/editor";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
 import { useEditorContext } from "@/contexts/EditorContext";
+import { DESKTOP_GRID } from "@/lib/editor-engine/grid/grid-config";
 import {
-  DESKTOP_GRID,
   clamp,
   rectForBlock,
   sizePxForBlock,
   spansForBlock,
-} from "@/lib/blockGrid";
+} from "@/lib/editor-engine/grid/grid-math";
 import { useGridDnd } from "@/components/builder/BlockCanvas/hooks/useGridDnd";
 import { DesktopReadonlyBlock } from "@/components/builder/BlockCanvas/desktop/DesktopReadonlyBlock";
 import { snapToCursor } from "@/lib/dndKit";
