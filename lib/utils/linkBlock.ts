@@ -1,5 +1,5 @@
 import type { LinkBlock } from "@/types/editor";
-import { htmlToText } from "@/helper/htmlToText";
+import { htmlToText } from "@/lib/utils/htmlToText";
 
 export type { LinkMetadataResponse } from "@/types/editor";
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useEditor, EditorOptions } from "@tiptap/react";
 import { minimalRTEWithPlaceholder } from "@/lib/tiptap/minimalRichText";
-import { sanitizeMinimalRTH } from "@/helper/sanitizeRichText";
+import { sanitizeMinimalRTH } from "@/lib/utils/sanitizeRichText";
 
 type UseBlockEditorProps = {
   content: string;

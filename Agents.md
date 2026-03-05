@@ -51,7 +51,7 @@ lib/
     client.ts    — Client-side singleton
     server.ts    — Server-side client factory
   uploads/       — Image processing and storage
-helper/         — Small pure-function helpers (no side-effects, no imports from lib/)
+  utils/         — Pure utility functions (was helper/)
 stores/         — Zustand stores (thin — types live in types/)
 contexts/       — React contexts (thin — types live in types/)
 hooks/          — Shared React hooks (not tied to a single component)

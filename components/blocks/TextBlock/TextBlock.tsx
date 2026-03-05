@@ -6,7 +6,7 @@ import { useEditorContext } from "@/contexts/EditorContext";
 import {
   minimalRTHtmlToInlineForClamp,
   sanitizeMinimalRTH,
-} from "@/helper/sanitizeRichText";
+} from "@/lib/utils/sanitizeRichText";
 import { useBlockEditor } from "@/hooks/useBlockEditor";
 import styles from "./TextBlock.module.css";
 

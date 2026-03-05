@@ -11,11 +11,11 @@ import {
   resolveLinkTitle,
   shouldAutoApplyFetchedTitle,
   type LinkMetadataResponse,
-} from "@/helper/linkBlock";
+} from "@/lib/utils/linkBlock";
 import {
   minimalRTHtmlToInlineForClamp,
   sanitizeMinimalRTH,
-} from "@/helper/sanitizeRichText";
+} from "@/lib/utils/sanitizeRichText";
 import { useLinkMetadata } from "@/hooks/useLinkMetadata";
 import { useBlockEditor } from "@/hooks/useBlockEditor";
 import styles from "./LinkBlock.module.css";
