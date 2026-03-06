@@ -13,63 +13,72 @@ export function compactEmptyRows(
 ): CompactResult {
   if (blocks.length === 0) return { blocks, changedIds: new Set() };
 
-  const rects = blocks.map((b) => {
+  type RectSub = { id: string; ySub: number; hSub: number; originalY: number };
+  const rects: RectSub[] = [];
+
+  for (const b of blocks) {
     const { h } = spansForBlock(b, undefined, config);
     const y = Math.max(0, b.layout?.y ?? 0);
-    return {
+    rects.push({
       id: b.id,
       ySub: Math.round(y * config.rowScale),
       hSub: Math.max(1, Math.round(h * config.rowScale)),
-    };
-  });
-
-  const maxBottomSub = rects.reduce(
-    (acc, r) => Math.max(acc, r.ySub + r.hSub),
-    0,
-  );
-  if (maxBottomSub <= 0) return { blocks, changedIds: new Set() };
-
-  const covered = Array.from({ length: maxBottomSub }, () => false);
-  for (const r of rects) {
-    for (
-      let ySub = r.ySub;
-      ySub < r.ySub + r.hSub && ySub < covered.length;
-      ySub++
-    ) {
-      covered[ySub] = true;
-    }
+      originalY: b.layout?.y ?? 0,
+    });
   }
 
-  const hasAnyBlank = covered.some((c) => !c);
-  if (!hasAnyBlank) return { blocks, changedIds: new Set() };
+  // Find max bottom
+  const maxBottomSub = rects.reduce((acc, r) => Math.max(acc, r.ySub + r.hSub), 0);
+  if (maxBottomSub <= 0) return { blocks, changedIds: new Set() };
 
-  const blanksBeforeRow = new Array<number>(maxBottomSub + 1);
+  // Sweep coverage using fast TypedArrays
+  const covered = new Uint8Array(maxBottomSub);
+  for (const r of rects) {
+    covered.fill(1, r.ySub, Math.min(r.ySub + r.hSub, maxBottomSub));
+  }
+
+  // Early exit if no blanks
+  if (covered.indexOf(0) === -1) {
+    return { blocks, changedIds: new Set() };
+  }
+
+  // Prefix sum of blanks
+  const blanksBeforeRow = new Int32Array(maxBottomSub + 1);
   let blanks = 0;
-  blanksBeforeRow[0] = 0;
   for (let ySub = 0; ySub < maxBottomSub; ySub++) {
-    if (!covered[ySub]) blanks++;
+    if (covered[ySub] === 0) blanks++;
     blanksBeforeRow[ySub + 1] = blanks;
   }
 
   const changedIds = new Set<string>();
-  const nextBlocks = blocks.map((b) => {
-    const currentYSub = Math.round(
-      Math.max(0, b.layout?.y ?? 0) * config.rowScale,
-    );
-    const shiftSub = blanksBeforeRow[Math.min(currentYSub, maxBottomSub)] ?? 0;
-    const nextYSub = Math.max(0, currentYSub - shiftSub);
-    const nextY = nextYSub / config.rowScale;
+  const shiftMap = new Map<string, number>();
 
-    if (!b.layout) return b;
-    if (nextY === b.layout.y) return b;
-    changedIds.add(b.id);
-    return {
-      ...b,
-      layout: {
-        ...b.layout,
-        y: nextY,
-      },
-    };
+  for (const r of rects) {
+    const shiftSub = blanksBeforeRow[Math.min(r.ySub, maxBottomSub)];
+    if (shiftSub > 0) {
+      const nextYSub = Math.max(0, r.ySub - shiftSub);
+      const nextY = nextYSub / config.rowScale;
+      if (nextY !== r.originalY) {
+        shiftMap.set(r.id, nextY);
+        changedIds.add(r.id);
+      }
+    }
+  }
+
+  if (changedIds.size === 0) return { blocks, changedIds };
+
+  const nextBlocks = blocks.map((b) => {
+    const nextY = shiftMap.get(b.id);
+    if (nextY !== undefined && b.layout) {
+      return {
+        ...b,
+        layout: {
+          ...b.layout,
+          y: nextY,
+        },
+      };
+    }
+    return b;
   });
 
   return { blocks: nextBlocks, changedIds };

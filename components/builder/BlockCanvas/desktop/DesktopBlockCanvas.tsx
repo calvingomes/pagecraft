@@ -35,7 +35,9 @@ export const DesktopBlockCanvas = ({
   onUpdateBlock,
 }: DesktopBlockCanvasProps) => {
   const editor = useEditorContext();
-  const applyUpdate = onUpdateBlock ?? (() => undefined);
+  const applyUpdate = useMemo(() => {
+    return onUpdateBlock ?? (() => undefined);
+  }, [onUpdateBlock]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

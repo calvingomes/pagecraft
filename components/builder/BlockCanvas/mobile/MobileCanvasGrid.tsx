@@ -40,8 +40,9 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
   const { editable, blocks } = props;
   const editor = useEditorContext();
 
-  const applyUpdate =
-    editable && props.onUpdateBlock ? props.onUpdateBlock : () => undefined;
+  const applyUpdate = useMemo(() => {
+    return props.editable ? props.onUpdateBlock : () => undefined;
+  }, [props]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

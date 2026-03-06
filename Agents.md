@@ -177,6 +177,10 @@ Current product behavior:
 - `canPlaceBlockAt(block, at, placed, config?)` — bounds + collision check
 - `findFirstFreeSpot(block, placed, config?)` — first available grid position
 - `resolveCollisions(anchoredId, layout, preset, blocks, getLayout, config?)` — push all blocks to non-overlapping positions
+  *(Uses `OccupancyGrid` internally for fast O(1) coordinate mapping instead of recursive overlaps checks)*
+
+**Located in `lib/editor-engine/grid/occupancy.ts`:**
+- `OccupancyGrid` class — O(1) spatial map for tracking filled sub-rows on the canvas.
 
 **Located in `lib/editor-engine/grid/compact.ts`:**
 - `compactEmptyRows(blocks, config?)` — remove empty rows
@@ -236,6 +240,7 @@ blocks/TextBlock/
 - **Readonly canvas paths must never import `editor-store` or DnD hooks.** Use `DesktopReadonlyBlock` / `MobileReadonlyBlock` for view pages.
 - `SortableBlock` wraps each block with drag handles, resize toolbar, and hover detection. It subscribes to `editor-store` — only use in editable paths. Receives `dimensions: BlockDimensions` and optional `gridConfig: GridConfig` as props from the parent canvas — it never calls `sizePxForBlock` internally.
 - `useGridDnd` hook (shared) — handles 2D grid collision detection, placement highlighting, and layout compaction for both Desktop and Mobile editors. Consumes logic from `lib/editor-engine`.
+  - **CRITICAL:** The `updateBlock` callback function passed into `useGridDnd` must **ALWAYS** be wrapped in a `useMemo` hook with stable dependencies. Failing to memoize the function pointer will cause an infinite `Maximum update depth exceeded` loop when the DND sensors pick up the layout changes.
 - `BlockHoverToolbar` uses a shared preset list and viewport-aware filtering. `max` stays available in desktop editor only; mobile editor hides `max`.
 - Hover toolbar background toggle: only `text` and `link` blocks should show the `BG` toggle control.
 - Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.
