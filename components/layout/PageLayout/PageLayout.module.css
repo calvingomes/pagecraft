@@ -29,7 +29,7 @@
 
 @media (--bp-mobile) {
   .pageLayout {
-    justify-content: flex-start;
+    filter: blur(15px);
   }
 
   .inner {
