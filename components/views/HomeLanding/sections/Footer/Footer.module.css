@@ -6,7 +6,6 @@
   color: var(--color-black);
   padding: 80px 0 40px;
   overflow: hidden;
-  position: relative;
 }
 
 .footerContainer {
@@ -15,7 +14,6 @@
   gap: 120px;
 }
 
-/* --- Top Section: Heading + Links --- */
 .footerTop {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -55,27 +53,23 @@
   opacity: 1;
 }
 
-/* --- Middle Section: Big Brand Text --- */
 .footerBrandContainer {
   width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden; /* For reveal animation */
 }
 
 .footerBrandText {
-  font-size: clamp(60px, 18vw, 280px); /* Responsive massive text */
+  font-size: clamp(40px, 13vw, 200px);
   font-weight: 500;
-  line-height: 0.8;
+  line-height: 1;
   letter-spacing: -0.04em;
   text-align: center;
   margin: 0;
-  /* Clip the text slightly if needed or just let it span */
   white-space: nowrap;
 }
 
-/* --- Bottom Section: Legal/Meta --- */
 .footerBottom {
   display: flex;
   justify-content: space-between;
@@ -102,13 +96,12 @@
   color: var(--color-black);
 }
 
-/* --- Responsive --- */
 @media (--bp-tablet) {
   .footerTop {
     grid-template-columns: 1fr;
     gap: 60px;
   }
-  
+
   .footerLinksGrid {
     grid-template-columns: repeat(2, 1fr);
     width: 100%;
@@ -134,7 +127,7 @@
   }
 
   .footerLinksGrid {
-    grid-template-columns: 1fr; /* Stack links on mobile */
+    grid-template-columns: 1fr;
     gap: 40px;
   }
 
@@ -145,6 +138,6 @@
   }
 
   .footerBrandText {
-    font-size: 18vw; /* Still big relative to screen */
+    font-size: 15vw;
   }
 }
