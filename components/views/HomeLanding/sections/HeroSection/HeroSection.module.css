@@ -32,11 +32,11 @@
 .brandLogo {
   width: 24px;
   height: 24px;
-  width: 0; 
-  height: 0; 
+  width: 0;
+  height: 0;
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
-  border-bottom: 20px solid #4285F4;
+  border-bottom: 20px solid #4285f4;
   border-radius: 4px;
 }
 
@@ -73,7 +73,9 @@
   font-size: 16px;
   font-weight: 500;
   text-decoration: none;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .primaryButton:hover {
@@ -103,14 +105,14 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: 
-    radial-gradient(circle at 15% 25%, #4285F4 2px, transparent 3px),
-    radial-gradient(circle at 85% 15%, #EA4335 2px, transparent 3px),
-    radial-gradient(circle at 25% 85%, #FBBC04 2px, transparent 3px),
-    radial-gradient(circle at 75% 75%, #34A853 2px, transparent 3px),
-    radial-gradient(circle at 50% 50%, #4285F4 2px, transparent 3px),
-    radial-gradient(circle at 10% 60%, #EA4335 2px, transparent 3px),
-    radial-gradient(circle at 90% 40%, #FBBC04 2px, transparent 3px);
+  background-image:
+    radial-gradient(circle at 15% 25%, #4285f4 2px, transparent 3px),
+    radial-gradient(circle at 85% 15%, #ea4335 2px, transparent 3px),
+    radial-gradient(circle at 25% 85%, #fbbc04 2px, transparent 3px),
+    radial-gradient(circle at 75% 75%, #34a853 2px, transparent 3px),
+    radial-gradient(circle at 50% 50%, #4285f4 2px, transparent 3px),
+    radial-gradient(circle at 10% 60%, #ea4335 2px, transparent 3px),
+    radial-gradient(circle at 90% 40%, #fbbc04 2px, transparent 3px);
   background-size: 400px 400px;
   opacity: 0.6;
   z-index: 1;
