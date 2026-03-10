@@ -105,6 +105,7 @@ styles/         — Global CSS custom properties and media queries
   className={`${layoutStyles.container} ${styles.container}`}
   ```
 - Use `@import "@styles/media.css"` at the top of any module that needs responsive breakpoints.
+- **No comments in CSS files.** Keep them clean and purely functional.
 
 ### Breakpoint Ranges
 
@@ -168,7 +169,6 @@ Current product behavior:
 ### Grid Functions (all accept optional `config: GridConfig = DESKTOP_GRID`)
 
 **Located in `lib/editor-engine/grid/grid-math.ts`:**
-
 - `spansForPreset(preset, config?)` → `{ w, h }` column/row spans (width clamped to `config.cols`)
 - `spansForBlock(block, overridePreset?, config?)` → block-aware spans
 - `sizePxForPreset(preset, config?)` → `{ widthPx, heightPx }` derived pixel sizes
@@ -176,22 +176,18 @@ Current product behavior:
 - `rectForBlock(block, layout?, config?)` → full `GridRect` geometry
 
 **Located in `lib/editor-engine/layout/collision.ts`:**
-
 - `canPlaceBlockAt(block, at, placed, config?)` — bounds + collision check
 - `findFirstFreeSpot(block, placed, config?)` — first available grid position
 - `resolveCollisions(anchoredId, layout, preset, blocks, getLayout, config?)` — push all blocks to non-overlapping positions
   *(Uses `OccupancyGrid` internally for fast O(1) coordinate mapping instead of recursive overlaps checks)*
 
 **Located in `lib/editor-engine/grid/occupancy.ts`:**
-
 - `OccupancyGrid` class — O(1) spatial map for tracking filled sub-rows on the canvas.
 
 **Located in `lib/editor-engine/grid/compact.ts`:**
-
 - `compactEmptyRows(blocks, config?)` — remove empty rows
 
 **Located in `lib/editor-engine/layout/drag-placement.ts`:**
-
 - `computeTargetFromOver` — determine grid target from drop event
 - `computePushedLayouts` — calculate new layouts during drag
 
