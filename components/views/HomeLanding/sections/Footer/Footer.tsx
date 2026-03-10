@@ -5,40 +5,54 @@ import styles from "./Footer.module.css";
 export function Footer() {
   return (
     <footer className={styles.footer} aria-label="Footer">
-      <div className={layoutStyles.container}>
-        <div id="careers" className={styles.srOnly} />
+      <div className={`${layoutStyles.container} ${styles.footerContainer}`}>
+        
+        {/* Top Section: Heading & Links */}
         <div className={styles.footerTop}>
-          <div className={styles.footerMark} aria-hidden="true" />
-          <div className={styles.footerCols}>
-            <div className={styles.footerCol}>
-              <div className={styles.footerHeading}>Product</div>
-              <Link href="#products" className={styles.footerLink}>
-                Products
-              </Link>
-              <Link href="#customers" className={styles.footerLink}>
-                Customers
-              </Link>
+          <h2 className={styles.footerHeadline}>
+            Experience the future<br />of page building.
+          </h2>
+
+          <div className={styles.footerLinksGrid}>
+            {/* Column 1 */}
+            <div className={styles.footerLinkColumn}>
+              <Link href="#" className={styles.footerLink}>Download</Link>
+              <Link href="#" className={styles.footerLink}>Product</Link>
+              <Link href="#" className={styles.footerLink}>Docs</Link>
+              <Link href="#" className={styles.footerLink}>Changelog</Link>
             </div>
-            <div className={styles.footerCol}>
-              <div className={styles.footerHeading}>Company</div>
-              <Link href="/auth" className={styles.footerLink}>
-                Sign in
-              </Link>
-              <Link href="/claim" className={styles.footerLink}>
-                Book a demo
-              </Link>
-            </div>
-            <div className={styles.footerCol}>
-              <div className={styles.footerHeading}>Legal</div>
-              <Link href="/" className={styles.footerLink}>
-                Terms
-              </Link>
-              <Link href="/" className={styles.footerLink}>
-                Privacy
-              </Link>
+
+            {/* Column 2 */}
+            <div className={styles.footerLinkColumn}>
+              <Link href="#" className={styles.footerLink}>Blog</Link>
+              <Link href="#" className={styles.footerLink}>Pricing</Link>
+              <Link href="#" className={styles.footerLink}>Use Cases</Link>
+              <Link href="/auth" className={styles.footerLink}>Sign In</Link>
             </div>
           </div>
         </div>
+
+        {/* Middle Section: Big Brand Text */}
+        <div className={styles.footerBrandContainer}>
+          <h1 className={styles.footerBrandText}>
+            PageCraft
+          </h1>
+        </div>
+
+        {/* Bottom Section: Legal & Meta */}
+        <div className={styles.footerBottom}>
+          <div className={styles.footerBottomLeft}>
+            <span className={styles.footerLogo}>PageCraft</span>
+            <Link href="#" className={styles.footerBottomLink}>About PageCraft</Link>
+            <Link href="#" className={styles.footerBottomLink}>Products</Link>
+          </div>
+          
+          <div className={styles.footerBottomRight}>
+            <Link href="#" className={styles.footerBottomLink}>Privacy</Link>
+            <Link href="#" className={styles.footerBottomLink}>Terms</Link>
+          </div>
+        </div>
+
       </div>
     </footer>
   );
