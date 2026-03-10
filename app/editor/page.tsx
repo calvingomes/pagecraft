@@ -254,8 +254,10 @@ export default function EditorPage() {
       onUpdateBlock={handleUpdateBlock}
       onRemoveBlock={handleRemoveBlock}
     >
-      <div className={styles.actions}>
+      <div className={styles.saveButtonContainer}>
         <SaveButton onSave={handleSave} saving={isSaving} />
+      </div>
+      <div className={styles.logoutButtonContainer}>
         <LogoutButton />
       </div>
       {canTogglePreview && (
