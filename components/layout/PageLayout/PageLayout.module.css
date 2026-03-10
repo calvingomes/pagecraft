@@ -6,13 +6,12 @@
   --layout-content-max: 875px;
   --layout-gap: 40px;
   --layout-gutter: 24px;
-  --page-avatar-bg: rgb(15, 15, 15);
 
   display: flex;
   justify-content: center;
   min-height: 100vh;
   padding-top: 100px;
-  background: var(--color-page-bg-1);
+  background: var(--page-bg);
   padding-bottom: 80px;
 }
 
@@ -51,12 +50,11 @@
   gap: 0;
   width: 100%;
   max-width: 580px;
-  background: var(--color-white);
+  background: var(--page-bg);
   border: 1px solid var(--color-border-subtle);
   border-radius: 20px;
   overflow: hidden;
   padding: 20px;
-  background: #fcf8ff;
 }
 
 .pageLayout[data-preview="mobile"][data-framed-mobile-preview="true"]
@@ -155,39 +153,10 @@
   align-self: auto;
   flex: 0 0 auto;
   max-width: 100%;
+  color: #a3a3a3;
 }
 
 .pageLayout[data-preview="mobile"][data-framed-mobile-preview="true"]
   .contentSlot {
   max-width: 100%;
-}
-
-.pageLayout[data-bg="page-bg-1"] {
-  background: var(--color-page-bg-1);
-  --page-avatar-bg: var(--color-page-avatar-1);
-}
-
-.pageLayout[data-bg="page-bg-2"] {
-  background: var(--color-page-bg-2);
-  --page-avatar-bg: var(--color-page-avatar-2);
-}
-
-.pageLayout[data-bg="page-bg-3"] {
-  background: var(--color-page-bg-3);
-  --page-avatar-bg: var(--color-page-avatar-3);
-}
-
-.pageLayout[data-bg="page-bg-4"] {
-  background: var(--color-page-bg-4);
-  --page-avatar-bg: var(--color-page-avatar-4);
-}
-
-.pageLayout[data-bg="page-bg-5"] {
-  background: var(--color-page-bg-5);
-  --page-avatar-bg: var(--color-page-avatar-5);
-}
-
-.pageLayout[data-bg="page-bg-6"] {
-  background: var(--color-page-bg-6);
-  --page-avatar-bg: var(--color-page-avatar-6);
 }
