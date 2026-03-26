@@ -1,11 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import { AuthService } from "@/lib/services/auth.client";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
-import AuthView from "@/components/views/AuthView/AuthView";
 import { useSearchParams } from "next/navigation";
+import AuthView from "@/components/views/AuthView/AuthView";
 
-export default function AuthPage() {
+function AuthPageContent() {
   const { authChecked } = useAuthGuard("auth");
   const searchParams = useSearchParams();
   const initialUsername = searchParams.get("username") ?? undefined;
@@ -23,5 +24,13 @@ export default function AuthPage() {
       handleGoogleSignIn={handleGoogleSignIn}
       initialUsername={initialUsername}
     />
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense>
+      <AuthPageContent />
+    </Suspense>
   );
 }
