@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Laptop, Smartphone } from "lucide-react";
 import {
   selectActiveViewportBlocks,
@@ -16,9 +17,9 @@ import type {
   PageBackgroundId,
   SidebarPosition,
 } from "@/types/page";
+import { AuthService } from "@/lib/services/auth.client";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
-import { LogoutButton } from "@/components/layout/LogoutButton/LogoutButton";
-import { SaveButton } from "@/components/layout/SaveButton/SaveButton";
+import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
@@ -34,7 +35,9 @@ import { prepareImageBlockOptions } from "@/lib/editor/prepareImageBlockOptions"
 import styles from "./editor.module.css";
 
 export default function EditorPage() {
+  const router = useRouter();
   const { username, user, loading, setLoading } = useAuthStore();
+  const logout = useAuthStore((s) => s.logout);
   const { authChecked } = useAuthGuard("editor");
   const desktopBlocks = useEditorStore((s) => s.desktopBlocks);
   const mobileBlocks = useEditorStore((s) => s.mobileBlocks);
@@ -55,6 +58,13 @@ export default function EditorPage() {
   const [persistedAvatarUrl, setPersistedAvatarUrl] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveOverlay, setShowSaveOverlay] = useState(false);
+
+  const handleLogout = async () => {
+    await AuthService.signOut();
+    logout();
+    router.replace("/auth");
+  };
+
   const { screenView, previewView, setPreviewView, canTogglePreview } =
     useEditorViewportPreview();
 
@@ -255,10 +265,21 @@ export default function EditorPage() {
       onRemoveBlock={handleRemoveBlock}
     >
       <div className={styles.saveButtonContainer}>
-        <SaveButton onSave={handleSave} saving={isSaving} />
+        <ThemeButton
+          label={isSaving ? "Saving..." : "Save"}
+          cta={handleSave}
+          bgColor="#f6d045"
+          textColor="#0e220e"
+          disabled={isSaving}
+        />
       </div>
       <div className={styles.logoutButtonContainer}>
-        <LogoutButton />
+        <ThemeButton
+          label="Sign out"
+          cta={handleLogout}
+          bgColor="transparent"
+          textColor="#0e220e"
+        />
       </div>
       {canTogglePreview && (
         <div className={styles.previewToggle}>
