@@ -1,73 +1,79 @@
-import Image from "next/image";
-import layoutStyles from "../../LandingLayout.module.css";
 import styles from "./FeaturesSection.module.css";
 import type { FeatureItem } from "./FeaturesSection.types";
 
-// Data for the features
+const CARD_STICKY_BASE = 120;
+const CARD_STICKY_STEP = 20;
+const CARD_COLORS = [
+  "var(--color-landing-card-1)",
+  "var(--color-landing-card-2)",
+  "var(--color-landing-card-3)",
+];
+
 const FEATURES: FeatureItem[] = [
   {
-    id: "ai-ide-core",
-    title: "An AI IDE Core",
-    description: "Google Antigravity's Editor view offers tab autocompletion, natural language code commands, and a configurable, and context-aware configurable agent.",
+    id: "personal-page",
+    title: "Your link, your brand",
+    description:
+      "One link to share your work, social profiles, and anything else that matters. Fully yours.",
     mediaType: "image",
-    mediaSrc: "/images/features/ai-ide-core.png", // Placeholder path
-    mediaAlt: "AI IDE Core Interface showing code autocompletion"
+    mediaSrc: "",
+    mediaAlt: "Personal page preview",
   },
   {
-    id: "cross-surface-agents",
-    title: "Cross-surface Agents",
-    description: "Synchronized agentic control across your editor, terminal, and browser for powerful development workflows.",
+    id: "drag-drop",
+    title: "Drag, drop, done",
+    description:
+      "Build your page with a visual grid editor. No code. No templates forcing your hand.",
     mediaType: "image",
-    mediaSrc: "/images/features/cross-surface-agents.png", // Placeholder path
-    mediaAlt: "Agent interface showing cross-surface capabilities"
+    mediaSrc: "",
+    mediaAlt: "Drag and drop editor",
   },
   {
-    id: "user-feedback",
-    title: "User Feedback",
-    description: "Intuitively integrate feedback across surfaces and artifacts to guide and refine the agent's work.",
+    id: "mobile-desktop",
+    title: "Looks great everywhere",
+    description:
+      "Edit your desktop and mobile layouts independently. Your page adapts to every screen.",
     mediaType: "image",
-    mediaSrc: "/images/features/user-feedback.png", // Placeholder path
-    mediaAlt: "User feedback interface showing refinement options"
-  }
+    mediaSrc: "",
+    mediaAlt: "Responsive layout preview",
+  },
 ];
 
 export function FeaturesSection() {
   return (
-    <section className={styles.section} aria-label="Key Features">
-      <div className={layoutStyles.container}>
+    <section className={styles.section} aria-label="Features">
+      <div className={styles.container}>
+      <div className={styles.stack}>
         {FEATURES.map((feature, index) => (
-          <div 
-            key={feature.id} 
-            className={`${styles.featureRow} ${index % 2 !== 0 ? styles.reversed : ''}`}
+          <div
+            key={feature.id}
+            className={styles.card}
+            style={{
+              top: CARD_STICKY_BASE + index * CARD_STICKY_STEP,
+              zIndex: index + 1,
+              backgroundColor: CARD_COLORS[index],
+            }}
           >
-            {/* Text Content */}
             <div className={styles.textContent}>
               <h2 className={styles.title}>{feature.title}</h2>
               <p className={styles.description}>{feature.description}</p>
             </div>
 
-            {/* Media Content */}
-            <div className={styles.mediaContainer}>
-              {feature.mediaType === "video" ? (
-                <video 
-                  src={feature.mediaSrc} 
-                  className={styles.mediaAsset}
-                  autoPlay 
-                  muted 
-                  loop 
-                  playsInline
-                  aria-label={feature.mediaAlt}
+            <div className={styles.media}>
+              {feature.mediaSrc ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={feature.mediaSrc}
+                  alt={feature.mediaAlt}
+                  className={styles.mediaImage}
                 />
               ) : (
-                /* Using a simple div placeholder if image fails to load, or Next/Image */
-                <div style={{ width: '100%', height: '100%', background: '#F0F4F8', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8899A6' }}>
-                   {/* In a real app, use <Image /> here. For now, text placeholder to prevent broken image icons */}
-                   <span>{feature.mediaAlt} Placeholder</span>
-                </div>
+                <span>{feature.mediaAlt}</span>
               )}
             </div>
           </div>
         ))}
+      </div>
       </div>
     </section>
   );
