@@ -1,7 +1,7 @@
 import styles from "./FeaturesSection.module.css";
 import type { FeatureItem } from "./FeaturesSection.types";
 
-const CARD_STICKY_BASE = 120;
+const CARD_STICKY_BASE = 220;
 const CARD_STICKY_STEP = 20;
 const CARD_COLORS = [
   "var(--color-landing-card-1)",
