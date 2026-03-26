@@ -2,11 +2,7 @@
 
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/Button/Button";
-
-type SaveButtonProps = {
-  onSave: () => Promise<void>;
-  saving: boolean;
-};
+import type { SaveButtonProps } from "./SaveButton.types";
 
 export function SaveButton({ onSave, saving }: SaveButtonProps) {
   return (

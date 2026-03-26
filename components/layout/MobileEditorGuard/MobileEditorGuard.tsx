@@ -1,11 +1,5 @@
 import { OverlayPopup } from "@/components/layout/OverlayPopup/OverlayPopup";
-
-type MobileEditorGuardProps = {
-  open: boolean;
-  message?: string;
-  showCloseButton?: boolean;
-  onClose?: () => void;
-};
+import type { MobileEditorGuardProps } from "./MobileEditorGuard.types";
 
 export const MobileEditorGuard = ({
   open,

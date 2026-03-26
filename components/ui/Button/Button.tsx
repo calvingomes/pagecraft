@@ -1,13 +1,6 @@
-import { ButtonHTMLAttributes, ReactNode } from "react";
 import { Loader2 } from "lucide-react";
 import styles from "./Button.module.css";
-
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  isLoading?: boolean;
-  leftIcon?: ReactNode;
-  rightIcon?: ReactNode;
-  variant?: "primary" | "secondary" | "ghost";
-};
+import type { ButtonProps } from "./Button.types";
 
 export function Button({
   children,

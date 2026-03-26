@@ -1,21 +1,9 @@
 "use client";
 
-import React, { useEffect, ReactNode } from "react";
-import type {
-  PageBackgroundId,
-  PreviewViewport,
-  SidebarPosition,
-} from "@/types/page";
+import React, { useEffect } from "react";
 import { PAGE_THEMES, DEFAULT_PAGE_THEME } from "@/lib/page-theme";
 import styles from "./PageLayout.module.css";
-
-type PageLayoutProps = {
-  children: ReactNode;
-  background?: PageBackgroundId;
-  sidebarPosition?: SidebarPosition;
-  previewViewport?: PreviewViewport;
-  framedMobilePreview?: boolean;
-};
+import type { PageLayoutProps } from "./PageLayout.types";
 
 export function PageLayout({
   children,

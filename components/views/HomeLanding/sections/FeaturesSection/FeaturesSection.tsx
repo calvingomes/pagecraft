@@ -1,16 +1,7 @@
 import Image from "next/image";
 import layoutStyles from "../../LandingLayout.module.css";
 import styles from "./FeaturesSection.module.css";
-
-// Define the feature item type
-type FeatureItem = {
-  id: string;
-  title: string;
-  description: string;
-  mediaType: "image" | "video";
-  mediaSrc: string;
-  mediaAlt: string;
-};
+import type { FeatureItem } from "./FeaturesSection.types";
 
 // Data for the features
 const FEATURES: FeatureItem[] = [

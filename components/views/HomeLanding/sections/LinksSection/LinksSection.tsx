@@ -1,12 +1,7 @@
 import Link from "next/link";
 import layoutStyles from "../../LandingLayout.module.css";
 import styles from "./LinksSection.module.css";
-
-type HomeLink = {
-  title: string;
-  description: string;
-  href: string;
-};
+import type { HomeLink } from "./LinksSection.types";
 
 const LINKS: HomeLink[] = [
   {
