@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 import styles from "./Navbar.module.css";
+import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 
 const LEFT_ITEMS = [
   { label: "Products", href: "#products" },
   { label: "Customers", href: "#customers" },
-  { label: "Careers", href: "#careers" },
 ];
 
 const Navbar = () => {
@@ -24,9 +25,13 @@ const Navbar = () => {
       <nav className={styles.nav}>
         <div className={styles.navItemsLeft}>
           {LEFT_ITEMS.map((item) => (
-            <Link key={item.href} href={item.href} className={styles.navLink}>
-              {item.label}
-            </Link>
+            <ThemeButton
+              key={item.href}
+              label={item.label}
+              cta={item.href}
+              bgColor="transparent"
+              textColor="#0e220e"
+            />
           ))}
         </div>
 
@@ -35,12 +40,20 @@ const Navbar = () => {
         </Link>
 
         <div className={styles.navItemsRight}>
-          <Link href="/auth" className={styles.navButton}>
-            Sign in
-          </Link>
-          <Link href="/claim" className={styles.navCta}>
-            Book a demo
-          </Link>
+          <ThemeButton
+            label="Sign in"
+            cta="/auth"
+            bgColor="transparent"
+            textColor="#0e220e"
+          />
+          <ThemeButton
+            label="Claim Page"
+            cta="/claim"
+            icon={ArrowRight}
+            bgColor="#f6d045"
+            textColor="#0e220e"
+            iconCircle={false}
+          />
         </div>
       </nav>
       <Image

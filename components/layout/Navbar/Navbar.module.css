@@ -28,61 +28,32 @@
   width: 100%;
   max-width: 900px;
   height: 84px;
-  background: var(--color-white);
-  border-bottom-left-radius: var(--radius-xl);
-  border-bottom-right-radius: var(--radius-xl);
+  background: #ffffff;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
   padding: 0 24px;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  box-shadow: var(--shadow-xs);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .navItemsLeft,
 .navItemsRight {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 4px;
 }
 
 .navItemsRight {
   justify-content: flex-end;
 }
 
-.navLink {
-  font-size: var(--font-size-md);
-  color: var(--color-text-primary);
-  text-decoration: none;
-  padding: 3px 14px;
-  border-radius: var(--radius-xl);
-}
-
-.navLink:hover {
-  background-color: var(--color-bg-hover);
-}
-
 .navLogo {
-  font-size: var(--font-size-xl);
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-
-.navButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 14px;
-  border-radius: var(--radius-xl);
-  border: 1px solid var(--color-border-subtle);
-  background: transparent;
-  font-size: var(--font-size-md);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  white-space: nowrap;
-}
-
-.navButton:hover {
-  background-color: var(--color-bg-hover);
+  font-size: 20px;
+  font-weight: 700;
+  color: #0e220e;
+  text-decoration: none;
 }
 
 @media (--bp-mobile) {
@@ -101,37 +72,10 @@
   }
 
   .navItemsRight {
-    gap: 12px;
-  }
-
-  /* Keep just the CTA on small screens */
-  .navItemsRight a:first-child {
-    display: none;
-  }
-
-  .navCta {
-    padding: 10px 14px;
-    font-size: var(--font-size-sm);
-  }
-
-  .navLogo {
-    font-size: var(--font-size-lg);
+    gap: 8px;
   }
 
   .cornerSvg {
     display: none;
   }
-}
-
-.navCta {
-  background: var(--color-brand-accent);
-  color: var(--color-text-primary);
-  padding: 12px 24px;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-md);
-  text-decoration: none;
-  white-space: nowrap;
-  font-weight: 700;
-  border: 1px solid
-    color-mix(in srgb, var(--color-text-primary) 12%, transparent);
 }
