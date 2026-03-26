@@ -7,97 +7,108 @@
   overflow: hidden;
 }
 
-/* --- Left Side: Carousel (60%) --- */
-.carouselSection {
+/* ---- Left Panel (60%) ---- */
+.leftPanel {
   flex: 0 0 60%;
-  background-color: #000;
+  background: #0e220e;
   position: relative;
   display: flex;
   flex-direction: column;
-  color: #ffffff;
-}
-
-.carouselLogo {
-  position: absolute;
-  top: 40px;
-  left: 40px;
-  z-index: 10;
-  font-weight: 700;
-  font-size: 24px;
-  letter-spacing: 0.05em;
+  padding: 48px 56px;
+  overflow: hidden;
 }
 
 .backLink {
-  position: absolute;
-  top: 40px;
-  right: 40px;
-  z-index: 10;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  padding: 8px 16px;
-  border-radius: 9999px;
   font-size: 14px;
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.55);
   text-decoration: none;
-  transition: background 200ms ease;
+  width: fit-content;
+  transition: color 150ms ease;
 }
 
 .backLink:hover {
-  background: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
 }
 
-.swiperContainer {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-}
-
-.slideImage {
-  object-fit: cover;
-}
-
-.slideOverlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 50%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+.leftContent {
+  margin-top: auto;
+  margin-bottom: auto;
+  position: relative;
   z-index: 2;
 }
 
-.slideContent {
+.wordmark {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.tagline {
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* Decorative stacked cards */
+.cardStack {
   position: absolute;
-  bottom: 80px;
-  left: 60px;
+  bottom: -60px;
+  right: -40px;
+  width: 420px;
+  height: 340px;
+  pointer-events: none;
+}
+
+.decorCard {
+  position: absolute;
+  width: 340px;
+  height: 220px;
+  border-radius: 20px;
+}
+
+.decorCard1 {
+  background: #FCF2CB;
+  bottom: 0;
+  right: 0;
+  transform: rotate(8deg);
+  opacity: 0.9;
+}
+
+.decorCard2 {
+  background: #BFE7E6;
+  bottom: 30px;
+  right: 30px;
+  transform: rotate(3deg);
+  opacity: 0.95;
+}
+
+.decorCard3 {
+  background: #CBEED3;
+  bottom: 60px;
   right: 60px;
-  z-index: 10;
+  transform: rotate(-2deg);
 }
 
-.slideTitle {
-  font-size: 36px;
-  font-weight: 500;
-  line-height: 1.2;
-}
-
-/* --- Right Side: Form (40%) --- */
-.formSection {
+/* ---- Right Panel (40%) ---- */
+.rightPanel {
   flex: 0 0 40%;
-  padding: 0 80px;
+  background: #f5f5f5;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-color: #ffffff;
-  color: #0e220e;
+  padding: 0 72px;
   overflow-y: auto;
 }
 
 .modeToggle {
   display: flex;
-  background: #f3f4f6;
+  background: #e8e8e8;
   border-radius: 9999px;
   padding: 4px;
   width: fit-content;
@@ -129,9 +140,10 @@
 
 .title {
   font-size: 36px;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 8px;
   color: #0e220e;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
@@ -143,18 +155,17 @@
 .usernameInputWrapper {
   display: flex;
   align-items: center;
-  background: #f3f4f6;
-  border-radius: 10px;
-  padding: 12px 20px;
-  margin-bottom: 24px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
   font-size: 16px;
-  border: 1.5px solid transparent;
-  transition: border-color 150ms ease, background 150ms ease;
+  border: 1.5px solid #e5e7eb;
+  transition: border-color 150ms ease;
 }
 
 .usernameInputWrapper:focus-within {
   border-color: #0e220e;
-  background: #ffffff;
 }
 
 .usernamePrefix {
@@ -180,77 +191,12 @@
 }
 
 /* Email inputs — uncomment when implementing email auth
-.emailInputWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.emailInput {
-  width: 100%;
-  padding: 14px 18px;
-  border: 1.5px solid #e5e7eb;
-  border-radius: 10px;
-  font-size: 15px;
-  font-family: inherit;
-  color: #0e220e;
-  outline: none;
-  transition: border-color 150ms ease;
-  background: #fff;
-}
-
-.emailInput:focus {
-  border-color: #0e220e;
-}
+.emailInputWrapper { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.emailInput { width: 100%; padding: 14px 18px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 15px; font-family: inherit; color: #0e220e; outline: none; transition: border-color 150ms ease; background: #fff; }
+.emailInput:focus { border-color: #0e220e; }
 */
 
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.dividerLine {
-  flex: 1;
-  height: 1px;
-  background: #e5e7eb;
-}
-
-.dividerText {
-  font-size: 13px;
-  color: #9ca3af;
-}
-
-.googleButton {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 12px;
-  border: 1.5px solid #e5e7eb;
-  background-color: #ffffff;
-  color: #0e220e;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 150ms ease;
-  font-family: inherit;
-}
-
-.googleButton:hover:not(:disabled) {
-  background-color: #f9fafb;
-}
-
-.googleButton:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-/* --- Mobile --- */
+/* ---- Mobile ---- */
 @media (--bp-mobile) {
   .authPageWrapper {
     flex-direction: column;
@@ -258,27 +204,30 @@
     min-height: 100vh;
   }
 
-  .carouselSection {
-    flex: 0 0 280px;
-    height: 280px;
+  .leftPanel {
+    flex: 0 0 auto;
+    padding: 40px 28px 100px;
+    min-height: 320px;
   }
 
-  .slideContent {
-    bottom: 32px;
-    left: 24px;
-    right: 24px;
+  .tagline {
+    font-size: 40px;
   }
 
-  .slideTitle {
-    font-size: 24px;
+  .cardStack {
+    width: 280px;
+    height: 220px;
+    bottom: -40px;
+    right: -20px;
   }
 
-  .formSection {
+  .decorCard {
+    width: 220px;
+    height: 140px;
+  }
+
+  .rightPanel {
     flex: 1;
-    padding: 48px 24px;
-  }
-
-  .title {
-    font-size: 28px;
+    padding: 48px 28px;
   }
 }
