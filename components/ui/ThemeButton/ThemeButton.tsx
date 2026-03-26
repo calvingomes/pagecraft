@@ -12,6 +12,7 @@ export interface ThemeButtonProps {
   bgColor?: string;
   textColor?: string;
   iconCircle?: boolean;
+  disabled?: boolean;
 }
 
 export const ThemeButton = ({
@@ -21,6 +22,7 @@ export const ThemeButton = ({
   bgColor = 'var(--color-brand-primary)',
   textColor = 'var(--color-white)',
   iconCircle = true,
+  disabled = false,
 }: ThemeButtonProps) => {
   const isLink = typeof cta === 'string';
   const customStyle = { backgroundColor: bgColor, color: textColor };
@@ -52,6 +54,7 @@ export const ThemeButton = ({
       className={styles.button}
       onClick={cta as () => void}
       style={customStyle}
+      disabled={disabled}
     >
       {content}
     </button>
