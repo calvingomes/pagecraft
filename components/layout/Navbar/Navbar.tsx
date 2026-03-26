@@ -40,18 +40,18 @@ const Navbar = () => {
         </Link>
 
         <div className={styles.navItemsRight}>
-          <ThemeButton
+          {/* <ThemeButton
             label="Sign in"
             cta="/auth"
             bgColor="transparent"
             textColor="#0e220e"
-          />
+          /> */}
           <ThemeButton
-            label="Claim Page"
+            label="Sign in"
             cta="/claim"
             icon={ArrowRight}
-            bgColor="#f6d045"
-            textColor="#0e220e"
+            bgColor="#31a42bff"
+            textColor="#deffdeff"
             iconCircle={false}
           />
         </div>
