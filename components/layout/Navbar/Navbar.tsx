@@ -51,7 +51,6 @@ const Navbar = () => {
             cta="/claim"
             icon={ArrowRight}
             bgColor="#31a42bff"
-            textColor="#deffdeff"
             iconCircle={false}
           />
         </div>

@@ -45,7 +45,6 @@ export const ClaimInput = () => {
           cta={handleSubmit}
           icon={ArrowRight}
           bgColor="#f6d045"
-          textColor="#0e220e"
           iconCircle={false}
         />
       </div>

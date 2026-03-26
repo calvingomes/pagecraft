@@ -269,7 +269,6 @@ export default function EditorPage() {
           label={isSaving ? "Saving..." : "Save"}
           cta={handleSave}
           bgColor="#f6d045"
-          textColor="#0e220e"
           disabled={isSaving}
         />
       </div>

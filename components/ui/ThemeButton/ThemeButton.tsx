@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { LucideIcon } from 'lucide-react';
+import { deriveTextColor } from '@/lib/utils/colorUtils';
 import styles from './ThemeButton.module.css';
 
 export interface ThemeButtonProps {
@@ -20,12 +21,13 @@ export const ThemeButton = ({
   cta,
   icon: Icon,
   bgColor = 'var(--color-brand-primary)',
-  textColor = 'var(--color-white)',
+  textColor,
   iconCircle = true,
   disabled = false,
 }: ThemeButtonProps) => {
   const isLink = typeof cta === 'string';
-  const customStyle = { backgroundColor: bgColor, color: textColor };
+  const resolvedTextColor = textColor ?? deriveTextColor(bgColor);
+  const customStyle = { backgroundColor: bgColor, color: resolvedTextColor };
 
   const content = (
     <>
