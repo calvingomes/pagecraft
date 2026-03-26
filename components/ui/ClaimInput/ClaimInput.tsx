@@ -2,10 +2,12 @@
 
 import React, { useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { ThemeButton } from "../ThemeButton/ThemeButton";
 import styles from "./ClaimInput.module.css";
 
 export const ClaimInput = () => {
+  const router = useRouter();
   const [username, setUsername] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,9 +20,8 @@ export const ClaimInput = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const fullUrl = `pagecraft.com/${username}`;
-    console.log(fullUrl);
+    if (!username) return;
+    router.push(`/auth?username=${encodeURIComponent(username)}`);
   };
 
   return (
@@ -43,8 +44,8 @@ export const ClaimInput = () => {
           label="Claim Page"
           cta={handleSubmit}
           icon={ArrowRight}
-          bgColor="var(--color-landing-brand-accent)"
-          textColor="var(--color-landing-brand-primary)"
+          bgColor="#f6d045"
+          textColor="#0e220e"
           iconCircle={false}
         />
       </div>
