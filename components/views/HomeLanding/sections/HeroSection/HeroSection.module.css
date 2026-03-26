@@ -2,17 +2,15 @@
 
 .hero {
   width: 100%;
-  min-height: 90vh;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background:
-    linear-gradient(rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.28)),
-    url('https://images.unsplash.com/photo-1506744626753-eda81829f0ce?q=80&w=2000&auto=format&fit=crop') no-repeat center center;
+  background: rgba(204, 110, 110, 0.715);
   background-size: cover;
   position: relative;
   overflow: hidden;
-  padding: 140px 24px 100px;
+  padding: 200px 24px 100px;
 }
 
 .content {
