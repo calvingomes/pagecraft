@@ -18,7 +18,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 40px;
-  align-items: start;
+  align-items: center;
 }
 
 .footerHeadline {
@@ -28,29 +28,9 @@
   letter-spacing: -0.02em;
 }
 
-.footerLinksGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 60px;
-}
-
-.footerLinkColumn {
+.claimWrapper {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.footerLink {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-black);
-  text-decoration: none;
-  opacity: 0.8;
-  transition: opacity 0.2s ease;
-}
-
-.footerLink:hover {
-  opacity: 1;
+  justify-content: flex-end;
 }
 
 .footerBrandContainer {
@@ -73,12 +53,11 @@
 .footerBottom {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
   padding-top: 32px;
 }
 
-.footerBottomLeft,
 .footerBottomRight {
   display: flex;
   gap: 24px;
@@ -99,12 +78,11 @@
 @media (--bp-tablet) {
   .footerTop {
     grid-template-columns: 1fr;
-    gap: 60px;
+    gap: 40px;
   }
 
-  .footerLinksGrid {
-    grid-template-columns: repeat(2, 1fr);
-    width: 100%;
+  .claimWrapper {
+    justify-content: flex-start;
   }
 
   .footerContainer {
@@ -123,12 +101,11 @@
 
   .footerTop {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 32px;
   }
 
-  .footerLinksGrid {
-    grid-template-columns: 1fr;
-    gap: 40px;
+  .claimWrapper {
+    justify-content: flex-start;
   }
 
   .footerBottom {
