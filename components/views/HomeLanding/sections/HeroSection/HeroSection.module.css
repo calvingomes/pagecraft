@@ -6,11 +6,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(204, 110, 110, 0.715);
+  background: #173404;
   background-size: cover;
   position: relative;
   overflow: hidden;
-  padding: 200px 24px 100px;
+  padding: 150px 24px 100px;
+}
+
+.arcSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .content {
@@ -34,10 +44,14 @@
   margin: 0 auto;
 }
 
+.titleAccent {
+  color: #97C459;
+}
+
 .subtitle {
   font-size: 20px;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.88);
+  color: #97c459a7;
   max-width: 640px;
   margin: 0 auto;
 }

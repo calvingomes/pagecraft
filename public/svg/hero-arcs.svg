@@ -1,0 +1,14 @@
+<svg
+  width="1440"
+  height="700"
+  viewBox="0 0 1440 700"
+  xmlns="http://www.w3.org/2000/svg"
+  preserveAspectRatio="xMidYMax slice"
+>
+  <ellipse cx="720" cy="820" rx="380" ry="209" fill="none" stroke="rgba(180,230,100,0.09)" stroke-width="1.2"/>
+  <ellipse cx="720" cy="820" rx="520" ry="286" fill="none" stroke="rgba(180,230,100,0.09)" stroke-width="1.2"/>
+  <ellipse cx="720" cy="820" rx="660" ry="363" fill="none" stroke="rgba(180,230,100,0.09)" stroke-width="1.2"/>
+  <ellipse cx="720" cy="820" rx="800" ry="440" fill="none" stroke="rgba(180,230,100,0.09)" stroke-width="1.2"/>
+  <ellipse cx="720" cy="820" rx="940" ry="517" fill="none" stroke="rgba(180,230,100,0.09)" stroke-width="1.2"/>
+  <ellipse cx="720" cy="820" rx="1080" ry="594" fill="none" stroke="rgba(180,230,100,0.09)" stroke-width="1.2"/>
+</svg>

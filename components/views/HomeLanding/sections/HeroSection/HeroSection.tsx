@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import { ClaimInput } from "@/components/ui/ClaimInput/ClaimInput";
 import layoutStyles from "../../LandingLayout.module.css";
 import styles from "./HeroSection.module.css";
@@ -6,11 +7,18 @@ import styles from "./HeroSection.module.css";
 export function HeroSection() {
   return (
     <section className={styles.hero} aria-labelledby="home-hero-title">
+      <Image
+        src="/svg/hero-arcs.svg"
+        alt=""
+        fill
+        className={styles.arcSvg}
+        aria-hidden
+      />
       <div className={layoutStyles.container}>
         <div className={styles.content}>
           <h1 id="home-hero-title" className={styles.title}>
             Personal Page<br />
-            For The Modern Creatives
+            <span className={styles.titleAccent}>For Creatives</span>
           </h1>
           <p className={styles.subtitle}>
             Share who you are and attract more clients
