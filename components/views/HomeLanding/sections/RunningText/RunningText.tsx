@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
+import { useScrollProgress } from "@/hooks/useScrollProgress";
 import styles from "./RunningText.module.css";
 
 const TEXT =
@@ -10,32 +11,12 @@ const words = TEXT.split(" ");
 
 export function RunningText() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [litCount, setLitCount] = useState(1);
+  
+  // Use custom hook for scroll progress (0-1)
+  const progress = useScrollProgress(sectionRef, 0.9, 0.3);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const el = sectionRef.current;
-      if (!el) return;
-
-      const { top, height } = el.getBoundingClientRect();
-      const sectionCenter = top + height / 2;
-
-      const animStart = window.innerHeight * 0.9;
-      const animEnd = window.innerHeight * 0.5;
-
-      const progress = Math.min(
-        1,
-        Math.max(0, (animStart - sectionCenter) / (animStart - animEnd))
-      );
-
-      // Ensure first word always stays lit (minimum 1)
-      setLitCount(Math.max(1, Math.round(progress * words.length)));
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // Derive litCount from progress (minimum 1)
+  const litCount = Math.max(1, Math.round(progress * words.length));
 
   return (
     <section ref={sectionRef} className={styles.section}>
