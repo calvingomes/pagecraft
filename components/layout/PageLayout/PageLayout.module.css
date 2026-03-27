@@ -34,8 +34,9 @@
   .inner {
     flex-direction: column;
     justify-content: flex-start;
+    align-items: center;
     gap: 0;
-    padding: 0;
+    padding: 0 16px;
     max-width: 100%;
   }
 
@@ -133,16 +134,14 @@
 }
 
 @media (--bp-mobile) {
-  .sidebarSlot {
+  .pageLayout[data-sidebar] .sidebarSlot,
+  .pageLayout[data-sidebar] .contentSlot {
     position: static;
     top: auto;
     align-self: auto;
     flex: 0 0 auto;
-    max-width: 100%;
-  }
-
-  .contentSlot {
-    max-width: 100%;
+    width: 100%;
+    max-width: 525px;
   }
 }
 

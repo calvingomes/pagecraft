@@ -16,15 +16,6 @@ export function useViewportMode() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    let rafId = 0;
-    const getWidth = () => {
-      return window.visualViewport?.width ?? window.innerWidth;
-    };
-
-    const applyMode = () => {
-      setViewportMode(resolveViewportMode(getWidth()));
-    };
-
     const mobileMedia = window.matchMedia(`(max-width: ${MOBILE_MAX_WIDTH}px)`);
     const tabletMedia = window.matchMedia(
       `(min-width: ${TABLET_MIN_WIDTH}px) and (max-width: ${TABLET_MAX_WIDTH}px)`,
@@ -33,6 +24,23 @@ export function useViewportMode() {
       `(min-width: ${DESKTOP_MIN_WIDTH}px)`,
     );
 
+    const getWidth = () => {
+      return window.visualViewport?.width ?? window.innerWidth;
+    };
+
+    const applyMode = () => {
+      if (desktopMedia.matches) {
+        setViewportMode("desktop");
+      } else if (tabletMedia.matches) {
+        setViewportMode("tablet");
+      } else if (mobileMedia.matches) {
+        setViewportMode("mobile");
+      } else {
+        setViewportMode(resolveViewportMode(getWidth()));
+      }
+    };
+
+    let rafId = 0;
     const update = () => {
       if (rafId) {
         cancelAnimationFrame(rafId);

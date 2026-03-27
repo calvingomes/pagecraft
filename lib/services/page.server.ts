@@ -6,6 +6,8 @@ import {
   normalizeStoredBlocks,
   type RawStoredBlock,
 } from "@/lib/editor-engine/data/normalization";
+import type { GridConfig } from "@/types/grid";
+import { DESKTOP_GRID, MOBILE_GRID } from "@/lib/editor-engine/grid/grid-config";
 
 /**
  * Server-side service to fetch page data directly
@@ -51,9 +53,9 @@ export const ServerPageService = {
       styles: row.styles,
     });
 
-    const normalizeForViewport = (rows: RawStoredBlock[]) => {
+    const normalizeForViewport = (rows: RawStoredBlock[], config: GridConfig) => {
       const normalizedBlocks = normalizeStoredBlocks(rows);
-      return ensureBlocksHaveValidLayouts(normalizedBlocks);
+      return ensureBlocksHaveValidLayouts(normalizedBlocks, config);
     };
 
     const desktopRows = safeBlockRows
@@ -65,8 +67,8 @@ export const ServerPageService = {
       .map(toRawStoredBlock);
 
     return {
-      desktop: normalizeForViewport(desktopRows),
-      mobile: normalizeForViewport(mobileRows),
+      desktop: normalizeForViewport(desktopRows, DESKTOP_GRID),
+      mobile: normalizeForViewport(mobileRows, MOBILE_GRID),
     };
   },
 };

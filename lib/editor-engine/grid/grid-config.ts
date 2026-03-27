@@ -18,9 +18,9 @@ export const DESKTOP_GRID: GridConfig = {
 export const MOBILE_GRID: GridConfig = {
   cols: 2,
   cellPx: 250,
-  gapXPx: 40,
+  gapXPx: 25,
   gapYPx: 15,
-  canvasPx: 540,
+  canvasPx: 525,
   rowScale: 2,
   subRowPx: 120,
   subRowGapPx: 15,

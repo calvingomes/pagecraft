@@ -7,7 +7,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useMemo } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import type { Block } from "@/types/editor";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
 import { useEditorContext } from "@/contexts/EditorContext";
@@ -40,6 +40,20 @@ type MobileCanvasGridProps =
 export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
   const { editable, blocks } = props;
   const editor = useEditorContext();
+
+  const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const { width } = entries[0].contentRect;
+      setScale(width && width < MOBILE_GRID.canvasPx ? width / MOBILE_GRID.canvasPx : 1);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const applyUpdate = useMemo(() => {
     return props.editable ? props.onUpdateBlock : () => undefined;
@@ -99,13 +113,30 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
     };
   }, [activeBlock, placementTarget, gridXStridePx, gridYStridePx]);
 
+  const rawHeight =
+    subRows * MOBILE_GRID.subRowPx + (subRows - 1) * MOBILE_GRID.subRowGapPx;
+
   const content = (
     <div
-      className={styles.canvas}
+      ref={containerRef}
+      className={styles.mobileCanvasWrapper}
       style={{
-        height: `${subRows * MOBILE_GRID.subRowPx + (subRows - 1) * MOBILE_GRID.subRowGapPx}px`,
+        height: `${rawHeight * scale}px`,
       }}
     >
+      <div
+        className={styles.canvas}
+        style={{
+          width: `${MOBILE_GRID.canvasPx}px`,
+          maxWidth: "none",
+          height: `${rawHeight}px`,
+          transform: `scale(${scale})`,
+          transformOrigin: "top center",
+          position: "absolute",
+          left: "50%",
+          marginLeft: `-${MOBILE_GRID.canvasPx / 2}px`,
+        }}
+      >
       {editable && placementHighlightStyle && (
         <div
           className={styles.placementHighlight}
@@ -172,6 +203,7 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
         })}
       </div>
     </div>
+  </div>
   );
 
   if (!editable) return content;

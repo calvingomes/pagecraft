@@ -84,7 +84,7 @@
 /* Sidebar center */
 .sidebarCenter {
   align-items: stretch;
-  padding: 20px;
+  padding: 20px 0;
   margin-bottom: 0;
 }
 
@@ -96,8 +96,15 @@
   text-align: left;
 }
 
+.sidebarCenter .profileCard > div:last-child {
+  flex: 1;
+  min-width: 0;
+}
+
 .sidebarCenter .avatar {
   flex-shrink: 0;
+  width: 140px;
+  height: 140px;
 }
 
 .sidebarCenter .avatarWrap {
@@ -106,7 +113,6 @@
 
 /* Sidebar Mobile */
 @media (--bp-mobile) {
-
   .sidebarLeft,
   .sidebarRight {
     width: 100%;
@@ -114,6 +120,63 @@
     border-right: none;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   }
+
+  .sidebarCenter {
+    padding: 20px 0;
+  }
+
+  .sidebarCenter .profileCard {
+    gap: 1rem;
+  }
+
+  .sidebarCenter .avatar {
+    width: 96px;
+    height: 96px;
+  }
+
+  .sidebarCenter .nameInput :global(.ProseMirror),
+  .sidebarCenter .name {
+    font-size: 26px;
+  }
+
+  .sidebarCenter .bioEditor :global(.ProseMirror),
+  .sidebarCenter .bio {
+    font-size: 15px;
+    margin-top: 12px;
+  }
+}
+
+/* Force mobile styles when editor is in mobile preview mode */
+:global([data-preview="mobile"]) .sidebarLeft,
+:global([data-preview="mobile"]) .sidebarRight {
+  width: 100%;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+:global([data-preview="mobile"]) .sidebarCenter {
+  padding: 20px 0;
+}
+
+:global([data-preview="mobile"]) .sidebarCenter .profileCard {
+  gap: 1rem;
+}
+
+:global([data-preview="mobile"]) .sidebarCenter .avatar {
+  width: 96px;
+  height: 96px;
+}
+
+:global([data-preview="mobile"]) .sidebarCenter .nameInput :global(.ProseMirror),
+:global([data-preview="mobile"]) .sidebarCenter .name {
+  font-size: 26px;
+}
+
+:global([data-preview="mobile"]) .sidebarCenter .bioEditor :global(.ProseMirror),
+:global([data-preview="mobile"]) .sidebarCenter .bio {
+  font-size: 15px;
+  margin-top: 12px;
 }
 
 .nameInput :global(.ProseMirror) {

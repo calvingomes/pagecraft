@@ -15,16 +15,13 @@ type Props = {
 export function MobileReadonlyBlock({ block, dimensions }: Props) {
   const { widthPx, heightPx } = dimensions;
   const isTransparentWrapper = shouldUseTransparentWrapper(block, "view");
-  const aspectRatio = `${widthPx} / ${heightPx}`;
-
   return (
-    <div className={sortableBlockStyles.hoverZone} style={{ height: "auto" }}>
+    <div className={sortableBlockStyles.hoverZone}>
       <div
         className={`${sortableBlockStyles.wrapper} ${isTransparentWrapper ? sortableBlockStyles.emptyWrapper : ""}`}
         style={{
-          width: "100%",
-          height: "auto",
-          aspectRatio,
+          width: `${widthPx}px`,
+          height: `${heightPx}px`,
           cursor: "default",
         }}
       >

@@ -27,6 +27,7 @@ import { MobileEditorGuard } from "@/components/layout/MobileEditorGuard/MobileE
 import { OverlayPopup } from "@/components/layout/OverlayPopup/OverlayPopup";
 import { compactEmptyRows } from "@/lib/editor-engine/grid/compact";
 import { findFirstFreeSpot } from "@/lib/editor-engine/layout/collision";
+import { DESKTOP_GRID, MOBILE_GRID } from "@/lib/editor-engine/grid/grid-config";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEditorViewportPreview } from "@/hooks/useEditorViewportPreview";
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
@@ -174,7 +175,9 @@ export default function EditorPage() {
       order: activeBlocks.length,
       styles: { widthPreset },
     } as Block;
-    const pos = findFirstFreeSpot(tempBlockForPlacement, activeBlocks);
+
+    const gridConfig = activeBlockViewportMode === "mobile" ? MOBILE_GRID : DESKTOP_GRID;
+    const pos = findFirstFreeSpot(tempBlockForPlacement, activeBlocks, gridConfig);
 
     const newBlock: Block = {
       id,

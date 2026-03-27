@@ -47,7 +47,7 @@ export function getViewEffectiveSidebarPosition(
   mode: ViewportMode,
   persisted: SidebarPosition,
 ): SidebarPosition {
-  if (mode === "tablet") {
+  if (mode === "tablet" || mode === "mobile") {
     return "center";
   }
 

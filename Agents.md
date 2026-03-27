@@ -139,9 +139,9 @@ type GridConfig = {
 | ------------- | -------------- | ------------- |
 | `cols`        | 4              | 2             |
 | `cellPx`      | 200            | 250           |
-| `gapXPx`      | 25             | 40            |
+| `gapXPx`      | 25             | 25            |
 | `gapYPx`      | 25             | 15            |
-| `canvasPx`    | 875            | 540           |
+| `canvasPx`    | 875            | 525           |
 | `rowScale`    | 2              | 2             |
 | `subRowPx`    | 90             | 120           |
 | `subRowGapPx` | 25             | 15            |
@@ -246,7 +246,7 @@ blocks/TextBlock/
 - Hover toolbar background toggle: only `text` and `link` blocks should show the `BG` toggle control.
 - Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.
 - `sectionTitle` should use transparent wrapper styling only in **view mode** (not editor mode), via the same shared wrapper decision path.
-- `sectionTitle` size is `config.canvasPx × config.subRowPx` (desktop: `875×90`, mobile: `540×120`) and occupies **half-row grid height** (`h = 0.5`) to avoid dead space below.
+- `sectionTitle` size is `config.canvasPx × config.subRowPx` (desktop: `875×90`, mobile: `525×120`) and occupies **half-row grid height** (`h = 0.5`) to avoid dead space below.
 
 ### Editor Preview Modes (`app/editor/page.tsx` + `components/layout/PageLayout/`)
 
@@ -255,7 +255,7 @@ blocks/TextBlock/
 - The editor has a **desktop/mobile preview toggle** for visual editing without resizing the browser window, but only when screen width is `>=960`.
 - `PageLayout` exposes `previewViewport` (`"desktop" | "mobile"`) and `framedMobilePreview` (boolean): editor passes `framedMobilePreview={true}` for the framed mobile preview, while view pages keep it `false` for clean public mobile layout.
 - In mobile preview mode, only page content is previewed (`ProfileSidebar` + `BlockCanvas`); editor controls (`SaveButton`, `LogoutButton`, preview toggle, bottom toolbar) remain outside the preview frame.
-- Mobile preview frame is capped to `540px` max width and intentionally styled (frame/background) to make preview boundaries explicit.
+- Mobile preview frame is capped to `525px` max width and intentionally styled (frame/background) to make preview boundaries explicit.
 - Sticky sidebar styling is viewport-driven: sticky only when `data-preview="desktop"` and sidebar is not `center`.
 - Tablet mode (`960-1359`) should force profile position to `center` in editor and hide the profile-position section from the toolbar palette.
 - Mobile editor mode should also hide the profile-position section; profile positioning is a desktop-only editing feature.

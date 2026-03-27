@@ -1,5 +1,6 @@
 import type { Block, BlockType } from "@/types/editor";
-import type { GridLayout } from "@/types/grid";
+import type { GridLayout, GridConfig } from "@/types/grid";
+import { DESKTOP_GRID } from "../grid/grid-config";
 import { canPlaceBlockAt, findFirstFreeSpot } from "../layout/collision";
 
 export type RawStoredBlock = { id: string } & Record<string, unknown>;
@@ -92,7 +93,10 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
 }
 
 // Ensures blocks have a stable, non-overlapping layout matching the editor placement rules.
-export function ensureBlocksHaveValidLayouts(blocks: Block[]): Block[] {
+export function ensureBlocksHaveValidLayouts(
+  blocks: Block[],
+  config: GridConfig = DESKTOP_GRID,
+): Block[] {
   const placed: Block[] = [];
 
   return [...blocks]
@@ -103,13 +107,13 @@ export function ensureBlocksHaveValidLayouts(blocks: Block[]): Block[] {
           x: block.layout.x,
           y: block.layout.y,
         };
-        if (canPlaceBlockAt(block, candidate, placed)) {
+        if (canPlaceBlockAt(block, candidate, placed, config)) {
           placed.push(block);
           return block;
         }
       }
 
-      const pos = findFirstFreeSpot(block, placed);
+      const pos = findFirstFreeSpot(block, placed, config);
       const next = { ...block, layout: pos } as Block;
       placed.push(next);
       return next;
