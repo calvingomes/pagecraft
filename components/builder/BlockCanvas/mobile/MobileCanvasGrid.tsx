@@ -6,6 +6,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragOverlay,
 } from "@dnd-kit/core";
 import { useMemo, useState, useRef, useEffect } from "react";
 import type { Block } from "@/types/editor";
@@ -218,6 +219,26 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
       onDragEnd={handleDragEnd}
     >
       {content}
+      {typeof window !== "undefined" && (
+        <DragOverlay dropAnimation={null} style={{ zIndex: 1000 }}>
+          {activeBlock ? (
+            <div
+              style={{
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+              }}
+            >
+              <SortableBlock
+                block={activeBlock}
+                dimensions={sizePxForBlock(activeBlock, MOBILE_GRID)}
+                activeDragId={null}
+                gridConfig={MOBILE_GRID}
+                dndDisabled
+              />
+            </div>
+          ) : null}
+        </DragOverlay>
+      )}
     </DndContext>
   );
 };

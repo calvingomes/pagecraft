@@ -6,6 +6,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragOverlay,
 } from "@dnd-kit/core";
 import { useMemo } from "react";
 import type { Block } from "@/types/editor";
@@ -178,6 +179,19 @@ export const DesktopBlockCanvas = ({
       onDragEnd={handleDragEnd}
     >
       {content}
+      {typeof window !== "undefined" && (
+        <DragOverlay dropAnimation={null} style={{ zIndex: 1000 }}>
+          {activeBlock ? (
+            <SortableBlock
+              block={activeBlock}
+              dimensions={sizePxForBlock(activeBlock, DESKTOP_GRID)}
+              activeDragId={null}
+              gridConfig={DESKTOP_GRID}
+              dndDisabled
+            />
+          ) : null}
+        </DragOverlay>
+      )}
     </DndContext>
   );
 };
