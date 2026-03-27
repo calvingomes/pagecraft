@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Laptop, Smartphone } from "lucide-react";
 import {
@@ -27,7 +27,10 @@ import { MobileEditorGuard } from "@/components/layout/MobileEditorGuard/MobileE
 import { OverlayPopup } from "@/components/layout/OverlayPopup/OverlayPopup";
 import { compactEmptyRows } from "@/lib/editor-engine/grid/compact";
 import { findFirstFreeSpot } from "@/lib/editor-engine/layout/collision";
-import { DESKTOP_GRID, MOBILE_GRID } from "@/lib/editor-engine/grid/grid-config";
+import {
+  DESKTOP_GRID,
+  MOBILE_GRID,
+} from "@/lib/editor-engine/grid/grid-config";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEditorViewportPreview } from "@/hooks/useEditorViewportPreview";
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
@@ -35,6 +38,21 @@ import { saveEditorPage } from "@/lib/editor/saveEditorPage";
 import { prepareImageBlockOptions } from "@/lib/editor/prepareImageBlockOptions";
 import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
 import styles from "./editor.module.css";
+
+type EditorSnapshotPayload = {
+  background: PageBackgroundId;
+  sidebarPosition: SidebarPosition;
+  displayName: string;
+  bioHtml: string;
+  avatarUrl: string;
+  persistedAvatarUrl: string;
+  avatarShape: AvatarShape;
+  desktopBlocks: Block[];
+  mobileBlocks: Block[];
+};
+
+const serializeSnapshot = (payload: EditorSnapshotPayload) =>
+  JSON.stringify(payload);
 
 export default function EditorPage() {
   const router = useRouter();
@@ -60,6 +78,38 @@ export default function EditorPage() {
   const [persistedAvatarUrl, setPersistedAvatarUrl] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveOverlay, setShowSaveOverlay] = useState(false);
+  const [lastSavedPayload, setLastSavedPayload] =
+    useState<EditorSnapshotPayload | null>(null);
+
+  const currentSnapshot = useMemo(
+    () =>
+      serializeSnapshot({
+        background,
+        sidebarPosition: desktopSidebarPosition,
+        displayName,
+        bioHtml,
+        avatarUrl,
+        persistedAvatarUrl,
+        avatarShape,
+        desktopBlocks,
+        mobileBlocks,
+      }),
+    [
+      background,
+      desktopSidebarPosition,
+      displayName,
+      bioHtml,
+      avatarUrl,
+      persistedAvatarUrl,
+      avatarShape,
+      desktopBlocks,
+      mobileBlocks,
+    ],
+  );
+
+  const hasUnsavedChanges =
+    lastSavedPayload !== null &&
+    currentSnapshot !== serializeSnapshot(lastSavedPayload);
 
   const handleLogout = async () => {
     await AuthService.signOut();
@@ -96,52 +146,80 @@ export default function EditorPage() {
     if (!username || !user?.id) return;
 
     const loadPageData = async () => {
-      setDisplayName(username);
-      setBioHtml("");
-      setAvatarUrl("");
-      setPersistedAvatarUrl("");
-      setAvatarShape("circle");
-
       const pageData = await PageService.getPageByUsername(username);
-
-      let incomingDisplayName: string | undefined;
+      let nextBackground: PageBackgroundId = "page-bg-1";
+      let nextSidebarPosition: SidebarPosition = "left";
+      let nextDisplayName = username;
+      let nextBioHtml = "";
+      let nextAvatarUrl = "";
+      let nextAvatarShape: AvatarShape = "circle";
 
       if (pageData) {
         if (pageData.background) {
-          setBackground(pageData.background);
+          nextBackground = pageData.background;
         }
         if (pageData.sidebar_position) {
-          setDesktopSidebarPosition(pageData.sidebar_position);
+          nextSidebarPosition = pageData.sidebar_position;
         }
         if (pageData.display_name) {
-          incomingDisplayName = pageData.display_name;
+          nextDisplayName = pageData.display_name;
         }
         if (pageData.bio_html) {
-          setBioHtml(pageData.bio_html);
+          nextBioHtml = pageData.bio_html;
         }
         if (pageData.avatar_url) {
-          setAvatarUrl(pageData.avatar_url);
-          setPersistedAvatarUrl(pageData.avatar_url);
+          nextAvatarUrl = pageData.avatar_url;
         }
         if (
           pageData.avatar_shape === "circle" ||
           pageData.avatar_shape === "square"
         ) {
-          setAvatarShape(pageData.avatar_shape);
+          nextAvatarShape = pageData.avatar_shape;
         }
       }
 
-      setDisplayName(incomingDisplayName ?? username);
+      setBackground(nextBackground);
+      setDesktopSidebarPosition(nextSidebarPosition);
+      setDisplayName(nextDisplayName);
+      setBioHtml(nextBioHtml);
+      setAvatarUrl(nextAvatarUrl);
+      setPersistedAvatarUrl(nextAvatarUrl);
+      setAvatarShape(nextAvatarShape);
 
       const blocks = await BlockService.getBlocksForPage(username);
 
       setAllBlocks(blocks);
 
+      const initialPayload: EditorSnapshotPayload = {
+        background: nextBackground,
+        sidebarPosition: nextSidebarPosition,
+        displayName: nextDisplayName,
+        bioHtml: nextBioHtml,
+        avatarUrl: nextAvatarUrl,
+        persistedAvatarUrl: nextAvatarUrl,
+        avatarShape: nextAvatarShape,
+        desktopBlocks: blocks.desktop,
+        mobileBlocks: blocks.mobile,
+      };
+
+      setLastSavedPayload(initialPayload);
+
       setLoading(false);
     };
 
     loadPageData();
-  }, [username, user?.id, setAllBlocks, setLoading]);
+  }, [username, user?.id, setAllBlocks, setLoading, setLastSavedPayload]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!hasUnsavedChanges) return;
+      event.preventDefault();
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const handleAddBlock = async (
     blockType: BlockType,
@@ -176,8 +254,13 @@ export default function EditorPage() {
       styles: { widthPreset },
     } as Block;
 
-    const gridConfig = activeBlockViewportMode === "mobile" ? MOBILE_GRID : DESKTOP_GRID;
-    const pos = findFirstFreeSpot(tempBlockForPlacement, activeBlocks, gridConfig);
+    const gridConfig =
+      activeBlockViewportMode === "mobile" ? MOBILE_GRID : DESKTOP_GRID;
+    const pos = findFirstFreeSpot(
+      tempBlockForPlacement,
+      activeBlocks,
+      gridConfig,
+    );
 
     const newBlock: Block = {
       id,
@@ -243,11 +326,27 @@ export default function EditorPage() {
         },
       });
 
-      if (result.avatarUrl !== avatarUrl) {
-        setAvatarUrl(result.avatarUrl);
+      const resolvedAvatarUrl = result.avatarUrl;
+
+      if (resolvedAvatarUrl !== avatarUrl) {
+        setAvatarUrl(resolvedAvatarUrl);
       }
-      setPersistedAvatarUrl(result.avatarUrl);
+      setPersistedAvatarUrl(resolvedAvatarUrl);
       setAllBlocks(result.blocksByViewport);
+
+      const latestPayload: EditorSnapshotPayload = {
+        background,
+        sidebarPosition: desktopSidebarPosition,
+        displayName,
+        bioHtml,
+        avatarUrl: resolvedAvatarUrl,
+        persistedAvatarUrl: resolvedAvatarUrl,
+        avatarShape,
+        desktopBlocks: result.blocksByViewport.desktop,
+        mobileBlocks: result.blocksByViewport.mobile,
+      };
+
+      setLastSavedPayload(latestPayload);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unknown save error.";
@@ -290,8 +389,16 @@ export default function EditorPage() {
             value={previewView}
             onChange={setPreviewView}
             options={[
-              { value: "desktop", label: <Laptop size={20} />, ariaLabel: "Preview desktop view" },
-              { value: "mobile", label: <Smartphone size={20} />, ariaLabel: "Preview mobile view" },
+              {
+                value: "desktop",
+                label: <Laptop size={20} />,
+                ariaLabel: "Preview desktop view",
+              },
+              {
+                value: "mobile",
+                label: <Smartphone size={20} />,
+                ariaLabel: "Preview mobile view",
+              },
             ]}
           />
         </div>
