@@ -21,16 +21,16 @@
 }
 
 .prefix {
-  color: #0e220e;
+  color: #173404;
 }
 
 .word {
-  color: rgba(14, 34, 14, 0.15);
+  color: #dff0c0;
   transition: color 100ms ease;
 }
 
 .lit {
-  color: #0e220e;
+  color: #173404;
 }
 
 @media (--bp-mobile) {
