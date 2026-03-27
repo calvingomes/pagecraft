@@ -32,6 +32,7 @@ import { useEditorViewportPreview } from "@/hooks/useEditorViewportPreview";
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
 import { saveEditorPage } from "@/lib/editor/saveEditorPage";
 import { prepareImageBlockOptions } from "@/lib/editor/prepareImageBlockOptions";
+import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
 import styles from "./editor.module.css";
 
 export default function EditorPage() {
@@ -282,28 +283,14 @@ export default function EditorPage() {
       </div>
       {canTogglePreview && (
         <div className={styles.previewToggle}>
-          <button
-            type="button"
-            className={`${styles.previewToggleBtn} ${
-              previewView === "desktop" ? styles.previewToggleBtnActive : ""
-            }`}
-            onClick={() => setPreviewView("desktop")}
-            aria-label="Preview desktop view"
-            title="Preview desktop view"
-          >
-            <Laptop size={20} />
-          </button>
-          <button
-            type="button"
-            className={`${styles.previewToggleBtn} ${
-              previewView === "mobile" ? styles.previewToggleBtnActive : ""
-            }`}
-            onClick={() => setPreviewView("mobile")}
-            aria-label="Preview mobile view"
-            title="Preview mobile view"
-          >
-            <Smartphone size={20} />
-          </button>
+          <TogglePill
+            value={previewView}
+            onChange={setPreviewView}
+            options={[
+              { value: "desktop", label: <Laptop size={20} />, ariaLabel: "Preview desktop view" },
+              { value: "mobile", label: <Smartphone size={20} />, ariaLabel: "Preview mobile view" },
+            ]}
+          />
         </div>
       )}
       <PageLayout
