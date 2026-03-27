@@ -11,18 +11,22 @@
   --color-landing-text-secondary: #235524;
   --color-landing-brand-primary: #0e220e;
   --color-landing-brand-accent: #f6d045;
-  --color-landing-card-1: #FCF2CB;
+  /* --color-landing-card-1: #FCF2CB;
   --color-landing-card-2: #BFE7E6;
-  --color-landing-card-3: #CBEED3;
+  --color-landing-card-3: #CBEED3; */
+
+  --color-landing-card-1: #E4F2D8;
+  --color-landing-card-2: #E4F2D8;
+  --color-landing-card-3: #E4F2D8;
 
 
   /* Backgrounds */
-  --color-bg-page: #f5f5f5;
+  --color-bg-page: #f3f5f2;
   --color-bg-surface: #020617;
   --color-bg-elevated: #020617;
 
   /* Page background palette */
-  --color-page-bg-1: #f5f5f5;
+  --color-page-bg-1: #f3f5f2;
   --color-page-bg-2: #f4f9f2;
   --color-page-bg-3: #fefce8;
   --color-page-bg-4: #eff6ff;
