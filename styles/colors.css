@@ -1,12 +1,15 @@
 :root {
   /* Updating relevant colors */
-  --color-light-grey: #f3f5f2;
-  --color-mid-grey: #dcdcdc;
-  --color-light-grey: #f3f5f2;
-  --color-lime-green: #E4F2D8;
-  --color-text-bluish-grey: #9ca3af;
   --color-black: #000000;
   --color-white: #ffffff;
+  
+  --color-light-grey: #f3f5f2;
+  --color-mid-grey: #dcdcdc;
+  --color-text-bluish-grey: #9ca3af;
+  
+  --color-lime-green: #E4F2D8;
+
+  --color-theme-yellow: #EF9F27; 
 
   /* Page background palette */
   --color-editor-page-bg-1: #f3f5f2;

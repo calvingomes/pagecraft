@@ -101,7 +101,7 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
           <ThemeButton
             label={isSignUp ? "Create an account with Google" : "Continue with Google"}
             cta={handleGoogleSignIn}
-            bgColor={canProceed ? "#EF9F27" : "#e5e7eb"}
+            bgColor={canProceed ? "var(--color-theme-yellow)" : "var(--color-mid-grey)"}
             textColor={canProceed ? "#ffffff" : "#0e220e"}
             iconCircle={false}
             icon={ArrowRight}
