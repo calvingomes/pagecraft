@@ -99,7 +99,6 @@ styles/         — Global CSS custom properties and media queries
 - **No duplicate selectors** across files. If two components need the same style, extract it to a shared module or use CSS custom properties.
 - **Avoid `composes` keyword** for cross-file composition. Import the style object in JS and concatenate class names:
   ```tsx
-  import layoutStyles from "../../LandingLayout.module.css";
   import styles from "./Section.module.css";
   // ...
   className={`${layoutStyles.container} ${styles.container}`}

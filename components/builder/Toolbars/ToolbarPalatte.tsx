@@ -8,12 +8,12 @@ import type {
 } from "./Toolbar.types";
 
 const PAGE_BG_OPTIONS: PageBackgroundOption[] = [
-  { id: "page-bg-1", cssVar: "var(--color-page-bg-1)" },
-  { id: "page-bg-2", cssVar: "var(--color-page-bg-2)" },
-  { id: "page-bg-3", cssVar: "var(--color-page-bg-3)" },
-  { id: "page-bg-4", cssVar: "var(--color-page-bg-4)" },
-  { id: "page-bg-5", cssVar: "var(--color-page-bg-5)" },
-  { id: "page-bg-6", cssVar: "var(--color-page-bg-6)" },
+  { id: "page-bg-1", cssVar: "var(--color-editor-page-bg-1)" },
+  { id: "page-bg-2", cssVar: "var(--color-editor-page-bg-2)" },
+  { id: "page-bg-3", cssVar: "var(--color-editor-page-bg-3)" },
+  { id: "page-bg-4", cssVar: "var(--color-editor-page-bg-4)" },
+  { id: "page-bg-5", cssVar: "var(--color-editor-page-bg-5)" },
+  { id: "page-bg-6", cssVar: "var(--color-editor-page-bg-6)" },
 ];
 
 export const ToolbarPalatte = ({
@@ -35,9 +35,8 @@ export const ToolbarPalatte = ({
             <button
               key={option.id}
               type="button"
-              className={`${styles.colorSwatch} ${
-                background === option.id ? styles.colorSwatchSelected : ""
-              }`}
+              className={`${styles.colorSwatch} ${background === option.id ? styles.colorSwatchSelected : ""
+                }`}
               style={{ background: option.cssVar }}
               onClick={() => onChangeBackground?.(option.id)}
               aria-label={`Background ${option.id}`}
@@ -53,11 +52,10 @@ export const ToolbarPalatte = ({
             <div className={styles.sidebarPositionGroup}>
               <button
                 type="button"
-                className={`${styles.sidebarPositionBtn} ${
-                  sidebarPosition === "left"
+                className={`${styles.sidebarPositionBtn} ${sidebarPosition === "left"
                     ? styles.sidebarPositionSelected
                     : ""
-                }`}
+                  }`}
                 onClick={() => onChangeSidebarPosition?.("left")}
                 title="Profile on left"
                 aria-label="Profile on left"
@@ -66,11 +64,10 @@ export const ToolbarPalatte = ({
               </button>
               <button
                 type="button"
-                className={`${styles.sidebarPositionBtn} ${
-                  sidebarPosition === "center"
+                className={`${styles.sidebarPositionBtn} ${sidebarPosition === "center"
                     ? styles.sidebarPositionSelected
                     : ""
-                }`}
+                  }`}
                 onClick={() => onChangeSidebarPosition?.("center")}
                 title="Profile in center"
                 aria-label="Profile in center"
@@ -79,11 +76,10 @@ export const ToolbarPalatte = ({
               </button>
               <button
                 type="button"
-                className={`${styles.sidebarPositionBtn} ${
-                  sidebarPosition === "right"
+                className={`${styles.sidebarPositionBtn} ${sidebarPosition === "right"
                     ? styles.sidebarPositionSelected
                     : ""
-                }`}
+                  }`}
                 onClick={() => onChangeSidebarPosition?.("right")}
                 title="Profile on right"
                 aria-label="Profile on right"

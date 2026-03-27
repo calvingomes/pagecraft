@@ -6,7 +6,6 @@ type FeatureCardProps = {
   feature: FeatureItem;
   index: number;
   stickyTop: number;
-  backgroundColor: string;
   scale: number;
 };
 
@@ -14,13 +13,11 @@ export function FeatureCard({
   feature,
   index,
   stickyTop,
-  backgroundColor,
   scale,
 }: FeatureCardProps) {
   const cardStyle: CSSProperties = {
     top: stickyTop,
     zIndex: index + 1,
-    backgroundColor: backgroundColor,
     transform: `scale(${scale})`,
   };
 

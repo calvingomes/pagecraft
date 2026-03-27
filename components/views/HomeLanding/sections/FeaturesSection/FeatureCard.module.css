@@ -2,7 +2,7 @@
 
 .card {
   position: sticky;
-  background: #ffffff;
+  background: var(--color-lime-green);
   border-radius: 24px;
   margin-bottom: 24px;
   padding: 48px 56px;

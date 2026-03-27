@@ -2,7 +2,7 @@
 
 .section {
   width: 100%;
-  background: #f3f5f2;
+  background: var(--color-light-grey);
   padding: 60px 0 0;
 }
 

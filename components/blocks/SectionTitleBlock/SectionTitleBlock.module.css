@@ -23,7 +23,7 @@
   border: none;
   border-radius: 8px;
   background: #242528;
-  color: #fff;
+  color: var(--color-white);
   display: flex;
   align-items: center;
   justify-content: center;

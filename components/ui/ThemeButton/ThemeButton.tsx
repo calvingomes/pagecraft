@@ -10,7 +10,7 @@ export interface ThemeButtonProps {
   label: string;
   cta: (() => void) | ((e: React.FormEvent) => void) | string;
   icon?: LucideIcon | React.ElementType;
-  bgColor?: string;
+  bgColor: string;
   textColor?: string;
   iconCircle?: boolean;
   disabled?: boolean;
@@ -20,7 +20,7 @@ export const ThemeButton = ({
   label,
   cta,
   icon: Icon,
-  bgColor = 'var(--color-brand-primary)',
+  bgColor,
   textColor,
   iconCircle = true,
   disabled = false,

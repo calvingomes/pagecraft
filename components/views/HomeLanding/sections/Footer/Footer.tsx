@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ClaimInput } from "@/components/ui/ClaimInput/ClaimInput";
-import layoutStyles from "../../LandingLayout.module.css";
 import styles from "./Footer.module.css";
 
 export function Footer() {
@@ -14,7 +13,7 @@ export function Footer() {
         className={styles.arcSvg}
         aria-hidden
       />
-      <div className={`${layoutStyles.container} ${styles.footerContainer}`}>
+      <div className={`${styles.container} ${styles.footerContainer}`}>
 
         {/* Top: Headline + ClaimInput centered */}
         <div className={styles.footerTop}>

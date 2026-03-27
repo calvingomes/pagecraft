@@ -1,7 +1,5 @@
-import React from "react";
 import Image from "next/image";
 import { ClaimInput } from "@/components/ui/ClaimInput/ClaimInput";
-import layoutStyles from "../../LandingLayout.module.css";
 import styles from "./HeroSection.module.css";
 
 export function HeroSection() {
@@ -14,7 +12,7 @@ export function HeroSection() {
         className={styles.arcSvg}
         aria-hidden
       />
-      <div className={layoutStyles.container}>
+      <div className={styles.container}>
         <div className={styles.content}>
           <h1 id="home-hero-title" className={styles.title}>
             Personal Page<br />

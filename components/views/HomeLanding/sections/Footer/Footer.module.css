@@ -1,5 +1,12 @@
 @import "@styles/media.css";
 
+.container {
+  width: 100%;
+  max-width: 1260px;
+  padding: 0 20px;
+  margin: 0 auto;
+}
+
 .footer {
   width: 100%;
   background: var(--color-white);

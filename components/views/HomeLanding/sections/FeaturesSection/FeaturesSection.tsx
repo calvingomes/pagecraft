@@ -5,11 +5,6 @@ import type { FeatureItem } from "./FeaturesSection.types";
 const CARD_STICKY_BASE = 160;
 const CARD_STICKY_STEP = 20;
 const CARD_SCALES = [0.93, 0.96, 1];
-const CARD_COLORS = [
-  "var(--color-landing-card-1)",
-  "var(--color-landing-card-2)",
-  "var(--color-landing-card-3)",
-];
 
 const FEATURES: FeatureItem[] = [
   {
@@ -52,7 +47,6 @@ export function FeaturesSection() {
               feature={feature}
               index={index}
               stickyTop={CARD_STICKY_BASE + index * CARD_STICKY_STEP}
-              backgroundColor={CARD_COLORS[index]}
               scale={CARD_SCALES[index]}
             />
           ))}

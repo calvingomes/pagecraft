@@ -17,7 +17,7 @@
   position: fixed;
   inset: 12px;
   border-radius: 20px;
-  box-shadow: 0 0 0 100vmax #ffffff;
+  box-shadow: 0 0 0 100vmax var(--color-white);
   pointer-events: none;
   z-index: 9999;
 }
@@ -46,7 +46,7 @@
   width: 100%;
   max-width: 200px;
   height: 64px;
-  background: #ffffff;
+  background: var(--color-white);
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
   padding: 0 24px;

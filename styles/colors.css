@@ -1,68 +1,19 @@
 :root {
-  /* Brand */
-  --color-brand-primary: #6366f1;
-  --color-brand-accent: #22d3ee;
-
-  /* Landing (Solidroad-like) palette */
-  --color-landing-bg: #f9f9f9;
-  --color-landing-surface: #ffffff;
-  --color-landing-border: #e5e7e5;
-  --color-landing-text-primary: #0e220e;
-  --color-landing-text-secondary: #235524;
-  --color-landing-brand-primary: #0e220e;
-  --color-landing-brand-accent: #f6d045;
-  /* --color-landing-card-1: #FCF2CB;
-  --color-landing-card-2: #BFE7E6;
-  --color-landing-card-3: #CBEED3; */
-
-  --color-landing-card-1: #E4F2D8;
-  --color-landing-card-2: #E4F2D8;
-  --color-landing-card-3: #E4F2D8;
-
-
-  /* Backgrounds */
-  --color-bg-page: #f3f5f2;
-  --color-bg-surface: #020617;
-  --color-bg-elevated: #020617;
+  /* Updating relevant colors */
+  --color-light-grey: #f3f5f2;
+  --color-mid-grey: #dcdcdc;
+  --color-light-grey: #f3f5f2;
+  --color-lime-green: #E4F2D8;
+  --color-text-bluish-grey: #9ca3af;
+  --color-black: #000000;
+  --color-white: #ffffff;
 
   /* Page background palette */
-  --color-page-bg-1: #f3f5f2;
-  --color-page-bg-2: #f4f9f2;
-  --color-page-bg-3: #fefce8;
-  --color-page-bg-4: #eff6ff;
-  --color-page-bg-5: #fdf2ff;
-  --color-page-bg-6: #fef2f2;
+  --color-editor-page-bg-1: #f3f5f2;
+  --color-editor-page-bg-2: #f4f9f2;
+  --color-editor-page-bg-3: #fefce8;
+  --color-editor-page-bg-4: #eff6ff;
+  --color-editor-page-bg-5: #fdf2ff;
+  --color-editor-page-bg-6: #fef2f2;
 
-  /* Page avatar palette (darker counterpart of page backgrounds) */
-  --color-page-avatar-1: #b8b8b8;
-  --color-page-avatar-2: #b7c9ad;
-  --color-page-avatar-3: #d1c578;
-  --color-page-avatar-4: #a9c2e8;
-  --color-page-avatar-5: #cfa6d6;
-  --color-page-avatar-6: #e0a7a7;
-
-  /* Text */
-  --color-text-primary: #000000;
-  --color-text-secondary: #0e220e;
-  --color-text-inverse-primary: #e5e7eb;
-  --color-text-inverse-secondary: #9ca3af;
-
-  /* Borders */
-  --color-border-focus: var(--color-brand-primary);
-  --color-border-subtle: rgba(0, 0, 0, 0.08);
-  --color-border-strong: rgba(0, 0, 0, 0.16);
-
-  /* UI */
-  --color-bg-hover: rgba(0, 0, 0, 0.04);
-
-  /* Status */
-  --color-status-error: #ef4444;
-  --color-status-success: #4caf50;
-  --color-status-warning: #f59e0b;
-
-  /* Base */
-  --color-white: #ffffff;
-  --color-black: #000000;
-  --color-grey-light: #f3f4f6;
-  --color-grey-dark: #333333;
 }

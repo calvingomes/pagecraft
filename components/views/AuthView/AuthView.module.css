@@ -40,7 +40,7 @@
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.03em;
-  color: #ffffff;
+  color: var(--color-white);
   margin-bottom: 28px;
   max-width: 12ch;
 }
@@ -74,7 +74,7 @@
 /* ---- Right Panel (35%) ---- */
 .rightPanel {
   flex: 0 0 40%;
-  background: #f3f5f2;
+  background: var(--color-light-grey);
   position: relative;
   max-width: 600px;
   overflow-y: auto;
@@ -117,7 +117,7 @@
 .separatorText {
   position: relative;
   z-index: 2;
-  background: #f3f5f2;
+  background: var(--color-light-grey);
   padding: 0 16px;
   font-size: 14px;
   color: #9ca3af;
@@ -147,7 +147,7 @@
 .usernameInputWrapper {
   display: flex;
   align-items: center;
-  background: #ffffff;
+  background: var(--color-white);
   border-radius: 12px;
   padding: 16px 20px;
   margin-bottom: 24px;

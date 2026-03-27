@@ -1,5 +1,12 @@
 @import "@styles/media.css";
 
+.container {
+  width: 100%;
+  max-width: 1260px;
+  padding: 0 20px;
+  margin: 0 auto;
+}
+
 .hero {
   width: 100%;
   height: 100vh;
@@ -41,7 +48,7 @@
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.025em;
-  color: #ffffff;
+  color: var(--color-white);
   max-width: 18ch;
   margin: 0 auto;
 }
