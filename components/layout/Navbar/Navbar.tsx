@@ -25,7 +25,7 @@ const Navbar = () => {
           PageCraft
         </Link>
 
-        <div className={styles.navItemsRight}>
+        {/* <div className={styles.navItemsRight}>
           <ThemeButton
             label="Sign in"
             cta="/auth"
@@ -33,7 +33,7 @@ const Navbar = () => {
             bgColor="#31a42bff"
             iconCircle={false}
           />
-        </div>
+        </div> */}
       </nav>
       <Image
         src="/svg/corner.svg"
