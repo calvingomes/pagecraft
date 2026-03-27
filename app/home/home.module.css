@@ -19,19 +19,3 @@
   background: var(--color-bg-page);
   color: var(--color-text-primary);
 }
-
-.homeViewport::after {
-  content: "";
-  position: fixed;
-  inset: 12px;
-  border-radius: 20px;
-  box-shadow: 0 0 0 100vmax #ffffff;
-  pointer-events: none;
-  z-index: 9999;
-}
-
-@media (--bp-mobile) {
-  .homeViewport::after {
-    display: none;
-  }
-}

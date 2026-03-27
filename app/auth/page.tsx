@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { AuthService } from "@/lib/services/auth.client";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useSearchParams } from "next/navigation";
+import { Navbar } from "@/components/layout/Navbar/Navbar";
 import AuthView from "@/components/views/AuthView/AuthView";
 
 function AuthPageContent() {
@@ -20,10 +21,13 @@ function AuthPageContent() {
   };
 
   return (
-    <AuthView
-      handleGoogleSignIn={handleGoogleSignIn}
-      initialUsername={initialUsername}
-    />
+    <>
+      <Navbar />
+      <AuthView
+        handleGoogleSignIn={handleGoogleSignIn}
+        initialUsername={initialUsername}
+      />
+    </>
   );
 }
 

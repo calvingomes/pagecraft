@@ -27,34 +27,6 @@
   opacity: 0.5;
 }
 
-.topLeftRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  z-index: 2;
-  margin-bottom: 48px;
-}
-
-.wordmark {
-  font-family: var(--font-belanosima);
-  font-size: 20px;
-  font-weight: 400;
-  color: #97C459;
-  letter-spacing: 0.12em;
-}
-
-.backLink {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
-  text-decoration: none;
-  transition: color 150ms ease;
-}
-
-.backLink:hover {
-  color: #ffffff;
-}
-
 .leftContent {
   margin-top: 150px;
   margin-bottom: 40px;

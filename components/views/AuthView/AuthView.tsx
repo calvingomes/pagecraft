@@ -37,14 +37,7 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
           className={styles.arcSvg}
           aria-hidden
         />
-
-        <div className={styles.topLeftRow}>
-          <div className={styles.wordmark}>PageCraft</div>
-          <Link href="/home" className={styles.backLink}>
-            ← Back to home
-          </Link>
-        </div>
-
+        
         <div className={styles.leftContent}>
           <h1 className={styles.tagline}>
             Your link.<br />

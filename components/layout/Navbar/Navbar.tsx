@@ -2,9 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
 import styles from "./Navbar.module.css";
-import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 
 
 const Navbar = () => {
@@ -26,13 +24,13 @@ const Navbar = () => {
         </Link>
 
         {/* <div className={styles.navItemsRight}>
-          <ThemeButton
-            label="Sign in"
-            cta="/auth"
-            icon={ArrowRight}
-            bgColor="#31a42bff"
-            iconCircle={false}
-          />
+            <ThemeButton
+              label="Sign in"
+              cta="/auth"
+              icon={ArrowRight}
+              bgColor="#31a42bff"
+              iconCircle={false}
+            />
         </div> */}
       </nav>
       <Image
