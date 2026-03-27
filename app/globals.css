@@ -1,5 +1,7 @@
 @import "@styles/colors.css";
 @import "@styles/media.css";
+@import "@styles/fonts.css";
+
 :root {
   /* Radius */
   --radius-xs: 4px;
