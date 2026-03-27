@@ -1,5 +1,5 @@
 import type { Block, BlockWidthPreset } from "@/types/editor";
-import type { GridConfig, GridRect, GridLayout } from "@/types/grid";
+import type { GridConfig, GridLayout } from "@/types/grid";
 import { DESKTOP_GRID } from "../grid/grid-config";
 import { clamp, rectForBlock, spansForBlock, spansForPreset } from "../grid/grid-math";
 import { OccupancyGrid } from "../grid/occupancy";

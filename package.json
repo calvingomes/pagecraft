@@ -46,6 +46,7 @@
     "husky": "^9.1.7",
     "postcss-custom-media": "^11.0.6",
     "postcss-import": "^16.1.1",
+    "purgecss": "^8.0.0",
     "typescript": "^5"
   }
 }

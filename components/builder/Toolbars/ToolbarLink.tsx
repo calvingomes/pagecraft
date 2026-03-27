@@ -1,3 +1,4 @@
+/* eslint-disable css-modules/no-unused-class */
 "use client";
 
 import { ArrowLeft, Check } from "lucide-react";

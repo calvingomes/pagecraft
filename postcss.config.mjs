@@ -16,7 +16,7 @@ function resolveStyleAlias(id) {
   return id;
 }
 
-export default {
+const config = {
   plugins: [
     postcssImport({
       resolve: (id) => resolveStyleAlias(id),
@@ -26,3 +26,5 @@ export default {
     }),
   ],
 };
+
+export default config;

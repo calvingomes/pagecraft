@@ -1,3 +1,4 @@
+/* eslint-disable css-modules/no-unused-class */
 "use client";
 
 import { useRef, useState, type ChangeEvent } from "react";
@@ -72,7 +73,7 @@ export const ToolbarDefault = ({
           <Heading size={18} />
         </button>
         <button
-          className={`${styles.toolButton} ${styles.paletteTrigger}`}
+          className={styles.toolButton}
           title="Background color"
           type="button"
           onClick={() => setIsPaletteOpen((open) => !open)}

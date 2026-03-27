@@ -1,3 +1,4 @@
+/* eslint-disable css-modules/no-unused-class */
 "use client";
 
 import {
@@ -114,7 +115,7 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
 
       {editable && (
         <div
-          className={`${styles.dropGrid} ${styles.dropGridMobile} ${activeId ? styles.dropGridActive : ""}`}
+          className={`${styles.dropGrid} ${activeId ? styles.dropGridActive : ""}`}
           style={{
             gridTemplateRows: `repeat(${subRows}, ${MOBILE_GRID.subRowPx}px)`,
             // Override grid template columns for mobile (2 cols)

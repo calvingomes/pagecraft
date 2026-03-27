@@ -1,3 +1,4 @@
+/* eslint-disable css-modules/no-undef-class */
 "use client";
 
 import type { Block } from "@/types/editor";

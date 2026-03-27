@@ -20,10 +20,6 @@
   margin: 0;
 }
 
-.prefix {
-  color: #173404;
-}
-
 .word {
   color: #dff0c0;
   transition: color 100ms ease;

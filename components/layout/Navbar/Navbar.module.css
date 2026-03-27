@@ -61,13 +61,6 @@
   flex: 1;
 }
 
-.navItemsRight {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-}
-
 .navLogo {
   font-size: 20px;
   font-weight: 700;
@@ -91,11 +84,7 @@
   .navSpacer {
     display: none;
   }
-
-  .navItemsRight {
-    gap: 8px;
-  }
-
+  
   .cornerSvg {
     display: none;
   }

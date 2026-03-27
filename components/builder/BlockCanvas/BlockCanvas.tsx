@@ -13,7 +13,6 @@ const EditableBlockCanvas = () => {
   const activeBlocks = useEditorStore(selectActiveViewportBlocks);
   const activeEditorViewportMode = useEditorStore((s) => s.activeViewportMode);
   const updateBlock = useEditorStore((s) => s.updateBlock);
-  const reorderBlocks = useEditorStore((s) => s.reorderBlocks);
   const renderViewportMode = activeEditorViewportMode;
   const blocks = activeBlocks;
 

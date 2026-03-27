@@ -2,7 +2,7 @@
 
 import { Circle, Square, Trash2, Upload } from "lucide-react";
 import { useRef, type ChangeEvent } from "react";
-import toolbarStyles from "@/components/builder/BlockHoverToolbar/BlockHoverToolbar.module.css";
+import styles from "./AvatarToolbar.module.css";
 import type { AvatarToolbarProps } from "./ProfileSidebar.types";
 
 const ALLOWED_INPUT_TYPES = new Set(["image/jpeg", "image/png"]);
@@ -45,7 +45,7 @@ export function AvatarToolbar({
   return (
     <>
       <div
-        className={`${toolbarStyles.toolbar} ${visible ? toolbarStyles.toolbarVisible : ""} ${className ?? ""}`}
+        className={`${styles.toolbar} ${visible ? styles.toolbarVisible : ""} ${className ?? ""}`}
         onPointerDown={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
       >
@@ -54,9 +54,9 @@ export function AvatarToolbar({
           title="Circle"
           aria-label="Circle"
           onClick={() => onShapeChange("circle")}
-          className={`${toolbarStyles.sizeButton} ${currentShape === "circle" ? toolbarStyles.active : ""}`}
+          className={`${styles.sizeButton} ${currentShape === "circle" ? styles.active : ""}`}
         >
-          <Circle size={16} className={toolbarStyles.sizeIcon} />
+          <Circle size={16} className={styles.sizeIcon} />
         </button>
 
         <button
@@ -64,9 +64,9 @@ export function AvatarToolbar({
           title="Square"
           aria-label="Square"
           onClick={() => onShapeChange("square")}
-          className={`${toolbarStyles.sizeButton} ${currentShape === "square" ? toolbarStyles.active : ""}`}
+          className={`${styles.sizeButton} ${currentShape === "square" ? styles.active : ""}`}
         >
-          <Square size={16} className={toolbarStyles.sizeIcon} />
+          <Square size={16} className={styles.sizeIcon} />
         </button>
 
         <button
@@ -74,21 +74,21 @@ export function AvatarToolbar({
           title="Upload"
           aria-label="Upload"
           onClick={handlePickFile}
-          className={toolbarStyles.sizeButton}
+          className={styles.sizeButton}
         >
-          <Upload size={16} className={toolbarStyles.sizeIcon} />
+          <Upload size={16} className={styles.sizeIcon} />
         </button>
 
-        <div className={toolbarStyles.divider} />
+        <div className={styles.divider} />
 
         <button
           type="button"
           title="Delete image"
           aria-label="Delete image"
           onClick={onDelete}
-          className={toolbarStyles.deleteButton}
+          className={styles.deleteButton}
         >
-          <Trash2 size={18} className={toolbarStyles.sizeIcon} />
+          <Trash2 size={18} />
         </button>
       </div>
 

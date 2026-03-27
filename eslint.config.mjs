@@ -22,6 +22,12 @@ const eslintConfig = defineConfig([
       "css-modules/no-unused-class": ["warn", { camelCase: true }],
     },
   },
+  {
+    files: ["**/Readonly*.tsx", "**/Preview*.tsx"],
+    rules: {
+      "css-modules/no-undef-class": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

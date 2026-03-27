@@ -11,9 +11,6 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 20;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  touch-action: manipulation;
   opacity: 0;
   visibility: hidden;
   transition:
@@ -26,12 +23,6 @@
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-}
-
-.sizeGroup {
-  display: flex;
-  align-items: center;
-  gap: 2px;
 }
 
 .sizeButton,
@@ -54,12 +45,10 @@
 
 .sizeButton:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: var(--color-white);
 }
 
 .deleteButton:hover {
   background: rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
 }
 
 .sizeButton.active {

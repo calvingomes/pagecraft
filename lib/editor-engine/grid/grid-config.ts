@@ -1,9 +1,5 @@
-import type { Block, BlockWidthPreset } from "@/types/editor";
 import type {
   GridConfig,
-  GridLayout,
-  GridRect,
-  PlacedRect,
 } from "@/types/grid";
 
 // ── Grid configurations (single source of truth) ────────────────────

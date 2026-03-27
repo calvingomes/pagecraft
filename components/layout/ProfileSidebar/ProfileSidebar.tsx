@@ -111,7 +111,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
             />
           ) : null}
         </div>
-        <div className={styles.profileText}>
+        <div>
           {props.variant === "editor" ? (
             <div className={styles.nameInput}>
               <EditorContent editor={displayNameEditor} />
