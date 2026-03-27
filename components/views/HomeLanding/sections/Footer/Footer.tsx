@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ClaimInput } from "@/components/ui/ClaimInput/ClaimInput";
 import layoutStyles from "../../LandingLayout.module.css";
 import styles from "./Footer.module.css";
@@ -6,30 +7,36 @@ import styles from "./Footer.module.css";
 export function Footer() {
   return (
     <footer className={styles.footer} aria-label="Footer">
+      <Image
+        src="/svg/hero-arcs.svg"
+        alt=""
+        fill
+        className={styles.arcSvg}
+        aria-hidden
+      />
       <div className={`${layoutStyles.container} ${styles.footerContainer}`}>
 
-        {/* Top Section: Headline + ClaimInput */}
+        {/* Top: Headline + ClaimInput centered */}
         <div className={styles.footerTop}>
           <h2 className={styles.footerHeadline}>
-            Your link.<br />Your brand.
+            Claim your page today
           </h2>
           <div className={styles.claimWrapper}>
             <ClaimInput />
           </div>
         </div>
 
-        {/* Middle Section: Big Brand Text */}
+        {/* Big Brand Text */}
         <div className={styles.footerBrandContainer}>
-          <h3 className={styles.footerBrandText}>
-            PageCraft
-          </h3>
+          <h3 className={styles.footerBrandText}>PageCraft</h3>
         </div>
 
-        {/* Bottom Section: Legal */}
+        {/* Bottom Bar */}
         <div className={styles.footerBottom}>
           <span className={styles.footerLogo}>PageCraft</span>
           <div className={styles.footerBottomRight}>
             <Link href="#" className={styles.footerBottomLink}>Privacy</Link>
+            <span className={styles.footerDot}>·</span>
             <Link href="#" className={styles.footerBottomLink}>Terms</Link>
           </div>
         </div>
