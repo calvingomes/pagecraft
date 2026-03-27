@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { AuthMode, AuthViewProps } from "./AuthView.types";
 import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
+import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
 import styles from "./AuthView.module.css";
 
 const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
@@ -49,22 +50,14 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
       {/* Right Panel */}
       <div className={styles.rightPanel}>
         {/* Mode Toggle */}
-        <div className={styles.modeToggle}>
-          <button
-            type="button"
-            className={`${styles.toggleBtn} ${isSignUp ? styles.toggleBtnActive : ""}`}
-            onClick={() => setMode("signup")}
-          >
-            Sign up
-          </button>
-          <button
-            type="button"
-            className={`${styles.toggleBtn} ${!isSignUp ? styles.toggleBtnActive : ""}`}
-            onClick={() => setMode("signin")}
-          >
-            Sign in
-          </button>
-        </div>
+        <TogglePill<AuthMode>
+          value={mode}
+          onChange={setMode}
+          options={[
+            { value: "signup", label: "Sign up" },
+            { value: "signin", label: "Sign in" },
+          ]}
+        />
 
         <div className={styles.header}>
           <h1 className={styles.title}>
@@ -80,7 +73,7 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
         {/* Username input — sign-up only */}
         {isSignUp && (
           <div className={styles.usernameInputWrapper}>
-            <span className={styles.usernamePrefix}>pagecraft.com/</span>
+            <span className={styles.usernamePrefix}>pagecraft-psi.vercel.app/</span>
             <input
               type="text"
               value={username}

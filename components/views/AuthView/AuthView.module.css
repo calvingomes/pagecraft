@@ -105,34 +105,10 @@
   padding: 0 72px;
   overflow-y: auto;
 }
-
-.modeToggle {
-  display: flex;
-  background: #e8e8e8;
-  border-radius: 9999px;
-  padding: 4px;
-  width: fit-content;
+.rightPanel > :first-child {
   margin-bottom: 36px;
 }
 
-.toggleBtn {
-  padding: 8px 24px;
-  border-radius: 9999px;
-  border: none;
-  background: transparent;
-  font-size: 15px;
-  font-weight: 500;
-  color: #6b7280;
-  cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
-  font-family: inherit;
-}
-
-.toggleBtnActive {
-  background: #ffffff;
-  color: #0e220e;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}
 
 .header {
   margin-bottom: 32px;
