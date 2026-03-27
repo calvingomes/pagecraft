@@ -11,4 +11,5 @@ export type PageLayoutProps = {
   sidebarPosition?: SidebarPosition;
   previewViewport?: PreviewViewport;
   framedMobilePreview?: boolean;
+  isEditor?: boolean;
 };

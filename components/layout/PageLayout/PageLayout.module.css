@@ -27,7 +27,7 @@
 }
 
 @media (--bp-mobile) {
-  .pageLayout {
+  .pageLayout[data-is-editor="true"] {
     filter: blur(15px);
   }
 

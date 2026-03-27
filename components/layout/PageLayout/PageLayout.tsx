@@ -11,6 +11,7 @@ export function PageLayout({
   sidebarPosition = "left",
   previewViewport = "desktop",
   framedMobilePreview = false,
+  isEditor = false,
 }: PageLayoutProps) {
   const [sidebar, content] = React.Children.toArray(children);
 
@@ -34,6 +35,7 @@ export function PageLayout({
       data-sidebar={sidebarPosition}
       data-preview={previewViewport}
       data-framed-mobile-preview={framedMobilePreview ? "true" : "false"}
+      data-is-editor={isEditor ? "true" : "false"}
       style={
         {
           "--page-bg": theme.bg,
