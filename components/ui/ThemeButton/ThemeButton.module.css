@@ -13,6 +13,7 @@
   font-family: inherit;
   line-height: 1;
   white-space: nowrap;
+  width: fit-content;
 }
 
 .icon {
@@ -30,8 +31,8 @@
   transition: transform 300ms ease;
 }
 
-.button:hover .icon,
-.button:hover .iconFlat {
+.button:hover:not(:disabled) .icon,
+.button:hover:not(:disabled) .iconFlat {
   transform: rotate(-45deg);
 }
 
