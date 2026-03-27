@@ -3,7 +3,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px;
+  padding: 4px;
   background: color-mix(in srgb, #252525 12%, white);
   border: 1px solid #d6d6d6;
   border-radius: 12px;
@@ -14,12 +14,12 @@
   position: absolute;
   background: #ffffff;
   border: 1px solid #d8d8d8;
-  border-radius: 10px;
+  border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   pointer-events: none;
   z-index: 0;
   transition: left 200ms cubic-bezier(0.4, 0, 0.2, 1),
-              width 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    width 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn {
@@ -29,11 +29,11 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-width: 44px;
-  height: 44px;
+  min-width: 35px;
+  height: 35px;
   padding: 0 14px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   color: #7b7b7b;
   background: transparent;
   cursor: pointer;
@@ -46,4 +46,23 @@
 
 .btnActive {
   color: #2a2a2a;
+}
+
+.pillDark {
+  background: color-mix(in srgb, #97C459 8%, #f3f5f2);
+  border: 1px solid color-mix(in srgb, #97C459 20%, transparent);
+}
+
+.pillDark .thumb {
+  background: #173404;
+  border: 1px solid #0e220e;
+}
+
+.pillDark .btn {
+  color: #6b7280;
+}
+
+.pillDark :global(.btnActive),
+.pillDark .btnActive {
+  color: #ffffff;
 }

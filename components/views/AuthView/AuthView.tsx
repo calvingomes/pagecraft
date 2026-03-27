@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 import type { AuthMode, AuthViewProps } from "./AuthView.types";
 import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
@@ -28,88 +30,91 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
     <div className={styles.authPageWrapper}>
       {/* Left Panel */}
       <div className={styles.leftPanel}>
-        <Link href="/home" className={styles.backLink}>
-          ← Back to home
-        </Link>
+        <Image
+          src="/svg/hero-arcs.svg"
+          alt=""
+          fill
+          className={styles.arcSvg}
+          aria-hidden
+        />
+
+        <div className={styles.topLeftRow}>
+          <div className={styles.wordmark}>PageCraft</div>
+          <Link href="/home" className={styles.backLink}>
+            ← Back to home
+          </Link>
+        </div>
 
         <div className={styles.leftContent}>
-          <div className={styles.wordmark}>PageCraft</div>
-          <p className={styles.tagline}>
-            Your link.<br />Your brand.
+          <h1 className={styles.tagline}>
+            Your link.<br />
+            <span className={styles.taglineAccent}>Your brand.</span>
+          </h1>
+          <p className={styles.leftSubtitle}>
+            One link for everything you do.
           </p>
         </div>
 
-        {/* Decorative stacked cards */}
-        <div className={styles.cardStack}>
-          <div className={`${styles.decorCard} ${styles.decorCard1}`} />
-          <div className={`${styles.decorCard} ${styles.decorCard2}`} />
-          <div className={`${styles.decorCard} ${styles.decorCard3}`} />
+        <div className={styles.rectStack}>
+          <Image
+            src="/svg/stacked-cards.svg"
+            alt=""
+            fill
+            className={styles.rectImage}
+            aria-hidden
+          />
         </div>
       </div>
 
-      {/* Right Panel */}
       <div className={styles.rightPanel}>
-        {/* Mode Toggle */}
-        <TogglePill<AuthMode>
-          value={mode}
-          onChange={setMode}
-          options={[
-            { value: "signup", label: "Sign up" },
-            { value: "signin", label: "Sign in" },
-          ]}
-        />
+        <div className={styles.formContainer}>
+          <TogglePill<AuthMode>
+            value={mode}
+            onChange={setMode}
+            variant="dark"
+            options={[
+              { value: "signup", label: "Sign up" },
+              { value: "signin", label: "Sign in" },
+            ]}
+          />
 
-        <div className={styles.header}>
-          <h1 className={styles.title}>
-            {isSignUp ? "Create your page" : "Welcome back"}
-          </h1>
-          <p className={styles.subtitle}>
-            {isSignUp
-              ? "Get your own link-in-bio page in seconds."
-              : "Sign in to continue to your PageCraft."}
-          </p>
+          <div className={styles.header}>
+            <h1 className={styles.title}>
+              {isSignUp ? "Create your page" : "Welcome back"}
+            </h1>
+            <p className={styles.subtitle}>
+              {isSignUp
+                ? "Get your own link-in-bio page in seconds."
+                : "Sign in to continue to your PageCraft."}
+            </p>
+          </div>
+
+          {/* Username input — sign-up only */}
+          {isSignUp && (
+            <div className={styles.usernameInputWrapper}>
+              <span className={styles.usernamePrefix}>pagecraft-psi.vercel.app/</span>
+              <input
+                type="text"
+                value={username}
+                onChange={handleUsernameChange}
+                placeholder="your-name"
+                className={styles.usernameInput}
+                autoComplete="off"
+                spellCheck={false}
+              />
+            </div>
+          )}
+
+          <ThemeButton
+            label={isSignUp ? "Create an account with Google" : "Continue with Google"}
+            cta={handleGoogleSignIn}
+            bgColor={canProceed ? "#EF9F27" : "#e5e7eb"}
+            textColor={canProceed ? "#ffffff" : "#0e220e"}
+            iconCircle={false}
+            icon={ArrowRight}
+            disabled={!canProceed}
+          />
         </div>
-
-        {/* Username input — sign-up only */}
-        {isSignUp && (
-          <div className={styles.usernameInputWrapper}>
-            <span className={styles.usernamePrefix}>pagecraft-psi.vercel.app/</span>
-            <input
-              type="text"
-              value={username}
-              onChange={handleUsernameChange}
-              placeholder="your-name"
-              className={styles.usernameInput}
-              autoComplete="off"
-              spellCheck={false}
-            />
-          </div>
-        )}
-
-        {/* Email/password inputs — UI only, uncomment when ready
-        {isSignUp && (
-          <div className={styles.emailInputWrapper}>
-            <input type="email" placeholder="Email address" className={styles.emailInput} />
-            <input type="password" placeholder="Password" className={styles.emailInput} />
-            <input type="password" placeholder="Confirm password" className={styles.emailInput} />
-          </div>
-        )}
-        {!isSignUp && (
-          <div className={styles.emailInputWrapper}>
-            <input type="email" placeholder="Email address" className={styles.emailInput} />
-            <input type="password" placeholder="Password" className={styles.emailInput} />
-          </div>
-        )}
-        */}
-
-        <ThemeButton
-          label={isSignUp ? "Create an account with Google" : "Continue with Google"}
-          cta={handleGoogleSignIn}
-          bgColor={canProceed ? "#f6d045" : "#e5e7eb"}
-          textColor="#0e220e"
-          iconCircle={false}
-          disabled={!canProceed}
-        />
       </div>
     </div>
   );

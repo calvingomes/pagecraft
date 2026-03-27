@@ -8,7 +8,8 @@ export function TogglePill<T extends string>({
   options,
   value,
   onChange,
-}: TogglePillProps<T>) {
+  variant = "default",
+}: TogglePillProps<T> & { variant?: "default" | "dark" }) {
   const pillRef = useRef<HTMLDivElement>(null);
   const [thumb, setThumb] = useState({ left: 0, width: 0, height: 0 });
 
@@ -27,7 +28,10 @@ export function TogglePill<T extends string>({
   }, [value, options]);
 
   return (
-    <div ref={pillRef} className={styles.pill}>
+    <div
+      ref={pillRef}
+      className={`${styles.pill} ${variant === "dark" ? styles.pillDark : ""}`}
+    >
       <span
         className={styles.thumb}
         style={{ left: thumb.left, width: thumb.width, height: thumb.height }}

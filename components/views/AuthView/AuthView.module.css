@@ -7,22 +7,47 @@
   overflow: hidden;
 }
 
-/* ---- Left Panel (60%) ---- */
 .leftPanel {
   flex: 0 0 60%;
-  background: #0e220e;
+  background: #173404;
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 48px 56px;
+  padding: 48px 64px 0px;
   overflow: hidden;
+}
+
+.arcSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+.topLeftRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 48px;
+}
+
+.wordmark {
+  font-family: var(--font-belanosima);
+  font-size: 20px;
+  font-weight: 400;
+  color: #97C459;
+  letter-spacing: 0.12em;
 }
 
 .backLink {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(255, 255, 255, 0.6);
   text-decoration: none;
-  width: fit-content;
   transition: color 150ms ease;
 }
 
@@ -31,95 +56,113 @@
 }
 
 .leftContent {
-  margin-top: auto;
-  margin-bottom: auto;
+  margin-top: 150px;
+  margin-bottom: 40px;
   position: relative;
   z-index: 2;
-}
-
-.wordmark {
-  font-size: 18px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 32px;
+  width: 100%;
 }
 
 .tagline {
-  font-size: clamp(40px, 5vw, 72px);
+  font-size: clamp(48px, 6vw, 84px);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.05;
   letter-spacing: -0.03em;
   color: #ffffff;
-  margin: 0;
+  margin-bottom: 28px;
+  max-width: 12ch;
 }
 
-/* Decorative stacked cards */
-.cardStack {
-  position: absolute;
-  bottom: -60px;
-  right: -40px;
-  width: 420px;
-  height: 340px;
-  pointer-events: none;
+.taglineAccent {
+  color: #97C459;
 }
 
-.decorCard {
-  position: absolute;
-  width: 340px;
-  height: 220px;
-  border-radius: 20px;
+.leftSubtitle {
+  font-size: 19px;
+  color: rgba(255, 255, 255, 0.4);
+  max-width: none;
+  margin-bottom: 40px;
 }
 
-.decorCard1 {
-  background: #FCF2CB;
-  bottom: 0;
-  right: 0;
-  transform: rotate(8deg);
-  opacity: 0.9;
+.rectStack {
+  position: relative;
+  width: 100%;
+  /* max-width: 440px; */
+  height: 380px;
+  width: 500px;
+  z-index: 2;
+  margin: 0 auto;
 }
 
-.decorCard2 {
-  background: #BFE7E6;
-  bottom: 30px;
-  right: 30px;
-  transform: rotate(3deg);
-  opacity: 0.95;
+.rectImage {
+  object-fit: contain;
+  /* object-position: center bottom; */
 }
 
-.decorCard3 {
-  background: #CBEED3;
-  bottom: 60px;
-  right: 60px;
-  transform: rotate(-2deg);
-}
-
-/* ---- Right Panel (40%) ---- */
+/* ---- Right Panel (35%) ---- */
 .rightPanel {
   flex: 0 0 40%;
   background: #f3f5f2;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0 72px;
+  position: relative;
+  max-width: 600px;
   overflow-y: auto;
 }
 
+.formContainer {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  padding: 0 72px;
+  transform: translateY(-50%);
+  min-height: 400px;
+}
+
 .rightPanel> :first-child {
+  margin-bottom: 48px;
+}
+
+.separator {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 24px 0;
+  width: 100%;
+}
+
+.separator::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 1px;
+  background: #e5e7eb;
+  z-index: 1;
+}
+
+.separatorText {
+  position: relative;
+  z-index: 2;
+  background: #f3f5f2;
+  padding: 0 16px;
+  font-size: 14px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.header {
+  margin-top: 26px;
   margin-bottom: 36px;
 }
 
-
-.header {
-  margin-bottom: 32px;
-}
-
 .title {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 700;
   margin-bottom: 8px;
-  color: #0e220e;
+  color: #173404;
   letter-spacing: -0.02em;
 }
 
@@ -134,15 +177,15 @@
   align-items: center;
   background: #ffffff;
   border-radius: 12px;
-  padding: 14px 20px;
-  margin-bottom: 20px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
   font-size: 16px;
   border: 1.5px solid #e5e7eb;
   transition: border-color 150ms ease;
 }
 
 .usernameInputWrapper:focus-within {
-  border-color: #0e220e;
+  border-color: #173404;
 }
 
 .usernamePrefix {
@@ -156,7 +199,7 @@
   background: transparent;
   font-size: 16px;
   font-weight: 600;
-  color: #0e220e;
+  color: #173404;
   outline: none;
   width: 100%;
   font-family: inherit;
@@ -166,12 +209,6 @@
   color: #d1d5db;
   font-weight: 400;
 }
-
-/* Email inputs — uncomment when implementing email auth
-.emailInputWrapper { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-.emailInput { width: 100%; padding: 14px 18px; border: 1.5px solid #e5e7eb; border-radius: 10px; font-size: 15px; font-family: inherit; color: #0e220e; outline: none; transition: border-color 150ms ease; background: #fff; }
-.emailInput:focus { border-color: #0e220e; }
-*/
 
 /* ---- Mobile ---- */
 @media (--bp-mobile) {
@@ -183,28 +220,22 @@
 
   .leftPanel {
     flex: 0 0 auto;
-    padding: 40px 28px 100px;
-    min-height: 320px;
+    padding: 40px 24px 60px;
+    min-height: 440px;
   }
 
   .tagline {
-    font-size: 40px;
+    font-size: 38px;
   }
 
-  .cardStack {
-    width: 280px;
-    height: 220px;
-    bottom: -40px;
-    right: -20px;
-  }
-
-  .decorCard {
-    width: 220px;
-    height: 140px;
+  .rectStack {
+    max-width: 320px;
+    height: 200px;
+    margin-left: 0;
   }
 
   .rightPanel {
     flex: 1;
-    padding: 48px 28px;
+    padding: 48px 24px;
   }
 }
