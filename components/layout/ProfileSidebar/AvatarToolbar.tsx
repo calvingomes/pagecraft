@@ -54,6 +54,7 @@ export function AvatarToolbar({
       >
         <ToggleGroup.Root
           type="single"
+          className={styles.group}
           value={currentShape}
           onValueChange={(nextValue) => {
             if (nextValue === "circle" || nextValue === "square") {

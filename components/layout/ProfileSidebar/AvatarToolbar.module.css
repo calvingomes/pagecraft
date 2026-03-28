@@ -25,6 +25,12 @@
   pointer-events: auto;
 }
 
+.group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .sizeButton,
 .deleteButton {
   display: flex;
