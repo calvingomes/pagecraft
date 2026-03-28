@@ -1,6 +1,7 @@
 /* eslint-disable css-modules/no-unused-class */
 "use client";
 
+import * as RadioGroup from "@radix-ui/react-radio-group";
 import { LayoutTemplate, PanelLeft, PanelRight } from "lucide-react";
 import styles from "./Toolbar.module.css";
 import type {
@@ -18,76 +19,87 @@ const PAGE_BG_OPTIONS: PageBackgroundOption[] = [
 ];
 
 export const ToolbarPalatte = ({
-  isOpen,
   onChangeBackground,
   onChangeSidebarPosition,
   background = "page-bg-1",
   sidebarPosition = "left",
   showSidebarPositionControls = true,
 }: ToolbarPalatteProps) => {
-  if (!isOpen) return null;
-
   return (
     <div className={styles.palettePopover}>
       <div className={styles.paletteSection}>
         <span className={styles.paletteLabel}>Background</span>
-        <div className={styles.colorSwatches}>
+        <RadioGroup.Root
+          className={styles.colorSwatches}
+          value={background}
+          onValueChange={(next) =>
+            onChangeBackground?.(next as PageBackgroundOption["id"])
+          }
+          aria-label="Background"
+        >
           {PAGE_BG_OPTIONS.map((option) => (
-            <button
+            <RadioGroup.Item
               key={option.id}
-              type="button"
-              className={`${styles.colorSwatch} ${background === option.id ? styles.colorSwatchSelected : ""
-                }`}
+              className={`${styles.colorSwatch} ${
+                background === option.id ? styles.colorSwatchSelected : ""
+              }`}
               style={{ background: option.cssVar }}
-              onClick={() => onChangeBackground?.(option.id)}
+              value={option.id}
               aria-label={`Background ${option.id}`}
             />
           ))}
-        </div>
+        </RadioGroup.Root>
       </div>
       {showSidebarPositionControls && (
         <>
           <div className={styles.paletteDivider} />
           <div className={styles.paletteSection}>
             <span className={styles.paletteLabel}>Profile position</span>
-            <div className={styles.sidebarPositionGroup}>
-              <button
-                type="button"
-                className={`${styles.sidebarPositionBtn} ${sidebarPosition === "left"
+            <RadioGroup.Root
+              className={styles.sidebarPositionGroup}
+              value={sidebarPosition}
+              onValueChange={(next) =>
+                onChangeSidebarPosition?.(next as "left" | "center" | "right")
+              }
+              aria-label="Profile position"
+            >
+              <RadioGroup.Item
+                className={`${styles.sidebarPositionBtn} ${
+                  sidebarPosition === "left"
                     ? styles.sidebarPositionSelected
                     : ""
-                  }`}
-                onClick={() => onChangeSidebarPosition?.("left")}
+                }`}
+                value="left"
                 title="Profile on left"
                 aria-label="Profile on left"
               >
                 <PanelLeft size={18} />
-              </button>
-              <button
-                type="button"
-                className={`${styles.sidebarPositionBtn} ${sidebarPosition === "center"
+              </RadioGroup.Item>
+              <RadioGroup.Item
+                className={`${styles.sidebarPositionBtn} ${
+                  sidebarPosition === "center"
                     ? styles.sidebarPositionSelected
                     : ""
-                  }`}
-                onClick={() => onChangeSidebarPosition?.("center")}
+                }`}
+                value="center"
                 title="Profile in center"
                 aria-label="Profile in center"
               >
                 <LayoutTemplate size={18} />
-              </button>
-              <button
-                type="button"
-                className={`${styles.sidebarPositionBtn} ${sidebarPosition === "right"
+              </RadioGroup.Item>
+              <RadioGroup.Item
+                className={`${styles.sidebarPositionBtn} ${
+                  sidebarPosition === "right"
                     ? styles.sidebarPositionSelected
                     : ""
-                  }`}
-                onClick={() => onChangeSidebarPosition?.("right")}
+                }`}
+                value="right"
                 title="Profile on right"
                 aria-label="Profile on right"
               >
                 <PanelRight size={18} />
-              </button>
-            </div>
+              </RadioGroup.Item>
+            </RadioGroup.Root>
           </div>
         </>
       )}

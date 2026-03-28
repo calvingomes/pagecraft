@@ -29,6 +29,7 @@ PageCraft is a "link-in-bio" style page builder that allows users to create a si
 - **Styling**: CSS Modules with PostCSS (using CSS variables for theming)
 - **Drag & Drop**: @dnd-kit (Core, Sortable, Utilities)
 - **Rich Text**: Tiptap (Headless wrapper around ProseMirror)
+- **UI Primitives**: Radix UI (Dialog, Popover, Toolbar, Toggle Group, Radio Group, Label, Slot)
 - **Icons**: Lucide React
 - **Image Processing**: browser-image-compression (client-side WebP conversion)
 
@@ -59,7 +60,7 @@ hooks/          — Shared React hooks (not tied to a single component)
 components/
   blocks/       — Visual block components (TextBlock, LinkBlock, ImageBlock, SectionTitleBlock)
   builder/      — Editor infrastructure (canvas, toolbars, dnd, registry)
-  layout/       — Page-level layout shells (Header, Navbar, PageLayout, ProfileSidebar)
+  layout/       — Page-level layout shells (Navbar, PageLayout, ProfileSidebar)
   ui/           — Generic reusable UI primitives (Button, etc.)
   views/        — Full-page view compositions (AuthView, HomeLanding, PageView)
 app/            — Next.js App Router pages and API routes
@@ -92,11 +93,11 @@ styles/         — Global CSS custom properties and media queries
 
 ## 4. CSS Modules
 
-- **Every component gets its own `*.module.css`** — no global utility classes.
-- **ProseMirror overrides** go in a co-located `*.prosemirror.css` file imported from the module CSS.
+- **Use CSS Modules per feature/folder** and keep styles local. Sibling files can share a module when they are one composed control (e.g. toolbar variants).
 - Use CSS custom properties from `styles/colors.css` and `styles/media.css` — never hardcode colors or breakpoints that are already defined as variables.
 - **Delete dead CSS immediately.** If a class is no longer referenced in the component, remove it. Do not leave commented-out rules.
 - **No duplicate selectors** across files. If two components need the same style, extract it to a shared module or use CSS custom properties.
+- If a shared module is intentional across sibling components, scoped `css-modules` lint suppressions are acceptable.
 - **Avoid `composes` keyword** for cross-file composition. Import the style object in JS and concatenate class names:
   ```tsx
   import styles from "./Section.module.css";
@@ -168,6 +169,7 @@ Current product behavior:
 ### Grid Functions (all accept optional `config: GridConfig = DESKTOP_GRID`)
 
 **Located in `lib/editor-engine/grid/grid-math.ts`:**
+
 - `spansForPreset(preset, config?)` → `{ w, h }` column/row spans (width clamped to `config.cols`)
 - `spansForBlock(block, overridePreset?, config?)` → block-aware spans
 - `sizePxForPreset(preset, config?)` → `{ widthPx, heightPx }` derived pixel sizes
@@ -175,18 +177,22 @@ Current product behavior:
 - `rectForBlock(block, layout?, config?)` → full `GridRect` geometry
 
 **Located in `lib/editor-engine/layout/collision.ts`:**
+
 - `canPlaceBlockAt(block, at, placed, config?)` — bounds + collision check
 - `findFirstFreeSpot(block, placed, config?)` — first available grid position
 - `resolveCollisions(anchoredId, layout, preset, blocks, getLayout, config?)` — push all blocks to non-overlapping positions
-  *(Uses `OccupancyGrid` internally for fast O(1) coordinate mapping instead of recursive overlaps checks)*
+  _(Uses `OccupancyGrid` internally for fast O(1) coordinate mapping instead of recursive overlaps checks)_
 
 **Located in `lib/editor-engine/grid/occupancy.ts`:**
+
 - `OccupancyGrid` class — O(1) spatial map for tracking filled sub-rows on the canvas.
 
 **Located in `lib/editor-engine/grid/compact.ts`:**
+
 - `compactEmptyRows(blocks, config?)` — remove empty rows
 
 **Located in `lib/editor-engine/layout/drag-placement.ts`:**
+
 - `computeTargetFromOver` — determine grid target from drop event
 - `computePushedLayouts` — calculate new layouts during drag
 
@@ -254,7 +260,7 @@ blocks/TextBlock/
 - Viewport logic should be centralized in `lib/editor-engine/data/viewport.ts` and hooks (`hooks/useViewportMode.ts`, `hooks/useEditorViewportPreview.ts`).
 - The editor has a **desktop/mobile preview toggle** for visual editing without resizing the browser window, but only when screen width is `>=960`.
 - `PageLayout` exposes `previewViewport` (`"desktop" | "mobile"`) and `framedMobilePreview` (boolean): editor passes `framedMobilePreview={true}` for the framed mobile preview, while view pages keep it `false` for clean public mobile layout.
-- In mobile preview mode, only page content is previewed (`ProfileSidebar` + `BlockCanvas`); editor controls (`SaveButton`, `LogoutButton`, preview toggle, bottom toolbar) remain outside the preview frame.
+- In mobile preview mode, only page content is previewed (`ProfileSidebar` + `BlockCanvas`); editor chrome (save/signout buttons, preview toggle, bottom toolbar) remains outside the preview frame.
 - Mobile preview frame is capped to `525px` max width and intentionally styled (frame/background) to make preview boundaries explicit.
 - Sticky sidebar styling is viewport-driven: sticky only when `data-preview="desktop"` and sidebar is not `center`.
 - Tablet mode (`960-1359`) should force profile position to `center` in editor and hide the profile-position section from the toolbar palette.
@@ -364,3 +370,15 @@ Used in: `EditorState.setAllBlocks`, `saveEditorPage`, server component → `Pag
 6. Handle creation in `app/editor/page.tsx` toolbar action.
 7. Handle normalization in `lib/editor-engine/data/normalization.ts` → `normalizeStoredBlocks`.
 8. If the block has viewport-specific rendering, handle it in both `DesktopBlockCanvas` and `MobileCanvasGrid`.
+
+---
+
+## 13. Radix UI Usage
+
+- Prefer Radix primitives for interactive UI controls (dialogs, popovers, toolbars, segmented controls) while preserving current visuals.
+- Keep class names and module structure stable when migrating to Radix; behavior/accessibility should improve without layout redesign.
+- Use `Popover.Portal` / `Dialog.Portal` for layered UI. Avoid manual document/body scroll-lock logic when Radix already handles it.
+- For toolbar-attached popovers, keep trigger geometry stable while open. Do not apply hover transforms to active popover triggers.
+- For palette-style popovers that should match trigger container size, set width from the toolbar container and keep inner palette wrapper at `width: 100%`.
+- If overlay is open in editor, hide or blur editor chrome (save/signout/toggles/toolbar) through a single wrapper state instead of z-index fights across independent stacking contexts.
+- For visually hidden labels, prefer the shared `lib/utils/visuallyHidden.ts` style constant over duplicating `.visuallyHidden` classes across CSS modules.

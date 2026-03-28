@@ -1,5 +1,6 @@
 "use client";
 
+import * as Toolbar from "@radix-ui/react-toolbar";
 import { useMemo, useCallback } from "react";
 import { EditorContent } from "@tiptap/react";
 import { Link2, Trash2 } from "lucide-react";
@@ -160,15 +161,17 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
         {isEditable ? (
           <>
             <div className={styles.previewOverlay} aria-hidden />
-            <button
-              type="button"
-              className={styles.previewDeleteButton}
-              onClick={handleRemoveMetaImage}
-              aria-label="Remove preview image"
-              title="Remove preview image"
-            >
-              <Trash2 size={18} />
-            </button>
+            <Toolbar.Root aria-label="Preview image actions">
+              <Toolbar.Button
+                type="button"
+                className={styles.previewDeleteButton}
+                onClick={handleRemoveMetaImage}
+                aria-label="Remove preview image"
+                title="Remove preview image"
+              >
+                <Trash2 size={18} />
+              </Toolbar.Button>
+            </Toolbar.Root>
           </>
         ) : null}
       </div>

@@ -361,77 +361,81 @@ export default function EditorPage() {
     return <div>Loading editor…</div>;
   }
 
+  const isOverlayOpen = showSaveOverlay || isMobileScreen;
+
   return (
     <EditorProvider
       username={username ?? null}
       onUpdateBlock={handleUpdateBlock}
       onRemoveBlock={handleRemoveBlock}
     >
-      <div className={styles.saveButtonContainer}>
-        <ThemeButton
-          label={isSaving ? "Saving..." : "Save"}
-          cta={handleSave}
-          bgColor="#f6d045"
-          disabled={isSaving}
-        />
-      </div>
-      <div className={styles.logoutButtonContainer}>
-        <ThemeButton
-          label="Sign out"
-          cta={handleLogout}
-          bgColor="transparent"
-          textColor="#0e220e"
-        />
-      </div>
-      {canTogglePreview && (
-        <div className={styles.previewToggle}>
-          <TogglePill
-            value={previewView}
-            onChange={setPreviewView}
-            options={[
-              {
-                value: "desktop",
-                label: <Laptop size={20} />,
-                ariaLabel: "Preview desktop view",
-              },
-              {
-                value: "mobile",
-                label: <Smartphone size={20} />,
-                ariaLabel: "Preview mobile view",
-              },
-            ]}
+      <div style={isOverlayOpen ? { filter: "blur(4px)" } : undefined}>
+        <div className={styles.saveButtonContainer}>
+          <ThemeButton
+            label={isSaving ? "Saving..." : "Save"}
+            cta={handleSave}
+            bgColor="#f6d045"
+            disabled={isSaving}
           />
         </div>
-      )}
-      <PageLayout
-        background={background}
-        sidebarPosition={effectiveSidebarPosition}
-        previewViewport={previewView}
-        framedMobilePreview
-        isEditor
-      >
-        <ProfileSidebar
-          variant="editor"
-          position={effectiveSidebarPosition}
-          displayName={displayName}
-          bioHtml={bioHtml}
-          onChangeDisplayName={setDisplayName}
-          onChangeBioHtml={setBioHtml}
-          avatarUrl={avatarUrl}
-          avatarShape={avatarShape}
-          onChangeAvatarUrl={setAvatarUrl}
-          onChangeAvatarShape={setAvatarShape}
+        <div className={styles.logoutButtonContainer}>
+          <ThemeButton
+            label="Sign out"
+            cta={handleLogout}
+            bgColor="transparent"
+            textColor="#0e220e"
+          />
+        </div>
+        {canTogglePreview && (
+          <div className={styles.previewToggle}>
+            <TogglePill
+              value={previewView}
+              onChange={setPreviewView}
+              options={[
+                {
+                  value: "desktop",
+                  label: <Laptop size={20} />,
+                  ariaLabel: "Preview desktop view",
+                },
+                {
+                  value: "mobile",
+                  label: <Smartphone size={20} />,
+                  ariaLabel: "Preview mobile view",
+                },
+              ]}
+            />
+          </div>
+        )}
+        <PageLayout
+          background={background}
+          sidebarPosition={effectiveSidebarPosition}
+          previewViewport={previewView}
+          framedMobilePreview
+          isEditor
+        >
+          <ProfileSidebar
+            variant="editor"
+            position={effectiveSidebarPosition}
+            displayName={displayName}
+            bioHtml={bioHtml}
+            onChangeDisplayName={setDisplayName}
+            onChangeBioHtml={setBioHtml}
+            avatarUrl={avatarUrl}
+            avatarShape={avatarShape}
+            onChangeAvatarUrl={setAvatarUrl}
+            onChangeAvatarShape={setAvatarShape}
+          />
+          <BlockCanvas editable />
+        </PageLayout>
+        <Toolbar
+          onAddBlock={handleAddBlock}
+          onChangeBackground={setBackground}
+          onChangeSidebarPosition={setDesktopSidebarPosition}
+          background={background}
+          sidebarPosition={desktopSidebarPosition}
+          showSidebarPositionControls={isDesktopEditing}
         />
-        <BlockCanvas editable />
-      </PageLayout>
-      <Toolbar
-        onAddBlock={handleAddBlock}
-        onChangeBackground={setBackground}
-        onChangeSidebarPosition={setDesktopSidebarPosition}
-        background={background}
-        sidebarPosition={desktopSidebarPosition}
-        showSidebarPositionControls={isDesktopEditing}
-      />
+      </div>
       <OverlayPopup
         open={showSaveOverlay}
         title="Saving changes"

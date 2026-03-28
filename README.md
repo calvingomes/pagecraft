@@ -31,6 +31,7 @@ Sign in and open `http://localhost:3000/editor` to build your profile. Published
 
 - **Framework** - Next.js (App Router)
 - **Drag and drop** - `@dnd-kit`
+- **UI primitives** - `Radix UI`
 - **Database / auth** - Supabase
 - **Package manager** - Bun
 

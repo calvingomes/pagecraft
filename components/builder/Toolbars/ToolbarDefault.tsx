@@ -1,6 +1,8 @@
 /* eslint-disable css-modules/no-unused-class */
 "use client";
 
+import * as Popover from "@radix-ui/react-popover";
+import * as Toolbar from "@radix-ui/react-toolbar";
 import { useRef, useState, type ChangeEvent } from "react";
 import {
   Type,
@@ -23,7 +25,17 @@ export const ToolbarDefault = ({
   showSidebarPositionControls = true,
 }: ToolbarDefaultProps) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const [toolbarWidth, setToolbarWidth] = useState<number | null>(null);
+  const toolbarContainerRef = useRef<HTMLDivElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handlePaletteOpenChange = (nextOpen: boolean) => {
+    if (nextOpen && toolbarContainerRef.current) {
+      setToolbarWidth(Math.round(toolbarContainerRef.current.offsetWidth));
+    }
+
+    setIsPaletteOpen(nextOpen);
+  };
 
   const handleImageClick = () => {
     imageInputRef.current?.click();
@@ -38,48 +50,80 @@ export const ToolbarDefault = ({
   };
 
   return (
-    <div className={styles.toolbarContainer}>
-      <div className={styles.toolbarContent}>
-        <button
+    <div className={styles.toolbarContainer} ref={toolbarContainerRef}>
+      <Toolbar.Root
+        className={styles.toolbarContent}
+        aria-label="Add block toolbar"
+      >
+        <Toolbar.Button
           className={styles.toolButton}
           title="Text"
           type="button"
           onClick={() => onAddBlock?.("text")}
+          aria-label="Add text block"
         >
           <Type size={18} />
-        </button>
-        <button
+        </Toolbar.Button>
+        <Toolbar.Button
           className={styles.toolButton}
           title="Link"
           type="button"
           onClick={onOpenLink}
+          aria-label="Add link block"
         >
           <Link2 size={18} />
-        </button>
-        <button
+        </Toolbar.Button>
+        <Toolbar.Button
           className={styles.toolButton}
           title="Image"
           type="button"
           onClick={handleImageClick}
+          aria-label="Add image block"
         >
           <ImageIcon size={18} />
-        </button>
-        <button
+        </Toolbar.Button>
+        <Toolbar.Button
           className={styles.toolButton}
           title="Section title"
           type="button"
           onClick={() => onAddBlock?.("sectionTitle")}
+          aria-label="Add section title block"
         >
           <Heading size={18} />
-        </button>
-        <button
-          className={styles.toolButton}
-          title="Background color"
-          type="button"
-          onClick={() => setIsPaletteOpen((open) => !open)}
+        </Toolbar.Button>
+        <Popover.Root
+          open={isPaletteOpen}
+          onOpenChange={handlePaletteOpenChange}
         >
-          <Palette size={18} />
-        </button>
+          <Popover.Trigger asChild>
+            <Toolbar.Button
+              className={styles.toolButton}
+              title="Background color"
+              type="button"
+              data-toolbar-role="palette"
+              aria-label="Background color"
+            >
+              <Palette size={18} />
+            </Toolbar.Button>
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Content
+              side="top"
+              align="end"
+              sideOffset={8}
+              className={styles.popoverContent}
+              style={toolbarWidth ? { width: `${toolbarWidth}px` } : undefined}
+            >
+              <ToolbarPalatte
+                background={background}
+                sidebarPosition={sidebarPosition}
+                onChangeBackground={onChangeBackground}
+                onChangeSidebarPosition={onChangeSidebarPosition}
+                showSidebarPositionControls={showSidebarPositionControls}
+              />
+            </Popover.Content>
+          </Popover.Portal>
+        </Popover.Root>
         <input
           ref={imageInputRef}
           type="file"
@@ -87,15 +131,7 @@ export const ToolbarDefault = ({
           onChange={handleImageChange}
           hidden
         />
-      </div>
-      <ToolbarPalatte
-        isOpen={isPaletteOpen}
-        background={background}
-        sidebarPosition={sidebarPosition}
-        onChangeBackground={onChangeBackground}
-        onChangeSidebarPosition={onChangeSidebarPosition}
-        showSidebarPositionControls={showSidebarPositionControls}
-      />
+      </Toolbar.Root>
     </div>
   );
 };

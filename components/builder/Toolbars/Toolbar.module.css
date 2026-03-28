@@ -47,6 +47,17 @@
   transform: scale(0.95);
 }
 
+.toolButton[data-toolbar-role="palette"]:hover,
+.toolButton[data-toolbar-role="palette"]:active,
+.toolButton[data-toolbar-role="palette"][data-state="open"] {
+  transform: none;
+}
+
+.popoverContent {
+  z-index: 1200;
+  outline: none;
+}
+
 .toolbarLinkContainer {
   width: 400px;
   background: transparent;
@@ -104,9 +115,7 @@
 }
 
 .palettePopover {
-  position: absolute;
-  bottom: 64px;
-  right: 0;
+  position: static;
   padding: 12px 14px;
   border-radius: 8px;
   background: var(--color-white);
@@ -115,6 +124,7 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  margin: 10px;
 }
 
 .paletteSection {

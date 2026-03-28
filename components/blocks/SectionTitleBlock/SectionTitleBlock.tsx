@@ -1,5 +1,6 @@
 "use client";
 
+import * as Toolbar from "@radix-ui/react-toolbar";
 import { Trash2 } from "lucide-react";
 import { useEditorContext } from "@/contexts/EditorContext";
 import { SectionTitleBlock as SectionTitleBlockType } from "@/types/editor";
@@ -21,7 +22,7 @@ export const SectionTitleBlock = ({
   }
 
   return (
-    <div className={styles.frame}>
+    <Toolbar.Root className={styles.frame} aria-label="Section title controls">
       <input
         type="text"
         name="section-title"
@@ -34,7 +35,7 @@ export const SectionTitleBlock = ({
           });
         }}
       />
-      <button
+      <Toolbar.Button
         type="button"
         aria-label="Delete section title"
         title="Delete section title"
@@ -44,7 +45,7 @@ export const SectionTitleBlock = ({
         }}
       >
         <Trash2 size={20} />
-      </button>
-    </div>
+      </Toolbar.Button>
+    </Toolbar.Root>
   );
 };

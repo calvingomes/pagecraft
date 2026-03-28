@@ -1,10 +1,11 @@
 "use client";
 
-import React from 'react';
-import Link from 'next/link';
-import { LucideIcon } from 'lucide-react';
-import { deriveTextColor } from '@/lib/utils/colorUtils';
-import styles from './ThemeButton.module.css';
+import React from "react";
+import Link from "next/link";
+import { Slot } from "@radix-ui/react-slot";
+import { LucideIcon } from "lucide-react";
+import { deriveTextColor } from "@/lib/utils/colorUtils";
+import styles from "./ThemeButton.module.css";
 
 export interface ThemeButtonProps {
   label: string;
@@ -25,20 +26,23 @@ export const ThemeButton = ({
   iconCircle = true,
   disabled = false,
 }: ThemeButtonProps) => {
-  const isLink = typeof cta === 'string';
+  const isLink = typeof cta === "string";
   const resolvedTextColor = textColor ?? deriveTextColor(bgColor);
   const customStyle = { backgroundColor: bgColor, color: resolvedTextColor };
 
   const content = (
     <>
       <span>{label}</span>
-      {Icon && (
-        iconCircle ? (
-          <Icon className={styles.icon} />
+      {Icon &&
+        (iconCircle ? (
+          <Slot className={styles.icon}>
+            <Icon aria-hidden />
+          </Slot>
         ) : (
-          <Icon className={styles.iconFlat} />
-        )
-      )}
+          <Slot className={styles.iconFlat}>
+            <Icon aria-hidden />
+          </Slot>
+        ))}
     </>
   );
 

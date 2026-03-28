@@ -1,5 +1,7 @@
 "use client";
 
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import * as Toolbar from "@radix-ui/react-toolbar";
 import {
   Trash2,
   RectangleVertical,
@@ -85,31 +87,39 @@ export function BlockHoverToolbar({
     blockType === "text" || blockType === "link";
 
   return (
-    <div
+    <Toolbar.Root
       className={`${styles.toolbar} ${visible ? styles.toolbarVisible : ""}`}
       onPointerDown={(e) => e.stopPropagation()}
       onTouchStart={(e) => e.stopPropagation()}
+      aria-label="Block controls"
     >
-      <div className={styles.sizeGroup}>
+      <ToggleGroup.Root
+        type="single"
+        className={styles.sizeGroup}
+        value={currentPreset}
+        onValueChange={(nextPreset) => {
+          if (!nextPreset) return;
+          onWidthChange(nextPreset as BlockHoverToolbarIcons["preset"]);
+        }}
+      >
         {visiblePresets.map(({ preset, Icon, title, iconSize }) => (
-          <button
+          <ToggleGroup.Item
             key={preset}
-            type="button"
+            value={preset}
             title={title}
             aria-label={title}
-            onClick={() => onWidthChange(preset)}
             className={`${styles.sizeButton} ${
               currentPreset === preset ? styles.active : ""
             }`}
           >
             <Icon size={iconSize} className={styles.sizeIcon} />
-          </button>
+          </ToggleGroup.Item>
         ))}
-      </div>
+      </ToggleGroup.Root>
       {canToggleWrapperBackground && onToggleWrapperBackground && (
         <>
           <div className={styles.divider} />
-          <button
+          <Toolbar.Button
             type="button"
             title="Toggle wrapper background"
             aria-label="Toggle wrapper background"
@@ -119,11 +129,11 @@ export function BlockHoverToolbar({
             }`}
           >
             BG
-          </button>
+          </Toolbar.Button>
         </>
       )}
       <div className={styles.divider} />
-      <button
+      <Toolbar.Button
         type="button"
         title="Delete block"
         aria-label="Delete block"
@@ -131,7 +141,7 @@ export function BlockHoverToolbar({
         className={styles.deleteButton}
       >
         <Trash2 size={20} className={styles.sizeIcon} />
-      </button>
-    </div>
+      </Toolbar.Button>
+    </Toolbar.Root>
   );
 }

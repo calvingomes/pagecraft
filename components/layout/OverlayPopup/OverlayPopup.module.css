@@ -2,15 +2,16 @@
   position: fixed;
   inset: 0;
   z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
   background: color-mix(in srgb, black 42%, transparent);
 }
 
 .panel {
-  width: min(100%, 420px);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  width: min(calc(100vw - 48px), 420px);
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.22);
   background: var(--color-white);

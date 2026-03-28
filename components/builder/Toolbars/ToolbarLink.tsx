@@ -1,7 +1,10 @@
 /* eslint-disable css-modules/no-unused-class */
 "use client";
 
+import * as Label from "@radix-ui/react-label";
+import * as Toolbar from "@radix-ui/react-toolbar";
 import { ArrowLeft, Check } from "lucide-react";
+import { VISUALLY_HIDDEN_STYLE } from "@/lib/utils/visuallyHidden";
 import styles from "./Toolbar.module.css";
 import type { ToolbarLinkProps } from "./Toolbar.types";
 
@@ -11,19 +14,26 @@ export function ToolbarLink({
   onBack,
   onCreateLink,
 }: ToolbarLinkProps) {
+  const inputId = "toolbar-link-url";
+
   return (
-    <div
+    <Toolbar.Root
       className={`${styles.toolbarContainer} ${styles.toolbarLinkContainer}`}
+      aria-label="Link toolbar"
     >
-      <button
+      <Toolbar.Button
         type="button"
         className={styles.backButton}
         onClick={onBack}
         aria-label="Back to toolbar"
       >
         <ArrowLeft size={18} />
-      </button>
+      </Toolbar.Button>
+      <Label.Root htmlFor={inputId} style={VISUALLY_HIDDEN_STYLE}>
+        Link URL
+      </Label.Root>
       <input
+        id={inputId}
         className={styles.linkInput}
         placeholder="Add link here"
         value={linkUrl}
@@ -36,14 +46,14 @@ export function ToolbarLink({
           }
         }}
       />
-      <button
+      <Toolbar.Button
         type="button"
         className={styles.pasteButton}
         onClick={() => void onCreateLink()}
         aria-label="Create link"
       >
         <Check size={18} />
-      </button>
-    </div>
+      </Toolbar.Button>
+    </Toolbar.Root>
   );
 }

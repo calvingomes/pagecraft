@@ -1,5 +1,7 @@
 "use client";
 
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import * as Toolbar from "@radix-ui/react-toolbar";
 import { Circle, Square, Trash2, Upload } from "lucide-react";
 import { useRef, type ChangeEvent } from "react";
 import styles from "./AvatarToolbar.module.css";
@@ -44,32 +46,41 @@ export function AvatarToolbar({
 
   return (
     <>
-      <div
+      <Toolbar.Root
         className={`${styles.toolbar} ${visible ? styles.toolbarVisible : ""} ${className ?? ""}`}
         onPointerDown={(e) => e.stopPropagation()}
         onTouchStart={(e) => e.stopPropagation()}
+        aria-label="Avatar controls"
       >
-        <button
-          type="button"
-          title="Circle"
-          aria-label="Circle"
-          onClick={() => onShapeChange("circle")}
-          className={`${styles.sizeButton} ${currentShape === "circle" ? styles.active : ""}`}
+        <ToggleGroup.Root
+          type="single"
+          value={currentShape}
+          onValueChange={(nextValue) => {
+            if (nextValue === "circle" || nextValue === "square") {
+              onShapeChange(nextValue);
+            }
+          }}
         >
-          <Circle size={16} className={styles.sizeIcon} />
-        </button>
+          <ToggleGroup.Item
+            value="circle"
+            title="Circle"
+            aria-label="Circle"
+            className={`${styles.sizeButton} ${currentShape === "circle" ? styles.active : ""}`}
+          >
+            <Circle size={16} className={styles.sizeIcon} />
+          </ToggleGroup.Item>
 
-        <button
-          type="button"
-          title="Square"
-          aria-label="Square"
-          onClick={() => onShapeChange("square")}
-          className={`${styles.sizeButton} ${currentShape === "square" ? styles.active : ""}`}
-        >
-          <Square size={16} className={styles.sizeIcon} />
-        </button>
+          <ToggleGroup.Item
+            value="square"
+            title="Square"
+            aria-label="Square"
+            className={`${styles.sizeButton} ${currentShape === "square" ? styles.active : ""}`}
+          >
+            <Square size={16} className={styles.sizeIcon} />
+          </ToggleGroup.Item>
+        </ToggleGroup.Root>
 
-        <button
+        <Toolbar.Button
           type="button"
           title="Upload"
           aria-label="Upload"
@@ -77,11 +88,11 @@ export function AvatarToolbar({
           className={styles.sizeButton}
         >
           <Upload size={16} className={styles.sizeIcon} />
-        </button>
+        </Toolbar.Button>
 
         <div className={styles.divider} />
 
-        <button
+        <Toolbar.Button
           type="button"
           title="Delete image"
           aria-label="Delete image"
@@ -89,8 +100,8 @@ export function AvatarToolbar({
           className={styles.deleteButton}
         >
           <Trash2 size={18} />
-        </button>
-      </div>
+        </Toolbar.Button>
+      </Toolbar.Root>
 
       <input
         ref={fileInputRef}

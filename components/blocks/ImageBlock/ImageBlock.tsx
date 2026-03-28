@@ -1,15 +1,18 @@
 "use client";
 
+import * as Label from "@radix-ui/react-label";
 import { useState } from "react";
 import { ImageBlock as ImageBlockType } from "@/types/editor";
 import Image from "next/image";
 import { useEditorContext } from "@/contexts/EditorContext";
+import { VISUALLY_HIDDEN_STYLE } from "@/lib/utils/visuallyHidden";
 import styles from "./ImageBlock.module.css";
 
 export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
   const editor = useEditorContext();
   const isEditable = !!editor;
   const [isHovered, setIsHovered] = useState(false);
+  const captionInputId = `image-caption-${block.id}`;
   const caption = block.content.caption ?? "";
   const hasCaption = caption.trim().length > 0;
 
@@ -32,7 +35,11 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
 
       {isEditable && isHovered ? (
         <div className={styles.captionInputWrap}>
+          <Label.Root htmlFor={captionInputId} style={VISUALLY_HIDDEN_STYLE}>
+            Image caption
+          </Label.Root>
           <input
+            id={captionInputId}
             type="text"
             value={caption}
             onChange={(event) => {

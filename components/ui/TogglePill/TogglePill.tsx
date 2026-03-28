@@ -1,5 +1,6 @@
 "use client";
 
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { useRef, useEffect, useState } from "react";
 import type { TogglePillProps } from "./TogglePill.types";
 import styles from "./TogglePill.module.css";
@@ -16,9 +17,8 @@ export function TogglePill<T extends string>({
   useEffect(() => {
     const pill = pillRef.current;
     if (!pill) return;
-    const activeIndex = options.findIndex((o) => o.value === value);
-    const btns = pill.querySelectorAll<HTMLButtonElement>("button");
-    const activeBtn = btns[activeIndex];
+    const activeBtn =
+      pill.querySelector<HTMLButtonElement>('[data-state="on"]');
     if (!activeBtn) return;
     setThumb({
       left: activeBtn.offsetLeft,
@@ -28,8 +28,15 @@ export function TogglePill<T extends string>({
   }, [value, options]);
 
   return (
-    <div
+    <ToggleGroup.Root
       ref={pillRef}
+      type="single"
+      value={value}
+      onValueChange={(nextValue) => {
+        if (nextValue) {
+          onChange(nextValue as T);
+        }
+      }}
       className={`${styles.pill} ${variant === "dark" ? styles.pillDark : ""}`}
     >
       <span
@@ -38,17 +45,16 @@ export function TogglePill<T extends string>({
         aria-hidden
       />
       {options.map((option) => (
-        <button
+        <ToggleGroup.Item
           key={option.value}
-          type="button"
+          value={option.value}
           className={`${styles.btn} ${value === option.value ? styles.btnActive : ""}`}
-          onClick={() => onChange(option.value)}
           aria-label={option.ariaLabel}
           title={option.ariaLabel}
         >
           {option.label}
-        </button>
+        </ToggleGroup.Item>
       ))}
-    </div>
+    </ToggleGroup.Root>
   );
 }
