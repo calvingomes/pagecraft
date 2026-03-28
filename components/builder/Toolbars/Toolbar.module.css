@@ -195,7 +195,8 @@
   background: #f8fafc;
 }
 
-.sidebarPositionSelected {
+.sidebarPositionSelected,
+.sidebarPositionSelected:hover {
   border-color: #eab308;
   background: #fefce8;
   color: #a16207;

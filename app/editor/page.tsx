@@ -78,6 +78,7 @@ export default function EditorPage() {
   const [persistedAvatarUrl, setPersistedAvatarUrl] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveOverlay, setShowSaveOverlay] = useState(false);
+  const [isEditorDataReady, setIsEditorDataReady] = useState(false);
   const [lastSavedPayload, setLastSavedPayload] =
     useState<EditorSnapshotPayload | null>(null);
 
@@ -148,71 +149,88 @@ export default function EditorPage() {
   }, [activeBlockViewportMode, setActiveViewportMode]);
 
   useEffect(() => {
-    if (!username || !user?.id) return;
+    if (!username || !user?.id) {
+      setIsEditorDataReady(false);
+      return;
+    }
+
+    setIsEditorDataReady(false);
+    let active = true;
 
     const loadPageData = async () => {
-      const pageData = await PageService.getPageByUsername(username);
-      let nextBackground: PageBackgroundId = "page-bg-1";
-      let nextSidebarPosition: SidebarPosition = "left";
-      let nextDisplayName = username;
-      let nextBioHtml = "";
-      let nextAvatarUrl = "";
-      let nextAvatarShape: AvatarShape = "circle";
+      try {
+        const pageData = await PageService.getPageByUsername(username);
+        let nextBackground: PageBackgroundId = "page-bg-1";
+        let nextSidebarPosition: SidebarPosition = "left";
+        let nextDisplayName = username;
+        let nextBioHtml = "";
+        let nextAvatarUrl = "";
+        let nextAvatarShape: AvatarShape = "circle";
 
-      if (pageData) {
-        if (pageData.background) {
-          nextBackground = pageData.background;
+        if (pageData) {
+          if (pageData.background) {
+            nextBackground = pageData.background;
+          }
+          if (pageData.sidebar_position) {
+            nextSidebarPosition = pageData.sidebar_position;
+          }
+          if (pageData.display_name) {
+            nextDisplayName = pageData.display_name;
+          }
+          if (pageData.bio_html) {
+            nextBioHtml = pageData.bio_html;
+          }
+          if (pageData.avatar_url) {
+            nextAvatarUrl = pageData.avatar_url;
+          }
+          if (
+            pageData.avatar_shape === "circle" ||
+            pageData.avatar_shape === "square"
+          ) {
+            nextAvatarShape = pageData.avatar_shape;
+          }
         }
-        if (pageData.sidebar_position) {
-          nextSidebarPosition = pageData.sidebar_position;
-        }
-        if (pageData.display_name) {
-          nextDisplayName = pageData.display_name;
-        }
-        if (pageData.bio_html) {
-          nextBioHtml = pageData.bio_html;
-        }
-        if (pageData.avatar_url) {
-          nextAvatarUrl = pageData.avatar_url;
-        }
-        if (
-          pageData.avatar_shape === "circle" ||
-          pageData.avatar_shape === "square"
-        ) {
-          nextAvatarShape = pageData.avatar_shape;
-        }
+
+        if (!active) return;
+
+        setBackground(nextBackground);
+        setDesktopSidebarPosition(nextSidebarPosition);
+        setDisplayName(nextDisplayName);
+        setBioHtml(nextBioHtml);
+        setAvatarUrl(nextAvatarUrl);
+        setPersistedAvatarUrl(nextAvatarUrl);
+        setAvatarShape(nextAvatarShape);
+
+        const blocks = await BlockService.getBlocksForPage(username);
+        if (!active) return;
+
+        setAllBlocks(blocks);
+
+        const initialPayload: EditorSnapshotPayload = {
+          background: nextBackground,
+          sidebarPosition: nextSidebarPosition,
+          displayName: nextDisplayName,
+          bioHtml: nextBioHtml,
+          avatarUrl: nextAvatarUrl,
+          persistedAvatarUrl: nextAvatarUrl,
+          avatarShape: nextAvatarShape,
+          desktopBlocks: blocks.desktop,
+          mobileBlocks: blocks.mobile,
+        };
+
+        setLastSavedPayload(initialPayload);
+      } finally {
+        if (!active) return;
+        setIsEditorDataReady(true);
+        setLoading(false);
       }
-
-      setBackground(nextBackground);
-      setDesktopSidebarPosition(nextSidebarPosition);
-      setDisplayName(nextDisplayName);
-      setBioHtml(nextBioHtml);
-      setAvatarUrl(nextAvatarUrl);
-      setPersistedAvatarUrl(nextAvatarUrl);
-      setAvatarShape(nextAvatarShape);
-
-      const blocks = await BlockService.getBlocksForPage(username);
-
-      setAllBlocks(blocks);
-
-      const initialPayload: EditorSnapshotPayload = {
-        background: nextBackground,
-        sidebarPosition: nextSidebarPosition,
-        displayName: nextDisplayName,
-        bioHtml: nextBioHtml,
-        avatarUrl: nextAvatarUrl,
-        persistedAvatarUrl: nextAvatarUrl,
-        avatarShape: nextAvatarShape,
-        desktopBlocks: blocks.desktop,
-        mobileBlocks: blocks.mobile,
-      };
-
-      setLastSavedPayload(initialPayload);
-
-      setLoading(false);
     };
 
     loadPageData();
+
+    return () => {
+      active = false;
+    };
   }, [username, user?.id, setAllBlocks, setLoading, setLastSavedPayload]);
 
   useEffect(() => {
@@ -362,7 +380,7 @@ export default function EditorPage() {
     }
   };
 
-  if (loading || !authChecked || !viewportResolved) {
+  if (loading || !authChecked || !viewportResolved || !isEditorDataReady) {
     return <div className={styles.loadingScreen}>Loading editor…</div>;
   }
 
