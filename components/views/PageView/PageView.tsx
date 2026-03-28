@@ -5,6 +5,7 @@ import type {
   AvatarShape,
   PageBackgroundId,
   SidebarPosition,
+  ViewportMode,
 } from "@/types/page";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
@@ -22,6 +23,7 @@ type PageViewProps = {
   bioHtml?: string;
   avatarUrl?: string;
   avatarShape?: AvatarShape;
+  initialViewportMode?: ViewportMode;
 };
 
 export function PageView({
@@ -34,8 +36,9 @@ export function PageView({
   bioHtml,
   avatarUrl,
   avatarShape,
+  initialViewportMode = "desktop",
 }: PageViewProps) {
-  const viewportMode = useViewportMode();
+  const { viewportMode } = useViewportMode(initialViewportMode);
 
   const effectiveSidebarPosition = getViewEffectiveSidebarPosition(
     viewportMode,

@@ -117,8 +117,13 @@ export default function EditorPage() {
     router.replace("/auth");
   };
 
-  const { screenView, previewView, setPreviewView, canTogglePreview } =
-    useEditorViewportPreview();
+  const {
+    screenView,
+    previewView,
+    setPreviewView,
+    canTogglePreview,
+    viewportResolved,
+  } = useEditorViewportPreview();
 
   const activeEditorMode =
     screenView === "mobile"
@@ -357,8 +362,8 @@ export default function EditorPage() {
     }
   };
 
-  if (loading || !authChecked) {
-    return <div>Loading editor…</div>;
+  if (loading || !authChecked || !viewportResolved) {
+    return <div className={styles.loadingScreen}>Loading editor…</div>;
   }
 
   const isOverlayOpen = showSaveOverlay || isMobileScreen;

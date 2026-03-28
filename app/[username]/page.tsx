@@ -1,4 +1,6 @@
+import { headers } from "next/headers";
 import { ServerPageService } from "@/lib/services/page.server";
+import { resolveViewportModeFromUserAgent } from "@/lib/editor-engine/data/viewport";
 import type {
   AvatarShape,
   PageBackgroundId,
@@ -13,6 +15,10 @@ type Props = {
 
 export default async function UserPage({ params }: Props) {
   const { username } = await params;
+  const headerStore = await headers();
+  const initialViewportMode = resolveViewportModeFromUserAgent(
+    headerStore.get("user-agent"),
+  );
 
   // Use the dedicated server service to fetch data
   // This handles the server-side supabase client creation internally
@@ -51,8 +57,11 @@ export default async function UserPage({ params }: Props) {
         displayName={(page.display_name as string | undefined) ?? undefined}
         bioHtml={(page.bio_html as string | undefined) ?? undefined}
         avatarUrl={(page.avatar_url as string | undefined) ?? undefined}
-        avatarShape={(page.avatar_shape as AvatarShape | undefined) ?? undefined}
+        avatarShape={
+          (page.avatar_shape as AvatarShape | undefined) ?? undefined
+        }
         blocksByViewport={blocksByViewport}
+        initialViewportMode={initialViewportMode}
       />
     </>
   );

@@ -6,7 +6,7 @@ import { useViewportMode } from "@/hooks/useViewportMode";
 import type { PreviewViewport } from "@/types/page";
 
 export function useEditorViewportPreview() {
-  const viewportMode = useViewportMode();
+  const { viewportMode, isResolved } = useViewportMode();
   const [overrideView, setOverrideView] = useState<PreviewViewport | null>(
     null,
   );
@@ -33,5 +33,6 @@ export function useEditorViewportPreview() {
     clearPreviewOverride: () => setOverrideView(null),
     isOverrideActive: effectiveOverrideView !== null,
     canTogglePreview: capabilities.allowManualPreviewToggle,
+    viewportResolved: isResolved,
   };
 }

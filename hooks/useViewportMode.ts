@@ -10,8 +10,9 @@ import {
 } from "@/lib/editor-engine/data/viewport";
 import type { ViewportMode } from "@/types/page";
 
-export function useViewportMode() {
-  const [viewportMode, setViewportMode] = useState<ViewportMode>("desktop");
+export function useViewportMode(initialMode: ViewportMode = "desktop") {
+  const [viewportMode, setViewportMode] = useState<ViewportMode>(initialMode);
+  const [isResolved, setIsResolved] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -38,6 +39,8 @@ export function useViewportMode() {
       } else {
         setViewportMode(resolveViewportMode(getWidth()));
       }
+
+      setIsResolved(true);
     };
 
     let rafId = 0;
@@ -85,5 +88,5 @@ export function useViewportMode() {
     };
   }, []);
 
-  return viewportMode;
+  return { viewportMode, isResolved };
 }

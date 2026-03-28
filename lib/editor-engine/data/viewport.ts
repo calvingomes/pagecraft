@@ -15,6 +15,29 @@ export function resolveViewportMode(width: number): ViewportMode {
   return "desktop";
 }
 
+export function resolveViewportModeFromUserAgent(
+  userAgent: string | null | undefined,
+): ViewportMode {
+  const value = (userAgent ?? "").toLowerCase();
+
+  if (!value) {
+    return "desktop";
+  }
+
+  const isTablet = /ipad|tablet|android(?!.*mobile)|kindle|silk/.test(value);
+  if (isTablet) {
+    return "tablet";
+  }
+
+  const isMobile =
+    /mobile|iphone|ipod|android|blackberry|iemobile|opera mini/.test(value);
+  if (isMobile) {
+    return "mobile";
+  }
+
+  return "desktop";
+}
+
 export type EditorViewportCapabilities = {
   allowManualPreviewToggle: boolean;
   defaultPreviewViewport: PreviewViewport;
