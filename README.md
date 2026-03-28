@@ -1,6 +1,6 @@
 # PageCraft
 
-A link-in-bio builder for creators. Compose a single-page profile by snapping reusable blocks - text, links, hero images, titles - into a responsive canvas. Edit desktop and mobile layouts independently, then publish a fast, shareable page in one click.
+A link-in-bio builder for creators. **[Try it live →](https://pagecraft-psi.vercel.app/home)** Compose a single-page profile by snapping reusable blocks - text, links, hero images, titles - into a responsive canvas. Edit desktop and mobile layouts independently, then publish a fast, shareable page in one click.
 
 ## Features
 
