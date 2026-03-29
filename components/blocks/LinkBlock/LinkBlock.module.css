@@ -53,7 +53,7 @@
 }
 
 .title {
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   font-weight: 650;
   line-height: 1.1;
   color: var(--color-dark-grey);
@@ -62,7 +62,7 @@
 }
 
 .url {
-  font-size: 16px;
+  font-size: var(--font-size-md);
   line-height: 1.1;
   color: var(--color-mid-grey);
   overflow: hidden;
@@ -88,11 +88,11 @@
 
   .title,
   .titleEditor {
-    font-size: 18px;
+    font-size: var(--font-size-lg);
   }
 
   .url {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
   }
 }
 
@@ -156,7 +156,7 @@
 .titleEditorContainer :global(.ProseMirror) {
   border: none;
   background: transparent;
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   font-weight: 650;
   line-height: 1.1;
   color: var(--color-dark-grey);
@@ -185,7 +185,7 @@
   position: absolute;
   top: 0;
   left: 0;
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   color: var(--color-bluish-grey);
   pointer-events: none;
 }

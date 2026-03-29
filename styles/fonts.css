@@ -24,4 +24,15 @@
 
 :root {
   --font-belanosima: "Belanosima", sans-serif;
+
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 26px;
+  --font-size-3xl: 32px;
+  --font-size-4xl: 38px;
+  --font-size-5xl: 40px;
+  --font-size-6xl: 46px;
 }

@@ -58,7 +58,7 @@
 }
 
 .subtitle {
-  font-size: 20px;
+  font-size: var(--font-size-xl);
   line-height: 1.6;
   color: var(--color-light-grey);
   max-width: 640px;
@@ -89,10 +89,10 @@
   }
 
   .title {
-    font-size: 40px;
+    font-size: var(--font-size-5xl);
   }
 
   .subtitle {
-    font-size: 17px;
+    font-size: var(--font-size-md);
   }
 }

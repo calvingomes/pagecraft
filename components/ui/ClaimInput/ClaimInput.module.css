@@ -7,7 +7,8 @@
   width: 100%;
   max-width: 620px;
   border: 1px solid var(--color-lighter-grey);
-  box-shadow: 0 1px 10px color-mix(in srgb, var(--color-darkest-grey) 12%, transparent);
+  box-shadow: 0 1px 10px
+    color-mix(in srgb, var(--color-darkest-grey) 12%, transparent);
 }
 
 .inputWrapper {
@@ -20,7 +21,7 @@
 
 .prefix {
   color: var(--color-bluish-grey);
-  font-size: 17px;
+  font-size: var(--font-size-md);
   white-space: nowrap;
   flex-shrink: 0;
   font-family: inherit;
@@ -29,7 +30,7 @@
 .input {
   border: none;
   background: transparent;
-  font-size: 17px;
+  font-size: var(--font-size-md);
   color: var(--color-dark-grey);
   width: 100%;
   outline: none;
@@ -55,10 +56,10 @@
   }
 
   .input {
-    font-size: 15px;
+    font-size: var(--font-size-md);
   }
 
   .prefix {
-    font-size: 15px;
+    font-size: var(--font-size-md);
   }
 }

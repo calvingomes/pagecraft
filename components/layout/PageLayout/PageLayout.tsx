@@ -19,7 +19,7 @@ export function PageLayout({
 
   useEffect(() => {
     if (isMobilePreview) {
-      document.body.style.backgroundColor = "var(--color-faint-lime-green)";
+      document.body.style.backgroundColor = "var(--color-lighter-grey)";
     } else {
       document.body.style.backgroundColor = theme.bg;
     }
@@ -39,7 +39,7 @@ export function PageLayout({
           "--page-bg": theme.bg,
           "--page-avatar-bg": theme.avatarBg,
           backgroundColor: isMobilePreview
-            ? "var(--color-faint-lime-green)"
+            ? "var(--color-lighter-grey)"
             : undefined,
         } as React.CSSProperties
       }

@@ -4,7 +4,11 @@
   align-items: center;
   gap: 8px;
   padding: 4px;
-  background: color-mix(in srgb, var(--color-darker-grey) 12%, var(--color-white));
+  background: color-mix(
+    in srgb,
+    var(--color-darker-grey) 12%,
+    var(--color-white)
+  );
   border: 1px solid var(--color-light-grey);
   border-radius: 12px;
   width: fit-content;
@@ -14,7 +18,8 @@
   position: absolute;
   background: var(--color-white);
   border-radius: 8px;
-  box-shadow: 0 1px 3px color-mix(in srgb, var(--color-darkest-grey) 8%, transparent);
+  box-shadow: 0 1px 3px
+    color-mix(in srgb, var(--color-darkest-grey) 8%, transparent);
   pointer-events: none;
   z-index: 0;
   transition:
@@ -37,7 +42,7 @@
   color: var(--color-bluish-grey);
   background: transparent;
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   font-family: inherit;
   white-space: nowrap;

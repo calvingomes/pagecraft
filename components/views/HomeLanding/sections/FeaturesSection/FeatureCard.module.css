@@ -21,7 +21,7 @@
 }
 
 .title {
-  font-size: 26px;
+  font-size: var(--font-size-2xl);
   font-weight: 700;
   line-height: 1.2;
   color: var(--color-mid-grey);
@@ -29,7 +29,7 @@
 }
 
 .description {
-  font-size: 16px;
+  font-size: var(--font-size-md);
   line-height: 1.6;
   color: var(--color-mid-grey);
   margin: 0;
@@ -45,7 +45,7 @@
   align-items: center;
   justify-content: center;
   color: var(--color-mid-grey);
-  font-size: 14px;
+  font-size: var(--font-size-sm);
 }
 
 .mediaImage {

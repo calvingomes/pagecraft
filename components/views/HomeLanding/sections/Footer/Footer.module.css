@@ -93,11 +93,11 @@
 
 .footerDot {
   color: var(--color-mid-grey);
-  font-size: 14px;
+  font-size: var(--font-size-sm);
 }
 
 .footerBottomLink {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   color: var(--color-mid-grey);
   text-decoration: none;
 }
@@ -108,7 +108,7 @@
 
 .footerLogo {
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   color: var(--color-black);
 }
 

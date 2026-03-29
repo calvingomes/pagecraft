@@ -7,7 +7,7 @@
   border-radius: 8px;
   border: none;
   text-decoration: none;
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   cursor: pointer;
   transition: filter 150ms ease;
   font-family: inherit;

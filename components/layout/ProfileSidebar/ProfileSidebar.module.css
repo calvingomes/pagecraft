@@ -31,7 +31,7 @@
   border-radius: 50%;
   background: var(--page-avatar-bg);
   color: var(--color-black);
-  font-size: 2rem;
+  font-size: var(--font-size-3xl);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,7 +61,7 @@
 }
 
 .name {
-  font-size: 32px;
+  font-size: var(--font-size-3xl);
   font-weight: 600;
   margin: 0;
 }
@@ -75,7 +75,7 @@
 }
 
 .bio {
-  font-size: 16px;
+  font-size: var(--font-size-md);
   color: var(--color-grey-dark);
   line-height: 1.4;
   margin-top: 20px;
@@ -92,7 +92,7 @@
   flex-direction: row;
   align-items: flex-start;
   justify-content: flex-start;
-  gap: 1.5rem;
+  gap: 24px;
   text-align: left;
 }
 
@@ -118,7 +118,7 @@
   }
 
   .sidebarCenter .profileCard {
-    gap: 1rem;
+    gap: 16px;
   }
 
   .sidebarCenter .avatar {
@@ -128,12 +128,11 @@
 
   .sidebarCenter .nameInput :global(.ProseMirror),
   .sidebarCenter .name {
-    font-size: 26px;
+    font-size: var(--font-size-2xl);
   }
 
   .sidebarCenter .bioEditor :global(.ProseMirror),
   .sidebarCenter .bio {
-    font-size: 15px;
     margin-top: 12px;
   }
 }
@@ -144,7 +143,7 @@
 }
 
 :global([data-preview="mobile"]) .sidebarCenter .profileCard {
-  gap: 1rem;
+  gap: 16px;
 }
 
 :global([data-preview="mobile"]) .sidebarCenter .avatar {
@@ -157,7 +156,7 @@
   .nameInput
   :global(.ProseMirror),
 :global([data-preview="mobile"]) .sidebarCenter .name {
-  font-size: 26px;
+  font-size: var(--font-size-2xl);
 }
 
 :global([data-preview="mobile"])
@@ -165,12 +164,12 @@
   .bioEditor
   :global(.ProseMirror),
 :global([data-preview="mobile"]) .sidebarCenter .bio {
-  font-size: 15px;
+  font-size: var(--font-size-6xl);
   margin-top: 12px;
 }
 
 .nameInput :global(.ProseMirror) {
-  font-size: 32px;
+  font-size: var(--font-size-3xl);
   font-weight: 600;
   padding: 0;
   border: none;
@@ -202,7 +201,7 @@
   background: transparent;
   color: inherit;
   font-family: inherit;
-  font-size: 16px;
+  font-size: var(--font-size-md);
   line-height: 1.4;
   outline: none;
   min-width: 0;

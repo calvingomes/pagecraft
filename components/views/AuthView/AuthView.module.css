@@ -50,7 +50,7 @@
 }
 
 .leftSubtitle {
-  font-size: 19px;
+  font-size: var(--font-size-lg);
   color: var(--color-light-grey);
   max-width: none;
   margin-bottom: 40px;
@@ -100,7 +100,7 @@
 }
 
 .title {
-  font-size: 32px;
+  font-size: var(--font-size-3xl);
   font-weight: 700;
   margin-bottom: 8px;
   color: var(--color-forest-green);
@@ -108,7 +108,7 @@
 }
 
 .subtitle {
-  font-size: 15px;
+  font-size: var(--font-size-md);
   color: var(--color-mid-grey);
   line-height: 1.5;
 }
@@ -120,7 +120,7 @@
   border-radius: 12px;
   padding: 16px 20px;
   margin-bottom: 24px;
-  font-size: 16px;
+  font-size: var(--font-size-md);
   border: 1.5px solid var(--color-light-grey);
   transition: border-color 150ms ease;
 }
@@ -138,7 +138,7 @@
 .usernameInput {
   border: none;
   background: transparent;
-  font-size: 16px;
+  font-size: var(--font-size-md);
   color: var(--color-dark-grey);
   outline: none;
   width: 100%;
@@ -165,7 +165,7 @@
   }
 
   .tagline {
-    font-size: 38px;
+    font-size: var(--font-size-4xl);
   }
 
   .rectStack {

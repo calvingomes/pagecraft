@@ -27,12 +27,12 @@
 
 .title {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: var(--font-size-lg);
   font-weight: 700;
 }
 
 .text {
   margin: 10px 0 0;
-  font-size: 0.95rem;
+  font-size: var(--font-size-md);
   line-height: 1.45;
 }

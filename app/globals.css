@@ -10,15 +10,6 @@
   --radius-lg: 12px;
   --radius-xl: 20px;
 
-  /* Font sizes */
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-md: 16px;
-  --font-size-lg: 20px;
-  --font-size-xl: 24px;
-  --font-size-2xl: 30px;
-  --font-size-3xl: 36px;
-
   /* Motion */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   --duration-base: 200ms;

@@ -2,7 +2,7 @@
   --color-black: #000000;
   --color-white: #ffffff;
 
-  --color-lighter-grey: #f3f5f2;
+  --color-lighter-grey: #f3f3f3;
   --color-light-grey: #dcdcdc;
   --color-bluish-grey: #9ca3af;
   --color-mid-grey: #6b7280;
@@ -21,7 +21,7 @@
   --color-yellow: #ef9f27;
 
   /* Page background palette */
-  --color-editor-page-bg-1: #f3f5f2;
+  --color-editor-page-bg-1: #e8e8e6;
   --color-editor-page-bg-2: #f4f9f2;
   --color-editor-page-bg-3: #fefce8;
   --color-editor-page-bg-4: #eff6ff;
@@ -29,7 +29,7 @@
   --color-editor-page-bg-6: #fef2f2;
 
   /* Page avatar background  */
-  --color-editor-page-avatar-1: #b8b8b8;
+  --color-editor-page-avatar-1: #a8a8a6;
   --color-editor-page-avatar-2: #b7c9ad;
   --color-editor-page-avatar-3: #d1c578;
   --color-editor-page-avatar-4: #a9c2e8;
