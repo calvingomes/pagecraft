@@ -75,7 +75,7 @@
   text-align: center;
   margin: 0;
   white-space: nowrap;
-  color: #a3a3a3;
+  color: var(--color-light-grey);
 }
 
 .footerBottom {

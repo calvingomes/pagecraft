@@ -2,14 +2,22 @@
   /* Updating relevant colors */
   --color-black: #000000;
   --color-white: #ffffff;
-  
-  --color-light-grey: #f3f5f2;
-  --color-mid-grey: #dcdcdc;
-  --color-text-bluish-grey: #9ca3af;
-  
-  --color-lime-green: #E4F2D8;
 
-  --color-theme-yellow: #EF9F27; 
+  --color-lighter-grey: #f3f5f2;
+  --color-light-grey: #dcdcdc;
+  --color-bluish-grey: #9ca3af;
+  --color-mid-grey: #6b7280;
+  --color-dark-grey: #515151;
+  --color-darker-grey: #2d2d2d;
+  --color-darkest-grey: #111111;
+
+  --color-forest-green: #173404;
+  --color-faint-lime-green: #ecf1e6;
+  --color-light-lime-green: #d8edc6;
+  --color-lime-green: #e4f2d8;
+  --color-grass-green: #97c459;
+
+  --color-theme-yellow: #ef9f27;
 
   /* Page background palette */
   --color-editor-page-bg-1: #f3f5f2;
@@ -19,4 +27,18 @@
   --color-editor-page-bg-5: #fdf2ff;
   --color-editor-page-bg-6: #fef2f2;
 
+  /* Page avatar background  */
+  --color-editor-page-avatar-1: #b8b8b8;
+  --color-editor-page-avatar-2: #b7c9ad;
+  --color-editor-page-avatar-3: #d1c578;
+  --color-editor-page-avatar-4: #a9c2e8;
+  --color-editor-page-avatar-5: #cfa6d6;
+  --color-editor-page-avatar-6: #e0a7a7;
+
+  /* Needs work on these colors*/
+  --color-brighter-yellow: #ffc800; /* for toolbar icon highlighter - should I use it?*/
+  --color-darker-forest-green: #0e220e; /* thinking if I should use it */
+  --color-aqua: #22d3ee; /* TBD - considering for accent */
+
+  /* search and check color-mix */
 }

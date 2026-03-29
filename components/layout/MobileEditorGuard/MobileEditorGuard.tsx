@@ -4,7 +4,6 @@ import type { MobileEditorGuardProps } from "./MobileEditorGuard.types";
 export const MobileEditorGuard = ({
   open,
   message = "Open the editor page on a tablet or a desktop to edit.",
-  showCloseButton = false,
   onClose,
 }: MobileEditorGuardProps) => {
   return (
@@ -12,7 +11,6 @@ export const MobileEditorGuard = ({
       open={open}
       title="Editor unavailable on mobile"
       message={message}
-      showCloseButton={showCloseButton}
       onClose={onClose}
     />
   );

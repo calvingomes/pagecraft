@@ -8,7 +8,6 @@ export const OverlayPopup = ({
   open,
   title,
   message,
-  showCloseButton = false,
   onClose,
 }: OverlayPopupProps) => {
   return (
@@ -21,17 +20,6 @@ export const OverlayPopup = ({
         <Dialog.Content className={styles.panel}>
           <div className={styles.header}>
             <Dialog.Title className={styles.title}>{title}</Dialog.Title>
-            {showCloseButton && (
-              <Dialog.Close asChild>
-                <button
-                  type="button"
-                  className={styles.closeButton}
-                  aria-label="Close"
-                >
-                  ×
-                </button>
-              </Dialog.Close>
-            )}
           </div>
           <Dialog.Description className={styles.text}>
             {message}

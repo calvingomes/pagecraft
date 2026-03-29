@@ -9,7 +9,7 @@
 
 .leftPanel {
   flex: 0 0 60%;
-  background: #173404;
+  background: var(--color-forest-green);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -46,7 +46,7 @@
 }
 
 .taglineAccent {
-  color: #97C459;
+  color: var(--color-grass-green);
 }
 
 .leftSubtitle {
@@ -74,7 +74,7 @@
 /* ---- Right Panel (35%) ---- */
 .rightPanel {
   flex: 0 0 40%;
-  background: var(--color-light-grey);
+  background: var(--color-lighter-grey);
   position: relative;
   max-width: 600px;
   overflow-y: auto;
@@ -90,7 +90,7 @@
   min-height: 400px;
 }
 
-.rightPanel> :first-child {
+.rightPanel > :first-child {
   margin-bottom: 48px;
 }
 
@@ -103,13 +103,13 @@
   font-size: 32px;
   font-weight: 700;
   margin-bottom: 8px;
-  color: #173404;
+  color: var(--color-forest-green);
   letter-spacing: -0.02em;
 }
 
 .subtitle {
   font-size: 15px;
-  color: #6b7280;
+  color: var(--color-mid-grey);
   line-height: 1.5;
 }
 
@@ -121,16 +121,16 @@
   padding: 16px 20px;
   margin-bottom: 24px;
   font-size: 16px;
-  border: 1.5px solid var(--color-mid-grey);
+  border: 1.5px solid var(--color-light-grey);
   transition: border-color 150ms ease;
 }
 
 .usernameInputWrapper:focus-within {
-  border-color: #173404;
+  border-color: var(--color-forest-green);
 }
 
 .usernamePrefix {
-  color: #9ca3af;
+  color: var(--color-bluish-grey);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -139,15 +139,14 @@
   border: none;
   background: transparent;
   font-size: 16px;
-  font-weight: 600;
-  color: #173404;
+  color: var(--color-dark-grey);
   outline: none;
   width: 100%;
   font-family: inherit;
 }
 
 .usernameInput::placeholder {
-  color: #d1d5db;
+  color: var(--color-bluish-grey);
   font-weight: 400;
 }
 

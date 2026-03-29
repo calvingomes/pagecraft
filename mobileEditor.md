@@ -27,13 +27,11 @@ Props:
 - `open: boolean`
 - `title: string`
 - `message: string`
-- `showCloseButton?: boolean`
 - `onClose?: () => void`
 
 `MobileEditorGuard` is now a thin wrapper around `OverlayPopup` and also supports:
 
 - `message?: string`
-- `showCloseButton?: boolean`
 - `onClose?: () => void`
 
 ## Remove Later
@@ -44,3 +42,4 @@ To remove this temporary guard later:
 2. If overlay is no longer used elsewhere, delete `components/layout/OverlayPopup/`.
 3. Remove `MobileEditorGuard` import and `<MobileEditorGuard open={isMobileScreen} />` from `app/editor/page.tsx`.
 4. Remove `isMobileScreen` variable if no longer used.
+

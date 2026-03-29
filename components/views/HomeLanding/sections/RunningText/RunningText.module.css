@@ -2,7 +2,7 @@
 
 .section {
   width: 100%;
-  background: var(--color-light-grey);
+  background: var(--color-lighter-grey);
   padding: 120px 0;
 }
 
@@ -21,12 +21,12 @@
 }
 
 .word {
-  color: #dff0c0;
+  color: var(--color-light-lime-green);
   transition: color 100ms ease;
 }
 
 .lit {
-  color: #173404;
+  color: var(--color-forest-green);
 }
 
 @media (--bp-mobile) {

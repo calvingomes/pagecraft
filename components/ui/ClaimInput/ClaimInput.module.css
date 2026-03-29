@@ -6,7 +6,7 @@
   padding: 4px;
   width: 100%;
   max-width: 620px;
-  border: 1px solid var(--color-light-grey);
+  border: 1px solid var(--color-lighter-grey);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
 }
 
@@ -19,7 +19,7 @@
 }
 
 .prefix {
-  color: #6d6d6e;
+  color: var(--color-bluish-grey);
   font-size: 17px;
   white-space: nowrap;
   flex-shrink: 0;
@@ -30,7 +30,7 @@
   border: none;
   background: transparent;
   font-size: 17px;
-  color: #111827;
+  color: var(--color-dark-grey);
   width: 100%;
   outline: none;
   font-family: inherit;
@@ -38,7 +38,7 @@
 }
 
 .input::placeholder {
-  color: #9ca3af;
+  color: var(--color-bluish-grey);
 }
 
 .buttonWrapper {

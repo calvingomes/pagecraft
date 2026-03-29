@@ -28,7 +28,7 @@
 }
 
 .editor :global(.ProseMirror):focus-visible {
-  background-color: rgb(240, 240, 240);
+  background-color: var(--color-lighter-grey);
   overflow: scroll;
   transition:
     opacity 0.15s,
@@ -38,7 +38,7 @@
 .editor :global(.ProseMirror p.is-editor-empty:first-child::before) {
   content: attr(data-placeholder);
   float: left;
-  color: var(--color-text-bluish-grey);
+  color: var(--color-bluish-grey);
   pointer-events: none;
   height: 0;
 }

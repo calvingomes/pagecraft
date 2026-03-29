@@ -7,7 +7,7 @@
   align-items: center;
   gap: 4px;
   padding: 6px 8px;
-  background: #2d2d2d;
+  background: var(--color-darker-grey);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 20;
@@ -59,12 +59,12 @@
 
 .deleteButton:hover {
   background: rgba(239, 68, 68, 0.4);
-  color: #fca5a5;
+  color: var(--color-aqua);
 }
 
 .sizeButton.active {
   background: rgba(255, 200, 0, 0.3);
-  color: #ffc800;
+  color: var(--color-aqua);
 }
 
 .divider {

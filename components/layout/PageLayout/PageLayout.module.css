@@ -48,7 +48,7 @@
   width: 100%;
   max-width: 580px;
   background: var(--page-bg);
-  border: 1px solid var(--color-mid-grey);
+  border: 1px solid var(--color-light-grey);
   border-radius: 20px;
   overflow: hidden;
   padding: 20px;
@@ -148,7 +148,6 @@
   align-self: auto;
   flex: 0 0 auto;
   max-width: 100%;
-  color: #a3a3a3;
 }
 
 .pageLayout[data-preview="mobile"][data-framed-mobile-preview="true"]

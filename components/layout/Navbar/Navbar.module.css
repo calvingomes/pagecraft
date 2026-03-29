@@ -64,7 +64,7 @@
 .navLogo {
   font-size: 20px;
   font-weight: 700;
-  color: #0e220e;
+  color: var(--color-forest-green);
   text-decoration: none;
 }
 
@@ -84,7 +84,7 @@
   .navSpacer {
     display: none;
   }
-  
+
   .cornerSvg {
     display: none;
   }

@@ -19,7 +19,7 @@
   padding: 8px 10px;
   border-radius: 6px;
   border: 0;
-  background: #2d2d2d;
+  background: var(--color-darker-grey);
   color: var(--color-white);
   font-size: 0.85rem;
 }

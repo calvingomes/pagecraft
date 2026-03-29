@@ -10,7 +10,7 @@ import styles from "./AuthView.module.css";
 
 const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
   const [mode, setMode] = useState<AuthMode>(
-    initialUsername ? "signup" : "signin"
+    initialUsername ? "signup" : "signin",
   );
   const [username, setUsername] = useState(initialUsername ?? "");
 
@@ -18,11 +18,7 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
   const canProceed = !isSignUp || username.trim().length > 0;
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(
-      e.target.value
-        .toLowerCase()
-        .replace(/[^a-z0-9-]/g, "")
-    );
+    setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
   };
 
   return (
@@ -36,15 +32,14 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
           className={styles.arcSvg}
           aria-hidden
         />
-        
+
         <div className={styles.leftContent}>
           <h1 className={styles.tagline}>
-            Your link.<br />
+            Your link.
+            <br />
             <span className={styles.taglineAccent}>Your brand.</span>
           </h1>
-          <p className={styles.leftSubtitle}>
-            One link for everything you do.
-          </p>
+          <p className={styles.leftSubtitle}>One link for everything you do.</p>
         </div>
 
         <div className={styles.rectStack}>
@@ -84,7 +79,9 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
           {/* Username input — sign-up only */}
           {isSignUp && (
             <div className={styles.usernameInputWrapper}>
-              <span className={styles.usernamePrefix}>pagecraft-psi.vercel.app/</span>
+              <span className={styles.usernamePrefix}>
+                pagecraft-psi.vercel.app/
+              </span>
               <input
                 type="text"
                 value={username}
@@ -98,10 +95,18 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
           )}
 
           <ThemeButton
-            label={isSignUp ? "Create an account with Google" : "Continue with Google"}
+            label={
+              isSignUp
+                ? "Create an account with Google"
+                : "Continue with Google"
+            }
             cta={handleGoogleSignIn}
-            bgColor={canProceed ? "var(--color-theme-yellow)" : "var(--color-mid-grey)"}
-            textColor={canProceed ? "#ffffff" : "#0e220e"}
+            bgColor={
+              canProceed
+                ? "var(--color-theme-yellow)"
+                : "var(--color-light-grey)"
+            }
+            textColor={canProceed ? "var(--color-white)" : "var(--color-aqua)"}
             iconCircle={false}
             icon={ArrowRight}
             disabled={!canProceed}

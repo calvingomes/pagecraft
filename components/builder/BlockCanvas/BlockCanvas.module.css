@@ -34,7 +34,7 @@
   border-radius: 8px;
   left: 0;
   top: 0;
-  background-color: color-mix(in srgb, #515151 12%, transparent);
+  background-color: color-mix(in srgb, var(--color-dark-grey) 12%, transparent);
   will-change: transform, width, height;
   transition:
     transform var(--duration-base) var(--ease-standard),

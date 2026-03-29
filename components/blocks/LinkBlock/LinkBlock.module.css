@@ -168,7 +168,7 @@
 }
 
 .titleEditorContainer :global(.ProseMirror):focus-visible {
-  background-color: rgb(240, 240, 240);
+  background-color: var(--color-lighter-grey);
   overflow: scroll;
   transition:
     opacity 0.15s,

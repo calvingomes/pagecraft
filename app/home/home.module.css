@@ -2,6 +2,6 @@
 
 .homeViewport {
   min-height: 100vh;
-  background: var(--color-light-grey);
+  background: var(--color-lighter-grey);
   color: var(--color-black);
 }

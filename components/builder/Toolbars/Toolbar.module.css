@@ -8,7 +8,7 @@
   align-items: center;
   z-index: 1000;
   border-radius: 8px;
-  background: #2d2d2d;
+  background: var(--color-darker-grey);
   -webkit-overflow-scrolling: touch;
   touch-action: manipulation;
   transition:
@@ -75,13 +75,13 @@
   padding: 10px 12px;
   border-radius: 8px;
   border: none;
-  background: #2d2d2d;
-  color: var(--color-mid-grey);
+  background: var(--color-darker-grey);
+  color: var(--color-light-grey);
   font-size: 0.875rem;
 }
 
 .linkInput::placeholder {
-  color: #6b7280;
+  color: var(--color-bluish-grey);
 }
 
 .linkInput:focus-visible {
@@ -103,15 +103,15 @@
 }
 
 .backButton {
-  background: #2d2d2d;
+  background: var(--color-aqua);
 }
 
 .pasteButton {
-  background: #249652;
+  background: var(--color-aqua);
 }
 
 .pasteButton:hover {
-  background: #14532d;
+  background: var(--color-aqua);
 }
 
 .palettePopover {
@@ -137,7 +137,8 @@
 .paletteLabel {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #64748b;
+  color: red;
+  color: var(--color-dark-grey);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -154,18 +155,18 @@
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  border: 2px solid transparent;
+  border: 2px solid var(--color-light-grey);
   cursor: pointer;
   background-clip: padding-box;
 }
 
 .colorSwatchSelected {
-  border-color: #eab308;
+  border-color: var(--color-theme-yellow);
 }
 
 .paletteDivider {
   height: 1px;
-  background: #e2e8f0;
+  background: var(--color-light-grey);
 }
 
 .sidebarPositionGroup {
@@ -179,10 +180,10 @@
   align-items: center;
   justify-content: center;
   padding: 8px 12px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid var(--color-light-grey);
   border-radius: 10px;
   background: var(--color-white);
-  color: #64748b;
+  color: var(--color-bluish-grey);
   cursor: pointer;
   transition:
     border-color 0.15s,
@@ -190,14 +191,9 @@
     color 0.15s;
 }
 
-.sidebarPositionBtn:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
-}
-
 .sidebarPositionSelected,
 .sidebarPositionSelected:hover {
-  border-color: #eab308;
-  background: #fefce8;
-  color: #a16207;
+  border-color: var(--color-theme-yellow);
+  background: var(--color-aqua);
+  color: aqua;
 }

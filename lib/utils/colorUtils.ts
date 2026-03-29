@@ -20,11 +20,11 @@ function relativeLuminance(r: number, g: number, b: number): number {
  * Derives a legible text color from a hex background.
  * - Dark bg → very light tinted version of the color (mix with white at 88%)
  * - Light bg → very dark tinted version of the color (scale down to 14%)
- * Falls back to #ffffff for non-parseable inputs (CSS vars, 'transparent', etc.)
+ * Falls back to white for non-parseable inputs (CSS vars, 'transparent', etc.)
  */
 export function deriveTextColor(bgColor: string): string {
   const rgb = hexToRgb(bgColor);
-  if (!rgb) return "#ffffff";
+  if (!rgb) return "var(--color-white)";
 
   const lum = relativeLuminance(rgb.r, rgb.g, rgb.b);
 

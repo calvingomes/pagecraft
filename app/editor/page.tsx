@@ -397,7 +397,7 @@ export default function EditorPage() {
           <ThemeButton
             label={isSaving ? "Saving..." : "Save"}
             cta={handleSave}
-            bgColor="#f6d045"
+            bgColor="var(--color-theme-yellow)"
             disabled={isSaving}
           />
         </div>
@@ -406,7 +406,7 @@ export default function EditorPage() {
             label="Sign out"
             cta={handleLogout}
             bgColor="transparent"
-            textColor="#0e220e"
+            textColor="aqua"
           />
         </div>
         {canTogglePreview && (

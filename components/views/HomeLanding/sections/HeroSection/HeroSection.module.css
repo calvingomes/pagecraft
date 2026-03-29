@@ -13,7 +13,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #173404;
+  background: var(--color-forest-green);
   background-size: cover;
   position: relative;
   overflow: hidden;
@@ -54,13 +54,13 @@
 }
 
 .titleAccent {
-  color: #97C459;
+  color: var(--color-grass-green);
 }
 
 .subtitle {
   font-size: 20px;
   line-height: 1.6;
-  color: #97c459a7;
+  color: var(--color-aqua);
   max-width: 640px;
   margin: 0 auto;
 }
