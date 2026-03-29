@@ -49,7 +49,7 @@ export const ClaimInput = () => {
           label="Claim Page"
           cta={handleSubmit}
           icon={ArrowRight}
-          bgColor="var(--color-theme-yellow)"
+          bgColor="var(--color-yellow)"
           iconCircle={false}
         />
       </div>

@@ -22,7 +22,7 @@
   height: 45px;
   border: none;
   border-radius: 8px;
-  background: var(--color-aqua);
+  background: var(--color-danger);
   color: var(--color-white);
   display: flex;
   align-items: center;

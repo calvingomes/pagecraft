@@ -1,14 +1,5 @@
 import type { AvatarShape, SidebarPosition } from "@/types/page";
 
-export type AvatarToolbarProps = {
-  visible: boolean;
-  currentShape: AvatarShape;
-  onDelete: () => void;
-  onShapeChange: (shape: AvatarShape) => void;
-  onUpload: (imageDataUrl: string) => void;
-  className?: string;
-};
-
 export type ProfileSidebarProps = (
   | {
       variant: "editor";

@@ -11,9 +11,6 @@
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 20;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  touch-action: manipulation;
   opacity: 0;
   visibility: hidden;
   transition:
@@ -28,7 +25,8 @@
   pointer-events: auto;
 }
 
-.sizeGroup {
+.sizeGroup,
+.shapeGroup {
   display: flex;
   align-items: center;
   gap: 2px;
@@ -53,18 +51,17 @@
 }
 
 .sizeButton:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-white);
+  background: var(--color-dark-grey);
 }
 
 .deleteButton:hover {
-  background: rgba(239, 68, 68, 0.4);
-  color: var(--color-aqua);
+  background: color-mix(in srgb, var(--color-danger) 65%, black);
+  color: color-mix(in srgb, var(--color-danger) 15%, white);
 }
 
 .sizeButton.active {
-  background: rgba(255, 200, 0, 0.3);
-  color: var(--color-aqua);
+  background: color-mix(in srgb, var(--color-yellow) 45%, black);
+  color: var(--color-yellow);
 }
 
 .divider {

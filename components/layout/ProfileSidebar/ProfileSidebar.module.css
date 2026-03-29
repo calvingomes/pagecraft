@@ -48,7 +48,7 @@
   object-fit: cover;
 }
 
-.avatarToolbar {
+.AvatarHoverToolbar {
   bottom: -16px;
 }
 
@@ -168,12 +168,18 @@
   height: 96px;
 }
 
-:global([data-preview="mobile"]) .sidebarCenter .nameInput :global(.ProseMirror),
+:global([data-preview="mobile"])
+  .sidebarCenter
+  .nameInput
+  :global(.ProseMirror),
 :global([data-preview="mobile"]) .sidebarCenter .name {
   font-size: 26px;
 }
 
-:global([data-preview="mobile"]) .sidebarCenter .bioEditor :global(.ProseMirror),
+:global([data-preview="mobile"])
+  .sidebarCenter
+  .bioEditor
+  :global(.ProseMirror),
 :global([data-preview="mobile"]) .sidebarCenter .bio {
   font-size: 15px;
   margin-top: 12px;

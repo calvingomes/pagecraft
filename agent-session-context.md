@@ -58,7 +58,7 @@
 ## 7. Recent Operations
 
 - **Last Agent Commands:**
-  - Read files: imageProcessing.ts, imageWebp.ts, pageImageStorage.ts, prepareImageBlockOptions.ts, saveEditorPage.ts, AvatarToolbar.tsx
+  - Read files: imageProcessing.ts, imageWebp.ts, pageImageStorage.ts, prepareImageBlockOptions.ts, saveEditorPage.ts, AvatarHoverToolbar.tsx
 - **Tool Results Summary:**
   - Confirmed avatar and image block uploads are compressed and converted to WebP in normal UI flows; backend/storage allows jpeg/png/webp and does not strictly enforce WebP-only
 - **Pre-Summary State:**

@@ -60,7 +60,7 @@
 .subtitle {
   font-size: 20px;
   line-height: 1.6;
-  color: var(--color-aqua);
+  color: var(--color-light-grey);
   max-width: 640px;
   margin: 0 auto;
 }

@@ -102,11 +102,11 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
             }
             cta={handleGoogleSignIn}
             bgColor={
-              canProceed
-                ? "var(--color-theme-yellow)"
-                : "var(--color-light-grey)"
+              canProceed ? "var(--color-yellow)" : "var(--color-light-grey)"
             }
-            textColor={canProceed ? "var(--color-white)" : "var(--color-aqua)"}
+            textColor={
+              canProceed ? "var(--color-white)" : "var(--color-mid-grey)"
+            }
             iconCircle={false}
             icon={ArrowRight}
             disabled={!canProceed}

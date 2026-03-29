@@ -1,22 +1,23 @@
+/* eslint-disable css-modules/no-unused-class */
 "use client";
 
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import { Circle, Square, Trash2, Upload } from "lucide-react";
 import { useRef, type ChangeEvent } from "react";
-import styles from "./AvatarToolbar.module.css";
-import type { AvatarToolbarProps } from "./ProfileSidebar.types";
+import styles from "./../HoverToolbar.module.css";
+import type { AvatarHoverToolbarProps } from "./AvatarHoverToolbar.types";
 
 const ALLOWED_INPUT_TYPES = new Set(["image/jpeg", "image/png"]);
 
-export function AvatarToolbar({
+export function AvatarHoverToolbar({
   visible,
   currentShape,
   onDelete,
   onShapeChange,
   onUpload,
   className,
-}: AvatarToolbarProps) {
+}: AvatarHoverToolbarProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handlePickFile = () => {
@@ -54,7 +55,7 @@ export function AvatarToolbar({
       >
         <ToggleGroup.Root
           type="single"
-          className={styles.group}
+          className={styles.shapeGroup}
           value={currentShape}
           onValueChange={(nextValue) => {
             if (nextValue === "circle" || nextValue === "square") {

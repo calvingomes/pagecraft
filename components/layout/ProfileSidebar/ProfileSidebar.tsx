@@ -7,7 +7,7 @@ import { useState } from "react";
 import { htmlToText } from "@/lib/utils/htmlToText";
 import { sanitizeMinimalRTH } from "@/lib/utils/sanitizeRichText";
 import type { ProfileSidebarProps } from "./ProfileSidebar.types";
-import { AvatarToolbar } from "./AvatarToolbar";
+import { AvatarHoverToolbar } from "@/components/builder/HoverToolbar/AvatarHoverToolbar/AvatarHoverToolbar";
 import { useBlockEditor } from "@/hooks/useBlockEditor";
 
 export const ProfileSidebar = (props: ProfileSidebarProps) => {
@@ -32,7 +32,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
   const avatarShape = props.avatarShape ?? "circle";
   const avatarUrl = props.avatarUrl ?? "";
 
-  const [showAvatarToolbar, setShowAvatarToolbar] = useState(false);
+  const [showAvatarHoverToolbar, setShowAvatarHoverToolbar] = useState(false);
 
   const avatarLetter = (() => {
     const source = (displayNameText || username || "?").trim();
@@ -82,8 +82,8 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
       <div className={styles.profileCard}>
         <div
           className={styles.avatarWrap}
-          onMouseEnter={() => setShowAvatarToolbar(true)}
-          onMouseLeave={() => setShowAvatarToolbar(false)}
+          onMouseEnter={() => setShowAvatarHoverToolbar(true)}
+          onMouseLeave={() => setShowAvatarHoverToolbar(false)}
         >
           <div className={avatarClassName}>
             {avatarUrl ? (
@@ -99,15 +99,15 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
           </div>
 
           {props.variant === "editor" ? (
-            <AvatarToolbar
-              visible={showAvatarToolbar}
+            <AvatarHoverToolbar
+              visible={showAvatarHoverToolbar}
               currentShape={avatarShape}
               onShapeChange={(nextShape) =>
                 props.onChangeAvatarShape?.(nextShape)
               }
               onDelete={() => props.onChangeAvatarUrl?.("")}
               onUpload={(nextImage) => props.onChangeAvatarUrl?.(nextImage)}
-              className={styles.avatarToolbar}
+              className={styles.AvatarHoverToolbar}
             />
           ) : null}
         </div>

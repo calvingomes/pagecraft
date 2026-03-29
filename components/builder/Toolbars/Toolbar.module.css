@@ -103,15 +103,15 @@
 }
 
 .backButton {
-  background: var(--color-aqua);
+  background: var(--color-darker-grey);
 }
 
 .pasteButton {
-  background: var(--color-aqua);
+  background: var(--color-success);
 }
 
 .pasteButton:hover {
-  background: var(--color-aqua);
+  background: color-mix(in srgb, var(--color-success) 80%, black);
 }
 
 .palettePopover {
@@ -161,7 +161,7 @@
 }
 
 .colorSwatchSelected {
-  border-color: var(--color-theme-yellow);
+  border-color: var(--color-yellow);
 }
 
 .paletteDivider {
@@ -193,7 +193,7 @@
 
 .sidebarPositionSelected,
 .sidebarPositionSelected:hover {
-  border-color: var(--color-theme-yellow);
-  background: var(--color-aqua);
-  color: aqua;
+  border-color: var(--color-yellow);
+  background: color-mix(in srgb, var(--color-yellow) 15%, white);
+  color: var(--color-yellow);
 }

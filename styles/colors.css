@@ -1,5 +1,4 @@
 :root {
-  /* Updating relevant colors */
   --color-black: #000000;
   --color-white: #ffffff;
 
@@ -17,7 +16,9 @@
   --color-lime-green: #e4f2d8;
   --color-grass-green: #97c459;
 
-  --color-theme-yellow: #ef9f27;
+  --color-danger: #e05252;
+  --color-success: #249652;
+  --color-yellow: #ef9f27;
 
   /* Page background palette */
   --color-editor-page-bg-1: #f3f5f2;
@@ -38,7 +39,6 @@
   /* Needs work on these colors*/
   --color-brighter-yellow: #ffc800; /* for toolbar icon highlighter - should I use it?*/
   --color-darker-forest-green: #0e220e; /* thinking if I should use it */
-  --color-aqua: #22d3ee; /* TBD - considering for accent */
 
   /* search and check color-mix */
 }

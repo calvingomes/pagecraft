@@ -1,3 +1,4 @@
+/* eslint-disable css-modules/no-unused-class */
 "use client";
 
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
@@ -9,7 +10,7 @@ import {
   Square,
 } from "lucide-react";
 import { useEditorContext } from "@/contexts/EditorContext";
-import styles from "./BlockHoverToolbar.module.css";
+import styles from "./../HoverToolbar.module.css";
 import type {
   BlockHoverToolbarProps,
   BlockHoverToolbarIcons,

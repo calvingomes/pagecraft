@@ -10,7 +10,7 @@ import {
   useEditorStore,
 } from "@/stores/editor-store";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
-import { BlockHoverToolbar } from "@/components/builder/BlockHoverToolbar/BlockHoverToolbar";
+import { BlockHoverToolbar } from "@/components/builder/HoverToolbar/BlockHoverToolbar/BlockHoverToolbar";
 import styles from "./SortableBlock.module.css";
 import { shouldUseTransparentWrapper } from "@/lib/blockWrapper";
 import type { SortableBlockProps } from "@/types/builder";
