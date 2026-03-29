@@ -2,7 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: color-mix(in srgb, black 42%, transparent);
+  background: color-mix(in srgb, var(--color-black) 42%, transparent);
 }
 
 .panel {
@@ -13,7 +13,6 @@
   z-index: 10000;
   width: min(calc(100vw - 48px), 420px);
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
   background: var(--color-white);
   color: var(--color-darkest-grey);
   padding: 18px 16px;

@@ -9,7 +9,7 @@
   padding: 6px 8px;
   background: var(--color-darker-grey);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--color-darkest-grey) 25%, transparent);
   z-index: 20;
   opacity: 0;
   visibility: hidden;
@@ -52,22 +52,25 @@
 
 .sizeButton:hover {
   background: var(--color-dark-grey);
+  transform: scale(1.1);
 }
 
 .deleteButton:hover {
-  background: color-mix(in srgb, var(--color-danger) 65%, black);
-  color: color-mix(in srgb, var(--color-danger) 15%, white);
+  background: color-mix(in srgb, var(--color-danger) 65%, var(--color-black));
+  color: color-mix(in srgb, var(--color-danger) 15%, var(--color-white));
+  transform: scale(1.1);
 }
 
 .sizeButton.active {
-  background: color-mix(in srgb, var(--color-yellow) 45%, black);
+  background: color-mix(in srgb, var(--color-yellow) 45%, var(--color-black));
   color: var(--color-yellow);
+  transform: none;
 }
 
 .divider {
   width: 1px;
   height: 20px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--color-bluish-grey);
   margin: 0 4px;
 }
 

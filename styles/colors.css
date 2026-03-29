@@ -35,10 +35,4 @@
   --color-editor-page-avatar-4: #a9c2e8;
   --color-editor-page-avatar-5: #cfa6d6;
   --color-editor-page-avatar-6: #e0a7a7;
-
-  /* Needs work on these colors*/
-  --color-brighter-yellow: #ffc800; /* for toolbar icon highlighter - should I use it?*/
-  --color-darker-forest-green: #0e220e; /* thinking if I should use it */
-
-  /* search and check color-mix */
 }

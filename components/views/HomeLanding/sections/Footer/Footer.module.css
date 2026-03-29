@@ -92,14 +92,18 @@
 }
 
 .footerDot {
-  color: rgba(0, 0, 0, 0.3);
+  color: var(--color-mid-grey);
   font-size: 14px;
 }
 
 .footerBottomLink {
   font-size: 13px;
-  color: var(--color-gray-600);
+  color: var(--color-mid-grey);
   text-decoration: none;
+}
+
+.footerBottomLink:hover {
+  color: var(--color-darker-grey);
 }
 
 .footerLogo {

@@ -438,7 +438,6 @@ export default function EditorPage() {
         >
           <ProfileSidebar
             variant="editor"
-            position={effectiveSidebarPosition}
             displayName={displayName}
             bioHtml={bioHtml}
             onChangeDisplayName={setDisplayName}

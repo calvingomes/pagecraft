@@ -1,6 +1,6 @@
-import type { AvatarShape, SidebarPosition } from "@/types/page";
+import type { AvatarShape } from "@/types/page";
 
-export type ProfileSidebarProps = (
+export type ProfileSidebarProps =
   | {
       variant: "editor";
       displayName?: string;
@@ -19,5 +19,4 @@ export type ProfileSidebarProps = (
       bioHtml?: string;
       avatarUrl?: string;
       avatarShape?: AvatarShape;
-    }
-) & { position?: SidebarPosition };
+    };

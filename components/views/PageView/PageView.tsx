@@ -60,7 +60,6 @@ export function PageView({
       <ProfileSidebar
         variant="view"
         username={username}
-        position={effectiveSidebarPosition}
         displayName={displayName}
         bioHtml={bioHtml}
         avatarUrl={avatarUrl}

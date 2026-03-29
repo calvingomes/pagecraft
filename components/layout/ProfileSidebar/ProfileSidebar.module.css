@@ -113,14 +113,6 @@
 
 /* Sidebar Mobile */
 @media (--bp-mobile) {
-  .sidebarLeft,
-  .sidebarRight {
-    width: 100%;
-    border-left: none;
-    border-right: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  }
-
   .sidebarCenter {
     padding: 20px 0;
   }
@@ -147,14 +139,6 @@
 }
 
 /* Force mobile styles when editor is in mobile preview mode */
-:global([data-preview="mobile"]) .sidebarLeft,
-:global([data-preview="mobile"]) .sidebarRight {
-  width: 100%;
-  border-left: none;
-  border-right: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
 :global([data-preview="mobile"]) .sidebarCenter {
   padding: 20px 0;
 }

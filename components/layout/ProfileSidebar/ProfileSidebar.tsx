@@ -13,7 +13,6 @@ import { useBlockEditor } from "@/hooks/useBlockEditor";
 export const ProfileSidebar = (props: ProfileSidebarProps) => {
   const { username: editorUsername } = useAuthStore();
   const username = props.variant === "view" ? props.username : editorUsername;
-  const position = props.position ?? "left";
 
   const displayNameRaw =
     typeof props.displayName === "string"
@@ -68,17 +67,10 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
     },
   });
 
-  const positionClass =
-    position === "left"
-      ? styles.sidebarLeft
-      : position === "center"
-        ? styles.sidebarCenter
-        : styles.sidebarRight;
-
   const avatarClassName = `${styles.avatar} ${avatarShape === "square" ? styles.avatarSquare : ""}`;
 
   return (
-    <aside className={`${styles.sidebar} ${positionClass}`}>
+    <aside className={`${styles.sidebar} ${styles.sidebarCenter}`}>
       <div className={styles.profileCard}>
         <div
           className={styles.avatarWrap}
