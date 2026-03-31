@@ -72,7 +72,7 @@
   margin-top: 16px;
 }
 
-@media (max-width: 1359px) {
+@media (--bp-tablet) {
   .hero {
     min-height: 80vh;
   }
@@ -82,7 +82,7 @@
   }
 }
 
-@media (max-width: 959px) {
+@media (--bp-mobile) {
   .hero {
     padding: 120px 20px 80px;
     min-height: auto;

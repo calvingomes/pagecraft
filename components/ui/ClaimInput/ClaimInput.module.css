@@ -1,3 +1,5 @@
+@import "@styles/media.css";
+
 .form {
   display: flex;
   align-items: center;
@@ -46,7 +48,7 @@
   flex-shrink: 0;
 }
 
-@media (max-width: 959px) {
+@media (--bp-mobile) {
   .form {
     max-width: 100%;
   }
