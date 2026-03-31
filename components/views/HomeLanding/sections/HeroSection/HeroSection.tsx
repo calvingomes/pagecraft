@@ -12,7 +12,7 @@ export function HeroSection() {
         className={styles.arcSvg}
         aria-hidden
       />
-      <div className={styles.container}>
+      <div className="container">
         <div className={styles.content}>
           <h1 id="home-hero-title" className={styles.title}>
             Personal Page<br />

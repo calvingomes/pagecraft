@@ -1,11 +1,6 @@
 @import "@styles/media.css";
 
-.container {
-  width: 100%;
-  max-width: 1260px;
-  padding: 0 20px;
-  margin: 0 auto;
-}
+
 
 .hero {
   width: 100%;
@@ -14,17 +9,12 @@
   align-items: center;
   justify-content: center;
   background: var(--color-forest-green);
-  background-size: cover;
   position: relative;
   overflow: hidden;
-  padding: 150px 24px 100px;
+  padding: 150px 0 100px;
 }
 
 .arcSvg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
   object-fit: cover;
   object-position: top;
   pointer-events: none;
@@ -44,13 +34,12 @@
 }
 
 .title {
-  font-size: clamp(40px, 6vw, 80px);
+  font-size: var(--font-size-fluid-display);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.025em;
   color: var(--color-white);
   max-width: 18ch;
-  margin: 0 auto;
 }
 
 .titleAccent {
@@ -58,11 +47,10 @@
 }
 
 .subtitle {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-fluid-lg);
   line-height: 1.6;
   color: var(--color-light-grey);
   max-width: 640px;
-  margin: 0 auto;
 }
 
 .actionContainer {
@@ -74,25 +62,15 @@
 
 @media (--bp-tablet) {
   .hero {
-    min-height: 80vh;
-  }
-
-  .title {
-    font-size: clamp(36px, 5vw, 64px);
+    height: auto;
+    min-height: 85vh;
   }
 }
 
 @media (--bp-mobile) {
   .hero {
-    padding: 120px 20px 80px;
-    min-height: auto;
-  }
-
-  .title {
-    font-size: var(--font-size-5xl);
-  }
-
-  .subtitle {
-    font-size: var(--font-size-md);
+    height: auto;
+    min-height: 85vh;
+    padding: 120px 0 80px;
   }
 }
