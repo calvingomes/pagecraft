@@ -1,63 +1,60 @@
 # PageCraft Responsive Layout & Styling Rules
 
-To maintain perfect brand consistency and a scalable codebase, any layout or styling changes must strictly follow these foundational rules derived from our previous layout fixes.
+To maintain perfect brand consistency and a scalable codebase, any layout or styling changes must strictly follow these foundational rules.
 
 ## 1. Global Containers & Padding
-Always use the abstracted global `.container` utility class (defined in `app/globals.css`) to wrap the inner content of any new section (e.g., Hero, Features, Footer).
+Always use the abstracted global `.container` utility class (defined in `app/globals.css`) to wrap the inner content of any new section.
 - It handles the `max-width: 1260px` and centering automatically.
-- **CRITICAL:** It contains built-in responsive safe-area buffering (`padding: 0 24px` on desktop, `padding: 0 20px` on mobile). 
-- Do **NOT** add horizontal padding (`padding-left`, `padding-right`) to the outer section wrappers (like `.hero`), as `.container` securely prevents the content from hitting the screen edges.
+- **CRITICAL:** It contains built-in responsive safe-area buffering (`padding: 0 48px` on tablet, `padding: 0 20px` on mobile/desktop). 
+- Do **NOT** add horizontal padding (`padding-left`, `padding-right`) to outer section wrappers, as `.container` securely prevents content from hitting the screen edges.
 
 ## 2. Typography & Clamps
-Never write custom font sizes (e.g., `font-size: 16px`) or custom `clamp()` expressions directly inside CSS `.module.css` files. 
-Always use variables directly from `styles/fonts.css`.
+Never write custom font sizes or custom `clamp()` expressions directly inside CSS `.module.css` files. Always use variables directly from `styles/fonts.css`.
 
 **A. Fluid Headings:**
-For text that needs to responsively shrink across devices, use the fluid variables. This eliminates the need to write typography `@media` overrides!
-- `--font-size-fluid-display`: `clamp(40px, 6vw, 80px)` (Massive Hero Titles)
-- `--font-size-fluid-h1`: `clamp(32px, 5vw, 64px)` (Section Headers)
-- `--font-size-fluid-h2`: `clamp(26px, 4vw, 48px)`
-- `--font-size-fluid-h3`: `clamp(22px, 3vw, 36px)`
-- `--font-size-fluid-xl`: `clamp(18px, 2.5vw, 24px)`
-- `--font-size-fluid-lg`: `clamp(16px, 2vw, 20px)` (Subtitles/Leads)
+For text that needs to responsively scale across devices, use the fluid variables to eliminate the need for typography `@media` overrides.
+- **Massive Display**: `--font-size-fluid-display` (`40px` to `80px`) — Primary impact headings.
+- **Brand Marquee**: `--font-size-fluid-brand` (`96px` to `200px`) — Edge-to-edge decorative text.
+- **Heading 1**: `--font-size-fluid-h1` (`40px` to `56px`) — Standard section headers.
+- **Heading 1 (Alt)**: `--font-size-fluid-h1-secondary` (`32px` to `48px`) — Compressed headers.
+- **Heading 2 (High)**: `--font-size-fluid-h2-plus` (`28px` to `52px`) — Impactful subtitles.
+- **Heading 2 (Base)**: `--font-size-fluid-h2` (`26px` to `48px`) — Component titles.
+- **Secondary UI**: `--font-size-fluid-lg` (`16px` to `20px`) — Sub-text and descriptors.
 
 **B. Fixed UI Text:**
-For rigid elements like inputs, buttons, and system text, use the absolute scale: `var(--font-size-sm)`, `var(--font-size-md)`, `var(--font-size-lg)`.
+For rigid elements like inputs, buttons, and small labels, use the absolute scale: `var(--font-size-sm)`, `var(--font-size-md)`, `var(--font-size-lg)`.
 
 ## 3. Responsive Architecture (Desktop-First)
-We author CSS **Desktop-First**. Write your base styles at the top of the file without queries, aiming at a large desktop.
+We author CSS **Desktop-First**. Base styles are written without overrides, targeting a high-resolution desktop.
 - Override for tablets using `@media (--bp-tablet)` (960px to 1359px).
 - Override for phones using `@media (--bp-mobile)` (< 960px).
-- **Rule:** Do not duplicate rules across both blocks if one rule serves both. However, since `--bp-tablet` and `--bp-mobile` are mutually exclusive, duplicating layout shifts (like `flex-direction: column`) in both blocks is occasionally required and accepted.
+- **Rule:** Do not duplicate rules if one serves both. If a layout shift (like `flex-direction: column`) is required for both mobile and tablet, standardizing the change at the tablet level is preferred.
 
-## 4. Input & Component Constraints
-When dealing with forms or floating actionable UI (like `ClaimInput`):
-- Avoid fixed `px` widths that stretch or overflow. Use `width: 100%` paired with a strict `max-width` (e.g., `max-width: 480px`).
-- Always protect minimum constraints against extreme screen narrowness: Use `min-width: min(100%, 320px)` instead of `min-width: 320px` to guarantee it never busts out of the `.container`'s 20px edge padding on narrow iPhones.
+## 4. Component Constraints
+Always protect minimum and maximum constraints against extreme screen narrowness or width:
+- Use `width: 100%` paired with a strict `max-width` for any isolated floating or centered UI elements.
+- Use `min-width: min(100%, 320px)` to guarantee a component never overflows the `.container` horizontal padding on narrow devices.
 
 ## 5. CSS Redundancy (Don'ts)
-- Do **not** apply `margin: 0 auto;` to elements whose parent is a flex container with `align-items: center;`.
-- Do **not** declare `position: absolute; inset: 0; width: 100%; height: 100%;` on elements mapped to `<Image fill />`. Next.js forcefully injects these positioning rules inline.
-- Do **not** declare `background-size: cover;` on elements where `background` is simply a solid color variable.
+- Do **not** apply `margin: 0 auto;` to elements whose parent is a flex container with `center` alignment.
+- Do **not** declare `position: absolute; inset: 0; width: 100%; height: 100%;` on elements mapped to `<Image fill />` as Next.js handles this automatically.
+- Do **not** declare `background-size: cover;` on elements where `background` is a solid color.
 
-## 6. Color Opacities & Glass Mating
-When creating transparent overlays or softer variations of a global color variable, do **not** use a hardcoded Hex code with an alpha slice (e.g. `#ffffff44`). 
-- **Rule:** Use the native CSS4 `color-mix` engine to inject transparency directly into the design system variables:
+## 6. Color Opacities
+Avoid using hardcoded Hex codes with alpha slices (e.g. `#ffffff44`). 
+- **Rule:** Use the native CSS `color-mix` engine to inject transparency into design system variables:
   `background-color: color-mix(in srgb, var(--color-white) 27%, transparent);`
 
 ## 7. Motion & Animations
-Never hardcode raw `cubic-bezier()` functions (or basic `ease` properties) into a CSS module unless strictly unique.
-- Use `var(--ease-snappy)` (`0.16, 1, 0.3, 1`) for hyper-premium, aggressive 'fast-out/slow-in' GUI snappy motions.
-- Use `var(--ease-bouncy)` (`0.68, -0.55, 0.265, 1.55`) for elastic effects.
-- Use `var(--ease-standard)` for generic smooth transitions.
-- **Rule:** For complex icon swaps on hover, rely on dual SVGs sliding through clipped wrappers (`overflow: hidden;`) utilizing `transform: translateX()` rather than generic `scale()` or `rotate()` trickery.
+Standardize on the global bezier motions to ensure a premium GUI feel:
+- Use `var(--ease-snappy)` (`0.16, 1, 0.3, 1`) for high-velocity interface interactions.
+- Use `var(--ease-bouncy)` for elastic elements.
+- **Rule:** For complex icon swaps on hover, prefer sliding SVG translations through clipped wrappers (`overflow: hidden;`) over generic scaling or rotation.
 
 ## 8. File Structure & Typing
-In strict alignment with the `AGENTS.md` protocol:
-- **Never** define Component Props (`interface [Component]Props`) inside the `.tsx` UI render file. 
-- **Rule:** Always extract those types into their own explicitly localized `*.types.ts` registry directly next to the component (e.g., `ThemeButton.types.ts`) and `import type { ThemeButtonProps }` them cleanly.
+- **Never** define Component Props inside the `.tsx` UI render file. 
+- **Rule:** Always extract types into their own localized `*.types.ts` registry directly next to the component and use `import type` cleanly.
 
-## 9. Tablet Viewport Padding
-For tablet screens (`960px` to `1359px`), we use a more generous horizontal padding to prevent wide text blocks (like `RunningText`) from looking cramped.
-- **Rule:** The global `.container` class is configured with **48px** of horizontal padding on tablet. 
-- Use the global `.container` to automatically apply this shift without writing manual tablet queries in every component module.
+## 9. Layout Design Philosophy
+- **Fluidity First:** Always prefer fluid variables first to minimize the amount of device-specific overrides needed.
+- **Clean Transitions:** When stacking elements vertically on mobile, ensure the alignment feels native to the page rhythm (usually left-aligned for long-form content, centered only for brief hero callouts).

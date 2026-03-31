@@ -13,7 +13,7 @@ export function Footer() {
         className={styles.arcSvg}
         aria-hidden
       />
-      <div className={`${styles.container} ${styles.footerContainer}`}>
+      <div className={`container ${styles.footerContainer}`}>
 
         {/* Top: Headline + ClaimInput centered */}
         <div className={styles.footerTop}>

@@ -1,11 +1,6 @@
 @import "@styles/media.css";
 
-.container {
-  width: 100%;
-  max-width: 1260px;
-  padding: 0 20px;
-  margin: 0 auto;
-}
+
 
 .footer {
   width: 100%;
@@ -17,10 +12,6 @@
 }
 
 .arcSvg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
   object-fit: cover;
   object-position: bottom;
   pointer-events: none;
@@ -46,7 +37,7 @@
 }
 
 .footerHeadline {
-  font-size: clamp(32px, 4vw, 56px);
+  font-size: var(--font-size-fluid-h1-secondary);
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.025em;
@@ -68,7 +59,7 @@
 
 .footerBrandText {
   font-family: var(--font-belanosima);
-  font-size: clamp(40px, 13vw, 200px);
+  font-size: var(--font-size-fluid-brand);
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -121,18 +112,7 @@
     gap: 56px;
   }
 
-  .footerTop {
-    align-items: flex-start;
-    text-align: left;
-  }
-
-  .claimWrapper {
-    justify-content: flex-start;
-  }
-
-  .footerBottom {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+  .footerHeadline {
+    font-size: var(--font-size-fluid-h1-secondary);
   }
 }
