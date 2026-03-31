@@ -1,39 +1,78 @@
 .button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 20px;
   padding: 10px;
   border-radius: 8px;
   border: none;
   text-decoration: none;
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-fluid-lg);
   cursor: pointer;
   transition: filter 150ms ease;
   font-family: inherit;
   line-height: 1;
   white-space: nowrap;
-  width: fit-content;
 }
 
-.icon {
-  width: 32px;
-  height: 32px;
-  transition: transform 300ms ease;
+/* Icon Containers */
+.iconCircleWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-radius: 50%;
 }
 
-.iconFlat {
+.iconFlatWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  padding: 4px;
-  background-color: #ffffff44;
-  transition: transform 300ms ease;
+  background-color: color-mix(in srgb, var(--color-white) 27%, transparent);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-.button:hover:not(:disabled) .icon,
-.button:hover:not(:disabled) .iconFlat {
-  transform: rotate(-45deg);
+/* Base SVG Styles */
+.svgPrimary {
+  transition: transform 500ms var(--ease-snappy);
+  transform: translateX(0);
+}
+
+.svgSecondary {
+  position: absolute;
+  transition: transform 500ms var(--ease-snappy);
+  transform: translateX(-150%);
+}
+
+/* Explicit SVG Scaling inside wrappers */
+.iconCircleWrapper .svgPrimary,
+.iconCircleWrapper .svgSecondary {
+  width: 24px;
+  height: 24px;
+}
+
+.iconFlatWrapper .svgPrimary,
+.iconFlatWrapper .svgSecondary {
+  width: 18px;
+  height: 18px;
+}
+
+/* Hover Animation Orchestration */
+.button:hover:not(:disabled) .svgPrimary {
+  transform: translateX(150%);
+}
+
+.button:hover:not(:disabled) .svgSecondary {
+  transform: translateX(0);
 }
 
 .button:disabled {

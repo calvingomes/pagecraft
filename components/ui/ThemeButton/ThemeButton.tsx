@@ -2,20 +2,9 @@
 
 import React from "react";
 import Link from "next/link";
-import { Slot } from "@radix-ui/react-slot";
-import { LucideIcon } from "lucide-react";
 import { deriveTextColor } from "@/lib/utils/colorUtils";
+import type { ThemeButtonProps } from "./ThemeButton.types";
 import styles from "./ThemeButton.module.css";
-
-export interface ThemeButtonProps {
-  label: string;
-  cta: (() => void) | ((e: React.FormEvent) => void) | string;
-  icon?: LucideIcon | React.ElementType;
-  bgColor: string;
-  textColor?: string;
-  iconCircle?: boolean;
-  disabled?: boolean;
-}
 
 export const ThemeButton = ({
   label,
@@ -24,25 +13,26 @@ export const ThemeButton = ({
   bgColor,
   textColor,
   iconCircle = true,
+  buttonWidth,
   disabled = false,
 }: ThemeButtonProps) => {
   const isLink = typeof cta === "string";
   const resolvedTextColor = textColor ?? deriveTextColor(bgColor);
-  const customStyle = { backgroundColor: bgColor, color: resolvedTextColor };
+  const customStyle = { 
+    backgroundColor: bgColor, 
+    color: resolvedTextColor,
+    width: buttonWidth ?? "100%",
+  };
 
   const content = (
     <>
       <span>{label}</span>
-      {Icon &&
-        (iconCircle ? (
-          <Slot className={styles.icon}>
-            <Icon aria-hidden />
-          </Slot>
-        ) : (
-          <Slot className={styles.iconFlat}>
-            <Icon aria-hidden />
-          </Slot>
-        ))}
+      {Icon && (
+        <div className={iconCircle ? styles.iconCircleWrapper : styles.iconFlatWrapper}>
+          <Icon aria-hidden className={styles.svgPrimary} />
+          <Icon aria-hidden className={styles.svgSecondary} />
+        </div>
+      )}
     </>
   );
 
