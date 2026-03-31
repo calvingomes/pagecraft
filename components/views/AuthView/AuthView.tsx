@@ -80,7 +80,7 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
           {isSignUp && (
             <div className={styles.usernameInputWrapper}>
               <span className={styles.usernamePrefix}>
-                pagecraft-psi.vercel.app/
+                pagecraft.me/
               </span>
               <input
                 type="text"
