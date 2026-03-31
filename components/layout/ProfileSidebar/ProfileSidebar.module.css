@@ -89,7 +89,7 @@
 }
 
 .sidebarCenter .profileCard {
-  flex-direction: row;
+  flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   gap: 24px;
@@ -99,12 +99,13 @@
 .sidebarCenter .profileCard > div:last-child {
   flex: 1;
   min-width: 0;
+  width: 100%;
 }
 
 .sidebarCenter .avatar {
   flex-shrink: 0;
-  width: 140px;
-  height: 140px;
+  width: 200px;
+  height: 200px;
 }
 
 .sidebarCenter .avatarWrap {
@@ -118,6 +119,7 @@
   }
 
   .sidebarCenter .profileCard {
+    flex-direction: row;
     gap: 16px;
   }
 
@@ -143,6 +145,7 @@
 }
 
 :global([data-preview="mobile"]) .sidebarCenter .profileCard {
+  flex-direction: row;
   gap: 16px;
 }
 
