@@ -39,7 +39,7 @@ const FEATURES: FeatureItem[] = [
 export function FeaturesSection() {
   return (
     <section className={styles.section} aria-label="Features">
-      <div className={styles.container}>
+      <div className="container">
         <div className={styles.stack}>
           {FEATURES.map((feature, index) => (
             <FeatureCard

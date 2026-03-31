@@ -1,13 +1,6 @@
 import styles from "./FeatureCard.module.css";
-import type { FeatureItem } from "./FeaturesSection.types";
+import type { FeatureCardProps } from "./FeaturesSection.types";
 import type { CSSProperties } from "react";
-
-type FeatureCardProps = {
-  feature: FeatureItem;
-  index: number;
-  stickyTop: number;
-  scale: number;
-};
 
 export function FeatureCard({
   feature,
