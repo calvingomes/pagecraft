@@ -12,6 +12,8 @@
 
   /* Motion */
   --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bouncy: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --duration-base: 200ms;
 }
 
@@ -62,4 +64,18 @@ a {
 
 :focus-visible {
   outline: none;
+}
+
+/* Global Layout Utilities */
+.container {
+  width: 100%;
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+@media (--bp-mobile) {
+  .container {
+    padding: 0 20px;
+  }
 }
