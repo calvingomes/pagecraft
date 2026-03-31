@@ -178,8 +178,7 @@
   .formContainer {
     position: static;
     transform: none;
-    margin-top: 20vh;
-    padding: 0;
+    margin-top: 25vh;
     min-height: auto;
     width: 100%;
     max-width: 500px;

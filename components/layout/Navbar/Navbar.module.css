@@ -80,6 +80,27 @@
     padding: 0 16px;
     border-radius: 0;
     grid-template-columns: auto 1fr;
+    background: var(--color-white);
+  }
+
+  .transparentOnMobile .nav {
+    background: transparent;
+    box-shadow: none;
+    transition: background-color 300ms ease, box-shadow 300ms ease;
+  }
+
+  .transparentOnMobile .navLogo {
+    color: var(--color-white);
+    transition: color 300ms ease;
+  }
+
+  .transparentOnMobile.scrolled .nav {
+    background: var(--color-white);
+    box-shadow: 0 1px 4px color-mix(in srgb, var(--color-darkest-grey) 8%, transparent);
+  }
+
+  .transparentOnMobile.scrolled .navLogo {
+    color: var(--color-forest-green);
   }
 
   .navSpacer {
