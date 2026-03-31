@@ -19,11 +19,3 @@
   z-index: 50;
 }
 
-.loadingScreen {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-black);
-  background-color: var(--color-lighter-grey);
-}

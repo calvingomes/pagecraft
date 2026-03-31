@@ -37,6 +37,7 @@ import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.type
 import { saveEditorPage } from "@/lib/editor/saveEditorPage";
 import { prepareImageBlockOptions } from "@/lib/editor/prepareImageBlockOptions";
 import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
+import { PageLoader } from "@/components/ui/PageLoader/PageLoader";
 import styles from "./editor.module.css";
 
 type EditorSnapshotPayload = {
@@ -381,7 +382,9 @@ export default function EditorPage() {
   };
 
   if (loading || !authChecked || !viewportResolved || !isEditorDataReady) {
-    return <div className={styles.loadingScreen}>Loading editor…</div>;
+    return (
+      <PageLoader label="Loading editor..." backgroundColor="var(--color-lighter-grey)" />
+    );
   }
 
   const isOverlayOpen = showSaveOverlay || isMobileScreen;

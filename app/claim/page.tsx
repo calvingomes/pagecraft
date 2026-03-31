@@ -7,6 +7,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { AuthService } from "@/lib/services/auth.client";
 import { PageService } from "@/lib/services/page.client";
 import { BlockService } from "@/lib/services/block.client";
+import { PageLoader } from "@/components/ui/PageLoader/PageLoader";
 
 /**
  * Normalize username:
@@ -73,7 +74,7 @@ export default function ClaimPage() {
   };
 
   if (!authChecked) {
-    return <div>Loading...</div>;
+    return <PageLoader />;
   }
 
   return (

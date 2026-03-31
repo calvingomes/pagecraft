@@ -6,6 +6,7 @@ import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar/Navbar";
 import AuthView from "@/components/views/AuthView/AuthView";
+import { PageLoader } from "@/components/ui/PageLoader/PageLoader";
 
 function AuthPageContent() {
   const { authChecked } = useAuthGuard("auth");
@@ -13,7 +14,7 @@ function AuthPageContent() {
   const initialUsername = searchParams.get("username") ?? undefined;
 
   if (!authChecked) {
-    return <div>Loading...</div>;
+    return <PageLoader />;
   }
 
   const handleGoogleSignIn = async () => {
