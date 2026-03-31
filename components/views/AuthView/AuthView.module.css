@@ -131,6 +131,35 @@
   border-color: var(--color-yellow);
 }
 
+.usernameInputWrapper.statusAvailable {
+  border-color: var(--color-success);
+}
+
+.usernameInputWrapper.statusTaken {
+  border-color: var(--color-danger);
+}
+
+.statusMessage {
+  font-size: var(--font-size-xs);
+  margin-top: -16px;
+  margin-bottom: 16px;
+  min-height: 1.25em;
+  font-weight: 500;
+  transition: color 150ms ease;
+}
+
+.statusMessageAvailable {
+  color: var(--color-success);
+}
+
+.statusMessageTaken {
+  color: var(--color-danger);
+}
+
+.statusMessageChecking {
+  color: var(--color-mid-grey);
+}
+
 .usernamePrefix {
   color: var(--color-bluish-grey);
   white-space: nowrap;

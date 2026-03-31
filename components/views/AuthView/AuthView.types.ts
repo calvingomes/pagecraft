@@ -1,6 +1,6 @@
 export type AuthMode = "signup" | "signin";
 
 export type AuthViewProps = {
-  handleGoogleSignIn: () => Promise<void>;
+  handleGoogleSignIn: (username?: string) => Promise<void>;
   initialUsername?: string;
 };

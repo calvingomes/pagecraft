@@ -28,11 +28,16 @@ export const AuthService = {
   /**
    * Sign in with Google OAuth
    */
-  signInWithGoogle: async () => {
+  signInWithGoogle: async (username?: string) => {
+    let redirectTo = `${window.location.origin}/auth`;
+    if (username) {
+      redirectTo += `?username=${encodeURIComponent(username)}`;
+    }
+
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth`,
+        redirectTo,
       },
     });
   },

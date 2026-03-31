@@ -48,6 +48,16 @@ export function useAuthGuard(mode: AuthGuardMode) {
 
       if (mode === "auth") {
         setLoading(false);
+        // If we have a username in the URL, we're in the middle of an automated claim.
+        // Don't redirect to /claim yet; let the Auth page handle it.
+        const hasUrlUsername = new URLSearchParams(window.location.search).has(
+          "username",
+        );
+        if (hasUrlUsername && !username) {
+          setAuthChecked(true);
+          return;
+        }
+
         router.replace(username ? "/editor" : "/claim");
         return;
       }

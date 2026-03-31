@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 import type { AuthMode, AuthViewProps } from "./AuthView.types";
 import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
+import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 import styles from "./AuthView.module.css";
 
 const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
@@ -13,9 +14,12 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
     initialUsername ? "signup" : "signin",
   );
   const [username, setUsername] = useState(initialUsername ?? "");
+  const availabilityStatus = useUsernameAvailability(username);
 
   const isSignUp = mode === "signup";
-  const canProceed = !isSignUp || username.trim().length > 0;
+  const canProceed =
+    !isSignUp ||
+    (username.trim().length >= 3 && availabilityStatus === "available");
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
@@ -78,20 +82,46 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
 
           {/* Username input — sign-up only */}
           {isSignUp && (
-            <div className={styles.usernameInputWrapper}>
-              <span className={styles.usernamePrefix}>
-                pagecraft.me/
-              </span>
-              <input
-                type="text"
-                value={username}
-                onChange={handleUsernameChange}
-                placeholder="your-name"
-                className={styles.usernameInput}
-                autoComplete="off"
-                spellCheck={false}
-              />
-            </div>
+            <>
+              <div
+                className={`${styles.usernameInputWrapper} ${
+                  availabilityStatus === "available" ? styles.statusAvailable : ""
+                } ${availabilityStatus === "taken" ? styles.statusTaken : ""}`}
+              >
+                <span className={styles.usernamePrefix}>pagecraft.me/</span>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={handleUsernameChange}
+                  placeholder="your-name"
+                  className={styles.usernameInput}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+              </div>
+
+              {/* Status Message */}
+              <div
+                className={`${styles.statusMessage} ${
+                  availabilityStatus === "available"
+                    ? styles.statusMessageAvailable
+                    : ""
+                } ${
+                  availabilityStatus === "taken"
+                    ? styles.statusMessageTaken
+                    : ""
+                } ${
+                  availabilityStatus === "checking"
+                    ? styles.statusMessageChecking
+                    : ""
+                }`}
+              >
+                {availabilityStatus === "checking" && "Checking availability..."}
+                {availabilityStatus === "available" && "Username available!"}
+                {availabilityStatus === "taken" && "This handle is already taken."}
+                {availabilityStatus === "error" && "Error checking availability."}
+              </div>
+            </>
           )}
 
           <ThemeButton
@@ -100,7 +130,7 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
                 ? "Create an account with Google"
                 : "Continue with Google"
             }
-            cta={handleGoogleSignIn}
+            cta={() => handleGoogleSignIn(username)}
             bgColor={
               canProceed ? "var(--color-yellow)" : "var(--color-light-grey)"
             }
