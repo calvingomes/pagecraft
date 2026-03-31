@@ -1,5 +1,11 @@
-import { redirect } from "next/navigation";
+import { HomeLanding } from "@/components/views/HomeLanding/HomeLanding";
+import { Navbar } from "@/components/layout/Navbar/Navbar";
 
-export default function IndexPage() {
-  redirect("/home");
+export default function HomePage() {
+  return (
+    <>
+      <Navbar />
+      <HomeLanding />
+    </>
+  );
 }

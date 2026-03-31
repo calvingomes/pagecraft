@@ -1,7 +1,0 @@
-@import "@styles/media.css";
-
-.homeViewport {
-  min-height: 100vh;
-  background: var(--color-lighter-grey);
-  color: var(--color-black);
-}

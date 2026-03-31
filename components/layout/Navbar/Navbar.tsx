@@ -21,7 +21,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const isTransparentMobilePage = pathname === "/" || pathname === "/home";
+  const isTransparentMobilePage = pathname === "/";
 
   return (
     <header className={`${styles.navWrapper} ${isScrolled ? styles.scrolled : ""} ${isTransparentMobilePage ? styles.transparentOnMobile : ""}`}>
@@ -36,7 +36,7 @@ const Navbar = () => {
       <nav className={styles.nav}>
         <div className={styles.navSpacer} />
 
-        <Link href="/home" className={styles.navLogo}>
+        <Link href="/" className={styles.navLogo}>
           PageCraft
         </Link>
       </nav>
