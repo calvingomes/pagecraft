@@ -12,7 +12,7 @@ export const ThemeButton = ({
   icon: Icon,
   bgColor,
   textColor,
-  iconCircle = true,
+  borderColor,
   buttonWidth,
   disabled = false,
 }: ThemeButtonProps) => {
@@ -22,13 +22,14 @@ export const ThemeButton = ({
     backgroundColor: bgColor, 
     color: resolvedTextColor,
     width: buttonWidth ?? "100%",
+    border: borderColor ? `1px solid ${borderColor}` : "none",
   };
 
   const content = (
     <>
       <span>{label}</span>
       {Icon && (
-        <div className={iconCircle ? styles.iconCircleWrapper : styles.iconFlatWrapper}>
+        <div className={styles.iconContainer}>
           <Icon aria-hidden className={styles.svgPrimary} />
           <Icon aria-hidden className={styles.svgSecondary} />
         </div>

@@ -7,7 +7,7 @@ export interface ThemeButtonProps {
   icon?: LucideIcon | React.ElementType;
   bgColor: string;
   textColor?: string;
-  iconCircle?: boolean;
+  borderColor?: string;
   buttonWidth?: string;
   disabled?: boolean;
 }
