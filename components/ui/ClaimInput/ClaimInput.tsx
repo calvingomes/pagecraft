@@ -28,7 +28,7 @@ export const ClaimInput = () => {
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <div className={styles.inputWrapper}>
-        <span className={styles.prefix}>pagecraft-psi.vercel.app/</span>
+        <span className={styles.prefix}>pagecraft.me/</span>
         <Label.Root htmlFor={inputId} style={VISUALLY_HIDDEN_STYLE}>
           Username
         </Label.Root>

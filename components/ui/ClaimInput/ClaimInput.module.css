@@ -7,6 +7,7 @@
   border-radius: 12px;
   padding: 4px;
   width: 100%;
+  min-width: min(100%, 320px);
   max-width: 620px;
   border: 1px solid var(--color-lighter-grey);
   box-shadow: 0 1px 10px
@@ -23,7 +24,7 @@
 
 .prefix {
   color: var(--color-bluish-grey);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-fluid-lg);
   white-space: nowrap;
   flex-shrink: 0;
   font-family: inherit;
@@ -32,7 +33,7 @@
 .input {
   border: none;
   background: transparent;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-fluid-lg);
   color: var(--color-dark-grey);
   width: 100%;
   outline: none;
@@ -48,20 +49,22 @@
   flex-shrink: 0;
 }
 
+@media (--bp-tablet) {
+  .form {
+    max-width: 480px;
+  }
+
+  .inputWrapper {
+    padding-left: 20px;
+  }
+}
+
 @media (--bp-mobile) {
   .form {
-    max-width: 100%;
+    max-width: 480px;
   }
 
   .inputWrapper {
     padding-left: 16px;
-  }
-
-  .input {
-    font-size: var(--font-size-md);
-  }
-
-  .prefix {
-    font-size: var(--font-size-md);
   }
 }
