@@ -5,6 +5,7 @@ import Text from "@tiptap/extension-text";
 import Bold from "@tiptap/extension-bold";
 import Italic from "@tiptap/extension-italic";
 import Underline from "@tiptap/extension-underline";
+import History from "@tiptap/extension-history";
 
 export const minimalRTE = [
   Document,
@@ -13,6 +14,7 @@ export const minimalRTE = [
   Bold,
   Italic,
   Underline,
+  History,
 ] as const;
 
 export function minimalRTEWithPlaceholder(options: {
