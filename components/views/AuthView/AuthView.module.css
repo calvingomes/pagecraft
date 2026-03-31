@@ -8,12 +8,12 @@
 }
 
 .leftPanel {
-  flex: 0 0 60%;
+  flex: 1;
   background: var(--color-forest-green);
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 48px 64px 0px;
+  padding: 48px 48px 0;
   overflow: hidden;
 }
 
@@ -36,13 +36,13 @@
 }
 
 .tagline {
-  font-size: clamp(48px, 6vw, 84px);
+  font-size: var(--font-size-fluid-display);
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -0.03em;
   color: var(--color-white);
   margin-bottom: 28px;
-  max-width: 12ch;
+  max-width: 15ch;
 }
 
 .taglineAccent {
@@ -50,7 +50,7 @@
 }
 
 .leftSubtitle {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-fluid-lg);
   color: var(--color-light-grey);
   max-width: none;
   margin-bottom: 40px;
@@ -59,7 +59,6 @@
 .rectStack {
   position: relative;
   width: 100%;
-  /* max-width: 440px; */
   height: 380px;
   width: 500px;
   z-index: 2;
@@ -73,11 +72,11 @@
 
 /* ---- Right Panel (35%) ---- */
 .rightPanel {
-  flex: 0 0 40%;
-  background: var(--color-lighter-grey);
+  flex: 1;
+  background: color-mix(in srgb, var(--color-lighter-grey) 98%, var(--color-white));
   position: relative;
-  max-width: 600px;
   overflow-y: auto;
+  border-left: 1px solid var(--color-light-grey);
 }
 
 .formContainer {
@@ -85,12 +84,15 @@
   top: 50%;
   left: 0;
   right: 0;
-  padding: 0 72px;
+  margin: 0 auto;
+  padding: 0 20px;
   transform: translateY(-50%);
   min-height: 400px;
+  width: 100%;
+  max-width: 500px;
 }
 
-.rightPanel > :first-child {
+.rightPanel> :first-child {
   margin-bottom: 48px;
 }
 
@@ -100,10 +102,10 @@
 }
 
 .title {
-  font-size: var(--font-size-3xl);
+  font-size: var(--font-size-fluid-h1-secondary);
   font-weight: 700;
   margin-bottom: 8px;
-  color: var(--color-forest-green);
+  color: var(--color-darker-grey);
   letter-spacing: -0.02em;
 }
 
@@ -118,15 +120,15 @@
   align-items: center;
   background: var(--color-white);
   border-radius: 12px;
-  padding: 16px 20px;
+  padding: 14px 20px;
+  margin-top: 16px;
   margin-bottom: 24px;
-  font-size: var(--font-size-md);
   border: 1.5px solid var(--color-light-grey);
-  transition: border-color 150ms ease;
+  transition: border-color 150ms var(--ease-snappy);
 }
 
 .usernameInputWrapper:focus-within {
-  border-color: var(--color-forest-green);
+  border-color: var(--color-yellow);
 }
 
 .usernamePrefix {
@@ -159,23 +161,27 @@
   }
 
   .leftPanel {
-    flex: 0 0 auto;
-    padding: 40px 24px 60px;
-    min-height: 440px;
-  }
-
-  .tagline {
-    font-size: var(--font-size-4xl);
-  }
-
-  .rectStack {
-    max-width: 320px;
-    height: 200px;
-    margin-left: 0;
+    display: none;
   }
 
   .rightPanel {
     flex: 1;
-    padding: 48px 24px;
+    max-width: 100%;
+    border-left: none;
+    background: var(--color-white);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .formContainer {
+    position: static;
+    transform: none;
+    margin-top: 20vh;
+    padding: 0;
+    min-height: auto;
+    width: 100%;
+    max-width: 500px;
   }
 }
