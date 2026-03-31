@@ -60,17 +60,8 @@
   margin-top: 16px;
 }
 
-@media (--bp-tablet) {
-  .hero {
-    height: auto;
-    min-height: 85vh;
-  }
-}
-
 @media (--bp-mobile) {
   .hero {
-    height: auto;
-    min-height: 85vh;
     padding: 120px 0 80px;
   }
 }
