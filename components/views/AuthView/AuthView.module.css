@@ -141,10 +141,11 @@
 
 .statusMessage {
   font-size: var(--font-size-xs);
-  margin-top: -16px;
+  margin-top: -20px;
   margin-bottom: 16px;
   min-height: 1.25em;
   font-weight: 500;
+  padding-left: 16px;
   transition: color 150ms ease;
 }
 

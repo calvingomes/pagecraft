@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Laptop, Smartphone } from "lucide-react";
+import { Laptop, Smartphone, LogOut, Save } from "lucide-react";
 import {
   selectActiveViewportBlocks,
   useEditorStore,
@@ -398,18 +398,22 @@ export default function EditorPage() {
       <div style={isOverlayOpen ? { filter: "blur(4px)" } : undefined}>
         <div className={styles.saveButtonContainer}>
           <ThemeButton
-            label={isSaving ? "Saving..." : "Save"}
+            label="Save"
             cta={handleSave}
             bgColor="var(--color-yellow)"
-            disabled={isSaving}
+            textColor="var(--color-white)"
+            disabled={isSaving || !hasUnsavedChanges}
+            icon={Save}
           />
         </div>
         <div className={styles.logoutButtonContainer}>
           <ThemeButton
-            label="Sign out"
+            label="Logout"
             cta={handleLogout}
-            bgColor="transparent"
-            textColor="var(--color-dark-grey)"
+            bgColor="var(--color-white)"
+            textColor="var(--color-mid-grey)"
+            borderColor="var(--color-light-grey)"
+            icon={LogOut}
           />
         </div>
         {canTogglePreview && (
