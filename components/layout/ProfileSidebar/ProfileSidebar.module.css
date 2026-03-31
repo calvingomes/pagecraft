@@ -164,7 +164,7 @@
   .bioEditor
   :global(.ProseMirror),
 :global([data-preview="mobile"]) .sidebarCenter .bio {
-  font-size: var(--font-size-6xl);
+  font-size: var(--font-size-md);
   margin-top: 12px;
 }
 

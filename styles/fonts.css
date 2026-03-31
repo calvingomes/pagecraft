@@ -34,7 +34,6 @@
   --font-size-3xl: 32px;
   --font-size-4xl: 38px;
   --font-size-5xl: 40px;
-  --font-size-6xl: 46px;
 
   /* Fluid typography (min, preferred, max) */
   --font-size-fluid-display: clamp(40px, 6vw, 80px);
