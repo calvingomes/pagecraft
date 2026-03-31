@@ -56,3 +56,8 @@ Never hardcode raw `cubic-bezier()` functions (or basic `ease` properties) into 
 In strict alignment with the `AGENTS.md` protocol:
 - **Never** define Component Props (`interface [Component]Props`) inside the `.tsx` UI render file. 
 - **Rule:** Always extract those types into their own explicitly localized `*.types.ts` registry directly next to the component (e.g., `ThemeButton.types.ts`) and `import type { ThemeButtonProps }` them cleanly.
+
+## 9. Tablet Viewport Padding
+For tablet screens (`960px` to `1359px`), we use a more generous horizontal padding to prevent wide text blocks (like `RunningText`) from looking cramped.
+- **Rule:** The global `.container` class is configured with **48px** of horizontal padding on tablet. 
+- Use the global `.container` to automatically apply this shift without writing manual tablet queries in every component module.

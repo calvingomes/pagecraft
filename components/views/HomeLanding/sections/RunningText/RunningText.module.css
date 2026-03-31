@@ -6,16 +6,10 @@
   padding: 120px 0;
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 48px;
-}
-
 .text {
-  font-size: clamp(28px, 4vw, 52px);
+  font-size: var(--font-size-fluid-h2-plus);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   margin: 0;
 }
@@ -29,12 +23,19 @@
   color: var(--color-forest-green);
 }
 
-@media (--bp-mobile) {
+@media (--bp-tablet) {
   .section {
     padding: 80px 0;
   }
+}
 
-  .container {
-    padding: 0 24px;
+@media (--bp-mobile) {
+  .section {
+    padding: 68px 0;
+  }
+
+  .text {
+    line-height: 1.3;
+    letter-spacing: -0.02em;
   }
 }
