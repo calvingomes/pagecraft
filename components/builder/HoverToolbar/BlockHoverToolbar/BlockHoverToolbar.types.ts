@@ -5,9 +5,9 @@ export type BlockHoverToolbarProps = {
   blockId: string;
   blockType: BlockType;
   currentPreset?: BlockWidthPreset;
-  currentTransparentWrapper?: boolean;
+  currentBackgroundColor?: string;
   onWidthChange: (preset: BlockWidthPreset) => void;
-  onToggleWrapperBackground?: () => void;
+  onBackgroundColorChange?: (color: string) => void;
   visible?: boolean;
   viewport?: "desktop" | "mobile";
 };

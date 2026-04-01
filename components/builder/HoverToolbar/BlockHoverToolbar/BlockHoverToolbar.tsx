@@ -3,6 +3,7 @@
 
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import * as Toolbar from "@radix-ui/react-toolbar";
+import * as Popover from "@radix-ui/react-popover";
 import {
   Trash2,
   RectangleVertical,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "./../HoverToolbar.module.css";
+import { BlockBackgroundPalette } from "./../BlockBackgroundPalette/BlockBackgroundPalette";
 import type {
   BlockHoverToolbarProps,
   BlockHoverToolbarIcons,
@@ -59,9 +61,9 @@ export function BlockHoverToolbar({
   blockId,
   blockType,
   currentPreset = "small",
-  currentTransparentWrapper = false,
+  currentBackgroundColor,
   onWidthChange,
-  onToggleWrapperBackground,
+  onBackgroundColorChange,
   visible = false,
   viewport = "desktop",
 }: BlockHoverToolbarProps) {
@@ -84,8 +86,6 @@ export function BlockHoverToolbar({
     }
     return true;
   });
-  const canToggleWrapperBackground =
-    blockType === "text" || blockType === "link";
 
   return (
     <Toolbar.Root
@@ -116,22 +116,31 @@ export function BlockHoverToolbar({
           </ToggleGroup.Item>
         ))}
       </ToggleGroup.Root>
-      {canToggleWrapperBackground && onToggleWrapperBackground && (
-        <>
-          <div className={styles.divider} />
+      <div className={styles.divider} />
+      <Popover.Root>
+        <Popover.Trigger asChild>
           <Toolbar.Button
             type="button"
-            title="Toggle wrapper background"
-            aria-label="Toggle wrapper background"
-            onClick={onToggleWrapperBackground}
-            className={`${styles.sizeButton} ${
-              currentTransparentWrapper ? styles.active : ""
-            }`}
-          >
-            BG
-          </Toolbar.Button>
-        </>
-      )}
+            title="Update background color"
+            aria-label="Update background color"
+            className={styles.sizeButton}
+            style={{
+              backgroundColor: currentBackgroundColor || "var(--color-white)",
+              color: "transparent",
+            }}
+          />
+        </Popover.Trigger>
+        <Popover.Content side="top" align="center" sideOffset={12}>
+          <BlockBackgroundPalette
+            currentValue={currentBackgroundColor}
+            onChange={(color) => {
+              if (onBackgroundColorChange) {
+                onBackgroundColorChange(color);
+              }
+            }}
+          />
+        </Popover.Content>
+      </Popover.Root>
       <div className={styles.divider} />
       <Toolbar.Button
         type="button"

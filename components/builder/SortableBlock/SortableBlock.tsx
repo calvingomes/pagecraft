@@ -8,6 +8,7 @@ import { BlockHoverToolbar } from "@/components/builder/HoverToolbar/BlockHoverT
 import styles from "./SortableBlock.module.css";
 import { shouldUseTransparentWrapper } from "@/lib/blockWrapper";
 import type { SortableBlockProps } from "@/types/builder";
+import { deriveTextColor } from "@/lib/utils/colorUtils";
 
 export function SortableBlock({
   block,
@@ -29,27 +30,50 @@ export function SortableBlock({
   const handleWidthChange = (preset: BlockWidthPreset) => {
     if (!editor?.onUpdateBlock) return;
     const stylesKey = viewport === "mobile" ? "mobileStyles" : "styles";
-    const currentStyles = viewport === "mobile" ? block.mobileStyles : block.styles;
+    const currentStyles =
+      viewport === "mobile" ? block.mobileStyles : block.styles;
     editor.onUpdateBlock(block.id, {
       [stylesKey]: { ...(currentStyles ?? {}), widthPreset: preset },
     });
   };
 
-  const handleToggleWrapperBackground = () => {
+  const handleBackgroundColorChange = (color: string | null) => {
     if (!editor?.onUpdateBlock) return;
-    const canToggleBackground = block.type === "text" || block.type === "link";
-    if (!canToggleBackground) return;
+    const stylesKey = viewport === "mobile" ? "mobileStyles" : "styles";
+    const currentStyles =
+      viewport === "mobile" ? block.mobileStyles : block.styles;
 
-    editor.onUpdateBlock(block.id, {
-      styles: {
-        ...block.styles,
-        transparentWrapper: !isTransparentWrapper,
-      },
-    });
+    if (color === null) {
+      editor.onUpdateBlock(block.id, {
+        [stylesKey]: {
+          ...(currentStyles ?? {}),
+          transparentWrapper: true,
+          backgroundColor: undefined,
+        },
+      });
+    } else {
+      editor.onUpdateBlock(block.id, {
+        [stylesKey]: {
+          ...(currentStyles ?? {}),
+          transparentWrapper: false,
+          backgroundColor: color,
+        },
+      });
+    }
   };
 
   const { widthPx, heightPx } = dimensions;
   const aspectRatio = `${widthPx} / ${heightPx}`;
+  const backgroundColor =
+    viewport === "mobile"
+      ? block.mobileStyles?.backgroundColor
+      : block.styles?.backgroundColor;
+
+  const textColor = deriveTextColor(
+    !isTransparentWrapper
+      ? backgroundColor || "var(--color-white)"
+      : "var(--color-white)"
+  );
 
   return (
     <div
@@ -67,9 +91,11 @@ export function SortableBlock({
         }}
       >
         <div
-          className={`drag-handle ${styles.wrapper} ${isTransparentWrapper ? styles.emptyWrapper : ""}`}
-          style={
-            fluid
+          className={`drag-handle ${styles.wrapper} ${
+            isTransparentWrapper ? styles.emptyWrapper : ""
+          }`}
+          style={{
+            ...(fluid
               ? {
                   width: "100%",
                   height: "auto",
@@ -79,8 +105,16 @@ export function SortableBlock({
                   width: `${widthPx}px`,
                   height: `${heightPx}px`,
                   cursor: editor ? "grab" : "default",
-                }
-          }
+                }),
+            backgroundColor: !isTransparentWrapper
+              ? backgroundColor || "var(--color-white)"
+              : "transparent",
+            color: textColor,
+            "--block-text-color": textColor,
+            "--block-bg-color": !isTransparentWrapper
+              ? backgroundColor || "var(--color-white)"
+              : "transparent",
+          } as React.CSSProperties & { [key: string]: string | number }}
         >
           <div className={styles.content}>
             <div className={styles.blockContent}>
@@ -94,9 +128,9 @@ export function SortableBlock({
             blockId={block.id}
             blockType={block.type}
             currentPreset={widthPreset}
-            currentTransparentWrapper={isTransparentWrapper}
+            currentBackgroundColor={backgroundColor}
             onWidthChange={handleWidthChange}
-            onToggleWrapperBackground={handleToggleWrapperBackground}
+            onBackgroundColorChange={handleBackgroundColorChange as (color: string) => void}
             visible={toolbarVisible}
             viewport={viewport}
           />

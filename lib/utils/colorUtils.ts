@@ -17,24 +17,35 @@ function relativeLuminance(r: number, g: number, b: number): number {
 }
 
 /**
- * Derives a legible text color from a hex background.
- * - Dark bg → very light tinted version of the color (mix with white at 88%)
- * - Light bg → very dark tinted version of the color (scale down to 14%)
- * Falls back to white for non-parseable inputs (CSS vars, 'transparent', etc.)
+ * Resolves a CSS variable or hex string to an RGB object.
+ * In a real browser environment, we'd use getComputedStyle.
+ * Here we provide a simple mapping for our predefined palette.
  */
+const COLOR_MAP: Record<string, string> = {
+  "var(--color-block-bg-white)": "#ffffff",
+  "var(--color-block-bg-light-grey)": "#f3f4f6",
+  "var(--color-block-bg-sky)": "#7dd3fc",
+  "var(--color-block-bg-blue)": "#3b82f6",
+  "var(--color-block-bg-indigo)": "#4f46e5",
+  "var(--color-block-bg-yellow)": "#fde047",
+  "var(--color-block-bg-orange)": "#f97316",
+  "var(--color-block-bg-red)": "#ef4444",
+  "var(--color-block-bg-dark-grey)": "#4b5563",
+  "var(--color-block-bg-black)": "#000000",
+  "var(--color-block-bg-lavender)": "#e0e7ff",
+  "var(--color-block-bg-purple)": "#a855f7",
+  "var(--color-block-bg-pink)": "#ec4899",
+  "var(--color-block-bg-mint)": "#ccfbf1",
+  "var(--color-block-bg-green)": "#22c55e",
+  "var(--color-block-bg-dark-green)": "#14532d",
+};
+
 export function deriveTextColor(bgColor: string): string {
-  const rgb = hexToRgb(bgColor);
-  if (!rgb) return "var(--color-white)";
+  const hex = bgColor.startsWith("var") ? COLOR_MAP[bgColor] : bgColor;
+  const rgb = hexToRgb(hex || "#ffffff");
+  if (!rgb) return "var(--color-black)";
 
   const lum = relativeLuminance(rgb.r, rgb.g, rgb.b);
-
-  if (lum > 0.35) {
-    // Light background → darken towards the hue
-    const f = 0.14;
-    return `rgb(${Math.round(rgb.r * f)}, ${Math.round(rgb.g * f)}, ${Math.round(rgb.b * f)})`;
-  } else {
-    // Dark background → lighten towards the hue
-    const f = 0.88;
-    return `rgb(${Math.round(rgb.r + (255 - rgb.r) * f)}, ${Math.round(rgb.g + (255 - rgb.g) * f)}, ${Math.round(rgb.b + (255 - rgb.b) * f)})`;
-  }
+  // WCAG threshold for contrast is usually 0.5 for simple black/white decision
+  return lum > 0.5 ? "var(--color-black)" : "var(--color-white)";
 }

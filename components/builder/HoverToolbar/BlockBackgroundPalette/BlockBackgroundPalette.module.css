@@ -1,0 +1,70 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px;
+  background: var(--color-darker-grey);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  align-items: center;
+  justify-items: center;
+}
+
+.radioGroup {
+  display: contents;
+}
+
+.swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition:
+    transform 0.1s,
+    border-color 0.1s;
+  outline: none;
+  background-clip: padding-box;
+}
+
+.swatch:hover {
+  transform: scale(1.1);
+}
+
+.selected {
+  border-color: var(--color-white);
+  box-shadow: 0 0 0 1px var(--color-dark-grey);
+}
+
+.hexInput {
+  width: 100%;
+  background: var(--color-dark-grey);
+  border: 1px solid var(--color-mid-grey);
+  border-radius: 6px;
+  color: var(--color-white);
+  padding: 8px 12px;
+  font-family: var(--font-family-mono, monospace);
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.hexInput:focus {
+  outline: none;
+  border-color: var(--color-success);
+}
+
+.hexInput::placeholder {
+  color: var(--color-mid-grey);
+  opacity: 0.5;
+}
+
+.inputContainer {
+  margin-top: 4px;
+}

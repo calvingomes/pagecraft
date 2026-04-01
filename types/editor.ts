@@ -18,6 +18,7 @@ interface BaseBlock {
     height?: number;
     widthPreset?: BlockWidthPreset;
     transparentWrapper?: boolean;
+    backgroundColor?: string;
   };
   // Desktop fallback/default placement
   layout?: {
@@ -29,6 +30,7 @@ interface BaseBlock {
     height?: number;
     widthPreset?: BlockWidthPreset;
     transparentWrapper?: boolean;
+    backgroundColor?: string;
   };
   mobileLayout?: {
     x: number;

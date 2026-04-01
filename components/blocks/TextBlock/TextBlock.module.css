@@ -17,7 +17,7 @@
   height: 100%;
   border: none;
   background: transparent;
-  color: var(--color-black);
+  color: inherit;
   font-family: inherit;
   font-size: inherit;
   line-height: 1.6;
@@ -28,7 +28,12 @@
 }
 
 .editor :global(.ProseMirror):focus-visible {
-  background-color: var(--color-lighter-grey);
+  outline: none;
+  background-color: color-mix(
+    in srgb,
+    var(--block-bg-color, var(--color-white)),
+    black 6%
+  );
   overflow: scroll;
   transition:
     opacity 0.15s,
@@ -56,7 +61,7 @@
   padding: 12px;
   margin: 0;
   line-height: 1.6;
-  color: var(--color-black);
+  color: inherit;
   word-wrap: break-word;
   word-break: break-word;
   overflow: hidden;

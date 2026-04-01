@@ -35,4 +35,23 @@
   --color-editor-page-avatar-4: #a9c2e8;
   --color-editor-page-avatar-5: #cfa6d6;
   --color-editor-page-avatar-6: #e0a7a7;
+  
+  /* Block background palette */
+  --color-block-bg-white: #ffffff;
+  --color-block-bg-light-grey: #f3f4f6;
+  --color-block-bg-sky: #7dd3fc;
+  --color-block-bg-blue: #3b82f6;
+  --color-block-bg-indigo: #4f46e5;
+  --color-block-bg-yellow: #fde047;
+  --color-block-bg-orange: #f97316;
+  --color-block-bg-red: #ef4444;
+  
+  --color-block-bg-dark-grey: #4b5563;
+  --color-block-bg-black: #000000;
+  --color-block-bg-lavender: #e0e7ff;
+  --color-block-bg-purple: #a855f7;
+  --color-block-bg-pink: #ec4899;
+  --color-block-bg-mint: #ccfbf1;
+  --color-block-bg-green: #22c55e;
+  --color-block-bg-dark-green: #14532d;
 }
