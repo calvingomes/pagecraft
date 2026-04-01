@@ -105,6 +105,7 @@ export default function EditorPage() {
 
   const {
     screenView,
+    canUseEditor,
     previewView,
     setPreviewView,
     canTogglePreview,
@@ -354,7 +355,7 @@ export default function EditorPage() {
     );
   }
 
-  if (screenView !== "desktop") {
+  if (!canUseEditor) {
     return (
       <OverlayPopup
         open={true}

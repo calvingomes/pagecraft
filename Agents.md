@@ -252,13 +252,13 @@ blocks/TextBlock/
 
 - Screen buckets are defined as: desktop `>=1360`, tablet `960-1359`, mobile `<960`.
 - Viewport logic should be centralized in `lib/editor-engine/data/viewport.ts` and hooks (`hooks/useViewportMode.ts`, `hooks/useEditorViewportPreview.ts`).
-- The editor has a **desktop/mobile preview toggle** for visual editing without resizing the browser window, but only when screen width is `>=960`.
+- The editor route itself is blocked on narrow screens; interactive editor access requires viewport width `>=1000px`.
+- Within the desktop editor, keep the **desktop/mobile preview toggle** enabled so users can edit and preview the mobile layout from desktop.
 - `PageLayout` exposes `previewViewport` (`"desktop" | "mobile"`) and `framedMobilePreview` (boolean): editor passes `framedMobilePreview={true}` for the framed mobile preview, while view pages keep it `false` for clean public mobile layout.
 - In mobile preview mode, only page content is previewed (`ProfileSidebar` + `BlockCanvas`); editor chrome (save/signout buttons, preview toggle, bottom toolbar) remains outside the preview frame.
 - Mobile preview frame is capped to `525px` max width and intentionally styled (frame/background) to make preview boundaries explicit.
 - Sticky sidebar styling is viewport-driven: sticky only when `data-preview="desktop"` and sidebar is not `center`.
-- Tablet mode (`960-1359`) should force profile position to `center` in editor and hide the profile-position section from the toolbar palette.
-- Mobile editor mode should also hide the profile-position section; profile positioning is a desktop-only editing feature.
+- Profile positioning is a desktop-only editing feature in the editor UI.
 - View page tablet mode should keep desktop-like layout behavior but render profile at the top (`center` sidebar position).
 
 ---

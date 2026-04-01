@@ -12,6 +12,7 @@ import type { ViewportMode } from "@/types/page";
 
 export function useViewportMode(initialMode: ViewportMode = "desktop") {
   const [viewportMode, setViewportMode] = useState<ViewportMode>(initialMode);
+  const [viewportWidth, setViewportWidth] = useState<number | null>(null);
   const [isResolved, setIsResolved] = useState(false);
 
   useEffect(() => {
@@ -30,6 +31,9 @@ export function useViewportMode(initialMode: ViewportMode = "desktop") {
     };
 
     const applyMode = () => {
+      const width = getWidth();
+      setViewportWidth(width);
+
       if (desktopMedia.matches) {
         setViewportMode("desktop");
       } else if (tabletMedia.matches) {
@@ -37,7 +41,7 @@ export function useViewportMode(initialMode: ViewportMode = "desktop") {
       } else if (mobileMedia.matches) {
         setViewportMode("mobile");
       } else {
-        setViewportMode(resolveViewportMode(getWidth()));
+        setViewportMode(resolveViewportMode(width));
       }
 
       setIsResolved(true);
@@ -88,5 +92,5 @@ export function useViewportMode(initialMode: ViewportMode = "desktop") {
     };
   }, []);
 
-  return { viewportMode, isResolved };
+  return { viewportMode, viewportWidth, isResolved };
 }
