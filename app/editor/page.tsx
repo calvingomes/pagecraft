@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Laptop, Smartphone, LogOut, Save } from "lucide-react";
+import { LogOut, Save } from "lucide-react";
 import { useEditorStore } from "@/stores/editor-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { PageService } from "@/lib/services/page.client";
@@ -27,7 +27,6 @@ import { useEditorViewportPreview } from "@/hooks/useEditorViewportPreview";
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
 import { saveEditorPage } from "@/lib/editor/saveEditorPage";
 import { prepareImageBlockOptions } from "@/lib/editor/prepareImageBlockOptions";
-import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
 import { PageLoader } from "@/components/ui/PageLoader/PageLoader";
 import styles from "./editor.module.css";
 
@@ -108,7 +107,6 @@ export default function EditorPage() {
     canUseEditor,
     previewView,
     setPreviewView,
-    canTogglePreview,
     viewportResolved,
   } = useEditorViewportPreview();
 
@@ -397,26 +395,6 @@ export default function EditorPage() {
             icon={LogOut}
           />
         </div>
-        {canTogglePreview && (
-          <div className={styles.previewToggle}>
-            <TogglePill
-              value={previewView}
-              onChange={setPreviewView}
-              options={[
-                {
-                  value: "desktop",
-                  label: <Laptop size={20} />,
-                  ariaLabel: "Preview desktop view",
-                },
-                {
-                  value: "mobile",
-                  label: <Smartphone size={20} />,
-                  ariaLabel: "Preview mobile view",
-                },
-              ]}
-            />
-          </div>
-        )}
         <PageLayout
           background={background}
           sidebarPosition={effectiveSidebarPosition}
@@ -444,6 +422,8 @@ export default function EditorPage() {
           background={background}
           sidebarPosition={desktopSidebarPosition}
           showSidebarPositionControls={isDesktopEditing}
+          previewViewport={previewView}
+          onViewportChange={setPreviewView}
         />
       </div>
       <OverlayPopup

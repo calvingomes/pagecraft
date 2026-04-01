@@ -18,10 +18,3 @@
   top: 24px;
   z-index: 50;
 }
-
-.previewToggle {
-  position: fixed;
-  top: 24px;
-  left: 24px;
-  z-index: 50;
-}

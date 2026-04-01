@@ -10,4 +10,6 @@ export type TogglePillProps<T extends string> = {
   options: TogglePillOption<T>[];
   value: T;
   onChange: (value: T) => void;
+  variant?: "default" | "dark" | "toolbar";
+  showBackground?: boolean;
 };

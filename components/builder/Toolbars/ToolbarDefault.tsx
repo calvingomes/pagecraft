@@ -4,12 +4,15 @@
 import * as Popover from "@radix-ui/react-popover";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import { useRef, useState, type ChangeEvent } from "react";
+import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
 import {
   Type,
   Link2,
   Image as ImageIcon,
   Palette,
   Heading,
+  Laptop,
+  Smartphone,
 } from "lucide-react";
 import styles from "./Toolbar.module.css";
 import type { ToolbarDefaultProps } from "./Toolbar.types";
@@ -23,6 +26,8 @@ export const ToolbarDefault = ({
   background = "page-bg-1",
   sidebarPosition = "left",
   showSidebarPositionControls = true,
+  previewViewport = "desktop",
+  onViewportChange,
 }: ToolbarDefaultProps) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [toolbarWidth, setToolbarWidth] = useState<number | null>(null);
@@ -124,6 +129,25 @@ export const ToolbarDefault = ({
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
+        <div className={styles.divider} />
+        <TogglePill
+          value={previewViewport}
+          onChange={onViewportChange || (() => {})}
+          variant="toolbar"
+          showBackground={false}
+          options={[
+            {
+              value: "desktop",
+              label: <Laptop size={20} />,
+              ariaLabel: "Preview desktop view",
+            },
+            {
+              value: "mobile",
+              label: <Smartphone size={20} />,
+              ariaLabel: "Preview mobile view",
+            },
+          ]}
+        />
         <input
           ref={imageInputRef}
           type="file"

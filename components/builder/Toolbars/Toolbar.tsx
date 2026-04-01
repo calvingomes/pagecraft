@@ -39,5 +39,10 @@ export const Toolbar = (props: ToolbarDefaultProps) => {
     );
   }
 
-  return <ToolbarDefault {...props} onOpenLink={() => setMode("link")} />;
+  return (
+    <ToolbarDefault
+      {...props}
+      onOpenLink={() => setMode("link")}
+    />
+  );
 };

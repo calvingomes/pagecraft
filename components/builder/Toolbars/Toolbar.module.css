@@ -41,7 +41,6 @@
   transform: scale(1.1);
 }
 
-.toolButton[data-toolbar-role="palette"]:hover,
 .toolButton[data-toolbar-role="palette"][data-state="open"] {
   transform: none;
 }
@@ -112,8 +111,7 @@
   padding: 12px 14px;
   border-radius: 8px;
   background: var(--color-white);
-  box-shadow: 0 12px 40px
-    color-mix(in srgb, var(--color-darkest-grey) 25%, transparent);
+  box-shadow: 0 12px 40px color-mix(in srgb, var(--color-darkest-grey) 25%, transparent);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -189,4 +187,12 @@
   border-color: var(--color-yellow);
   background: color-mix(in srgb, var(--color-yellow) 15%, var(--color-white));
   color: var(--color-yellow);
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--color-dark-grey);
+  margin: 0 4px;
+  align-self: center;
 }

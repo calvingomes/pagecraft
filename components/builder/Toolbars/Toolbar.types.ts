@@ -1,5 +1,5 @@
 import type { BlockType } from "@/types/editor";
-import type { PageBackgroundId, SidebarPosition } from "@/types/page";
+import type { PageBackgroundId, SidebarPosition, PreviewViewport } from "@/types/page";
 
 export type ToolbarMode = "default" | "link";
 
@@ -21,6 +21,8 @@ export type ToolbarDefaultProps = {
   background?: PageBackgroundId;
   sidebarPosition?: SidebarPosition;
   showSidebarPositionControls?: boolean;
+  previewViewport?: PreviewViewport;
+  onViewportChange?: (viewport: PreviewViewport) => void;
 };
 
 export type ToolbarLinkProps = {

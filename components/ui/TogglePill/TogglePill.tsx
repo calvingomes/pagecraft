@@ -10,7 +10,8 @@ export function TogglePill<T extends string>({
   value,
   onChange,
   variant = "default",
-}: TogglePillProps<T> & { variant?: "default" | "dark" }) {
+  showBackground = true,
+}: TogglePillProps<T>) {
   const pillRef = useRef<HTMLDivElement>(null);
   const [thumb, setThumb] = useState({ left: 0, width: 0, height: 0 });
 
@@ -37,7 +38,7 @@ export function TogglePill<T extends string>({
           onChange(nextValue as T);
         }
       }}
-      className={`${styles.pill} ${variant === "dark" ? styles.pillDark : ""}`}
+      className={`${styles.pill} ${!showBackground ? styles.noBackground : ""} ${variant === "dark" ? styles.pillDark : ""} ${variant === "toolbar" ? styles.pillToolbar : ""}`}
     >
       <span
         className={styles.thumb}
