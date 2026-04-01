@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { useEditorContext } from "@/contexts/EditorContext";
 import { SectionTitleBlock as SectionTitleBlockType } from "@/types/editor";
 import styles from "./SectionTitleBlock.module.css";
@@ -11,13 +12,22 @@ export const SectionTitleBlock = ({
 }) => {
   const editor = useEditorContext();
   const editable = !!editor;
-  const title = block.content.title ?? "";
+  const initialTitle = block.content.title ?? "";
+
+  const [localTitle, setLocalTitle] = useState(initialTitle);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Sync local if external changes
+  useEffect(() => {
+    setLocalTitle(initialTitle);
+  }, [initialTitle]);
 
   if (!editable) {
-    return title.trim() ? (
-      <div className={styles.display}>{title.trim()}</div>
+    return initialTitle.trim() ? (
+      <div className={styles.display}>{initialTitle.trim()}</div>
     ) : null;
   }
+
   return (
     <div className={styles.frame}>
       <input
@@ -25,11 +35,20 @@ export const SectionTitleBlock = ({
         name="section-title"
         className={styles.input}
         placeholder="Add section title..."
-        value={title}
+        value={localTitle}
         onChange={(event) => {
-          editor.onUpdateBlock(block.id, {
-            content: { title: event.target.value },
-          });
+          const next = event.target.value;
+          setLocalTitle(next);
+
+          if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+          }
+
+          debounceTimerRef.current = setTimeout(() => {
+            editor.onUpdateBlock(block.id, {
+              content: { title: next },
+            });
+          }, 500);
         }}
       />
     </div>

@@ -22,6 +22,7 @@ export function useBlockEditor({
   const [isEmpty, setIsEmpty] = useState(!content);
 
   const onUpdateRef = useRef(onUpdate);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     onUpdateRef.current = onUpdate;
@@ -49,10 +50,34 @@ export function useBlockEditor({
       },
       onUpdate: ({ editor }) => {
         setIsEmpty(editor.isEmpty);
+
+        const callback = onUpdateRef.current;
+        if (!callback) return;
+
+        // Clear existing debounce
+        if (debounceTimerRef.current) {
+          clearTimeout(debounceTimerRef.current);
+        }
+
+        // Debounce store update to 500ms while typing
+        debounceTimerRef.current = setTimeout(() => {
+          const html = editor.isEmpty ? "" : editor.getHTML();
+          const final = sanitizeMinimalRTH(html);
+
+          if (final !== lastSyncedContent.current) {
+            lastSyncedContent.current = final;
+            callback(final);
+          }
+        }, 500);
       },
       onBlur: ({ editor }) => {
         const callback = onUpdateRef.current;
         if (!callback) return;
+
+        // Final sync on blur
+        if (debounceTimerRef.current) {
+          clearTimeout(debounceTimerRef.current);
+        }
 
         const html = editor.isEmpty ? "" : editor.getHTML();
         const final = sanitizeMinimalRTH(html);

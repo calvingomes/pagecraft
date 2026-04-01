@@ -293,7 +293,7 @@ export default function EditorPage() {
 
     const timer = setTimeout(() => {
       handleSave();
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [currentSnapshot, hasUnsavedChanges, isSaving, isEditorDataReady, handleSave]);
