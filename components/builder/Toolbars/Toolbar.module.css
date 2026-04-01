@@ -188,6 +188,15 @@
   align-self: center;
 }
 
+.logoutDivider {
+  margin: 0 12px !important;
+}
+
+.logoutButton:hover {
+  background: color-mix(in srgb, var(--color-danger) 15%, transparent) !important;
+  color: var(--color-danger) !important;
+}
+
 .copyButton {
   background: var(--color-success);
   width: auto;

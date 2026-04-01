@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
 import { useEditorStore } from "@/stores/editor-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { PageService } from "@/lib/services/page.client";
@@ -16,7 +15,6 @@ import type {
 } from "@/types/page";
 import { AuthService } from "@/lib/services/auth.client";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
-import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
@@ -401,18 +399,6 @@ export default function EditorPage() {
       onRemoveBlock={handleRemoveBlock}
     >
       <div className={styles.editorRoot}>
-        <div className={styles.logoutButtonContainer}>
-          <ThemeButton
-            label="Logout"
-            cta={handleLogout}
-            // bgColor="color-mix(in srgb, var(--color-danger) 12%, var(--color-white))"
-            bgColor="color-mix(in srgb, var(--color-danger) 12%, var(--color-white))"
-            textColor="var(--color-dark-grey)"
-            borderColor="var(--color-light-grey)"
-            icon={LogOut}
-            size="small"
-          />
-        </div>
         <PageLayout
           background={background}
           sidebarPosition={effectiveSidebarPosition}
@@ -444,6 +430,7 @@ export default function EditorPage() {
           onViewportChange={setPreviewView}
           username={username}
           isSaving={isSaving}
+          onLogout={handleLogout}
         />
       </div>
     </EditorProvider>

@@ -25,6 +25,7 @@ export type ToolbarDefaultProps = {
   onViewportChange?: (viewport: PreviewViewport) => void;
   username?: string | null;
   isSaving?: boolean;
+  onLogout?: () => void;
 };
 
 export type ToolbarLinkProps = {

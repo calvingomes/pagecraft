@@ -44,6 +44,7 @@ export const Toolbar = (props: ToolbarDefaultProps) => {
       {...props}
       onOpenLink={() => setMode("link")}
       isSaving={props.isSaving}
+      onLogout={props.onLogout}
     />
   );
 };

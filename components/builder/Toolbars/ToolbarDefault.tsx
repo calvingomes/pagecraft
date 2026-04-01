@@ -13,6 +13,7 @@ import {
   Heading,
   Laptop,
   Smartphone,
+  LogOut,
 } from "lucide-react";
 import styles from "./Toolbar.module.css";
 import type { ToolbarDefaultProps } from "./Toolbar.types";
@@ -30,6 +31,7 @@ export const ToolbarDefault = ({
   onViewportChange,
   username,
   isSaving = false,
+  onLogout,
 }: ToolbarDefaultProps) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -166,6 +168,16 @@ export const ToolbarDefault = ({
             },
           ]}
         />
+        <div className={`${styles.divider} ${styles.logoutDivider}`} />
+        <Toolbar.Button
+          className={`${styles.toolButton} ${styles.logoutButton}`}
+          title="Logout"
+          type="button"
+          onClick={onLogout}
+          aria-label="Logout"
+        >
+          <LogOut size={18} />
+        </Toolbar.Button>
         <input
           ref={imageInputRef}
           type="file"

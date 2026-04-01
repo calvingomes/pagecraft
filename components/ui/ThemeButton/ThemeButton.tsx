@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable css-modules/no-unused-class */
 
 import React from "react";
 import Link from "next/link";
@@ -20,7 +21,7 @@ export const ThemeButton = ({
   const isLink = typeof cta === "string";
   const resolvedTextColor = textColor ?? deriveTextColor(bgColor);
   const customStyle = { 
-    backgroundColor: bgColor, 
+    backgroundColor: bgColor,
     color: resolvedTextColor,
     width: buttonWidth ?? "100%",
     border: borderColor ? `1px solid ${borderColor}` : "none",
