@@ -15,6 +15,12 @@
   font-size: var(--font-size-lg);
   font-weight: 700;
   line-height: 1;
+  color: inherit;
+  background: transparent;
+}
+
+.input::placeholder {
+  color: color-mix(in srgb, var(--block-text-color, var(--color-black)), transparent 65%);
 }
 
 .deleteButton {
@@ -30,6 +36,8 @@
   cursor: pointer;
   opacity: 0;
   pointer-events: none;
+  z-index: 10;
+  position: relative;
 }
 
 .frame:hover .input,
@@ -38,7 +46,7 @@
   background-color: color-mix(
     in srgb,
     var(--block-bg-color, var(--color-white)),
-    black 6%
+    black 12%
   );
 }
 

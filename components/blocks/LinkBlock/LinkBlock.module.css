@@ -174,7 +174,7 @@
   background-color: color-mix(
     in srgb,
     var(--block-bg-color, var(--color-white)),
-    black 6%
+    black 12%
   );
   overflow: scroll;
   transition:
@@ -192,6 +192,6 @@
   top: 0;
   left: 0;
   font-size: var(--font-size-lg);
-  color: var(--color-bluish-grey);
+  color: color-mix(in srgb, var(--block-text-color, var(--color-black)), transparent 65%);
   pointer-events: none;
 }

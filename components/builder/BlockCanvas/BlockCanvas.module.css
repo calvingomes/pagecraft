@@ -18,3 +18,14 @@
     width: 100%;
   }
 }
+
+/* Elevate the RGL item container itself when hovered/focused to clear neighbors */
+.canvas :global(.react-grid-item:hover),
+.canvas :global(.react-grid-item:focus-within) {
+  z-index: 10 !important;
+}
+
+/* Ensure dragging items are even higher */
+.canvas :global(.react-grid-item.react-draggable-dragging) {
+  z-index: 20 !important;
+}

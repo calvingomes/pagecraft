@@ -32,7 +32,7 @@
   background-color: color-mix(
     in srgb,
     var(--block-bg-color, var(--color-white)),
-    black 6%
+    black 12%
   );
   overflow: scroll;
   transition:
@@ -43,7 +43,7 @@
 .editor :global(.ProseMirror p.is-editor-empty:first-child::before) {
   content: attr(data-placeholder);
   float: left;
-  color: var(--color-bluish-grey);
+  color: color-mix(in srgb, var(--block-text-color, var(--color-black)), transparent 65%);
   pointer-events: none;
   height: 0;
 }
