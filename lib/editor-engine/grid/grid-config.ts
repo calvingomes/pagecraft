@@ -6,22 +6,22 @@ import type {
 
 export const DESKTOP_GRID: GridConfig = {
   cols: 4,
-  cellPx: 200,
-  gapXPx: 25,
-  gapYPx: 25,
-  canvasPx: 875,
+  cellPx: 175,
+  gapXPx: 35,
+  gapYPx: 35,
+  canvasPx: 805,
   rowScale: 2,
-  subRowPx: 90,
-  subRowGapPx: 25,
+  subRowPx: 70,
+  subRowGapPx: 35,
 };
 
 export const MOBILE_GRID: GridConfig = {
   cols: 2,
-  cellPx: 250,
-  gapXPx: 25,
-  gapYPx: 15,
-  canvasPx: 525,
+  cellPx: 220,
+  gapXPx: 30,
+  gapYPx: 30,
+  canvasPx: 470,
   rowScale: 2,
-  subRowPx: 120,
-  subRowGapPx: 15,
+  subRowPx: 95,
+  subRowGapPx: 30,
 };

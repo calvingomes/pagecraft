@@ -17,7 +17,7 @@
 .captionInput {
   width: 100%;
   padding: 8px 10px;
-  border-radius: 6px;
+  border-radius: 12px;
   border: 0;
   background: var(--color-darker-grey);
   color: var(--color-white);

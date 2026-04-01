@@ -23,7 +23,7 @@
 .iconWrap {
   width: 40px;
   height: 40px;
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--color-lighter-grey);
   display: flex;
   align-items: center;
@@ -35,7 +35,7 @@
   width: 26px;
   height: 26px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 10px;
 }
 
 .iconFallback {
@@ -101,7 +101,7 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  border-radius: 6px;
+  border-radius: 16px;
   position: relative;
 }
 
@@ -166,7 +166,7 @@
   outline: none;
   overflow-wrap: anywhere;
   word-break: break-word;
-  border-radius: 6px;
+  border-radius: 16px;
 }
 
 .titleEditorContainer :global(.ProseMirror):focus-visible {

@@ -146,13 +146,13 @@ type GridConfig = {
 | Field         | `DESKTOP_GRID` | `MOBILE_GRID` |
 | ------------- | -------------- | ------------- |
 | `cols`        | 4              | 2             |
-| `cellPx`      | 200            | 250           |
-| `gapXPx`      | 25             | 25            |
-| `gapYPx`      | 25             | 15            |
-| `canvasPx`    | 875            | 525           |
+| `cellPx`      | 175            | 220           |
+| `gapXPx`      | 35             | 30            |
+| `gapYPx`      | 35             | 30            |
+| `canvasPx`    | 805            | 470           |
 | `rowScale`    | 2              | 2             |
-| `subRowPx`    | 90             | 120           |
-| `subRowGapPx` | 25             | 15            |
+| `subRowPx`    | 70             | 95            |
+| `subRowGapPx` | 35             | 30            |
 
 Configs are exported from `lib/editor-engine/grid/grid-config.ts`. All code should access grid values via `DESKTOP_GRID.*` or `MOBILE_GRID.*` property access.
 

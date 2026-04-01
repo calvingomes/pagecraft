@@ -95,6 +95,11 @@ export function SortableBlock({
         <div
           className={`drag-handle ${styles.wrapper} ${
             isTransparentWrapper ? styles.emptyWrapper : ""
+          } ${
+            (block.type === "text" || block.type === "link" || block.type === "image") &&
+            !isTransparentWrapper
+              ? styles.bordered
+              : ""
           }`}
           style={{
             ...(fluid
