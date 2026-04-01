@@ -114,6 +114,12 @@ styles/         — Global CSS custom properties and media queries
 - Tablet view: `960px` to `1359px`
 - Mobile view: below `960px`
 
+### Dynamic Theming & Contrast
+
+- **Automated Contrast**: Use the `deriveTextColor(bgColor)` utility from `@/lib/utils/colorUtils` to determine if text should be black or white.
+- **Variable Injection**: `SortableBlock` injects `--block-bg-color` and `--block-text-color` into the block's scope. Child components should use these variables instead of hardcoded colors to remain theme-aware.
+- **Interactive States**: Use `color-mix(in srgb, var(--block-bg-color), black 12%)` for focus/active states in the editor. This ensures the interactive feedback is always proportional to the block's current theme.
+
 ---
 
 ## 5. Grid System Constants
@@ -247,6 +253,12 @@ blocks/TextBlock/
 - Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.
 - `sectionTitle` should use transparent wrapper styling only in **view mode** (not editor mode), via the same shared wrapper decision path.
 - `sectionTitle` size is `config.canvasPx × config.subRowPx` (desktop: `875×90`, mobile: `525×120`) and occupies **half-row grid height** (`h = 0.5`) to avoid dead space below.
+
+### UI Stacking & Elevation
+
+- **Baseline Stacking**: All RGL items have `z-index: 1` to create a clean baseline.
+- **Active Elevation**: Hovered or focused blocks are elevated to `z-index: 100` via `SortableBlock.module.css` to ensure hover toolbars and popovers are never obscured by neighboring blocks.
+- **Portal Usage**: Always use `Popover.Portal` for toolbars to ensure they render at the top of the document's stacking context.
 
 ### Editor Preview Modes (`app/editor/page.tsx` + `components/layout/PageLayout/`)
 

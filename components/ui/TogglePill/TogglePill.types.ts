@@ -12,4 +12,5 @@ export type TogglePillProps<T extends string> = {
   onChange: (value: T) => void;
   variant?: "default" | "dark" | "toolbar";
   showBackground?: boolean;
+  fullWidth?: boolean;
 };

@@ -107,86 +107,75 @@
 }
 
 .palettePopover {
-  position: static;
-  padding: 12px 14px;
-  border-radius: 8px;
-  background: var(--color-white);
-  box-shadow: 0 12px 40px color-mix(in srgb, var(--color-darkest-grey) 25%, transparent);
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--color-darker-grey);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  margin: 10px;
+  gap: 16px;
+  /* width: 280px; */
 }
 
 .paletteSection {
   display: flex;
   width: 100%;
   flex-direction: column;
-  gap: 8px;
-}
-
-.paletteLabel {
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  color: var(--color-dark-grey);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  gap: 12px;
+  align-items: center;
 }
 
 .colorSwatches {
   display: grid;
-  width: 100%;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
   justify-items: center;
 }
 
 .colorSwatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: 2px solid var(--color-light-grey);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  padding: 0;
   cursor: pointer;
-  background-clip: padding-box;
+  transition:
+    transform 0.1s,
+    border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.colorSwatch:hover {
+  transform: scale(1.1);
 }
 
 .colorSwatchSelected {
-  border-color: var(--color-yellow);
+  border-color: var(--color-white);
+}
+
+.colorSwatchInner {
+  width: 24px;
+  height:24px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .paletteDivider {
   height: 1px;
-  background: var(--color-light-grey);
+  width: 100%;
+  background: var(--color-dark-grey);
+  opacity: 0.5;
+  margin: 4px 0;
 }
 
-.sidebarPositionGroup {
+.togglePillContainer {
   display: flex;
-  gap: 6px;
-}
-
-.sidebarPositionBtn {
-  flex: 1;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 8px 12px;
-  border: 2px solid var(--color-light-grey);
-  border-radius: 10px;
-  background: var(--color-white);
-  color: var(--color-bluish-grey);
-  cursor: pointer;
-  transition:
-    border-color 0.15s,
-    background 0.15s,
-    color 0.15s;
-}
-
-.sidebarPositionSelected,
-.sidebarPositionSelected:hover {
-  border-color: var(--color-yellow);
-  background: color-mix(in srgb, var(--color-yellow) 15%, var(--color-white));
-  color: var(--color-yellow);
+  width: 100%;
 }
 
 .divider {

@@ -35,7 +35,7 @@ export type ToolbarLinkProps = {
 
 export type PageBackgroundOption = { id: PageBackgroundId; cssVar: string };
 
-export type ToolbarPalatteProps = {
+export type ToolbarPaletteProps = {
   onChangeBackground?: (background: PageBackgroundId) => void;
   onChangeSidebarPosition?: (position: SidebarPosition) => void;
   background?: PageBackgroundId;

@@ -12,6 +12,14 @@
   width: fit-content;
 }
 
+.fullWidth {
+  width: 100%;
+}
+
+.fullWidth .btn {
+  flex: 1;
+}
+
 .thumb {
   position: absolute;
   background: var(--color-white);

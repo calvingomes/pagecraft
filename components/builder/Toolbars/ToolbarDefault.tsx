@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import styles from "./Toolbar.module.css";
 import type { ToolbarDefaultProps } from "./Toolbar.types";
-import { ToolbarPalatte } from "./ToolbarPalatte";
+import { ToolbarPalette } from "./ToolbarPalette";
 
 export const ToolbarDefault = ({
   onAddBlock,
@@ -32,15 +32,9 @@ export const ToolbarDefault = ({
 }: ToolbarDefaultProps) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const [toolbarWidth, setToolbarWidth] = useState<number | null>(null);
-  const toolbarContainerRef = useRef<HTMLDivElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
 
   const handlePaletteOpenChange = (nextOpen: boolean) => {
-    if (nextOpen && toolbarContainerRef.current) {
-      setToolbarWidth(Math.round(toolbarContainerRef.current.offsetWidth));
-    }
-
     setIsPaletteOpen(nextOpen);
   };
 
@@ -66,7 +60,7 @@ export const ToolbarDefault = ({
   };
 
   return (
-    <div className={styles.toolbarContainer} ref={toolbarContainerRef}>
+    <div className={styles.toolbarContainer}>
       <Toolbar.Root
         className={styles.toolbarContent}
         aria-label="Add block toolbar"
@@ -137,12 +131,11 @@ export const ToolbarDefault = ({
           <Popover.Portal>
             <Popover.Content
               side="top"
-              align="end"
-              sideOffset={8}
+              align="center"
+              sideOffset={14}
               className={styles.popoverContent}
-              style={toolbarWidth ? { width: `${toolbarWidth}px` } : undefined}
             >
-              <ToolbarPalatte
+              <ToolbarPalette
                 background={background}
                 sidebarPosition={sidebarPosition}
                 onChangeBackground={onChangeBackground}

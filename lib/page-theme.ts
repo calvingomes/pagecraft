@@ -30,6 +30,18 @@ export const PAGE_THEMES: Record<PageBackgroundId, PageTheme> = {
     bg: "var(--color-editor-page-bg-6)",
     avatarBg: "var(--color-editor-page-avatar-6)",
   },
+  "page-bg-7": {
+    bg: "var(--color-editor-page-bg-7)",
+    avatarBg: "var(--color-editor-page-avatar-7)",
+  },
+  "page-bg-8": {
+    bg: "var(--color-editor-page-bg-8)",
+    avatarBg: "var(--color-editor-page-avatar-8)",
+  },
+  "page-bg-9": {
+    bg: "var(--color-editor-page-bg-9)",
+    avatarBg: "var(--color-editor-page-avatar-9)",
+  },
 };
 
 export const DEFAULT_PAGE_THEME = PAGE_THEMES["page-bg-1"];

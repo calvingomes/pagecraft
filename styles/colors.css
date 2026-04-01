@@ -27,6 +27,9 @@
   --color-editor-page-bg-4: #eff6ff;
   --color-editor-page-bg-5: #fdf2ff;
   --color-editor-page-bg-6: #fef2f2;
+  --color-editor-page-bg-7: #f5f3ff;
+  --color-editor-page-bg-8: #f0fdfa;
+  --color-editor-page-bg-9: #fff7ed;
 
   /* Page avatar background  */
   --color-editor-page-avatar-1: #a8a8a6;
@@ -35,6 +38,9 @@
   --color-editor-page-avatar-4: #a9c2e8;
   --color-editor-page-avatar-5: #cfa6d6;
   --color-editor-page-avatar-6: #e0a7a7;
+  --color-editor-page-avatar-7: #a78bfa;
+  --color-editor-page-avatar-8: #5eead4;
+  --color-editor-page-avatar-9: #fdba74;
   
   /* Block background palette */
   --color-block-bg-white: #ffffff;
