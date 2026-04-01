@@ -120,3 +120,29 @@ export function rectForBlock(
   const y = at?.y ?? block.layout?.y ?? 0;
   return { x, y, w, h };
 }
+
+/**
+ * Derives CSS absolute positioning from grid coordinates.
+ * Used for "Lite" rendering without React-Grid-Layout.
+ */
+export function blockToStyle(
+  block: Block,
+  config: GridConfig = DESKTOP_GRID,
+): React.CSSProperties {
+  const { x, y, w, h } = rectForBlock(block, undefined, config);
+
+  // w horizontal + (w-1) gaps
+  const width = Math.round(w * config.cellPx + (Math.max(0, w - 1)) * config.gapXPx);
+  // h vertical + (h-1) gaps
+  const height = Math.round(h * config.cellPx + (Math.max(0, h - 1)) * config.gapYPx);
+
+  const left = Math.round(x * (config.cellPx + config.gapXPx));
+  const top = Math.round(y * (config.cellPx + config.gapYPx));
+
+  return {
+    position: "absolute",
+    width: `${width}px`,
+    height: `${height}px`,
+    transform: `translate3d(${left}px, ${top}px, 0)`,
+  };
+}

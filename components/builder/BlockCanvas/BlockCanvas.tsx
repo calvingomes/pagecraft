@@ -1,12 +1,20 @@
 "use client";
 
-import {
-  useEditorStore,
-} from "@/stores/editor-store";
-import type { Block } from "@/types/editor";
-import type { BlockCanvasProps, BlockCanvasRenderMode } from "@/types/builder";
-import { MobileBlockCanvas } from "./mobile/MobileBlockCanvas";
-import { DesktopBlockCanvas } from "./desktop/DesktopBlockCanvas";
+import dynamic from "next/dynamic";
+import { useEditorStore } from "@/stores/editor-store";
+import type { BlockCanvasProps } from "@/types/builder";
+import { ReadOnlyGrid } from "./ReadOnlyGrid";
+
+// Dynamically import the heavy RGL-based editor canvases
+const DesktopBlockCanvas = dynamic(
+  () => import("./desktop/DesktopBlockCanvas").then((mod) => mod.DesktopBlockCanvas),
+  { ssr: false }
+);
+
+const MobileBlockCanvas = dynamic(
+  () => import("./mobile/MobileBlockCanvas").then((mod) => mod.MobileBlockCanvas),
+  { ssr: false }
+);
 
 const EditableBlockCanvas = () => {
   const blocks = useEditorStore((s) => s.blocks);
@@ -32,26 +40,12 @@ const EditableBlockCanvas = () => {
   );
 };
 
-const ReadonlyBlockCanvas = ({
-  blocks,
-  renderMode,
-}: {
-  blocks: Block[];
-  renderMode: BlockCanvasRenderMode;
-}) => {
-  if (renderMode === "mobile") {
-    return <MobileBlockCanvas editable={false} blocks={blocks} />;
-  }
-
-  return <DesktopBlockCanvas editable={false} blocks={blocks} />;
-};
-
 export const BlockCanvas = (props: BlockCanvasProps) => {
   if (props.editable) {
     return <EditableBlockCanvas />;
   }
 
   return (
-    <ReadonlyBlockCanvas blocks={props.blocks} renderMode={props.renderMode} />
+    <ReadOnlyGrid blocks={props.blocks} renderMode={props.renderMode} />
   );
 };

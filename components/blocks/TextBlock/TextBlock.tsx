@@ -1,19 +1,23 @@
 "use client";
+/* eslint-disable css-modules/no-unused-class */
 
-import { EditorContent } from "@tiptap/react";
+import dynamic from "next/dynamic";
 import { TextBlock as TextBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import {
   minimalRTHtmlToInlineForClamp,
   sanitizeMinimalRTH,
 } from "@/lib/utils/sanitizeRichText";
-import { useBlockEditor } from "@/hooks/useBlockEditor";
 import styles from "./TextBlock.module.css";
+
+const TextBlockEditor = dynamic(
+  () => import("./TextBlockEditor").then((mod) => mod.TextBlockEditor),
+  { ssr: false }
+);
 
 export const TextBlock = ({ block }: { block: TextBlockType }) => {
   const contextEditor = useEditorContext();
   const editable = !!contextEditor;
-  const initialContent = block.content?.text ?? "";
 
   const preset = block.styles?.widthPreset ?? "small";
   const isSkinnyWide = preset === "skinnyWide";
@@ -25,22 +29,16 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
         ? styles.clampTall
         : styles.clampSmall;
 
-  const { editor } = useBlockEditor({
-    content: initialContent,
-    placeholder: "Write something...",
-    editable,
-    onUpdate: (html) => {
-      contextEditor?.onUpdateBlock(block.id, {
-        content: { text: html },
-      });
-    },
-  });
-
-  if (editable && editor) {
+  if (editable) {
     return (
-      <div className={styles.editorContainer}>
-        <EditorContent editor={editor} className={styles.editor} />
-      </div>
+      <TextBlockEditor
+        block={block}
+        onUpdate={(html) => {
+          contextEditor?.onUpdateBlock(block.id, {
+            content: { text: html },
+          });
+        }}
+      />
     );
   }
 

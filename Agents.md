@@ -16,7 +16,7 @@ PageCraft is a "link-in-bio" style page builder that allows users to create a si
   - **Mobile**: 2-column React Grid Layout canvas with scaled preview support.
 - **Editor vs. View Mode**:
   - **Editor** (`/editor`): Uses `zustand` store, `react-grid-layout`, and Tiptap editors.
-  - **View Page** (`/[username]`): Server Component fetches data via `ServerPageService`, passes to `PageView` (Client Component). No stores, no heavy libraries. Pure React props.
+  - **View Page** (`/[username]`): Server Component fetches data via `ServerPageService`, passes to `PageView` (Client Component). Renders using a zero-dependency `ReadOnlyGrid` and code-split lightweight versions of all blocks. No stores, no heavy libraries (Tiptap/RGL) in the visitor's bundle. Pure React props.
 
 ### Tech Stack
 
@@ -98,7 +98,7 @@ styles/         — Global CSS custom properties and media queries
 - Use CSS custom properties from `styles/colors.css` and `styles/media.css` — never hardcode colors or breakpoints that are already defined as variables.
 - **Delete dead CSS immediately.** If a class is no longer referenced in the component, remove it. Do not leave commented-out rules.
 - **No duplicate selectors** across files. If two components need the same style, extract it to a shared module or use CSS custom properties.
-- If a shared module is intentional across sibling components, scoped `css-modules` lint suppressions are acceptable.
+- **Shared Module Linting**: If a shared module is intentional across sibling components (e.g., View/Editor split), add `/* eslint-disable css-modules/no-unused-class */` to the top of BOTH files to satisfy linting while maintaining style colocation.
 - **Avoid `composes` keyword** for cross-file composition. Import the style object in JS and concatenate class names:
   ```tsx
   import styles from "./Section.module.css";
@@ -182,6 +182,7 @@ Current product behavior:
 - `sizePxForPreset(preset, config?)` → `{ widthPx, heightPx }` derived pixel sizes
 - `sizePxForBlock(block, config?)` → block-aware pixel dimensions (`BlockDimensions`)
 - `rectForBlock(block, layout?, config?)` → full `GridRect` geometry
+- `blockToStyle(block, config?)` → converts grid rect to CSS absolute positioning (`transform: translate3d(...)`) for library-free rendering.
 
 **Located in `lib/editor-engine/layout/collision.ts`:**
 
@@ -228,19 +229,22 @@ Each block type has its own folder:
 
 ```
 blocks/TextBlock/
-  TextBlock.tsx
+  TextBlock.tsx       — Lean entry point (renders static HTML)
+  TextBlockEditor.tsx — Rich editor (dynamically loaded via next/dynamic)
   TextBlock.module.css
 ```
 
 - Access editor capabilities via `useEditorContext()` — returns `null` in view mode.
 - Check `!!editor` to determine editability. Do not pass an `editable` prop separately.
+- **Component Splitting**: For blocks with heavy editor dependencies (Tiptap), split the component into a `*Block.tsx` (view) and `*BlockEditor.tsx` (editor). Load the editor component using `next/dynamic` with `{ ssr: false }` inside the view component's `if (editable)` block.
 - **Use the `useBlockEditor` hook** for all Tiptap editor instances (`TextBlock`, `LinkBlock`, `ProfileSidebar`). Do not implement `useEditor` manually.
 - **Use the `useLinkMetadata` hook** for link metadata fetching logic.
 
 ### Builder Components (`components/builder/`)
 
 - `BlockRegistry/blockRegistry.tsx` is the single map from `BlockType → ReactNode`. When adding a new block type, add it here and in `types/editor.ts` — the `BlockRenderer` will pick it up automatically.
-- **`BlockCanvas`** is the top-level canvas entry point. It dispatches between `EditableBlockCanvas` (editor, backed by `editor-store`) and `ReadonlyBlockCanvas` (view page, pure props). Readonly mode receives a `renderMode` prop (`"desktop" | "mobile"`) from the parent — it never independently detects viewport.
+- **`BlockCanvas`** is the top-level canvas entry point. It dispatches between `EditableBlockCanvas` (editor, backed by `editor-store`) and `ReadOnlyGrid` (view page, pure props). It uses `next/dynamic` to load heavy RGL-based canvases only during editing sessions.
+- **`ReadOnlyGrid`**: High-performance, library-free alternative to RGL for public views. It positions blocks using absolute CSS via `blockToStyle` and `rectForBlock` to ensure zero layout shift and minimal JS payload.
 - **Canvas sub-components** are split by viewport:
   - `BlockCanvas/desktop/DesktopBlockCanvas.tsx` — desktop React Grid Layout canvas for both editable and readonly modes. Uses `blockToRglItem` + `rglLayoutToBlockUpdates`.
   - `BlockCanvas/mobile/MobileBlockCanvas.tsx` — thin wrapper selecting editable or readonly `MobileCanvasGrid`
@@ -303,6 +307,9 @@ blocks/TextBlock/
   - `pageImageStorage.ts` — Supabase Storage upload/delete with `.webp` paths
 - The shared `WebpOptions` type lives in `types/uploads.ts`.
 - Always convert to WebP before uploading. Use `.webp` file extensions in storage paths.
+- **Image Optimization (SEO)**:
+  - Use Next.js `Image` for all assets hosted on internal/Supabase domains (e.g., Profile Avatars).
+  - Use standard `<img>` for external user-provided links (e.g., LinkBlock previews) where domain whitelisting in `next.config.ts` is not feasible. Add `// eslint-disable-next-line @next/next/no-img-element` to justify usage.
 
 ---
 
