@@ -10,7 +10,7 @@ export type { WebpOptions } from "@/types/uploads";
 const DEFAULT_WEBP_OPTIONS: Required<WebpOptions> = {
   maxSizeMB: 2,
   maxWidthOrHeight: 1600,
-  quality: 0.8,
+  quality: 0.6,
 };
 
 export async function toWebpFile(

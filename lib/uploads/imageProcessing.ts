@@ -30,7 +30,7 @@ export async function convertFileToWebp(
     maxSizeMB: options.maxSizeMB ?? 1,
     maxWidthOrHeight: options.maxWidthOrHeight ?? 1600,
     useWebWorker: true,
-    initialQuality: options.quality ?? 0.8,
+    initialQuality: options.quality ?? 0.6,
   });
 
   return new File([compressed], fileName, {
