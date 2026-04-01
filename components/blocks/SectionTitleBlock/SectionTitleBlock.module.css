@@ -10,13 +10,14 @@
   flex: 1;
   height: 55px;
   border: none;
-  border-radius: 6px;
-  padding: 0 20px;
+  border-radius: 16px;
+  padding: 8px 20px;
   font-size: var(--font-size-lg);
   font-weight: 700;
   line-height: 1;
   color: inherit;
   background: transparent;
+  transition: background-color 0.2s ease;
 }
 
 .input::placeholder {

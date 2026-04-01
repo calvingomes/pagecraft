@@ -92,7 +92,6 @@
 }
 
 .deleteButtonCorner:hover {
-  background: var(--color-lighter-grey);
   color: var(--color-danger);
   transform: scale(1.1);
 }
