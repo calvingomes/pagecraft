@@ -20,6 +20,7 @@ const PAGE_BG_OPTIONS: PageBackgroundOption[] = [
   { id: "page-bg-7", cssVar: "var(--color-editor-page-bg-7)" },
   { id: "page-bg-8", cssVar: "var(--color-editor-page-bg-8)" },
   { id: "page-bg-9", cssVar: "var(--color-editor-page-bg-9)" },
+  { id: "white", cssVar: "var(--color-editor-page-bg-white)" },
 ];
 
 export const ToolbarPalette = ({

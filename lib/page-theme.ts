@@ -42,6 +42,10 @@ export const PAGE_THEMES: Record<PageBackgroundId, PageTheme> = {
     bg: "var(--color-editor-page-bg-9)",
     avatarBg: "var(--color-editor-page-avatar-9)",
   },
+  white: {
+    bg: "var(--color-editor-page-bg-white)",
+    avatarBg: "var(--color-editor-page-avatar-white)",
+  },
 };
 
 export const DEFAULT_PAGE_THEME = PAGE_THEMES["page-bg-1"];

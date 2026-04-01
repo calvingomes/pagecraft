@@ -42,6 +42,9 @@
   --color-editor-page-avatar-8: #5eead4;
   --color-editor-page-avatar-9: #fdba74;
   
+  --color-editor-page-bg-white: var(--color-white);
+  --color-editor-page-avatar-white: #e5e7eb;
+  
   /* Block background palette */
   --color-block-bg-white: #ffffff;
   --color-block-bg-light-grey: #f3f4f6;

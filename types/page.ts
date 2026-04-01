@@ -7,7 +7,8 @@ export type PageBackgroundId =
   | "page-bg-6"
   | "page-bg-7"
   | "page-bg-8"
-  | "page-bg-9";
+  | "page-bg-9"
+  | "white";
 
 export type SidebarPosition = "left" | "center" | "right";
 
