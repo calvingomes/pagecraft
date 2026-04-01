@@ -50,29 +50,37 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
     </div>
   );
 
-  const PreviewElement = (imageUrl || isEditable) ? (
+  const widthPreset = block.styles?.widthPreset || "small";
+  const isCompact = widthPreset === "small" || widthPreset === "skinnyWide";
+
+  const PreviewElement = (imageUrl || isEditable) && !isCompact ? (
     <div className={`${styles.preview} ${isEditable ? styles.previewEditable : ""} ${!imageUrl && isEditable ? styles.previewEmpty : ""}`}>
       {imageUrl && (
         // eslint-disable-next-line @next/next/no-img-element
         <img className={styles.previewImg} src={imageUrl} alt="" />
       )}
       {isEditable && (
-        <LinkBlockEditor
-          block={block}
-          titleHtml={titleHtml}
-          onUpdate={(updates) => editor?.onUpdateBlock(block.id, updates)}
-          isTitleEmpty={!titleText && !metaTitle}
-        />
+        <div className={styles.previewActions}>
+          {/* Editor-only image buttons would go here if needed, but LinkBlockEditor handles title. 
+              The current LinkBlockEditor is used for title editing. 
+              If you have image upload buttons, they should be in LinkBlockEditor.
+          */}
+        </div>
       )}
     </div>
   ) : null;
 
-  const TitleElement = isEditable ? null : (
-    clampedTitleHtml ? (
-      <div className={styles.title} dangerouslySetInnerHTML={{ __html: clampedTitleHtml }} />
-    ) : (
-      <div className={styles.title}>{displayUrl}</div>
-    )
+  const TitleElement = isEditable ? (
+    <LinkBlockEditor
+      block={block}
+      titleHtml={titleHtml}
+      onUpdate={(updates) => editor?.onUpdateBlock(block.id, updates)}
+      isTitleEmpty={!titleText && !metaTitle}
+    />
+  ) : clampedTitleHtml ? (
+    <div className={styles.title} dangerouslySetInnerHTML={{ __html: clampedTitleHtml }} />
+  ) : (
+    <div className={styles.title}>{displayUrl}</div>
   );
 
   const ContentBody = (
@@ -88,12 +96,14 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
     </>
   );
 
+  const cardClasses = `${styles.card} ${styles[widthPreset] || ""} ${!PreviewElement ? styles.noPreview : ""}`;
+
   if (isEditable) {
-    return <div className={styles.card}>{ContentBody}</div>;
+    return <div className={cardClasses}>{ContentBody}</div>;
   }
 
   return (
-    <a className={styles.card} href={displayUrl} target="_blank" rel="noopener noreferrer">
+    <a className={cardClasses} href={displayUrl} target="_blank" rel="noopener noreferrer">
       {ContentBody}
     </a>
   );
