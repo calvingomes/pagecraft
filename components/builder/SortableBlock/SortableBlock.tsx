@@ -19,8 +19,9 @@ export function SortableBlock({
 }: SortableBlockProps) {
   const editor = useEditorContext();
   const [isHovered, setIsHovered] = useState(false);
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
 
-  const toolbarVisible = isHovered;
+  const toolbarVisible = isHovered || isPaletteOpen;
 
   const viewport = gridConfig?.cols === 2 ? "mobile" : "desktop";
 
@@ -145,6 +146,7 @@ export function SortableBlock({
             currentBackgroundColor={backgroundColor}
             onWidthChange={handleWidthChange}
             onBackgroundColorChange={handleBackgroundColorChange as (color: string) => void}
+            onPaletteOpenChange={setIsPaletteOpen}
             visible={toolbarVisible}
             viewport={viewport}
           />

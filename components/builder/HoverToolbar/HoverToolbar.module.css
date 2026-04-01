@@ -70,3 +70,8 @@
   align-items: center;
   justify-content: center;
 }
+
+.popoverContent {
+  z-index: 2000;
+  outline: none;
+}

@@ -62,6 +62,7 @@ export function BlockHoverToolbar({
   currentBackgroundColor,
   onWidthChange,
   onBackgroundColorChange,
+  onPaletteOpenChange,
   visible = false,
   viewport = "desktop",
 }: BlockHoverToolbarProps) {
@@ -112,7 +113,7 @@ export function BlockHoverToolbar({
         ))}
       </ToggleGroup.Root>
       <div className={styles.divider} />
-      <Popover.Root>
+      <Popover.Root onOpenChange={onPaletteOpenChange}>
         <Popover.Trigger asChild>
           <Toolbar.Button
             type="button"
@@ -125,16 +126,24 @@ export function BlockHoverToolbar({
             }}
           />
         </Popover.Trigger>
-        <Popover.Content side="top" align="center" sideOffset={12}>
-          <BlockBackgroundPalette
-            currentValue={currentBackgroundColor}
-            onChange={(color) => {
-              if (onBackgroundColorChange) {
-                onBackgroundColorChange(color);
-              }
-            }}
-          />
-        </Popover.Content>
+        <Popover.Portal>
+          <Popover.Content
+            side="top"
+            align="center"
+            sideOffset={12}
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            className={styles.popoverContent}
+          >
+            <BlockBackgroundPalette
+              currentValue={currentBackgroundColor}
+              onChange={(color) => {
+                if (onBackgroundColorChange) {
+                  onBackgroundColorChange(color);
+                }
+              }}
+            />
+          </Popover.Content>
+        </Popover.Portal>
       </Popover.Root>
     </Toolbar.Root>
   );
