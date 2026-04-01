@@ -50,6 +50,7 @@ export const ClaimInput = () => {
           cta={handleSubmit}
           icon={ArrowRight}
           bgColor="var(--color-yellow)"
+          size="large"
         />
       </div>
     </form>

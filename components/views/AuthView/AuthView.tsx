@@ -139,6 +139,7 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
             }
             icon={ArrowRight}
             disabled={!canProceed}
+            size="large"
           />
         </div>
       </div>

@@ -15,6 +15,7 @@ export const ThemeButton = ({
   borderColor,
   buttonWidth,
   disabled = false,
+  size = "large",
 }: ThemeButtonProps) => {
   const isLink = typeof cta === "string";
   const resolvedTextColor = textColor ?? deriveTextColor(bgColor);
@@ -24,6 +25,8 @@ export const ThemeButton = ({
     width: buttonWidth ?? "100%",
     border: borderColor ? `1px solid ${borderColor}` : "none",
   };
+
+  const buttonClasses = `${styles.button} ${styles[size]}`;
 
   const content = (
     <>
@@ -39,7 +42,7 @@ export const ThemeButton = ({
 
   if (isLink) {
     return (
-      <Link href={cta as string} className={styles.button} style={customStyle}>
+      <Link href={cta as string} className={buttonClasses} style={customStyle}>
         {content}
       </Link>
     );
@@ -48,7 +51,7 @@ export const ThemeButton = ({
   return (
     <button
       type="button"
-      className={styles.button}
+      className={buttonClasses}
       onClick={cta as () => void}
       style={customStyle}
       disabled={disabled}

@@ -10,4 +10,5 @@ export interface ThemeButtonProps {
   borderColor?: string;
   buttonWidth?: string;
   disabled?: boolean;
+  size?: "small" | "medium" | "large";
 }

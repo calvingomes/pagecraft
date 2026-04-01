@@ -405,10 +405,12 @@ export default function EditorPage() {
           <ThemeButton
             label="Logout"
             cta={handleLogout}
-            bgColor="var(--color-white)"
-            textColor="var(--color-mid-grey)"
+            // bgColor="color-mix(in srgb, var(--color-danger) 12%, var(--color-white))"
+            bgColor="color-mix(in srgb, var(--color-danger) 12%, var(--color-white))"
+            textColor="var(--color-dark-grey)"
             borderColor="var(--color-light-grey)"
             icon={LogOut}
+            size="small"
           />
         </div>
         <PageLayout
