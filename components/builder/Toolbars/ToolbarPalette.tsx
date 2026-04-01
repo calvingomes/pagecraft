@@ -9,6 +9,7 @@ import type {
   ToolbarPaletteProps,
 } from "./Toolbar.types";
 import * as RadioGroup from "@radix-ui/react-radio-group";
+import { memo } from "react";
 
 const PAGE_BG_OPTIONS: PageBackgroundOption[] = [
   { id: "page-bg-1", cssVar: "var(--color-editor-page-bg-1)" },
@@ -23,7 +24,7 @@ const PAGE_BG_OPTIONS: PageBackgroundOption[] = [
   { id: "white", cssVar: "var(--color-editor-page-bg-white)" },
 ];
 
-export const ToolbarPalette = ({
+export const ToolbarPalette = memo(({
   onChangeBackground,
   onChangeSidebarPosition,
   background = "page-bg-1",
@@ -93,4 +94,6 @@ export const ToolbarPalette = ({
       )}
     </div>
   );
-};
+});
+
+ToolbarPalette.displayName = "ToolbarPalette";

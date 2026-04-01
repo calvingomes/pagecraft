@@ -225,18 +225,24 @@ Current product behavior:
 
 ### Block Components (`components/blocks/`)
 
-Each block type has its own folder:
+Each block type has its own folder. Most blocks follow a split pattern between the view component and its rich editor:
 
 ```
 blocks/TextBlock/
   TextBlock.tsx       — Lean entry point (renders static HTML)
   TextBlockEditor.tsx — Rich editor (dynamically loaded via next/dynamic)
   TextBlock.module.css
+
+blocks/LinkBlock/
+  LinkBlock.tsx        — Entry point
+  LinkTitleEditor.tsx  — Tiptap title editor (dynamic)
+  LinkImageEditor.tsx  — Image upload/preview editor (dynamic)
+  LinkBlock.module.css
 ```
 
 - Access editor capabilities via `useEditorContext()` — returns `null` in view mode.
 - Check `!!editor` to determine editability. Do not pass an `editable` prop separately.
-- **Component Splitting**: For blocks with heavy editor dependencies (Tiptap), split the component into a `*Block.tsx` (view) and `*BlockEditor.tsx` (editor). Load the editor component using `next/dynamic` with `{ ssr: false }` inside the view component's `if (editable)` block.
+- **Component Splitting**: For blocks with heavy editor dependencies (Tiptap) or complex editor UI (LinkBlock), split the component into a `*Block.tsx` (view) and one or more `*Editor.tsx` components. Load these editor components using `next/dynamic` with `{ ssr: false }` inside the view component's `if (editable)` block.
 - **Use the `useBlockEditor` hook** for all Tiptap editor instances (`TextBlock`, `LinkBlock`, `ProfileSidebar`). Do not implement `useEditor` manually.
 - **Use the `useLinkMetadata` hook** for link metadata fetching logic.
 

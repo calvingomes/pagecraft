@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { ToolbarDefault } from "./ToolbarDefault";
 import { ToolbarLink } from "./ToolbarLink";
-
 import type { ToolbarDefaultProps, ToolbarMode } from "./Toolbar.types";
 
 export const Toolbar = (props: ToolbarDefaultProps) => {

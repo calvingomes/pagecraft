@@ -30,7 +30,7 @@
 .iconWrap {
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: 8px;
   background: color-mix(in srgb, var(--color-white) 27%, transparent);
   display: flex;
   align-items: center;
@@ -39,10 +39,10 @@
 }
 
 .iconImg {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 6px;
 }
 
 .iconFallback {
@@ -179,7 +179,8 @@
 }
 
 .previewEmpty {
-  background: var(--color-lighter-grey);
+  background: color-mix(in srgb, var(--color-white) 27%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-white) 6%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;

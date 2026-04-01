@@ -4,6 +4,7 @@
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import * as Popover from "@radix-ui/react-popover";
+import { useState } from "react";
 import {
   RectangleVertical,
   RectangleHorizontal,
@@ -63,10 +64,21 @@ export function BlockHoverToolbar({
   onWidthChange,
   onBackgroundColorChange,
   onPaletteOpenChange,
+  onPaletteHoverChange,
   visible = false,
   viewport = "desktop",
 }: BlockHoverToolbarProps) {
+  const [isInternalPaletteOpen, setIsInternalPaletteOpen] = useState(false);
+  const [prevVisible, setPrevVisible] = useState(visible);
   const editor = useEditorContext();
+
+  if (visible !== prevVisible) {
+    setPrevVisible(visible);
+    if (!visible) {
+      setIsInternalPaletteOpen(false);
+    }
+  }
+
   if (!editor) return null;
 
 
@@ -113,7 +125,13 @@ export function BlockHoverToolbar({
         ))}
       </ToggleGroup.Root>
       <div className={styles.divider} />
-      <Popover.Root onOpenChange={onPaletteOpenChange}>
+      <Popover.Root
+        open={isInternalPaletteOpen}
+        onOpenChange={(open) => {
+          setIsInternalPaletteOpen(open);
+          onPaletteOpenChange?.(open);
+        }}
+      >
         <Popover.Trigger asChild>
           <Toolbar.Button
             type="button"
@@ -124,6 +142,8 @@ export function BlockHoverToolbar({
               backgroundColor: currentBackgroundColor || "var(--color-white)",
               color: "transparent",
             }}
+            onMouseEnter={() => onPaletteHoverChange?.(true)}
+            onMouseLeave={() => onPaletteHoverChange?.(false)}
           />
         </Popover.Trigger>
         <Popover.Portal>
@@ -133,6 +153,8 @@ export function BlockHoverToolbar({
             sideOffset={12}
             onOpenAutoFocus={(e) => e.preventDefault()}
             className={styles.popoverContent}
+            onMouseEnter={() => onPaletteHoverChange?.(true)}
+            onMouseLeave={() => onPaletteHoverChange?.(false)}
           >
             <BlockBackgroundPalette
               currentValue={currentBackgroundColor}

@@ -19,11 +19,27 @@ export function SortableBlock({
 }: SortableBlockProps) {
   const editor = useEditorContext();
   const [isHovered, setIsHovered] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const [isPaletteHovered, setIsPaletteHovered] = useState(false);
 
-  const isShowingOverlay = isHovered || isFocused || isPaletteOpen;
-  const toolbarVisible = isShowingOverlay;
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setIsPaletteOpen(false);
+  };
+
+  const handlePaletteHoverChange = (isHoveringPortal: boolean) => {
+    if (isHoveringPortal) {
+      setIsPaletteHovered(true);
+    } else {
+      setIsPaletteHovered(false);
+    }
+  };
+
+  const toolbarVisible = isHovered || isPaletteHovered || isPaletteOpen;
 
   const viewport = gridConfig?.cols === 2 ? "mobile" : "desktop";
 
@@ -84,10 +100,8 @@ export function SortableBlock({
     <div
       className={styles.hoverZone}
       style={fluid ? { height: "auto" } : undefined}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onFocusCapture={() => setIsFocused(true)}
-      onBlurCapture={() => setIsFocused(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div
         className={styles.frame}
@@ -102,7 +116,7 @@ export function SortableBlock({
             isTransparentWrapper ? styles.emptyWrapper : ""
           } ${
             (block.type === "text" || block.type === "link" || block.type === "image" || block.type === "sectionTitle") &&
-            (!isTransparentWrapper || (isShowingOverlay && !!editor && (block.type === "text" || block.type === "sectionTitle")))
+            (!isTransparentWrapper || (toolbarVisible && !!editor && (block.type === "text" || block.type === "sectionTitle")))
               ? styles.bordered
               : ""
           }`}
@@ -120,14 +134,14 @@ export function SortableBlock({
                 }),
             backgroundColor: !isTransparentWrapper
               ? backgroundColor || "var(--color-white)"
-              : isShowingOverlay && !!editor && (block.type === "text" || block.type === "sectionTitle")
+              : toolbarVisible && !!editor && (block.type === "text" || block.type === "sectionTitle")
                 ? "var(--color-white)"
                 : "transparent",
             color: textColor,
             "--block-text-color": textColor,
             "--block-bg-color": !isTransparentWrapper
               ? backgroundColor || "var(--color-white)"
-              : isShowingOverlay && !!editor && (block.type === "text" || block.type === "sectionTitle")
+              : toolbarVisible && !!editor && (block.type === "text" || block.type === "sectionTitle")
                 ? "var(--color-white)"
                 : "transparent",
           } as React.CSSProperties & { [key: string]: string | number }}
@@ -154,6 +168,7 @@ export function SortableBlock({
             onWidthChange={handleWidthChange}
             onBackgroundColorChange={handleBackgroundColorChange as (color: string | null) => void}
             onPaletteOpenChange={setIsPaletteOpen}
+            onPaletteHoverChange={handlePaletteHoverChange}
             visible={toolbarVisible}
             viewport={viewport}
           />

@@ -1,11 +1,8 @@
 "use client";
 /* eslint-disable css-modules/no-unused-class */
 
-import * as Toolbar from "@radix-ui/react-toolbar";
 import { EditorContent } from "@tiptap/react";
-import { Trash2, Upload } from "lucide-react";
-import { useCallback, useRef, type ChangeEvent } from "react";
-import { fileToWebpDataUrl } from "@/lib/uploads/imageWebp";
+import { useCallback } from "react";
 import { LinkBlock as LinkBlockType } from "@/types/editor";
 import {
   isSupportedLinkUrl,
@@ -17,15 +14,14 @@ import { useLinkMetadata } from "@/hooks/useLinkMetadata";
 import { useBlockEditor } from "@/hooks/useBlockEditor";
 import styles from "./LinkBlock.module.css";
 
-type LinkBlockEditorProps = {
+type LinkTitleEditorProps = {
   block: LinkBlockType;
   onUpdate: (updates: Partial<LinkBlockType>) => void;
   titleHtml: string;
   isTitleEmpty: boolean;
 };
 
-export const LinkBlockEditor = ({ block, onUpdate, titleHtml }: LinkBlockEditorProps) => {
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+export const LinkTitleEditor = ({ block, onUpdate, titleHtml }: LinkTitleEditorProps) => {
   const content = block.content;
   const blockUrl = (content.url ?? "").trim();
   const canFetch = isSupportedLinkUrl(blockUrl);
@@ -71,45 +67,10 @@ export const LinkBlockEditor = ({ block, onUpdate, titleHtml }: LinkBlockEditorP
     onSuccess: handleMetadataSuccess,
   });
 
-  const handlePickFile = () => fileInputRef.current?.click();
-
-  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    try {
-      const dataUrl = await fileToWebpDataUrl(file, "link-preview.webp");
-      onUpdate({
-        content: { ...content, imageUrl: dataUrl, metaImageRemoved: false },
-      });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      event.target.value = "";
-    }
-  };
-
-  const handleRemoveMetaImage = () => {
-    onUpdate({ content: { ...content, imageUrl: "", metaImageRemoved: true } });
-  };
-
   return (
-    <>
-      <div className={styles.titleEditorContainer}>
-        {titleEditor && <EditorContent editor={titleEditor} className={styles.titleEditor} />}
-        {isTitleEmpty && <span className={styles.titlePlaceholder}>Write Title...</span>}
-      </div>
-      <div className={styles.previewOverlay} />
-      <Toolbar.Root className={styles.previewActions}>
-        <Toolbar.Button className={styles.previewIconButton} onClick={handlePickFile}>
-          <Upload size={18} />
-        </Toolbar.Button>
-        {content.imageUrl && (
-          <Toolbar.Button className={styles.previewIconButton} onClick={handleRemoveMetaImage}>
-            <Trash2 size={18} />
-          </Toolbar.Button>
-        )}
-      </Toolbar.Root>
-      <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} hidden />
-    </>
+    <div className={styles.titleEditorContainer}>
+      {titleEditor && <EditorContent editor={titleEditor} className={styles.titleEditor} />}
+      {isTitleEmpty && <span className={styles.titlePlaceholder}>Write Title...</span>}
+    </div>
   );
 };

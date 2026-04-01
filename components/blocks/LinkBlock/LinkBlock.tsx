@@ -16,8 +16,13 @@ import {
 import { getCacheBustedUrl } from "@/lib/utils/imageUtils";
 import styles from "./LinkBlock.module.css";
 
-const LinkBlockEditor = dynamic(
-  () => import("./LinkBlockEditor").then((mod) => mod.LinkBlockEditor),
+const LinkTitleEditor = dynamic(
+  () => import("./LinkTitleEditor").then((mod) => mod.LinkTitleEditor),
+  { ssr: false }
+);
+
+const LinkImageEditor = dynamic(
+  () => import("./LinkImageEditor").then((mod) => mod.LinkImageEditor),
   { ssr: false }
 );
 
@@ -60,18 +65,16 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
         <img className={styles.previewImg} src={imageUrl} alt="" />
       )}
       {isEditable && (
-        <div className={styles.previewActions}>
-          {/* Editor-only image buttons would go here if needed, but LinkBlockEditor handles title. 
-              The current LinkBlockEditor is used for title editing. 
-              If you have image upload buttons, they should be in LinkBlockEditor.
-          */}
-        </div>
+        <LinkImageEditor
+          block={block}
+          onUpdate={(updates) => editor?.onUpdateBlock(block.id, updates)}
+        />
       )}
     </div>
   ) : null;
 
   const TitleElement = isEditable ? (
-    <LinkBlockEditor
+    <LinkTitleEditor
       block={block}
       titleHtml={titleHtml}
       onUpdate={(updates) => editor?.onUpdateBlock(block.id, updates)}
