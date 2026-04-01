@@ -24,7 +24,6 @@
   color: color-mix(in srgb, var(--block-text-color, var(--color-black)), transparent 65%);
 }
 
-.frame:hover .input,
 .input:focus {
   outline: none;
   background-color: color-mix(

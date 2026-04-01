@@ -19,9 +19,11 @@ export function SortableBlock({
 }: SortableBlockProps) {
   const editor = useEditorContext();
   const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
 
-  const toolbarVisible = isHovered || isPaletteOpen;
+  const isShowingOverlay = isHovered || isFocused || isPaletteOpen;
+  const toolbarVisible = isShowingOverlay;
 
   const viewport = gridConfig?.cols === 2 ? "mobile" : "desktop";
 
@@ -85,6 +87,8 @@ export function SortableBlock({
       style={fluid ? { height: "auto" } : undefined}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onFocusCapture={() => setIsFocused(true)}
+      onBlurCapture={() => setIsFocused(false)}
     >
       <div
         className={styles.frame}
@@ -98,8 +102,8 @@ export function SortableBlock({
           className={`drag-handle ${styles.wrapper} ${
             isTransparentWrapper ? styles.emptyWrapper : ""
           } ${
-            (block.type === "text" || block.type === "link" || block.type === "image") &&
-            !isTransparentWrapper
+            (block.type === "text" || block.type === "link" || block.type === "image" || block.type === "sectionTitle") &&
+            (!isTransparentWrapper || (isShowingOverlay && !!editor && (block.type === "text" || block.type === "sectionTitle")))
               ? styles.bordered
               : ""
           }`}
@@ -117,12 +121,16 @@ export function SortableBlock({
                 }),
             backgroundColor: !isTransparentWrapper
               ? backgroundColor || "var(--color-white)"
-              : "transparent",
+              : isShowingOverlay && !!editor && (block.type === "text" || block.type === "sectionTitle")
+                ? "var(--color-white)"
+                : "transparent",
             color: textColor,
             "--block-text-color": textColor,
             "--block-bg-color": !isTransparentWrapper
               ? backgroundColor || "var(--color-white)"
-              : "transparent",
+              : isShowingOverlay && !!editor && (block.type === "text" || block.type === "sectionTitle")
+                ? "var(--color-white)"
+                : "transparent",
           } as React.CSSProperties & { [key: string]: string | number }}
         >
           <div className={styles.content}>
@@ -145,7 +153,7 @@ export function SortableBlock({
             currentPreset={widthPreset}
             currentBackgroundColor={backgroundColor}
             onWidthChange={handleWidthChange}
-            onBackgroundColorChange={handleBackgroundColorChange as (color: string) => void}
+            onBackgroundColorChange={handleBackgroundColorChange as (color: string | null) => void}
             onPaletteOpenChange={setIsPaletteOpen}
             visible={toolbarVisible}
             viewport={viewport}

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import * as RadioGroup from "@radix-ui/react-radio-group";
+import { Ban } from "lucide-react";
 import styles from "./BlockBackgroundPalette.module.css";
 
 const PREDEFINED_COLORS = [
@@ -25,12 +26,14 @@ const PREDEFINED_COLORS = [
 
 interface BlockBackgroundPaletteProps {
   currentValue?: string;
-  onChange: (value: string) => void;
+  onChange: (value: string | null) => void;
+  showTransparentOption?: boolean;
 }
 
 export function BlockBackgroundPalette({
   currentValue,
   onChange,
+  showTransparentOption = false,
 }: BlockBackgroundPaletteProps) {
   const [hexInput, setHexInput] = useState(currentValue?.startsWith("#") ? currentValue : "");
   const [prevValue, setPrevValue] = useState(currentValue);
@@ -54,12 +57,28 @@ export function BlockBackgroundPalette({
 
         <RadioGroup.Root
           className={styles.radioGroup}
-          value={currentValue || ""}
+          value={currentValue === undefined ? "transparent" : (currentValue || "")}
           onValueChange={(val) => {
-            onChange(val);
+            if (val === "transparent") {
+              onChange(null);
+            } else {
+              onChange(val);
+            }
             setHexInput("");
           }}
         >
+          {showTransparentOption && (
+            <RadioGroup.Item
+              key="transparent"
+              value="transparent"
+              className={`${styles.swatch} ${styles.transparentSwatch} ${
+                currentValue === undefined ? styles.selected : ""
+              }`}
+              aria-label="No background"
+            >
+              <Ban size={16} className={styles.noneIcon} />
+            </RadioGroup.Item>
+          )}
           {PREDEFINED_COLORS.map((color) => (
             <RadioGroup.Item
               key={color.id}

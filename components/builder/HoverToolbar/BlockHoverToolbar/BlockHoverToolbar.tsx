@@ -136,11 +136,8 @@ export function BlockHoverToolbar({
           >
             <BlockBackgroundPalette
               currentValue={currentBackgroundColor}
-              onChange={(color) => {
-                if (onBackgroundColorChange) {
-                  onBackgroundColorChange(color);
-                }
-              }}
+              onChange={onBackgroundColorChange ?? (() => {})}
+              showTransparentOption={blockType === "text"}
             />
           </Popover.Content>
         </Popover.Portal>

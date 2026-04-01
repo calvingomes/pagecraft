@@ -7,7 +7,7 @@ export function shouldUseTransparentWrapper(
   mode: WrapperRenderMode,
 ): boolean {
   if (block.type === "sectionTitle") {
-    return mode === "view";
+    return true;
   }
 
   const canToggleBackground = block.type === "text" || block.type === "link";

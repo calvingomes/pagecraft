@@ -60,6 +60,19 @@
   border-color: var(--color-success);
 }
 
+.transparentSwatch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-mid-grey);
+  border-color: var(--color-mid-grey);
+  color: var(--color-dark-grey);
+}
+
+.noneIcon {
+  opacity: 0.7;
+}
+
 .hexInput::placeholder {
   color: var(--color-mid-grey);
   opacity: 0.5;
