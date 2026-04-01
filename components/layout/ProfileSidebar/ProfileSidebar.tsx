@@ -9,6 +9,7 @@ import { sanitizeMinimalRTH } from "@/lib/utils/sanitizeRichText";
 import type { ProfileSidebarProps } from "./ProfileSidebar.types";
 import { AvatarHoverToolbar } from "@/components/builder/HoverToolbar/AvatarHoverToolbar/AvatarHoverToolbar";
 import { useBlockEditor } from "@/hooks/useBlockEditor";
+import { DeleteButtonCorner } from "@/components/builder/DeleteButtonCorner/DeleteButtonCorner";
 
 export const ProfileSidebar = (props: ProfileSidebarProps) => {
   const { username: editorUsername } = useAuthStore();
@@ -91,16 +92,24 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
           </div>
 
           {props.variant === "editor" ? (
-            <AvatarHoverToolbar
-              visible={showAvatarHoverToolbar}
-              currentShape={avatarShape}
-              onShapeChange={(nextShape) =>
-                props.onChangeAvatarShape?.(nextShape)
-              }
-              onDelete={() => props.onChangeAvatarUrl?.("")}
-              onUpload={(nextImage) => props.onChangeAvatarUrl?.(nextImage)}
-              className={styles.AvatarHoverToolbar}
-            />
+            <>
+              <AvatarHoverToolbar
+                visible={showAvatarHoverToolbar}
+                currentShape={avatarShape}
+                onShapeChange={(nextShape) =>
+                  props.onChangeAvatarShape?.(nextShape)
+                }
+                onUpload={(nextImage) => props.onChangeAvatarUrl?.(nextImage)}
+                className={styles.AvatarHoverToolbar}
+              />
+              {showAvatarHoverToolbar && !!avatarUrl && (
+                <DeleteButtonCorner
+                  onClick={() => props.onChangeAvatarUrl?.("")}
+                  title="Remove image"
+                  ariaLabel="Remove image"
+                />
+              )}
+            </>
           ) : null}
         </div>
         <div>

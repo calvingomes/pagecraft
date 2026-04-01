@@ -3,7 +3,7 @@
 
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import * as Toolbar from "@radix-ui/react-toolbar";
-import { Circle, Square, Trash2, Upload } from "lucide-react";
+import { Circle, Square, Upload } from "lucide-react";
 import { useRef, type ChangeEvent } from "react";
 import styles from "./../HoverToolbar.module.css";
 import type { AvatarHoverToolbarProps } from "./AvatarHoverToolbar.types";
@@ -13,7 +13,6 @@ const ALLOWED_INPUT_TYPES = new Set(["image/jpeg", "image/png"]);
 export function AvatarHoverToolbar({
   visible,
   currentShape,
-  onDelete,
   onShapeChange,
   onUpload,
   className,
@@ -89,18 +88,6 @@ export function AvatarHoverToolbar({
           className={styles.sizeButton}
         >
           <Upload size={16} className={styles.sizeIcon} />
-        </Toolbar.Button>
-
-        <div className={styles.divider} />
-
-        <Toolbar.Button
-          type="button"
-          title="Delete image"
-          aria-label="Delete image"
-          onClick={onDelete}
-          className={styles.deleteButton}
-        >
-          <Trash2 size={18} />
         </Toolbar.Button>
       </Toolbar.Root>
 

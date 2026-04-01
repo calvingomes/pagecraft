@@ -32,8 +32,7 @@
   gap: 2px;
 }
 
-.sizeButton,
-.deleteButton {
+.sizeButton {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -42,7 +41,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: var(--color-white);
+  color: var(--color-bluish-grey);
   border-radius: 6px;
   cursor: pointer;
   transition:
@@ -52,19 +51,11 @@
 
 .sizeButton:hover {
   background: var(--color-dark-grey);
-  transform: scale(1.1);
-}
-
-.deleteButton:hover {
-  background: color-mix(in srgb, var(--color-danger) 65%, var(--color-black));
-  color: color-mix(in srgb, var(--color-danger) 15%, var(--color-white));
-  transform: scale(1.1);
 }
 
 .sizeButton.active {
-  background: color-mix(in srgb, var(--color-yellow) 45%, var(--color-black));
-  color: var(--color-yellow);
-  transform: none;
+  background: var(--color-white);
+  color: var(--color-black);
 }
 
 .divider {

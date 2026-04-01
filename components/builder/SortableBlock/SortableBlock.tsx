@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
 import type { BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
+import { DeleteButtonCorner } from "@/components/builder/DeleteButtonCorner/DeleteButtonCorner";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import { BlockHoverToolbar } from "@/components/builder/HoverToolbar/BlockHoverToolbar/BlockHoverToolbar";
 import styles from "./SortableBlock.module.css";
@@ -132,15 +132,9 @@ export function SortableBlock({
         </div>
 
         {!!editor && isHovered && (
-          <button
-            type="button"
-            className={styles.deleteButtonCorner}
+          <DeleteButtonCorner
             onClick={() => editor.onRemoveBlock(block.id)}
-            title="Delete block"
-            aria-label="Delete block"
-          >
-            <Trash2 size={16} />
-          </button>
+          />
         )}
 
         {showHoverToolbar && (

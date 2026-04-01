@@ -22,7 +22,7 @@
 .toolButton {
   background: transparent;
   border: none;
-  color: var(--color-white);
+  color: var(--color-bluish-grey);
   font-size: var(--font-size-lg);
   width: 40px;
   height: 40px;
@@ -33,11 +33,13 @@
   cursor: pointer;
   transition:
     background 0.2s,
-    transform 0.1s;
+    transform 0.1s,
+    color 0.2s;
 }
 
 .toolButton:hover {
   background: var(--color-dark-grey);
+  color: var(--color-white);
   transform: scale(1.1);
 }
 
