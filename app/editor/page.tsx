@@ -231,6 +231,14 @@ export default function EditorPage() {
     if (!username || !user?.id || isSaving) return;
 
     setIsSaving(true);
+    const hasPageChanges =
+      !lastSavedPayload ||
+      background !== lastSavedPayload.background ||
+      desktopSidebarPosition !== lastSavedPayload.sidebarPosition ||
+      displayName !== lastSavedPayload.displayName ||
+      bioHtml !== lastSavedPayload.bioHtml ||
+      avatarUrl !== lastSavedPayload.avatarUrl ||
+      avatarShape !== lastSavedPayload.avatarShape;
 
     try {
       const result = await saveEditorPage({
@@ -244,6 +252,7 @@ export default function EditorPage() {
         persistedAvatarUrl,
         avatarShape,
         blocks,
+        skipPageUpdate: !hasPageChanges,
       });
 
       const resolvedAvatarUrl = result.avatarUrl;
@@ -286,6 +295,7 @@ export default function EditorPage() {
     avatarShape,
     blocks,
     setAllBlocks,
+    lastSavedPayload,
   ]);
 
   useEffect(() => {

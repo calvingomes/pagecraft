@@ -13,6 +13,7 @@ import {
   minimalRTHtmlToInlineForClamp,
   sanitizeMinimalRTH,
 } from "@/lib/utils/sanitizeRichText";
+import { getCacheBustedUrl } from "@/lib/utils/imageUtils";
 import styles from "./LinkBlock.module.css";
 
 const LinkBlockEditor = dynamic(
@@ -27,14 +28,14 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
   const blockUrl = content.url ?? "";
   const titleHtml = sanitizeMinimalRTH(resolveLinkTitle(content));
 
-  const imageUrl = content.imageUrl;
-  const iconUrl = content.iconUrl;
-  const displayUrl = blockUrl.trim();
-  const urlSubtext = getLinkHostOrUrl(displayUrl);
-
   const titleText = resolveLinkTitle(content).trim();
   const metaTitle = (content.metaTitle ?? "").trim();
   const clampedTitleHtml = minimalRTHtmlToInlineForClamp(titleText || metaTitle);
+
+  const imageUrl = getCacheBustedUrl(content.imageUrl, block.updated_at);
+  const iconUrl = getCacheBustedUrl(content.iconUrl, block.updated_at);
+  const displayUrl = blockUrl.trim();
+  const urlSubtext = getLinkHostOrUrl(displayUrl);
 
   if (!isEditable && !displayUrl) return null;
 

@@ -110,7 +110,6 @@ export async function uploadPageImage({
     data: { publicUrl },
   } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath);
 
-  const cacheBustedDownloadUrl = `${publicUrl}${publicUrl.includes("?") ? "&" : "?"}v=${Date.now()}`;
   const nextBytes = Math.max(0, currentUsed - previousBytes + file.size);
 
   const { error: pageUpdateError } = await supabase
@@ -123,7 +122,7 @@ export async function uploadPageImage({
   }
 
   return {
-    downloadUrl: cacheBustedDownloadUrl,
+    downloadUrl: publicUrl,
     storagePath,
     sizeBytes: file.size,
     totalBytesUsed: nextBytes,

@@ -32,6 +32,7 @@ export type SaveEditorPageInput = {
   persistedAvatarUrl: string;
   avatarShape: AvatarShape;
   blocks: Block[];
+  skipPageUpdate?: boolean;
 };
 
 export type SaveEditorPageResult = {
@@ -135,6 +136,7 @@ export async function saveEditorPage({
   persistedAvatarUrl,
   avatarShape,
   blocks,
+  skipPageUpdate,
 }: SaveEditorPageInput): Promise<SaveEditorPageResult> {
   const { error: profileError } = await supabase.from("profiles").upsert(
     {
@@ -145,7 +147,7 @@ export async function saveEditorPage({
   );
   throwIfError(profileError, "Saving profile failed");
 
-  let resolvedAvatarUrl = avatarUrl;
+  let resolvedAvatarUrl = avatarUrl.split("?")[0];
 
   if (avatarUrl === "" && persistedAvatarUrl) {
     try {
@@ -175,29 +177,37 @@ export async function saveEditorPage({
     }
   }
 
-  const { error: pageError } = await supabase.from("pages").upsert(
-    stripUndefinedDeep({
-      username,
-      uid: userId,
-      published: true,
-      background,
-      sidebar_position: sidebarPosition,
-      display_name: displayName,
-      bio_html: bioHtml,
-      avatar_url: resolvedAvatarUrl,
-      avatar_shape: avatarShape,
-    }),
-    { onConflict: "username" },
-  );
-  throwIfError(pageError, "Saving page settings failed");
+  if (!skipPageUpdate) {
+    const { error: pageError } = await supabase.from("pages").upsert(
+      stripUndefinedDeep({
+        username,
+        uid: userId,
+        published: true,
+        background,
+        sidebar_position: sidebarPosition,
+        display_name: displayName,
+        bio_html: bioHtml,
+        avatar_url: resolvedAvatarUrl,
+        avatar_shape: avatarShape,
+      }),
+      { onConflict: "username" },
+    );
+    throwIfError(pageError, "Saving page settings failed");
+  }
 
   const resolvedBlocks = await Promise.all(
     blocks.map(async (block) => {
       if (block.type !== "image") return block;
 
-      const contentUrl = block.content?.url ?? "";
+      const contentUrl = (block.content?.url ?? "").split("?")[0];
       if (!contentUrl || !isDataUrl(contentUrl)) {
-        return block;
+        return {
+          ...block,
+          content: {
+            ...block.content,
+            url: contentUrl,
+          },
+        } as Block;
       }
 
       try {

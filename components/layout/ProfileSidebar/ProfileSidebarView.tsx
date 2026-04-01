@@ -7,6 +7,7 @@ import { MOBILE_GRID } from "@/lib/editor-engine/grid/grid-config";
 import { htmlToText } from "@/lib/utils/htmlToText";
 import { sanitizeMinimalRTH } from "@/lib/utils/sanitizeRichText";
 import { useResponsiveZoom } from "@/hooks/useResponsiveZoom";
+import { getCacheBustedUrl } from "@/lib/utils/imageUtils";
 import styles from "./ProfileSidebar.module.css";
 
 type ProfileSidebarViewProps = {
@@ -15,6 +16,7 @@ type ProfileSidebarViewProps = {
   bioHtml?: string;
   avatarUrl?: string;
   avatarShape?: "circle" | "square";
+  updatedAt?: string;
 };
 
 export const ProfileSidebarView = (props: ProfileSidebarViewProps) => {
@@ -24,7 +26,7 @@ export const ProfileSidebarView = (props: ProfileSidebarViewProps) => {
   const displayNameText = displayNameRaw.includes("<") ? htmlToText(displayNameRaw) : displayNameRaw;
   const safeBioHtml = sanitizeMinimalRTH(props.bioHtml ?? "");
   const avatarShape = props.avatarShape ?? "circle";
-  const avatarUrl = props.avatarUrl ?? "";
+  const avatarUrl = getCacheBustedUrl(props.avatarUrl, props.updatedAt);
 
   const { containerRef, zoom } = useResponsiveZoom(MOBILE_GRID.canvasPx);
 

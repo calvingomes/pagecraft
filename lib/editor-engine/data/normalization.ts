@@ -82,13 +82,15 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
           content: {
             url: typeof data?.url === "string" ? data.url : "",
             title: typeof data?.title === "string" ? data.title : "",
+            imageUrl: typeof data?.imageUrl === "string" ? data.imageUrl.split("?")[0] : undefined,
+            iconUrl: typeof data?.iconUrl === "string" ? data.iconUrl.split("?")[0] : undefined,
           },
         } as Block;
       case "image":
         return {
           ...normalizedBase,
           content: {
-            url: typeof data?.url === "string" ? data.url : "",
+            url: typeof data?.url === "string" ? data.url.split("?")[0] : "",
             alt: typeof data?.alt === "string" ? data.alt : "",
           },
         } as Block;

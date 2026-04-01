@@ -27,6 +27,7 @@ type PageViewProps = {
   avatarUrl?: string;
   avatarShape?: AvatarShape;
   initialViewportMode?: ViewportMode;
+  updatedAt?: string;
 };
 
 export function PageView({
@@ -40,6 +41,7 @@ export function PageView({
   avatarUrl,
   avatarShape,
   initialViewportMode = "desktop",
+  updatedAt,
 }: PageViewProps) {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -83,6 +85,7 @@ export function PageView({
             bioHtml={bioHtml}
             avatarUrl={avatarUrl}
             avatarShape={avatarShape}
+            updatedAt={updatedAt}
           />
         )}
       </div>

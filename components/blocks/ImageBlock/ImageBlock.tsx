@@ -6,6 +6,7 @@ import { ImageBlock as ImageBlockType } from "@/types/editor";
 import Image from "next/image";
 import { useEditorContext } from "@/contexts/EditorContext";
 import { VISUALLY_HIDDEN_STYLE } from "@/lib/utils/visuallyHidden";
+import { getCacheBustedUrl } from "@/lib/utils/imageUtils";
 import styles from "./ImageBlock.module.css";
 
 export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
@@ -18,6 +19,8 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
 
   if (!block?.content?.url?.trim()) return null;
 
+  const imageUrl = getCacheBustedUrl(block.content.url, block.updated_at);
+
   return (
     <div
       className={styles.imageBlock}
@@ -25,7 +28,7 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <Image
-        src={block.content.url}
+        src={imageUrl}
         loading="lazy"
         alt={block.content.alt ?? ""}
         fill

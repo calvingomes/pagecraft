@@ -18,6 +18,7 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
         bioHtml={props.bioHtml}
         avatarUrl={props.avatarUrl}
         avatarShape={props.avatarShape}
+        updatedAt={props.updatedAt}
       />
     );
   }

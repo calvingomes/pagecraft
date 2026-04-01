@@ -13,6 +13,7 @@ export interface PageData {
   bio_html?: string;
   avatar_url?: string;
   avatar_shape?: AvatarShape;
+  updated_at?: string;
 }
 
 export const PageService = {

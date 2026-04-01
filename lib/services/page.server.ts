@@ -21,7 +21,7 @@ export const ServerPageService = {
     const { data } = await supabase
       .from("pages")
       .select(
-        "title, background, sidebar_position, display_name, bio_html, avatar_url, avatar_shape",
+        "title, background, sidebar_position, display_name, bio_html, avatar_url, avatar_shape, updated_at",
       )
       .eq("username", username)
       .maybeSingle();
@@ -36,7 +36,7 @@ export const ServerPageService = {
     const supabase = client ?? createSupabaseServerClient();
     const { data: blockRows } = await supabase
       .from("blocks")
-      .select("id, type, order, content, layout, styles, viewport_mode")
+      .select("id, type, order, content, layout, styles, viewport_mode, updated_at")
       .eq("page_username", username)
       .order("order", { ascending: true });
 

@@ -13,6 +13,7 @@ export type BlockWidthPreset =
 interface BaseBlock {
   id: string;
   order: number;
+  updated_at?: string;
   styles?: {
     width?: number;
     height?: number;

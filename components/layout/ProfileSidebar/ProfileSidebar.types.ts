@@ -11,6 +11,7 @@ export type ProfileSidebarProps =
       onChangeBioHtml?: (bioHtml: string) => void;
       onChangeAvatarUrl?: (avatarUrl: string) => void;
       onChangeAvatarShape?: (avatarShape: AvatarShape) => void;
+      updatedAt?: string;
     }
   | {
       variant: "view";
@@ -19,4 +20,5 @@ export type ProfileSidebarProps =
       bioHtml?: string;
       avatarUrl?: string;
       avatarShape?: AvatarShape;
+      updatedAt?: string;
     };

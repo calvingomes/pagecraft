@@ -47,6 +47,7 @@ export default async function UserPage({ params }: Props) {
           (page.avatar_shape as AvatarShape | undefined) ?? undefined
         }
         blocks={blocks}
+        updatedAt={page.updated_at as string}
       />
     </>
   );
