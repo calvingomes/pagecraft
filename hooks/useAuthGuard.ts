@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { AuthService } from "@/lib/services/auth.client";
 import { useAuthStore } from "@/stores/auth-store";
 
-type AuthGuardMode = "auth" | "claim" | "editor";
+type AuthGuardMode = "auth" | "editor";
 
 const getUsernameFromUser = (user: User | null): string | null => {
   if (!user) return null;
@@ -49,7 +49,7 @@ export function useAuthGuard(mode: AuthGuardMode) {
       if (mode === "auth") {
         setLoading(false);
         // If we have a username in the URL, we're in the middle of an automated claim.
-        // Don't redirect to /claim yet; let the Auth page handle it.
+        // Let the Auth page handle it.
         const hasUrlUsername = new URLSearchParams(window.location.search).has(
           "username",
         );
@@ -58,23 +58,13 @@ export function useAuthGuard(mode: AuthGuardMode) {
           return;
         }
 
-        router.replace(username ? "/editor" : "/claim");
+        router.replace(username ? "/editor" : "/auth");
         return;
       }
 
       if (!username) {
         setLoading(false);
-        if (mode === "editor") {
-          router.replace("/claim");
-        } else {
-          setAuthChecked(true);
-        }
-        return;
-      }
-
-      if (mode === "claim") {
-        setLoading(false);
-        router.replace("/editor");
+        router.replace("/auth");
         return;
       }
 

@@ -131,7 +131,6 @@
 .paletteLabel {
   font-size: var(--font-size-xs);
   font-weight: 600;
-  color: red;
   color: var(--color-dark-grey);
   text-transform: uppercase;
   letter-spacing: 0.05em;
