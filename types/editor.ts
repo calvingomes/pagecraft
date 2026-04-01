@@ -19,11 +19,24 @@ interface BaseBlock {
     widthPreset?: BlockWidthPreset;
     transparentWrapper?: boolean;
   };
-  // Fixed grid position (independent of block order). Measured in 4-column
-  // grid cells. (0-based)
+  // Desktop fallback/default placement
   layout?: {
     x: number;
     y: number;
+  };
+  mobileStyles?: {
+    width?: number;
+    height?: number;
+    widthPreset?: BlockWidthPreset;
+    transparentWrapper?: boolean;
+  };
+  mobileLayout?: {
+    x: number;
+    y: number;
+  };
+  visibility?: {
+    desktop?: boolean;
+    mobile?: boolean;
   };
 }
 
@@ -63,11 +76,6 @@ export type LinkMetadataResponse = {
   iconUrl: string | null;
 };
 
-export type BlocksByViewport = {
-  desktop: Block[];
-  mobile: Block[];
-};
-
 export type EditorContextValue = {
   username: string | null;
   onUpdateBlock: (id: string, updates: Partial<Block>) => Promise<void>;
@@ -75,25 +83,14 @@ export type EditorContextValue = {
 };
 
 export type EditorState = {
-  desktopBlocks: Block[];
-  mobileBlocks: Block[];
+  blocks: Block[];
   activeViewportMode: BlockViewportMode;
   selectedBlockId: string | null;
 
-  addBlock: (block: Block, mode?: BlockViewportMode) => void;
-  updateBlock: (
-    id: string,
-    updates: Partial<Block>,
-    mode?: BlockViewportMode,
-  ) => void;
-  removeBlock: (id: string, mode?: BlockViewportMode) => void;
-  reorderBlocks: (
-    activeId: string,
-    overId: string,
-    mode?: BlockViewportMode,
-  ) => void;
+  addBlock: (block: Block) => void;
+  updateBlock: (id: string, updates: Partial<Block>) => void;
+  removeBlock: (id: string) => void;
   selectBlock: (id: string | null) => void;
-  setBlocksForViewport: (mode: BlockViewportMode, blocks: Block[]) => void;
-  setAllBlocks: (blocks: BlocksByViewport) => void;
+  setAllBlocks: (blocks: Block[]) => void;
   setActiveViewportMode: (mode: BlockViewportMode) => void;
 };

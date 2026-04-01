@@ -31,7 +31,6 @@
   border-radius: 8px;
   box-shadow: 0 2px 8px color-mix(in srgb, var(--color-darkest-grey) 5%, transparent);
   box-sizing: border-box;
-  cursor: grab;
   user-select: none;
   overflow: hidden;
 }
@@ -39,11 +38,6 @@
 .wrapper.emptyWrapper {
   background: transparent;
   box-shadow: none;
-}
-
-.wrapper.dragging {
-  z-index: 10;
-  cursor: grabbing;
 }
 
 .content {

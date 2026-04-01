@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  selectActiveViewportBlocks,
   useEditorStore,
 } from "@/stores/editor-store";
 import type { Block } from "@/types/editor";
@@ -10,20 +9,16 @@ import { MobileBlockCanvas } from "./mobile/MobileBlockCanvas";
 import { DesktopBlockCanvas } from "./desktop/DesktopBlockCanvas";
 
 const EditableBlockCanvas = () => {
-  const activeBlocks = useEditorStore(selectActiveViewportBlocks);
+  const blocks = useEditorStore((s) => s.blocks);
   const activeEditorViewportMode = useEditorStore((s) => s.activeViewportMode);
   const updateBlock = useEditorStore((s) => s.updateBlock);
-  const renderViewportMode = activeEditorViewportMode;
-  const blocks = activeBlocks;
 
-  if (renderViewportMode === "mobile") {
+  if (activeEditorViewportMode === "mobile") {
     return (
       <MobileBlockCanvas
         editable
         blocks={blocks}
-        onUpdateBlock={(id: string, updates: Partial<Block>) =>
-          updateBlock(id, updates, "mobile")
-        }
+        onUpdateBlock={updateBlock}
       />
     );
   }
@@ -32,9 +27,7 @@ const EditableBlockCanvas = () => {
     <DesktopBlockCanvas
       editable
       blocks={blocks}
-      onUpdateBlock={(id: string, updates: Partial<Block>) =>
-        updateBlock(id, updates, "desktop")
-      }
+      onUpdateBlock={updateBlock}
     />
   );
 };

@@ -4,13 +4,13 @@ import {
   normalizeStoredBlocks,
   type RawStoredBlock,
 } from "@/lib/editor-engine/data/normalization";
-import { compactEmptyRows } from "@/lib/editor-engine/grid/compact";
+import type { Block } from "@/types/editor";
 
 export const BlockService = {
   /**
    * Fetch all blocks for a page, normalized and split by viewport
    */
-  getBlocksForPage: async (username: string) => {
+  getBlocksForPage: async (username: string): Promise<Block[]> => {
     const { data: blockRows } = await supabase
       .from("blocks")
       .select("id, type, order, content, layout, styles, viewport_mode")
@@ -19,48 +19,19 @@ export const BlockService = {
 
     const safeBlockRows = blockRows ?? [];
 
-    const toRawStoredBlock = (row: {
-      id: string | number;
-      type: unknown;
-      order: unknown;
-      content: unknown;
-      layout: unknown;
-      styles: unknown;
-    }): RawStoredBlock => ({
+    const rawBlocks: RawStoredBlock[] = safeBlockRows.map((row) => ({
       id: String(row.id),
       type: row.type,
       order: row.order,
       content: row.content,
       layout: row.layout,
       styles: row.styles,
-    });
+    }));
 
-    const normalizeForViewport = (rows: RawStoredBlock[]) => {
-      const normalizedBlocks = normalizeStoredBlocks(rows);
-      return ensureBlocksHaveValidLayouts(normalizedBlocks);
-    };
+    const normalizedBlocks = normalizeStoredBlocks(rawBlocks);
+    const validBlocks = ensureBlocksHaveValidLayouts(normalizedBlocks);
 
-    const desktopRows = safeBlockRows
-      .filter((row) => row.viewport_mode !== "mobile")
-      .map(toRawStoredBlock);
-
-    const mobileRows = safeBlockRows
-      .filter((row) => row.viewport_mode === "mobile")
-      .map(toRawStoredBlock);
-
-    // For editor use (compacted)
-    const getCompacted = (rows: RawStoredBlock[]) => {
-      const normalized = normalizeForViewport(rows);
-      return compactEmptyRows(normalized).blocks;
-    };
-
-    return {
-      desktop: getCompacted(desktopRows),
-      mobile: getCompacted(mobileRows),
-      // Raw normalized versions if needed for view mode without compaction logic?
-      // Actually view mode also needs valid layouts.
-      // We return 'compacted' blocks as the standard 'Block[]'
-    };
+    return validBlocks;
   },
 
   /**

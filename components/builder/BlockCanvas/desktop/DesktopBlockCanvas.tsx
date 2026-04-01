@@ -1,28 +1,16 @@
-/* eslint-disable css-modules/no-unused-class */
 "use client";
 
-import {
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-} from "@dnd-kit/core";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import ReactGridLayout from "react-grid-layout";
+import type { Layout } from "react-grid-layout";
 import type { Block } from "@/types/editor";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
 import { useEditorContext } from "@/contexts/EditorContext";
 import { DESKTOP_GRID } from "@/lib/editor-engine/grid/grid-config";
-import {
-  clamp,
-  rectForBlock,
-  sizePxForBlock,
-  spansForBlock,
-} from "@/lib/editor-engine/grid/grid-math";
-import { useGridDnd } from "@/components/builder/BlockCanvas/hooks/useGridDnd";
-import { DesktopReadonlyBlock } from "@/components/builder/BlockCanvas/desktop/DesktopReadonlyBlock";
-import { snapToCursor } from "@/lib/dndKit";
-import { DroppableCell } from "../DroppableCell";
+import { sizePxForBlock } from "@/lib/editor-engine/grid/grid-math";
+import { blockToRglItem } from "@/lib/editor-engine/rgl/blockToRglItem";
+import { rglLayoutToBlockUpdates } from "@/lib/editor-engine/rgl/rglLayoutToBlockUpdates";
+import "react-grid-layout/css/styles.css";
 import styles from "../BlockCanvas.module.css";
 
 type DesktopBlockCanvasProps = {
@@ -37,161 +25,84 @@ export const DesktopBlockCanvas = ({
   onUpdateBlock,
 }: DesktopBlockCanvasProps) => {
   const editor = useEditorContext();
-  const applyUpdate = useMemo(() => {
-    return onUpdateBlock ?? (() => undefined);
-  }, [onUpdateBlock]);
+  const snapshotRef = useRef<Record<string, { x: number; y: number }>>({});
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 },
-    }),
-  );
+  const visibleBlocks = useMemo(() => {
+    return blocks.filter((b) => b.visibility?.desktop !== false);
+  }, [blocks]);
 
-  const {
-    activeId,
-    placementTarget,
-    registerBlockNode,
-    handleDragStart,
-    handleDragCancel,
-    handleDragOver,
-    handleDragEnd,
-  } = useGridDnd({
-    editable,
-    blocks,
-    updateBlock: applyUpdate,
-    onPersistBlockUpdate: editor?.onUpdateBlock,
-    gridConfig: DESKTOP_GRID,
-  });
+  const layout = useMemo(() => {
+    return visibleBlocks.map((block) => blockToRglItem(block, DESKTOP_GRID));
+  }, [visibleBlocks]);
 
-  const activeBlock = useMemo(() => {
-    if (!activeId) return null;
-    return blocks.find((block) => block.id === activeId) ?? null;
-  }, [activeId, blocks]);
+  const handleDragStart = () => {
+    snapshotRef.current = Object.fromEntries(
+      visibleBlocks.map((block) => [
+        block.id,
+        { x: block.layout?.x ?? 0, y: block.layout?.y ?? 0 },
+      ]),
+    );
+  };
 
-  const maxBottom = blocks.reduce((acc, block) => {
-    const rect = rectForBlock(block, undefined, DESKTOP_GRID);
-    return Math.max(acc, rect.y + rect.h);
-  }, 0);
+  const handleLayoutChange = (newLayout: Layout[]) => {
+    if (!editable || !onUpdateBlock) return;
 
-  const trailingRows = activeId ? 4 : 1;
-  const subRows = Math.max(
-    1,
-    Math.ceil(maxBottom * DESKTOP_GRID.rowScale) +
-      trailingRows * DESKTOP_GRID.rowScale,
-  );
+    for (const item of newLayout) {
+      onUpdateBlock(item.i, {
+        layout: {
+          x: item.x,
+          y: item.y / DESKTOP_GRID.rowScale,
+        },
+      });
+    }
+  };
 
-  const gridXStridePx = DESKTOP_GRID.cellPx + DESKTOP_GRID.gapXPx;
-  const gridYStridePx = DESKTOP_GRID.subRowPx + DESKTOP_GRID.subRowGapPx;
+  const handleDragStop = async (newLayout: Layout[]) => {
+    if (!editable || !editor?.onUpdateBlock) return;
 
-  const placementHighlightStyle = useMemo(() => {
-    if (!activeBlock || !placementTarget) return null;
+    const changed = rglLayoutToBlockUpdates(
+      newLayout,
+      snapshotRef.current,
+      DESKTOP_GRID,
+    );
 
-    const { widthPx, heightPx } = sizePxForBlock(activeBlock, DESKTOP_GRID);
-
-    return {
-      transform: `translate3d(${placementTarget.x * gridXStridePx}px, ${placementTarget.y * DESKTOP_GRID.rowScale * gridYStridePx}px, 0)`,
-      width: `${widthPx}px`,
-      height: `${heightPx}px`,
-    };
-  }, [activeBlock, placementTarget, gridXStridePx, gridYStridePx]);
-
-  const content = (
-    <div
-      className={styles.canvas}
-      style={{
-        height: `${subRows * DESKTOP_GRID.subRowPx + (subRows - 1) * DESKTOP_GRID.subRowGapPx}px`,
-      }}
-    >
-      {editable && placementHighlightStyle && (
-        <div
-          className={styles.placementHighlight}
-          style={placementHighlightStyle}
-        />
-      )}
-
-      {editable && (
-        <div
-          className={`${styles.dropGrid} ${activeId ? styles.dropGridActive : ""}`}
-          style={{
-            gridTemplateRows: `repeat(${subRows}, ${DESKTOP_GRID.subRowPx}px)`,
-          }}
-        >
-          {Array.from({ length: subRows }).flatMap((_, y) =>
-            Array.from({ length: DESKTOP_GRID.cols }).map((__, x) => (
-              <DroppableCell key={`${x}-${y}`} x={x} y={y} />
-            )),
-          )}
-        </div>
-      )}
-
-      <div className={styles.grid}>
-        {blocks.map((block, index) => {
-          const { w: spanW, h: spanH } = spansForBlock(
-            block,
-            undefined,
-            DESKTOP_GRID,
-          );
-          const xRaw = block.layout?.x ?? index % DESKTOP_GRID.cols;
-          const yRaw = block.layout?.y ?? Math.floor(index / DESKTOP_GRID.cols);
-          const x = clamp(xRaw, 0, DESKTOP_GRID.cols - spanW);
-          const y = Math.max(0, yRaw);
-          const dimensions = sizePxForBlock(block, DESKTOP_GRID);
-
-          return (
-            <div
-              key={block.id}
-              ref={(node) => {
-                registerBlockNode(block.id, node);
-              }}
-              style={{
-                gridColumnStart: x + 1,
-                gridRowStart: Math.round(y * DESKTOP_GRID.rowScale) + 1,
-                gridColumnEnd: `span ${spanW}`,
-                gridRowEnd: `span ${Math.max(1, Math.round(spanH * DESKTOP_GRID.rowScale))}`,
-              }}
-            >
-              {editable ? (
-                <SortableBlock
-                  block={block}
-                  dimensions={dimensions}
-                  activeDragId={activeId}
-                  gridConfig={DESKTOP_GRID}
-                />
-              ) : (
-                <DesktopReadonlyBlock block={block} dimensions={dimensions} />
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-  if (!editable) return content;
+    await Promise.all(
+      changed.map(({ id, x, y }) =>
+        editor.onUpdateBlock(id, { layout: { x, y } }),
+      ),
+    );
+  };
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={snapToCursor}
-      onDragStart={handleDragStart}
-      onDragCancel={handleDragCancel}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
+    <div
+      className={styles.canvas}
+      data-mobile-canvas-wrapper={styles.mobileCanvasWrapper}
     >
-      {content}
-      {typeof window !== "undefined" && (
-        <DragOverlay dropAnimation={null} style={{ zIndex: 1000 }}>
-          {activeBlock ? (
+      <ReactGridLayout
+        layout={layout}
+        cols={DESKTOP_GRID.cols}
+        width={DESKTOP_GRID.canvasPx}
+        rowHeight={DESKTOP_GRID.subRowPx}
+        margin={[DESKTOP_GRID.gapXPx, DESKTOP_GRID.subRowGapPx]}
+        containerPadding={[0, 0]}
+        compactType={null}
+        isResizable={false}
+        isDraggable={editable}
+        draggableHandle=".drag-handle"
+        onDragStart={handleDragStart}
+        onLayoutChange={handleLayoutChange}
+        onDragStop={handleDragStop}
+      >
+        {visibleBlocks.map((block) => (
+          <div key={block.id}>
             <SortableBlock
-              block={activeBlock}
-              dimensions={sizePxForBlock(activeBlock, DESKTOP_GRID)}
-              activeDragId={null}
+              block={block}
+              dimensions={sizePxForBlock(block, DESKTOP_GRID)}
               gridConfig={DESKTOP_GRID}
-              dndDisabled
             />
-          ) : null}
-        </DragOverlay>
-      )}
-    </DndContext>
+          </div>
+        ))}
+      </ReactGridLayout>
+    </div>
   );
 };

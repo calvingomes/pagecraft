@@ -1,30 +1,16 @@
-/* eslint-disable css-modules/no-unused-class */
 "use client";
 
-import {
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-} from "@dnd-kit/core";
 import { useMemo, useState, useRef, useEffect } from "react";
+import ReactGridLayout from "react-grid-layout";
+import type { Layout } from "react-grid-layout";
 import type { Block } from "@/types/editor";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
 import { useEditorContext } from "@/contexts/EditorContext";
-import {
-  MOBILE_GRID,
-} from "@/lib/editor-engine/grid/grid-config";
-import {
-  clamp,
-  rectForBlock,
-  sizePxForBlock,
-  spansForBlock,
-} from "@/lib/editor-engine/grid/grid-math";
-import { useGridDnd } from "@/components/builder/BlockCanvas/hooks/useGridDnd";
-import { MobileReadonlyBlock } from "./MobileReadonlyBlock";
-import { snapToCursor } from "@/lib/dndKit";
-import { DroppableCell } from "../DroppableCell";
+import { MOBILE_GRID } from "@/lib/editor-engine/grid/grid-config";
+import { sizePxForBlock } from "@/lib/editor-engine/grid/grid-math";
+import { blockToRglItem } from "@/lib/editor-engine/rgl/blockToRglItem";
+import { rglLayoutToBlockUpdates } from "@/lib/editor-engine/rgl/rglLayoutToBlockUpdates";
+import "react-grid-layout/css/styles.css";
 import styles from "../BlockCanvas.module.css";
 
 type MobileCanvasGridProps =
@@ -41,6 +27,7 @@ type MobileCanvasGridProps =
 export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
   const { editable, blocks } = props;
   const editor = useEditorContext();
+  const snapshotRef = useRef<Record<string, { x: number; y: number }>>({});
 
   const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -56,189 +43,102 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
     return () => observer.disconnect();
   }, []);
 
-  const applyUpdate = useMemo(() => {
-    return props.editable ? props.onUpdateBlock : () => undefined;
-  }, [props]);
+  const projectedBlocks = useMemo(() => {
+    return blocks.map((b) => ({
+      ...b,
+      layout: b.mobileLayout ?? b.layout,
+      styles: b.mobileStyles ?? b.styles,
+    }) as Block);
+  }, [blocks]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 },
-    }),
-  );
+  const visibleBlocks = useMemo(() => {
+    return projectedBlocks.filter((b) => b.visibility?.mobile !== false);
+  }, [projectedBlocks]);
 
-  const {
-    activeId,
-    placementTarget,
-    registerBlockNode,
-    handleDragStart,
-    handleDragCancel,
-    handleDragOver,
-    handleDragEnd,
-  } = useGridDnd({
-    editable,
-    blocks,
-    updateBlock: applyUpdate,
-    onPersistBlockUpdate: editor?.onUpdateBlock,
-    gridConfig: MOBILE_GRID,
-  });
+  const layout = useMemo(() => {
+    return visibleBlocks.map((block) => blockToRglItem(block, MOBILE_GRID));
+  }, [visibleBlocks]);
 
-  const activeBlock = useMemo(() => {
-    if (!activeId) return null;
-    return blocks.find((block) => block.id === activeId) ?? null;
-  }, [activeId, blocks]);
+  const handleDragStart = () => {
+    snapshotRef.current = Object.fromEntries(
+      visibleBlocks.map((block) => [
+        block.id,
+        {
+          x: block.mobileLayout?.x ?? block.layout?.x ?? 0,
+          y: block.mobileLayout?.y ?? block.layout?.y ?? 0,
+        },
+      ]),
+    );
+  };
 
-  const maxBottom = blocks.reduce((acc, block) => {
-    const rect = rectForBlock(block, undefined, MOBILE_GRID);
-    return Math.max(acc, rect.y + rect.h);
-  }, 0);
+  const handleLayoutChange = (newLayout: Layout[]) => {
+    if (!editable || !props.onUpdateBlock) return;
 
-  const trailingRows = activeId ? 4 : 1;
-  const subRows = Math.max(
-    1,
-    Math.ceil(maxBottom * MOBILE_GRID.rowScale) +
-      trailingRows * MOBILE_GRID.rowScale,
-  );
+    for (const item of newLayout) {
+      props.onUpdateBlock(item.i, {
+        mobileLayout: {
+          x: item.x,
+          y: item.y / MOBILE_GRID.rowScale,
+        },
+      });
+    }
+  };
 
-  const gridXStridePx = MOBILE_GRID.cellPx + MOBILE_GRID.gapXPx;
-  const gridYStridePx = MOBILE_GRID.subRowPx + MOBILE_GRID.subRowGapPx;
+  const handleDragStop = async (newLayout: Layout[]) => {
+    if (!editable || !editor?.onUpdateBlock) return;
 
-  const placementHighlightStyle = useMemo(() => {
-    if (!activeBlock || !placementTarget) return null;
+    const changed = rglLayoutToBlockUpdates(
+      newLayout,
+      snapshotRef.current,
+      MOBILE_GRID,
+    );
 
-    const { widthPx, heightPx } = sizePxForBlock(activeBlock, MOBILE_GRID);
+    await Promise.all(
+      changed.map(({ id, x, y }) =>
+        editor.onUpdateBlock(id, { mobileLayout: { x, y } }),
+      ),
+    );
+  };
 
-    return {
-      transform: `translate3d(${placementTarget.x * gridXStridePx}px, ${placementTarget.y * MOBILE_GRID.rowScale * gridYStridePx}px, 0)`,
-      width: `${widthPx}px`,
-      height: `${heightPx}px`,
-    };
-  }, [activeBlock, placementTarget, gridXStridePx, gridYStridePx]);
-
-  const rawHeight =
-    subRows * MOBILE_GRID.subRowPx + (subRows - 1) * MOBILE_GRID.subRowGapPx;
-
-  const content = (
-    <div
-      ref={containerRef}
-      className={styles.mobileCanvasWrapper}
-      style={{
-        height: `${rawHeight * scale}px`,
-      }}
-    >
+  return (
+    <div ref={containerRef} className={styles.mobileCanvasWrapper}>
       <div
         className={styles.canvas}
         style={{
           width: `${MOBILE_GRID.canvasPx}px`,
           maxWidth: "none",
-          height: `${rawHeight}px`,
           transform: `scale(${scale})`,
           transformOrigin: "top center",
-          position: "absolute",
-          left: "50%",
-          marginLeft: `-${MOBILE_GRID.canvasPx / 2}px`,
+          margin: "0 auto",
         }}
       >
-      {editable && placementHighlightStyle && (
-        <div
-          className={styles.placementHighlight}
-          style={placementHighlightStyle}
-        />
-      )}
-
-      {editable && (
-        <div
-          className={`${styles.dropGrid} ${activeId ? styles.dropGridActive : ""}`}
-          style={{
-            gridTemplateRows: `repeat(${subRows}, ${MOBILE_GRID.subRowPx}px)`,
-            // Override grid template columns for mobile (2 cols)
-            gridTemplateColumns: `repeat(${MOBILE_GRID.cols}, ${MOBILE_GRID.cellPx}px)`,
-            gap: `${MOBILE_GRID.subRowGapPx}px ${MOBILE_GRID.gapXPx}px`,
-          }}
+        <ReactGridLayout
+          layout={layout}
+          cols={MOBILE_GRID.cols}
+          width={MOBILE_GRID.canvasPx}
+          rowHeight={MOBILE_GRID.subRowPx}
+          margin={[MOBILE_GRID.gapXPx, MOBILE_GRID.subRowGapPx]}
+          containerPadding={[0, 0]}
+          compactType={null}
+          isResizable={false}
+          isDraggable={editable}
+          draggableHandle=".drag-handle"
+          transformScale={scale}
+          onDragStart={handleDragStart}
+          onLayoutChange={handleLayoutChange}
+          onDragStop={handleDragStop}
         >
-          {Array.from({ length: subRows }).flatMap((_, y) =>
-            Array.from({ length: MOBILE_GRID.cols }).map((__, x) => (
-              <DroppableCell key={`${x}-${y}`} x={x} y={y} />
-            )),
-          )}
-        </div>
-      )}
-
-      <div className={styles.gridMobile}>
-        {blocks.map((block, index) => {
-          const { w: spanW, h: spanH } = spansForBlock(
-            block,
-            undefined,
-            MOBILE_GRID,
-          );
-          const xRaw = block.layout?.x ?? index % MOBILE_GRID.cols;
-          const yRaw = block.layout?.y ?? Math.floor(index / MOBILE_GRID.cols);
-          const x = clamp(xRaw, 0, MOBILE_GRID.cols - spanW);
-          const y = Math.max(0, yRaw);
-          const dimensions = sizePxForBlock(block, MOBILE_GRID);
-
-          return (
-            <div
-              key={block.id}
-              ref={(node) => {
-                registerBlockNode(block.id, node);
-              }}
-              style={{
-                gridColumnStart: x + 1,
-                gridRowStart: Math.round(y * MOBILE_GRID.rowScale) + 1,
-                gridColumnEnd: `span ${spanW}`,
-                gridRowEnd: `span ${Math.max(1, Math.round(spanH * MOBILE_GRID.rowScale))}`,
-              }}
-            >
-              {editable ? (
-                <SortableBlock
-                  block={block}
-                  dimensions={dimensions}
-                  activeDragId={activeId}
-                  gridConfig={MOBILE_GRID}
-                />
-              ) : (
-                <MobileReadonlyBlock block={block} dimensions={dimensions} />
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  </div>
-  );
-
-  if (!editable) return content;
-
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={snapToCursor}
-      onDragStart={handleDragStart}
-      onDragCancel={handleDragCancel}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
-      {content}
-      {typeof window !== "undefined" && (
-        <DragOverlay dropAnimation={null} style={{ zIndex: 1000 }}>
-          {activeBlock ? (
-            <div
-              style={{
-                transform: `scale(${scale})`,
-                transformOrigin: "top left",
-              }}
-            >
+          {visibleBlocks.map((block) => (
+            <div key={block.id}>
               <SortableBlock
-                block={activeBlock}
-                dimensions={sizePxForBlock(activeBlock, MOBILE_GRID)}
-                activeDragId={null}
+                block={block}
+                dimensions={sizePxForBlock(block, MOBILE_GRID)}
                 gridConfig={MOBILE_GRID}
-                dndDisabled
               />
             </div>
-          ) : null}
-        </DragOverlay>
-      )}
-    </DndContext>
+          ))}
+        </ReactGridLayout>
+      </div>
+    </div>
   );
 };

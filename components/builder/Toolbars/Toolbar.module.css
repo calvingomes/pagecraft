@@ -9,8 +9,6 @@
   z-index: 1000;
   border-radius: 8px;
   background: var(--color-darker-grey);
-  -webkit-overflow-scrolling: touch;
-  touch-action: manipulation;
   transition:
     opacity 0.15s,
     visibility 0.15s;

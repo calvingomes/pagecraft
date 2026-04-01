@@ -1,5 +1,5 @@
 import type { Block } from "@/types/editor";
-import type { GridConfig, LayoutById } from "@/types/grid";
+import type { GridConfig } from "@/types/grid";
 
 export type BlockCanvasRenderMode = "desktop" | "mobile";
 
@@ -20,22 +20,6 @@ export type BlockCanvasProps =
 export type SortableBlockProps = {
   block: Block;
   dimensions: BlockDimensions;
-  activeDragId?: string | null;
   fluid?: boolean;
-  dndDisabled?: boolean;
   gridConfig?: GridConfig;
-};
-
-export type DesktopDndSnapshot = {
-  layouts: LayoutById;
-};
-
-export type UseDesktopGridDndArgs = {
-  editable: boolean;
-  blocks: Block[];
-  updateBlock: (id: string, updates: Partial<Block>) => void;
-  onPersistBlockUpdate?: (
-    id: string,
-    updates: Partial<Block>,
-  ) => void | Promise<void>;
 };

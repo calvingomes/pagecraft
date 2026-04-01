@@ -1,6 +1,6 @@
 import type { Block, BlockType } from "@/types/editor";
 import type { GridLayout, GridConfig } from "@/types/grid";
-import { DESKTOP_GRID } from "../grid/grid-config";
+import { DESKTOP_GRID, MOBILE_GRID } from "../grid/grid-config";
 import { canPlaceBlockAt, findFirstFreeSpot } from "../layout/collision";
 
 export type RawStoredBlock = { id: string } & Record<string, unknown>;
@@ -22,6 +22,28 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
     const type = raw.type as BlockType;
     const order = typeof raw.order === "number" ? raw.order : index;
 
+    const rawStyles = { ...((raw.styles as Record<string, unknown>) || {}) };
+    const mobileLayout =
+      (raw.mobileLayout ?? rawStyles.mobileLayout) as Block["mobileLayout"] ?? undefined;
+    const mobileStyles =
+      (raw.mobileStyles ?? rawStyles.mobileStyles) as Block["mobileStyles"] ?? undefined;
+    const visibility =
+      (raw.visibility ?? rawStyles.visibility) as Block["visibility"] ?? undefined;
+
+    delete rawStyles.mobileLayout;
+    delete rawStyles.mobileStyles;
+    delete rawStyles.visibility;
+
+    // Base normalization for unified state
+    const normalizedBase = {
+      ...(raw as unknown as Block),
+      order,
+      styles: Object.keys(rawStyles).length > 0 ? rawStyles : undefined,
+      mobileLayout,
+      mobileStyles,
+      visibility,
+    };
+
     if (raw.content) {
       if (type === "sectionTitle") {
         const rawStyles =
@@ -30,8 +52,7 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
             : undefined;
 
         return {
-          ...(raw as unknown as Block),
-          order,
+          ...normalizedBase,
           styles: {
             ...(rawStyles as object),
             widthPreset: "full",
@@ -39,7 +60,7 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
         } as Block;
       }
 
-      return { ...(raw as unknown as Block), order } as Block;
+      return normalizedBase as Block;
     }
 
     const data =
@@ -50,16 +71,14 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
     switch (type) {
       case "text":
         return {
-          ...(raw as unknown as Block),
-          order,
+          ...normalizedBase,
           content: {
             text: typeof data?.text === "string" ? data.text : "",
           },
         } as Block;
       case "link":
         return {
-          ...(raw as unknown as Block),
-          order,
+          ...normalizedBase,
           content: {
             url: typeof data?.url === "string" ? data.url : "",
             title: typeof data?.title === "string" ? data.title : "",
@@ -67,8 +86,7 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
         } as Block;
       case "image":
         return {
-          ...(raw as unknown as Block),
-          order,
+          ...normalizedBase,
           content: {
             url: typeof data?.url === "string" ? data.url : "",
             alt: typeof data?.alt === "string" ? data.alt : "",
@@ -76,8 +94,7 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
         } as Block;
       case "sectionTitle":
         return {
-          ...(raw as unknown as Block),
-          order,
+          ...normalizedBase,
           styles: {
             ...((raw.styles as Record<string, unknown> | undefined) ?? {}),
             widthPreset: "full",
@@ -87,7 +104,7 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
           },
         } as Block;
       default:
-        return { ...(raw as unknown as Block), order } as Block;
+        return normalizedBase as Block;
     }
   });
 }
@@ -96,26 +113,52 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
 export function ensureBlocksHaveValidLayouts(
   blocks: Block[],
   config: GridConfig = DESKTOP_GRID,
+  viewport: "desktop" | "mobile" = "desktop",
 ): Block[] {
   const placed: Block[] = [];
 
-  return [...blocks]
+  const layoutKey = viewport === "mobile" ? "mobileLayout" : "layout";
+
+  const normalized = [...blocks]
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     .map((block) => {
-      if (isValidLayout(block.layout)) {
-        const candidate = {
-          x: block.layout.x,
-          y: block.layout.y,
-        };
-        if (canPlaceBlockAt(block, candidate, placed, config)) {
+      const currentLayout = block[layoutKey];
+
+      // To evaluate collision, we must project the 'placed' blocks so math helpers see the right coordinates/styles
+      const projectedPlaced = placed.map((b) => ({
+        ...b,
+        layout: viewport === "mobile" ? (b.mobileLayout ?? b.layout) : b.layout,
+        styles: viewport === "mobile" ? (b.mobileStyles ?? b.styles) : b.styles,
+      }) as Block);
+
+      const projectedBlock = {
+        ...block,
+        layout: viewport === "mobile" ? (block.mobileLayout ?? block.layout) : block.layout,
+        styles: viewport === "mobile" ? (block.mobileStyles ?? block.styles) : block.styles,
+      } as Block;
+
+      if (isValidLayout(currentLayout)) {
+        const candidate = { x: currentLayout.x, y: currentLayout.y };
+        if (canPlaceBlockAt(projectedBlock, candidate, projectedPlaced, config)) {
           placed.push(block);
           return block;
         }
       }
 
-      const pos = findFirstFreeSpot(block, placed, config);
-      const next = { ...block, layout: pos } as Block;
+      const pos = findFirstFreeSpot(projectedBlock, projectedPlaced, config);
+      const next = { ...block, [layoutKey]: pos } as Block;
       placed.push(next);
       return next;
     });
+
+  return normalized;
+}
+
+/**
+ * Convenience helper to run layout validation for both viewports at once.
+ * Essential for unified content state to ensure a block always has a safe spot everywhere.
+ */
+export function ensureBlocksHaveValidLayoutsForAllViewports(blocks: Block[]): Block[] {
+  const desktopNormalized = ensureBlocksHaveValidLayouts(blocks, DESKTOP_GRID, "desktop");
+  return ensureBlocksHaveValidLayouts(desktopNormalized, MOBILE_GRID, "mobile");
 }

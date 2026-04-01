@@ -50,7 +50,6 @@ export function AvatarHoverToolbar({
       <Toolbar.Root
         className={`${styles.toolbar} ${visible ? styles.toolbarVisible : ""} ${className ?? ""}`}
         onPointerDown={(e) => e.stopPropagation()}
-        onTouchStart={(e) => e.stopPropagation()}
         aria-label="Avatar controls"
       >
         <ToggleGroup.Root

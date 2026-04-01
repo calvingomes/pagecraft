@@ -4,6 +4,7 @@ import type {
   PageBackgroundId,
   SidebarPosition,
 } from "@/types/page";
+import type { Block } from "@/types/editor";
 import { PageView } from "@/components/views/PageView/PageView";
 import { Navbar } from "@/components/layout/Navbar/Navbar";
 
@@ -28,9 +29,9 @@ export default async function UserPage({ params }: Props) {
     return <div>Page not found</div>;
   }
 
-  let blocksByViewport;
+  let blocks: Block[] = [];
   try {
-    blocksByViewport = await ServerPageService.getBlocksForPage(username);
+    blocks = await ServerPageService.getBlocksForPage(username);
   } catch (error) {
     console.error("Failed to fetch blocks:", error);
     return <div>Error loading page content</div>;
@@ -54,7 +55,7 @@ export default async function UserPage({ params }: Props) {
         avatarShape={
           (page.avatar_shape as AvatarShape | undefined) ?? undefined
         }
-        blocksByViewport={blocksByViewport}
+        blocks={blocks}
       />
     </>
   );

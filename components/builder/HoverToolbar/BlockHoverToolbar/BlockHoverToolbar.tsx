@@ -91,7 +91,6 @@ export function BlockHoverToolbar({
     <Toolbar.Root
       className={`${styles.toolbar} ${visible ? styles.toolbarVisible : ""}`}
       onPointerDown={(e) => e.stopPropagation()}
-      onTouchStart={(e) => e.stopPropagation()}
       aria-label="Block controls"
     >
       <ToggleGroup.Root

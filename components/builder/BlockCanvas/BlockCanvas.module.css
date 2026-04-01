@@ -6,18 +6,10 @@
   position: relative;
 }
 
-.gridMobile {
-  display: grid;
-  grid-template-columns: repeat(2, 250px);
-  grid-auto-rows: 120px;
-  gap: 15px 25px;
-  position: relative;
-  z-index: 2;
-}
-
 .mobileCanvasWrapper {
   width: 100%;
-  display: block;
+  display: flex;
+  justify-content: center;
   position: relative;
 }
 
@@ -25,48 +17,4 @@
   .canvas {
     width: 100%;
   }
-}
-
-.placementHighlight {
-  position: absolute;
-  z-index: 0;
-  pointer-events: none;
-  border-radius: 8px;
-  left: 0;
-  top: 0;
-  background-color: color-mix(in srgb, var(--color-dark-grey) 12%, transparent);
-  will-change: transform, width, height;
-  transition:
-    transform var(--duration-base) var(--ease-standard),
-    width var(--duration-base) var(--ease-standard),
-    height var(--duration-base) var(--ease-standard);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 200px);
-  grid-auto-rows: 90px;
-  gap: 25px;
-  position: relative;
-  z-index: 2;
-}
-
-.dropGrid {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: repeat(4, 200px);
-  grid-auto-rows: 90px;
-  gap: 25px;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.dropGridActive {
-  pointer-events: auto;
-}
-
-.dropCell {
-  width: 100%;
-  height: 100%;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import type { BlocksByViewport } from "@/types/editor";
+import type { Block } from "@/types/editor";
 import type {
   AvatarShape,
   PageBackgroundId,
@@ -16,7 +16,7 @@ import { useViewportMode } from "@/hooks/useViewportMode";
 type PageViewProps = {
   username: string;
   title?: string;
-  blocksByViewport: BlocksByViewport;
+  blocks: Block[];
   background?: PageBackgroundId;
   sidebarPosition?: SidebarPosition;
   displayName?: string;
@@ -29,7 +29,7 @@ type PageViewProps = {
 export function PageView({
   username,
   title,
-  blocksByViewport,
+  blocks,
   background = "page-bg-1",
   sidebarPosition = "left",
   displayName,
@@ -46,10 +46,15 @@ export function PageView({
   );
 
   const isMobile = viewportMode === "mobile";
-  const visibleBlocks = isMobile
-    ? blocksByViewport.mobile
-    : blocksByViewport.desktop;
   const renderMode = isMobile ? "mobile" : "desktop";
+
+  const visibleBlocks = blocks
+    .filter((b) => (isMobile ? b.visibility?.mobile !== false : b.visibility?.desktop !== false))
+    .map((b) => ({
+      ...b,
+      layout: isMobile ? (b.mobileLayout ?? b.layout) : b.layout,
+      styles: isMobile ? (b.mobileStyles ?? b.styles) : b.styles,
+    }) as Block);
 
   return (
     <PageLayout

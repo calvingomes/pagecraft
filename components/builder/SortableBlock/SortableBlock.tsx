@@ -1,77 +1,38 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
-import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
+import { useState } from "react";
 import type { BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
-import {
-  selectActiveViewportBlocks,
-  useEditorStore,
-} from "@/stores/editor-store";
 import BlockRenderer from "@/components/builder/BlockRenderer/BlockRenderer";
 import { BlockHoverToolbar } from "@/components/builder/HoverToolbar/BlockHoverToolbar/BlockHoverToolbar";
 import styles from "./SortableBlock.module.css";
 import { shouldUseTransparentWrapper } from "@/lib/blockWrapper";
 import type { SortableBlockProps } from "@/types/builder";
-import { computeResizeAndPushUpdates } from "@/lib/editor-engine/layout/resize";
 
 export function SortableBlock({
   block,
   dimensions,
-  activeDragId,
   fluid = false,
-  dndDisabled = false,
   gridConfig,
 }: SortableBlockProps) {
   const editor = useEditorContext();
-  const allBlocks = useEditorStore(selectActiveViewportBlocks);
   const [isHovered, setIsHovered] = useState(false);
 
   const toolbarVisible = isHovered;
 
-  const { setNodeRef: setDroppableRef } = useDroppable({
-    id: `block:${block.id}`,
-    data: { type: "block", blockId: block.id },
-    disabled: dndDisabled,
-  });
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef: setDraggableRef,
-    transform,
-    isDragging,
-  } = useDraggable({
-    id: block.id,
-    data: { type: "block", blockId: block.id },
-    disabled: dndDisabled,
-  });
-
-  const dndStyle: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-  };
-
-  const hideBecauseOverlay = activeDragId === block.id;
-
   const widthPreset = block.styles?.widthPreset ?? "small";
   const showHoverToolbar = !!editor && block.type !== "sectionTitle";
-  const isTransparentWrapper = shouldUseTransparentWrapper(block, "edit");
+  const renderMode = editor ? "edit" : "view";
+  const isTransparentWrapper = shouldUseTransparentWrapper(block, renderMode);
   const viewport = gridConfig?.cols === 2 ? "mobile" : "desktop";
 
   const handleWidthChange = (preset: BlockWidthPreset) => {
     if (!editor?.onUpdateBlock) return;
-
-    const updates = computeResizeAndPushUpdates({
-      targetBlock: block,
-      allBlocks,
-      nextPreset: preset,
-      gridConfig,
+    const stylesKey = viewport === "mobile" ? "mobileStyles" : "styles";
+    const currentStyles = viewport === "mobile" ? block.mobileStyles : block.styles;
+    editor.onUpdateBlock(block.id, {
+      [stylesKey]: { ...(currentStyles ?? {}), widthPreset: preset },
     });
-
-    for (const { id, updates: blockUpdates } of updates) {
-      editor.onUpdateBlock(id, blockUpdates);
-    }
   };
 
   const handleToggleWrapperBackground = () => {
@@ -98,23 +59,15 @@ export function SortableBlock({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        ref={(node) => {
-          setDroppableRef(node);
-          setDraggableRef(node);
-        }}
         className={styles.frame}
         style={{
-          ...(hideBecauseOverlay ? {} : dndStyle),
           ...(fluid ? { width: "100%" } : {}),
           maxWidth: "100%",
           maxHeight: "100%",
-          opacity: hideBecauseOverlay ? 0 : 1,
         }}
-        {...(!dndDisabled ? attributes : {})}
-        {...(!dndDisabled ? listeners : {})}
       >
         <div
-          className={`${styles.wrapper} ${isTransparentWrapper ? styles.emptyWrapper : ""} ${isDragging ? styles.dragging : ""}`}
+          className={`drag-handle ${styles.wrapper} ${isTransparentWrapper ? styles.emptyWrapper : ""}`}
           style={
             fluid
               ? {
@@ -125,6 +78,7 @@ export function SortableBlock({
               : {
                   width: `${widthPx}px`,
                   height: `${heightPx}px`,
+                  cursor: editor ? "grab" : "default",
                 }
           }
         >

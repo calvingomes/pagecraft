@@ -11,11 +11,11 @@ PageCraft is a "link-in-bio" style page builder that allows users to create a si
 
 ### Core Concepts
 
-- **Viewport-Aware Block System**: Blocks are stored with a `viewport_mode` ('desktop' or 'mobile'). The editor loads both sets but only renders/edits the active one.
-  - **Desktop**: 4-column grid, free drag-and-drop placement.
-  - **Mobile**: 2-column grid, free drag-and-drop placement (uses same `useGridDnd` logic as desktop).
+- **Viewport-Aware Unified Block Model**: Blocks are stored as one array. Desktop uses `layout/styles`; mobile uses `mobileLayout/mobileStyles`; visibility is per viewport via `visibility.desktop|mobile`.
+  - **Desktop**: 4-column React Grid Layout canvas.
+  - **Mobile**: 2-column React Grid Layout canvas with scaled preview support.
 - **Editor vs. View Mode**:
-  - **Editor** (`/editor`): Uses `zustand` stores, `dnd-kit`, and Tiptap editors.
+  - **Editor** (`/editor`): Uses `zustand` store, `react-grid-layout`, and Tiptap editors.
   - **View Page** (`/[username]`): Server Component fetches data via `ServerPageService`, passes to `PageView` (Client Component). No stores, no heavy libraries. Pure React props.
 
 ### Tech Stack
@@ -27,7 +27,7 @@ PageCraft is a "link-in-bio" style page builder that allows users to create a si
 - **Database & Auth**: Supabase (via `lib/services/`)
 - **Core Logic**: `lib/editor-engine/` (Grid, Layout, Normalization)
 - **Styling**: CSS Modules with PostCSS (using CSS variables for theming)
-- **Drag & Drop**: @dnd-kit (Core, Sortable, Utilities)
+- **Drag & Drop**: react-grid-layout
 - **Rich Text**: Tiptap (Headless wrapper around ProseMirror)
 - **UI Primitives**: Radix UI (Dialog, Popover, Toolbar, Toggle Group, Radio Group, Label, Slot)
 - **Icons**: Lucide React
@@ -40,9 +40,10 @@ PageCraft is a "link-in-bio" style page builder that allows users to create a si
 ```
 types/          — All shared TypeScript types (no runtime code)
 lib/
-  editor-engine/ — Core editor logic (grid math, layout, collision, normalization)
+  editor-engine/ — Core editor logic (grid math, collision, normalization, RGL adapters)
     grid/        — Grid configuration and math
-    layout/      — Drag placement, resizing, collision detection
+    layout/      — Placement/collision helpers
+    rgl/         — Block ↔ ReactGridLayout conversion helpers
     data/        — Block normalization and viewport logic
   services/      — Data access layer (Supabase wrappers)
     auth.client.ts
@@ -75,10 +76,10 @@ styles/         — Global CSS custom properties and media queries
   Do not define types inline in stores, contexts, hooks, or lib files unless they are truly private to that file's implementation (e.g., a local helper type used nowhere else).
 
 - **One file per domain:**
-  - `types/editor.ts` — Block types (`TextBlock`, `LinkBlock`, `ImageBlock`, `SectionTitleBlock`), `Block` union, `BlockType`, `BlockWidthPreset`, `BlockViewportMode`, `BlocksByViewport`, `EditorState`, `EditorContextValue`, `LinkMetadataResponse`
+  - `types/editor.ts` — Block types (`TextBlock`, `LinkBlock`, `ImageBlock`, `SectionTitleBlock`), `Block` union, `BlockType`, `BlockWidthPreset`, `BlockViewportMode`, `EditorState`, `EditorContextValue`, `LinkMetadataResponse`
   - `types/grid.ts` — Grid geometry and config (`GridConfig`, `GridLayout`, `GridRect`, `PlacedRect`, `LayoutById`, `CompactResult`)
   - `types/page.ts` — Page-level enums (`PageBackgroundId`, `SidebarPosition`, `AvatarShape`, `ViewportMode`, `PreviewViewport`)
-  - `types/builder.ts` — Builder/component props (`BlockCanvasProps`, `BlockCanvasRenderMode`, `BlockDimensions`, `SortableBlockProps`, DnD snapshot types)
+  - `types/builder.ts` — Builder/component props (`BlockCanvasProps`, `BlockCanvasRenderMode`, `BlockDimensions`, `SortableBlockProps`)
   - `types/auth.ts` — Auth store shape (`AuthStore`)
   - `types/uploads.ts` — Upload/image processing options (`WebpOptions`)
 
@@ -180,21 +181,15 @@ Current product behavior:
 
 - `canPlaceBlockAt(block, at, placed, config?)` — bounds + collision check
 - `findFirstFreeSpot(block, placed, config?)` — first available grid position
-- `resolveCollisions(anchoredId, layout, preset, blocks, getLayout, config?)` — push all blocks to non-overlapping positions
-  _(Uses `OccupancyGrid` internally for fast O(1) coordinate mapping instead of recursive overlaps checks)_
 
 **Located in `lib/editor-engine/grid/occupancy.ts`:**
 
 - `OccupancyGrid` class — O(1) spatial map for tracking filled sub-rows on the canvas.
 
-**Located in `lib/editor-engine/grid/compact.ts`:**
+**Located in `lib/editor-engine/rgl/`:**
 
-- `compactEmptyRows(blocks, config?)` — remove empty rows
-
-**Located in `lib/editor-engine/layout/drag-placement.ts`:**
-
-- `computeTargetFromOver` — determine grid target from drop event
-- `computePushedLayouts` — calculate new layouts during drag
+- `blockToRglItem(block, config)` — block → RGL `{ i, x, y, w, h }`
+- `rglLayoutToBlockUpdates(newLayout, snapshot, config)` — RGL diff → persisted `{ id, x, y }` updates
 
 **Do / Don't**
 
@@ -202,7 +197,9 @@ Current product behavior:
 - **Do:** Pass the appropriate `GridConfig` (`DESKTOP_GRID` or `MOBILE_GRID`) when calling grid functions from viewport-specific code.
 - **Do:** Compute `BlockDimensions` in the parent canvas and pass as props — blocks should not call `sizePxForBlock` internally.
 - **Do:** Keep visual block height based on normalized content height; use quantized height for occupancy/reflow decisions.
-- **Do:** Use `snapToCursor` collision detection strategy (from `lib/dndKit.ts`) for all drag-and-drop operations to ensure items snap to the grid cell nearest the pointer.
+- **Do:** Use RGL `draggableHandle=".drag-handle"` so text editing/buttons do not trigger drags.
+- **Do:** Keep `isResizable={false}` in RGL; width changes come only from toolbar presets.
+- **Do:** Keep `compactType={null}` in RGL (compaction disabled) unless product behavior changes.
 - **Don't:** Add per-block collision or compaction loops directly inside component files.
 - **Don't:** Hardcode grid math (`0.5`, `200`, `25`, etc.) outside `lib/editor-engine`.
 - **Don't:** Import `MOBILE_GRID` in desktop-specific components or vice versa — keep viewport concerns separated at the component layer.
@@ -239,15 +236,12 @@ blocks/TextBlock/
 - `BlockRegistry/blockRegistry.tsx` is the single map from `BlockType → ReactNode`. When adding a new block type, add it here and in `types/editor.ts` — the `BlockRenderer` will pick it up automatically.
 - **`BlockCanvas`** is the top-level canvas entry point. It dispatches between `EditableBlockCanvas` (editor, backed by `editor-store`) and `ReadonlyBlockCanvas` (view page, pure props). Readonly mode receives a `renderMode` prop (`"desktop" | "mobile"`) from the parent — it never independently detects viewport.
 - **Canvas sub-components** are split by viewport:
-  - `BlockCanvas/desktop/DesktopBlockCanvas.tsx` — desktop grid with DnD (editable) or `DesktopReadonlyBlock` (readonly). Computes `sizePxForBlock(block)` and passes `dimensions` prop to children. Memoizes expensive layout styles and extracts `DroppableCell` to prevent re-renders.
-  - `BlockCanvas/desktop/DesktopReadonlyBlock.tsx` — lightweight readonly block for desktop grid layout. Receives `dimensions: BlockDimensions` as props.
+  - `BlockCanvas/desktop/DesktopBlockCanvas.tsx` — desktop React Grid Layout canvas for both editable and readonly modes. Uses `blockToRglItem` + `rglLayoutToBlockUpdates`.
   - `BlockCanvas/mobile/MobileBlockCanvas.tsx` — thin wrapper selecting editable or readonly `MobileCanvasGrid`
-  - `BlockCanvas/mobile/MobileCanvasGrid.tsx` — mobile 2-column grid. Uses `useGridDnd` for 2D drag-and-drop placement (similar to Desktop). Uses `MOBILE_GRID` for spans (`spansForBlock(block, undefined, MOBILE_GRID).w`) and pixel sizes (`sizePxForBlock(block, MOBILE_GRID)`).
-  - `BlockCanvas/mobile/MobileReadonlyBlock.tsx` — lightweight readonly block for mobile (no editor store or DnD deps). Receives `dimensions: BlockDimensions` as props.
-- **Readonly canvas paths must never import `editor-store` or DnD hooks.** Use `DesktopReadonlyBlock` / `MobileReadonlyBlock` for view pages.
-- `SortableBlock` wraps each block with drag handles, resize toolbar, and hover detection. It subscribes to `editor-store` — only use in editable paths. Receives `dimensions: BlockDimensions` and optional `gridConfig: GridConfig` as props from the parent canvas — it never calls `sizePxForBlock` internally.
-- `useGridDnd` hook (shared) — handles 2D grid collision detection, placement highlighting, and layout compaction for both Desktop and Mobile editors. Consumes logic from `lib/editor-engine`.
-  - **CRITICAL:** The `updateBlock` callback function passed into `useGridDnd` must **ALWAYS** be wrapped in a `useMemo` hook with stable dependencies. Failing to memoize the function pointer will cause an infinite `Maximum update depth exceeded` loop when the DND sensors pick up the layout changes.
+  - `BlockCanvas/mobile/MobileCanvasGrid.tsx` — mobile React Grid Layout canvas. Uses projected mobile fields (`mobileLayout/mobileStyles`), `transformScale`, and the same update/persist pattern as desktop.
+- **Readonly canvas paths must never import `editor-store` or drag hooks.**
+- `SortableBlock` is a grid item shell (content + hover toolbar + drag-handle class). It no longer uses dnd-kit.
+- Programmatic resize remains preset-based via hover toolbar. It updates width preset only; RGL repacks layout.
 - `BlockHoverToolbar` uses a shared preset list and viewport-aware filtering. `max` stays available in desktop editor only; mobile editor hides `max`.
 - Hover toolbar background toggle: only `text` and `link` blocks should show the `BG` toggle control.
 - Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.
@@ -280,12 +274,12 @@ blocks/TextBlock/
   - `client.ts`: Exports `supabase` singleton for client components.
   - `server.ts`: Exports `createSupabaseServerClient` for server components.
 - **Zustand stores** hold transient editor and auth state.
-  - `editor-store.ts` — dual block arrays (`desktopBlocks`, `mobileBlocks`), `activeViewportMode`, and viewport-scoped actions. Exports `selectActiveViewportBlocks` selector.
+  - `editor-store.ts` — unified `blocks` array, `activeViewportMode`, and block mutation actions. Exports `selectActiveViewportBlocks` selector.
   - `auth-store.ts` — auth/user state.
 - Store files should be thin — just `create<StoreType>()(...)` with the type imported from `types/`.
 - Derived/computed values can use Zustand selectors in components.
 - **EditorContext** provides `onUpdateBlock` and `onRemoveBlock` to block components so they don't import the store directly.
-- **View pages (`/[username]`) must not use any Zustand store.** The server component fetches all blocks using `ServerPageService` (`lib/services/page.server.ts`), splits by `viewport_mode`, normalizes, and passes `blocksByViewport` as props. The client `PageView` component selects visible blocks from props based on `useViewportMode()` — no store hydration needed.
+- **View pages (`/[username]`) must not use any Zustand store.** The server component fetches unified blocks using `ServerPageService` (`lib/services/page.server.ts`) and passes `blocks` to `PageView`. The client `PageView` component projects blocks for the active viewport via `useViewportMode()` — no store hydration needed.
 
 ---
 
@@ -329,34 +323,27 @@ blocks/TextBlock/
 
 ## 11. Viewport-Aware Block System
 
-Blocks are stored and rendered per viewport mode (`"desktop"` | `"mobile"`).
+Blocks are stored as a unified list and rendered per viewport mode (`"desktop"` | `"mobile"`).
 
 ### Database
 
-- The `blocks` table has a `viewport_mode` column (`text NOT NULL DEFAULT 'desktop'`, constrained to `'desktop'` or `'mobile'`).
-- Each block row belongs to exactly one viewport.
+- The `blocks` table has a `viewport_mode` column.
+- Current persistence stores editor blocks with `viewport_mode: "desktop"` as the row anchor.
+- Mobile-specific layout/style/visibility data is stored alongside each block (`mobileLayout`, `mobileStyles`, `visibility`) inside the JSON shape.
 
 ### Editor Flow
 
-- Editor loads all blocks in a single query, splits by `viewport_mode` in-memory, and hydrates `editor-store` via `setAllBlocks({ desktop, mobile })`.
+- Editor loads all blocks in a single query and hydrates `editor-store` via `setAllBlocks(blocks)`.
 - `activeViewportMode` in the store is synced to the editor's preview toggle.
-- All block mutations (`addBlock`, `updateBlock`, `removeBlock`, `reorderBlocks`) accept an optional `mode` parameter; when omitted, they default to `activeViewportMode`.
-- Save (`lib/editor/saveEditorPage.ts`) upserts all block rows with explicit `viewport_mode`, then deletes stale rows per viewport.
+- Block mutations update unified block objects (desktop fields or mobile fields depending on the edit context).
+- Save (`lib/editor/saveEditorPage.ts`) upserts unified block rows and deletes stale rows.
 
 ### View Page Flow
 
-- `app/[username]/page.tsx` (server component) fetches all blocks in one query, filters into `desktop` / `mobile` arrays, normalizes both, and passes `blocksByViewport` to `PageView`.
-- `PageView` (client component) uses `useViewportMode()` to pick `visibleBlocks` and `renderMode` from props — **no store, no hydration**.
+- `app/[username]/page.tsx` (server component) fetches all blocks in one query and passes unified `blocks` to `PageView`.
+- `PageView` (client component) uses `useViewportMode()` to project each block to the active viewport and derive `visibleBlocks` + `renderMode` — **no store, no hydration**.
 - `PageView` passes `previewViewport={renderMode}` into `PageLayout`, and leaves `framedMobilePreview` as default `false` so public mobile pages keep clean layout styling.
 - `BlockCanvas` receives `renderMode` and delegates to the correct canvas without re-detecting viewport.
-
-### Key Type: `BlocksByViewport`
-
-```ts
-type BlocksByViewport = { desktop: Block[]; mobile: Block[] };
-```
-
-Used in: `EditorState.setAllBlocks`, `saveEditorPage`, server component → `PageView` props.
 
 ---
 

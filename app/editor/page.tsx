@@ -3,10 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Laptop, Smartphone, LogOut, Save } from "lucide-react";
-import {
-  selectActiveViewportBlocks,
-  useEditorStore,
-} from "@/stores/editor-store";
+import { useEditorStore } from "@/stores/editor-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { PageService } from "@/lib/services/page.client";
 import { BlockService } from "@/lib/services/block.client";
@@ -23,14 +20,8 @@ import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
-import { MobileEditorGuard } from "@/components/layout/MobileEditorGuard/MobileEditorGuard";
 import { OverlayPopup } from "@/components/layout/OverlayPopup/OverlayPopup";
-import { compactEmptyRows } from "@/lib/editor-engine/grid/compact";
-import { findFirstFreeSpot } from "@/lib/editor-engine/layout/collision";
-import {
-  DESKTOP_GRID,
-  MOBILE_GRID,
-} from "@/lib/editor-engine/grid/grid-config";
+import { ensureBlocksHaveValidLayoutsForAllViewports } from "@/lib/editor-engine/data/normalization";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEditorViewportPreview } from "@/hooks/useEditorViewportPreview";
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
@@ -48,8 +39,7 @@ type EditorSnapshotPayload = {
   avatarUrl: string;
   persistedAvatarUrl: string;
   avatarShape: AvatarShape;
-  desktopBlocks: Block[];
-  mobileBlocks: Block[];
+  blocks: Block[];
 };
 
 const serializeSnapshot = (payload: EditorSnapshotPayload) =>
@@ -60,13 +50,9 @@ export default function EditorPage() {
   const { username, user, loading, setLoading } = useAuthStore();
   const logout = useAuthStore((s) => s.logout);
   const { authChecked } = useAuthGuard("editor");
-  const desktopBlocks = useEditorStore((s) => s.desktopBlocks);
-  const mobileBlocks = useEditorStore((s) => s.mobileBlocks);
-  const activeBlocks = useEditorStore(selectActiveViewportBlocks);
+  const blocks = useEditorStore((s) => s.blocks);
   const setAllBlocks = useEditorStore((s) => s.setAllBlocks);
-  const setBlocksForViewport = useEditorStore((s) => s.setBlocksForViewport);
   const setActiveViewportMode = useEditorStore((s) => s.setActiveViewportMode);
-  const addBlock = useEditorStore((s) => s.addBlock);
   const updateBlock = useEditorStore((s) => s.updateBlock);
 
   const [background, setBackground] = useState<PageBackgroundId>("page-bg-1");
@@ -93,8 +79,7 @@ export default function EditorPage() {
         avatarUrl,
         persistedAvatarUrl,
         avatarShape,
-        desktopBlocks,
-        mobileBlocks,
+        blocks,
       }),
     [
       background,
@@ -104,8 +89,7 @@ export default function EditorPage() {
       avatarUrl,
       persistedAvatarUrl,
       avatarShape,
-      desktopBlocks,
-      mobileBlocks,
+      blocks,
     ],
   );
 
@@ -143,7 +127,6 @@ export default function EditorPage() {
   const effectiveSidebarPosition: SidebarPosition = isDesktopEditing
     ? desktopSidebarPosition
     : "center";
-  const isMobileScreen = screenView === "mobile";
 
   useEffect(() => {
     setActiveViewportMode(activeBlockViewportMode);
@@ -205,7 +188,9 @@ export default function EditorPage() {
         const blocks = await BlockService.getBlocksForPage(username);
         if (!active) return;
 
-        setAllBlocks(blocks);
+        // Run full normalization for BOTH viewports during hydration
+        const normalized = ensureBlocksHaveValidLayoutsForAllViewports(blocks);
+        setAllBlocks(normalized);
 
         const initialPayload: EditorSnapshotPayload = {
           background: nextBackground,
@@ -215,8 +200,7 @@ export default function EditorPage() {
           avatarUrl: nextAvatarUrl,
           persistedAvatarUrl: nextAvatarUrl,
           avatarShape: nextAvatarShape,
-          desktopBlocks: blocks.desktop,
-          mobileBlocks: blocks.mobile,
+          blocks: normalized,
         };
 
         setLastSavedPayload(initialPayload);
@@ -270,32 +254,19 @@ export default function EditorPage() {
     const defaultContent = getDefaultContent(blockType, resolvedOptions);
     const widthPreset = blockType === "sectionTitle" ? "full" : "small";
 
-    const tempBlockForPlacement = {
-      id,
-      type: blockType,
-      content: defaultContent,
-      order: activeBlocks.length,
-      styles: { widthPreset },
-    } as Block;
-
-    const gridConfig =
-      activeBlockViewportMode === "mobile" ? MOBILE_GRID : DESKTOP_GRID;
-    const pos = findFirstFreeSpot(
-      tempBlockForPlacement,
-      activeBlocks,
-      gridConfig,
-    );
-
     const newBlock: Block = {
       id,
       type: blockType,
       content: defaultContent,
-      order: activeBlocks.length,
+      order: blocks.length,
       styles: { widthPreset },
-      layout: pos,
     } as Block;
 
-    addBlock(newBlock, activeBlockViewportMode);
+    // Use the robust normalization engine to calculate safe layouts for both
+    // viewports simultaneously and resolve any existing collisions instantly.
+    const nextBlocks = [...blocks, newBlock];
+    const normalized = ensureBlocksHaveValidLayoutsForAllViewports(nextBlocks);
+    setAllBlocks(normalized);
   };
 
   const getDefaultContent = (
@@ -318,13 +289,13 @@ export default function EditorPage() {
   };
 
   const handleUpdateBlock = async (id: string, updates: Partial<Block>) => {
-    updateBlock(id, updates, activeBlockViewportMode);
+    updateBlock(id, updates);
   };
 
   const handleRemoveBlock = async (id: string) => {
-    const remaining = activeBlocks.filter((block) => block.id !== id);
-    const compacted = compactEmptyRows(remaining);
-    setBlocksForViewport(activeBlockViewportMode, compacted.blocks);
+    const remaining = blocks.filter((b) => b.id !== id);
+    const normalized = ensureBlocksHaveValidLayoutsForAllViewports(remaining);
+    setAllBlocks(normalized);
   };
 
   const handleSave = async () => {
@@ -344,10 +315,7 @@ export default function EditorPage() {
         avatarUrl,
         persistedAvatarUrl,
         avatarShape,
-        blocksByViewport: {
-          desktop: desktopBlocks,
-          mobile: mobileBlocks,
-        },
+        blocks,
       });
 
       const resolvedAvatarUrl = result.avatarUrl;
@@ -356,7 +324,6 @@ export default function EditorPage() {
         setAvatarUrl(resolvedAvatarUrl);
       }
       setPersistedAvatarUrl(resolvedAvatarUrl);
-      setAllBlocks(result.blocksByViewport);
 
       const latestPayload: EditorSnapshotPayload = {
         background,
@@ -366,11 +333,11 @@ export default function EditorPage() {
         avatarUrl: resolvedAvatarUrl,
         persistedAvatarUrl: resolvedAvatarUrl,
         avatarShape,
-        desktopBlocks: result.blocksByViewport.desktop,
-        mobileBlocks: result.blocksByViewport.mobile,
+        blocks: result.blocks,
       };
 
       setLastSavedPayload(latestPayload);
+      setAllBlocks(result.blocks);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unknown save error.";
@@ -387,7 +354,17 @@ export default function EditorPage() {
     );
   }
 
-  const isOverlayOpen = showSaveOverlay || isMobileScreen;
+  if (screenView !== "desktop") {
+    return (
+      <OverlayPopup
+        open={true}
+        title="Editor is desktop-only!"
+        message="Open this page on desktop to continue."
+      />
+    );
+  }
+
+  const isOverlayOpen = showSaveOverlay;
 
   return (
     <EditorProvider
@@ -470,7 +447,6 @@ export default function EditorPage() {
         title="Saving changes"
         message="Your page is being saved."
       />
-      <MobileEditorGuard open={isMobileScreen} />
     </EditorProvider>
   );
 }
