@@ -1,10 +1,10 @@
 import { ServerPageService } from "@/lib/services/page.server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type {
   AvatarShape,
   PageBackgroundId,
   SidebarPosition,
 } from "@/types/page";
-import type { Block } from "@/types/editor";
 import { PageView } from "@/components/views/PageView/PageView";
 import { Navbar } from "@/components/layout/Navbar/Navbar";
 
@@ -15,26 +15,17 @@ type Props = {
 export default async function UserPage({ params }: Props) {
   const { username } = await params;
 
-  // Use the dedicated server service to fetch data
-  // This handles the server-side supabase client creation internally
-  let page;
-  try {
-    page = await ServerPageService.getPageByUsername(username);
-  } catch (error) {
-    console.error("Failed to fetch page:", error);
-    return <div>Error loading page configuration</div>;
-  }
+  const supabase = createSupabaseServerClient();
+
+  // Parallelize the database fetches to avoid Waterfall latency.
+  // This can significantly reduce TTFB on the user's profile.
+  const [page, blocks] = await Promise.all([
+    ServerPageService.getPageByUsername(username, supabase),
+    ServerPageService.getBlocksForPage(username, supabase),
+  ]);
 
   if (!page) {
     return <div>Page not found</div>;
-  }
-
-  let blocks: Block[] = [];
-  try {
-    blocks = await ServerPageService.getBlocksForPage(username);
-  } catch (error) {
-    console.error("Failed to fetch blocks:", error);
-    return <div>Error loading page content</div>;
   }
 
   return (

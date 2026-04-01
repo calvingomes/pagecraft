@@ -13,8 +13,11 @@ import { DESKTOP_GRID, MOBILE_GRID } from "@/lib/editor-engine/grid/grid-config"
  * (bypassing client-side singletons)
  */
 export const ServerPageService = {
-  getPageByUsername: async (username: string): Promise<PageData | null> => {
-    const supabase = createSupabaseServerClient();
+  getPageByUsername: async (
+    username: string,
+    client?: ReturnType<typeof createSupabaseServerClient>,
+  ): Promise<PageData | null> => {
+    const supabase = client ?? createSupabaseServerClient();
     const { data } = await supabase
       .from("pages")
       .select(
@@ -26,13 +29,14 @@ export const ServerPageService = {
     return data as PageData | null;
   },
 
-  getBlocksForPage: async (username: string): Promise<Block[]> => {
-    const supabase = createSupabaseServerClient();
+  getBlocksForPage: async (
+    username: string,
+    client?: ReturnType<typeof createSupabaseServerClient>,
+  ): Promise<Block[]> => {
+    const supabase = client ?? createSupabaseServerClient();
     const { data: blockRows } = await supabase
       .from("blocks")
-      .select(
-        "id, type, order, content, layout, styles, viewport_mode",
-      )
+      .select("id, type, order, content, layout, styles, viewport_mode")
       .eq("page_username", username)
       .order("order", { ascending: true });
 
@@ -43,17 +47,25 @@ export const ServerPageService = {
     // Normalize all blocks as a single unified list
     const normalizedBlocks = normalizeStoredBlocks(safeBlockRows);
 
-    // We still want to ensure layouts are valid for both viewports
-    const withDesktopLayouts = ensureBlocksHaveValidLayouts(
-      normalizedBlocks,
-      DESKTOP_GRID,
+    // OPTIMIZATION: For public SSR view, we trust the stored layouts if they are valid.
+    // This avoids expensive collision-detection math for every single page load.
+    const needsDesktopNormalization = normalizedBlocks.some(
+      (b) => !b.layout || typeof b.layout.x !== "number",
     );
-    const withBothLayouts = ensureBlocksHaveValidLayouts(
-      withDesktopLayouts,
-      MOBILE_GRID,
-      "mobile",
+    const needsMobileNormalization = normalizedBlocks.some(
+      (b) => !b.mobileLayout || typeof b.mobileLayout.x !== "number",
     );
 
-    return withBothLayouts;
+    let blocks = normalizedBlocks;
+
+    if (needsDesktopNormalization) {
+      blocks = ensureBlocksHaveValidLayouts(blocks, DESKTOP_GRID, "desktop");
+    }
+
+    if (needsMobileNormalization) {
+      blocks = ensureBlocksHaveValidLayouts(blocks, MOBILE_GRID, "mobile");
+    }
+
+    return blocks;
   },
 };
