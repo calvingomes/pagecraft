@@ -29,3 +29,11 @@
 .canvas :global(.react-grid-item.react-draggable-dragging) {
   z-index: 20 !important;
 }
+
+/* Grid Placeholder (Drag & Drop Highlight) */
+.canvas :global(.react-grid-placeholder) {
+  background: var(--color-light-grey) !important;
+  border: none !important;
+  border-radius: 20px !important;
+  opacity: 0.4 !important;
+}
