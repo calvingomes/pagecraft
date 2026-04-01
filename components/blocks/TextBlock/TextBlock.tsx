@@ -16,10 +16,14 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
   const initialContent = block.content?.text ?? "";
 
   const preset = block.styles?.widthPreset ?? "small";
+  const isSkinnyWide = preset === "skinnyWide";
+
   const clampClass =
-    preset === "tall" || preset === "large"
-      ? styles.clampTall
-      : styles.clampSmall;
+    isSkinnyWide
+      ? styles.skinnyWide
+      : preset === "tall" || preset === "large"
+        ? styles.clampTall
+        : styles.clampSmall;
 
   const { editor } = useBlockEditor({
     content: initialContent,

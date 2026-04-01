@@ -3,7 +3,8 @@
 import { useAuthStore } from "@/stores/auth-store";
 import styles from "./ProfileSidebar.module.css";
 import { EditorContent } from "@tiptap/react";
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { MOBILE_GRID } from "@/lib/editor-engine/grid/grid-config";
 import { htmlToText } from "@/lib/utils/htmlToText";
 import { sanitizeMinimalRTH } from "@/lib/utils/sanitizeRichText";
 import type { ProfileSidebarProps } from "./ProfileSidebar.types";
@@ -33,6 +34,22 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
   const avatarUrl = props.avatarUrl ?? "";
 
   const [showAvatarHoverToolbar, setShowAvatarHoverToolbar] = useState(false);
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+
+  useEffect(() => {
+    if (props.variant !== "view") return;
+    const el = wrapperRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0].contentRect.width;
+      if (!width) return;
+      setZoom(width < MOBILE_GRID.canvasPx ? width / MOBILE_GRID.canvasPx : 1);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [props.variant]);
 
   const avatarLetter = (() => {
     const source = (displayNameText || username || "?").trim();
@@ -70,8 +87,14 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
 
   const avatarClassName = `${styles.avatar} ${avatarShape === "square" ? styles.avatarSquare : ""}`;
 
+  const asideStyle =
+    props.variant === "view" && zoom < 1
+      ? ({ width: `${MOBILE_GRID.canvasPx}px`, zoom } as React.CSSProperties)
+      : undefined;
+
   return (
-    <aside className={`${styles.sidebar} ${styles.sidebarCenter}`}>
+    <div ref={wrapperRef}>
+    <aside className={`${styles.sidebar} ${styles.sidebarCenter}`} style={asideStyle}>
       <div className={styles.profileCard}>
         <div
           className={styles.avatarWrap}
@@ -143,5 +166,6 @@ export const ProfileSidebar = (props: ProfileSidebarProps) => {
         </div>
       </div>
     </aside>
+    </div>
   );
 };

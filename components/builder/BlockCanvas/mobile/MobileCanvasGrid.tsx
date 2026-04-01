@@ -29,15 +29,16 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
   const editor = useEditorContext();
   const snapshotRef = useRef<Record<string, { x: number; y: number }>>({});
 
-  const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const observer = new ResizeObserver((entries) => {
-      const { width } = entries[0].contentRect;
-      setScale(width && width < MOBILE_GRID.canvasPx ? width / MOBILE_GRID.canvasPx : 1);
+      const width = entries[0].contentRect.width;
+      if (!width) return;
+      setZoom(width < MOBILE_GRID.canvasPx ? width / MOBILE_GRID.canvasPx : 1);
     });
     observer.observe(el);
     return () => observer.disconnect();
@@ -107,9 +108,7 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
         style={{
           width: `${MOBILE_GRID.canvasPx}px`,
           maxWidth: "none",
-          transform: `scale(${scale})`,
-          transformOrigin: "top center",
-          margin: "0 auto",
+          zoom,
         }}
       >
         <ReactGridLayout
@@ -123,7 +122,6 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
           isResizable={false}
           isDraggable={editable}
           draggableHandle=".drag-handle"
-          transformScale={scale}
           onDragStart={handleDragStart}
           onLayoutChange={handleLayoutChange}
           onDragStop={handleDragStop}

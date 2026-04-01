@@ -17,11 +17,11 @@ export const DESKTOP_GRID: GridConfig = {
 
 export const MOBILE_GRID: GridConfig = {
   cols: 2,
-  cellPx: 220,
+  cellPx: 170,
   gapXPx: 30,
   gapYPx: 30,
-  canvasPx: 470,
+  canvasPx: 370,
   rowScale: 2,
-  subRowPx: 95,
+  subRowPx: 70,
   subRowGapPx: 30,
 };

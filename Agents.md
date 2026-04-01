@@ -146,12 +146,12 @@ type GridConfig = {
 | Field         | `DESKTOP_GRID` | `MOBILE_GRID` |
 | ------------- | -------------- | ------------- |
 | `cols`        | 4              | 2             |
-| `cellPx`      | 175            | 220           |
+| `cellPx`      | 175            | 170           |
 | `gapXPx`      | 35             | 30            |
 | `gapYPx`      | 35             | 30            |
-| `canvasPx`    | 805            | 470           |
+| `canvasPx`    | 805            | 370           |
 | `rowScale`    | 2              | 2             |
-| `subRowPx`    | 70             | 95            |
+| `subRowPx`    | 70             | 70            |
 | `subRowGapPx` | 35             | 30            |
 
 Configs are exported from `lib/editor-engine/grid/grid-config.ts`. All code should access grid values via `DESKTOP_GRID.*` or `MOBILE_GRID.*` property access.
@@ -252,7 +252,7 @@ blocks/TextBlock/
 - Hover toolbar background toggle: only `text` and `link` blocks should show the `BG` toggle control.
 - Wrapper background state is persisted in `block.styles.transparentWrapper` and rendered via `SortableBlock.module.css` `.emptyWrapper`.
 - `sectionTitle` should use transparent wrapper styling only in **view mode** (not editor mode), via the same shared wrapper decision path.
-- `sectionTitle` size is `config.canvasPx × config.subRowPx` (desktop: `875×90`, mobile: `525×120`) and occupies **half-row grid height** (`h = 0.5`) to avoid dead space below.
+- `sectionTitle` size is `config.canvasPx × config.subRowPx` (desktop: `805×70`, mobile: `370×70`) and occupies **half-row grid height** (`h = 0.5`) to avoid dead space below.
 
 ### UI Stacking & Elevation
 
@@ -268,7 +268,7 @@ blocks/TextBlock/
 - Within the desktop editor, keep the **desktop/mobile preview toggle** enabled so users can edit and preview the mobile layout from desktop.
 - `PageLayout` exposes `previewViewport` (`"desktop" | "mobile"`) and `framedMobilePreview` (boolean): editor passes `framedMobilePreview={true}` for the framed mobile preview, while view pages keep it `false` for clean public mobile layout.
 - In mobile preview mode, only page content is previewed (`ProfileSidebar` + `BlockCanvas`); editor chrome (save/signout buttons, preview toggle, bottom toolbar) remains outside the preview frame.
-- Mobile preview frame is capped to `525px` max width and intentionally styled (frame/background) to make preview boundaries explicit.
+- Mobile preview frame is sized from `MOBILE_GRID.canvasPx` (currently `370px`) and intentionally styled (frame/background) to make preview boundaries explicit.
 - Sticky sidebar styling is viewport-driven: sticky only when `data-preview="desktop"` and sidebar is not `center`.
 - Profile positioning is a desktop-only editing feature in the editor UI.
 - View page tablet mode should keep desktop-like layout behavior but render profile at the top (`center` sidebar position).

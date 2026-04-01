@@ -96,7 +96,7 @@
   text-align: left;
 }
 
-.sidebarCenter .profileCard > div:last-child {
+.sidebarCenter .profileCard>div:last-child {
   flex: 1;
   min-width: 0;
   width: 100%;
@@ -121,7 +121,8 @@
 /* Sidebar Mobile */
 @media (--bp-mobile) {
   .sidebarCenter {
-    padding: 20px 0;
+    padding: 20px 0 60px;
+    width: 100%;
   }
 
   .sidebarCenter .profileCard {
@@ -147,7 +148,7 @@
 
 /* Force mobile styles when editor is in mobile preview mode */
 :global([data-preview="mobile"]) .sidebarCenter {
-  padding: 20px 0;
+  padding: 20px 0 60px;
 }
 
 :global([data-preview="mobile"]) .sidebarCenter .profileCard {
@@ -160,18 +161,12 @@
   height: 96px;
 }
 
-:global([data-preview="mobile"])
-  .sidebarCenter
-  .nameInput
-  :global(.ProseMirror),
+:global([data-preview="mobile"]) .sidebarCenter .nameInput :global(.ProseMirror),
 :global([data-preview="mobile"]) .sidebarCenter .name {
   font-size: var(--font-size-2xl);
 }
 
-:global([data-preview="mobile"])
-  .sidebarCenter
-  .bioEditor
-  :global(.ProseMirror),
+:global([data-preview="mobile"]) .sidebarCenter .bioEditor :global(.ProseMirror),
 :global([data-preview="mobile"]) .sidebarCenter .bio {
   font-size: var(--font-size-md);
   margin-top: 12px;

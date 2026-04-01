@@ -1,10 +1,7 @@
 import type { Block } from "@/types/editor";
 
-export type WrapperRenderMode = "edit" | "view";
-
 export function shouldUseTransparentWrapper(
   block: Block,
-  mode: WrapperRenderMode,
 ): boolean {
   if (block.type === "sectionTitle") {
     return true;

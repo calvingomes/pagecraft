@@ -81,6 +81,27 @@
   max-height: calc(1.45em * 17);
 }
 
+.skinnyWide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: normal;
+  line-clamp: 1;
+  -webkit-line-clamp: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.skinnyWide :global(p) {
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .display :global(p) {
   margin: 0;
 }

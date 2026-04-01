@@ -68,8 +68,7 @@ export function SortableBlock({
 
   const widthPreset = resolvedStyles?.widthPreset ?? "small";
   const showHoverToolbar = !!editor && block.type !== "sectionTitle";
-  const renderMode = editor ? "edit" : "view";
-  const isTransparentWrapper = shouldUseTransparentWrapper(block, renderMode);
+  const isTransparentWrapper = shouldUseTransparentWrapper(block);
 
   const { widthPx, heightPx } = dimensions;
   const aspectRatio = `${widthPx} / ${heightPx}`;
