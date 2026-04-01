@@ -57,7 +57,7 @@ export const ToolbarDefault = ({
     navigator.clipboard.writeText(url);
     
     setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+    setTimeout(() => setIsCopied(false), 500);
   };
 
   return (
