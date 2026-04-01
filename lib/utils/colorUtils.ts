@@ -38,6 +38,17 @@ const COLOR_MAP: Record<string, string> = {
   "var(--color-block-bg-mint)": "#ccfbf1",
   "var(--color-block-bg-green)": "#22c55e",
   "var(--color-block-bg-dark-green)": "#14532d",
+  // Page Backgrounds
+  "var(--color-editor-page-bg-1)": "#e8e8e6",
+  "var(--color-editor-page-bg-2)": "#f4f9f2",
+  "var(--color-editor-page-bg-3)": "#fefce8",
+  "var(--color-editor-page-bg-4)": "#eff6ff",
+  "var(--color-editor-page-bg-5)": "#fdf2ff",
+  "var(--color-editor-page-bg-6)": "#fef2f2",
+  "var(--color-editor-page-bg-7)": "#f5f3ff",
+  "var(--color-editor-page-bg-8)": "#f0fdfa",
+  "var(--color-editor-page-bg-9)": "#fff7ed",
+  "var(--color-editor-page-bg-white)": "#ffffff",
 };
 
 export function deriveTextColor(bgColor: string): string {

@@ -4,9 +4,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import type { PageBackgroundId } from "@/types/page";
+import { PAGE_THEMES } from "@/lib/page-theme";
+import { deriveTextColor } from "@/lib/utils/colorUtils";
 import styles from "./Navbar.module.css";
 
-const Navbar = () => {
+const Navbar = ({ background }: { background?: PageBackgroundId }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
@@ -21,10 +24,20 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const isTransparentMobilePage = pathname === "/";
+  const segments = pathname.split("/").filter(Boolean);
+  const isTransparentMobilePage =
+    pathname === "/" ||
+    (segments.length === 1 && !["editor", "auth", "api"].includes(segments[0]));
+
+  const theme = background ? PAGE_THEMES[background] : null;
+  const derivedLogoColor = theme
+    ? deriveTextColor(theme.bg)
+    : "var(--color-white)";
 
   return (
-    <header className={`${styles.navWrapper} ${isScrolled ? styles.scrolled : ""} ${isTransparentMobilePage ? styles.transparentOnMobile : ""}`}>
+    <header
+      className={`${styles.navWrapper} ${isScrolled ? styles.scrolled : ""} ${isTransparentMobilePage ? styles.transparentOnMobile : ""}`}
+    >
       <Image
         src="/svg/corner.svg"
         alt=""
@@ -36,7 +49,15 @@ const Navbar = () => {
       <nav className={styles.nav}>
         <div className={styles.navSpacer} />
 
-        <Link href="/" className={styles.navLogo}>
+        <Link
+          href="/"
+          className={styles.navLogo}
+          style={
+            isTransparentMobilePage && !isScrolled
+              ? { color: derivedLogoColor }
+              : undefined
+          }
+        >
           PageCraft
         </Link>
       </nav>

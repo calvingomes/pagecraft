@@ -46,7 +46,7 @@ export const ClaimInput = () => {
 
       <div className={styles.buttonWrapper}>
         <ThemeButton
-          label="Claim Page"
+          label="Claim"
           cta={handleSubmit}
           icon={ArrowRight}
           bgColor="var(--color-yellow)"
