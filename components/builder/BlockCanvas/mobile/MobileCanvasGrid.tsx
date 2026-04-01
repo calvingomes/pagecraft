@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useMemo, useRef } from "react";
 import ReactGridLayout from "react-grid-layout";
 import type { Layout } from "react-grid-layout";
 import type { Block } from "@/types/editor";
@@ -10,6 +10,7 @@ import { MOBILE_GRID } from "@/lib/editor-engine/grid/grid-config";
 import { sizePxForBlock } from "@/lib/editor-engine/grid/grid-math";
 import { blockToRglItem } from "@/lib/editor-engine/rgl/blockToRglItem";
 import { rglLayoutToBlockUpdates } from "@/lib/editor-engine/rgl/rglLayoutToBlockUpdates";
+import { useResponsiveZoom } from "@/hooks/useResponsiveZoom";
 import "react-grid-layout/css/styles.css";
 import styles from "../BlockCanvas.module.css";
 
@@ -29,20 +30,7 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
   const editor = useEditorContext();
   const snapshotRef = useRef<Record<string, { x: number; y: number }>>({});
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [zoom, setZoom] = useState(1);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver((entries) => {
-      const width = entries[0].contentRect.width;
-      if (!width) return;
-      setZoom(width < MOBILE_GRID.canvasPx ? width / MOBILE_GRID.canvasPx : 1);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const { containerRef, zoom } = useResponsiveZoom(MOBILE_GRID.canvasPx);
 
   const projectedBlocks = useMemo(() => {
     return blocks.map((b) => ({

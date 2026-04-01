@@ -2,10 +2,11 @@
 /* eslint-disable css-modules/no-unused-class */
 
 import Image from "next/image";
-import React, { useState, useRef, useEffect } from "react";
+import React from "react";
 import { MOBILE_GRID } from "@/lib/editor-engine/grid/grid-config";
 import { htmlToText } from "@/lib/utils/htmlToText";
 import { sanitizeMinimalRTH } from "@/lib/utils/sanitizeRichText";
+import { useResponsiveZoom } from "@/hooks/useResponsiveZoom";
 import styles from "./ProfileSidebar.module.css";
 
 type ProfileSidebarViewProps = {
@@ -25,20 +26,7 @@ export const ProfileSidebarView = (props: ProfileSidebarViewProps) => {
   const avatarShape = props.avatarShape ?? "circle";
   const avatarUrl = props.avatarUrl ?? "";
 
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const [zoom, setZoom] = useState(1);
-
-  useEffect(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver((entries) => {
-      const width = entries[0].contentRect.width;
-      if (!width) return;
-      setZoom(width < MOBILE_GRID.canvasPx ? width / MOBILE_GRID.canvasPx : 1);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const { containerRef, zoom } = useResponsiveZoom(MOBILE_GRID.canvasPx);
 
   const avatarLetter = (() => {
     const source = (displayNameText || username || "?").trim();
@@ -49,7 +37,7 @@ export const ProfileSidebarView = (props: ProfileSidebarViewProps) => {
   const asideStyle = zoom < 1 ? ({ width: `${MOBILE_GRID.canvasPx}px`, zoom } as React.CSSProperties) : undefined;
 
   return (
-    <div ref={wrapperRef}>
+    <div ref={containerRef}>
       <aside className={`${styles.sidebar} ${styles.sidebarCenter}`} style={asideStyle}>
         <div className={styles.profileCard}>
           <div className={styles.avatarWrap}>

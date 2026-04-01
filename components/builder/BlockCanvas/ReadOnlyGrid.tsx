@@ -5,6 +5,7 @@ import type { BlockCanvasRenderMode } from "@/types/builder";
 import { DESKTOP_GRID, MOBILE_GRID } from "@/lib/editor-engine/grid/grid-config";
 import { sizePxForBlock, blockToStyle, rectForBlock } from "@/lib/editor-engine/grid/grid-math";
 import { SortableBlock } from "@/components/builder/SortableBlock/SortableBlock";
+import { useResponsiveZoom } from "@/hooks/useResponsiveZoom";
 import styles from "./BlockCanvas.module.css";
 
 type ReadOnlyGridProps = {
@@ -15,6 +16,8 @@ type ReadOnlyGridProps = {
 export const ReadOnlyGrid = ({ blocks, renderMode }: ReadOnlyGridProps) => {
   const isMobile = renderMode === "mobile";
   const config = isMobile ? MOBILE_GRID : DESKTOP_GRID;
+
+  const { containerRef, zoom } = useResponsiveZoom(MOBILE_GRID.canvasPx, isMobile);
 
   const visibleBlocks = useMemo(() => {
     return blocks
@@ -35,29 +38,33 @@ export const ReadOnlyGrid = ({ blocks, renderMode }: ReadOnlyGridProps) => {
   const containerHeight = Math.round(maxLatentY * (config.cellPx + config.gapYPx));
 
   return (
-    <div
-      className={styles.canvas}
-      style={{
-        position: "relative",
-        height: `${containerHeight}px`,
-        width: `${config.canvasPx}px`,
-        margin: "0 auto",
-      }}
-    >
-      {visibleBlocks.map((block) => {
-        const itemStyle = blockToStyle(block, config);
-        const dimensions = sizePxForBlock(block, config);
+    <div ref={containerRef} style={{ width: "100%" }}>
+      <div
+        className={styles.canvas}
+        style={{
+          position: "relative",
+          height: `${containerHeight}px`,
+          width: `${config.canvasPx}px`,
+          margin: "0 auto",
+          zoom: isMobile ? zoom : undefined,
+          maxWidth: isMobile ? "none" : undefined,
+        }}
+      >
+        {visibleBlocks.map((block) => {
+          const itemStyle = blockToStyle(block, config);
+          const dimensions = sizePxForBlock(block, config);
 
-        return (
-          <div key={block.id} style={itemStyle}>
-            <SortableBlock
-              block={block}
-              dimensions={dimensions}
-              gridConfig={config}
-            />
-          </div>
-        );
-      })}
+          return (
+            <div key={block.id} style={itemStyle}>
+              <SortableBlock
+                block={block}
+                dimensions={dimensions}
+                gridConfig={config}
+              />
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
