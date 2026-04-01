@@ -1,9 +1,10 @@
 "use client";
 
 import * as Toolbar from "@radix-ui/react-toolbar";
-import { useMemo, useCallback } from "react";
 import { EditorContent } from "@tiptap/react";
-import { Link2, Trash2 } from "lucide-react";
+import { Link2, Trash2, Upload } from "lucide-react";
+import { useMemo, useCallback, useRef, type ChangeEvent } from "react";
+import { fileToWebpDataUrl } from "@/lib/uploads/imageWebp";
 import { LinkBlock as LinkBlockType } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
 import {
@@ -23,6 +24,7 @@ import styles from "./LinkBlock.module.css";
 
 export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
   const editor = useEditorContext();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const content = block.content;
   const blockUrl = content.url ?? "";
   const titleHtml = sanitizeMinimalRTH(resolveLinkTitle(content));
@@ -40,6 +42,30 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
         metaImageRemoved: true,
       },
     });
+  };
+
+  const handlePickFile = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !editor?.onUpdateBlock) return;
+
+    try {
+      const dataUrl = await fileToWebpDataUrl(file, "link-preview.webp");
+      editor.onUpdateBlock(block.id, {
+        content: {
+          ...content,
+          imageUrl: dataUrl,
+          metaImageRemoved: false,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to process image:", error);
+    } finally {
+      event.target.value = "";
+    }
   };
 
   const { editor: titleEditor, isEmpty: isTitleEmpty } = useBlockEditor({
@@ -152,26 +178,48 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
   );
 
   const PreviewElement =
-    showPreviewImage && imageUrl ? (
+    (showPreviewImage && imageUrl) || isEditable ? (
       <div
-        className={`${styles.preview} ${isEditable ? styles.previewEditable : ""}`}
+        className={`${styles.preview} ${isEditable ? styles.previewEditable : ""} ${!imageUrl && isEditable ? styles.previewEmpty : ""}`}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className={styles.previewImg} src={imageUrl} alt="" />
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className={styles.previewImg} src={imageUrl} alt="" />
+        ) : null}
+        
         {isEditable ? (
           <>
             <div className={styles.previewOverlay} aria-hidden />
-            <Toolbar.Root aria-label="Preview image actions">
+            <Toolbar.Root className={styles.previewActions} aria-label="Preview image actions">
               <Toolbar.Button
                 type="button"
-                className={styles.previewDeleteButton}
-                onClick={handleRemoveMetaImage}
-                aria-label="Remove preview image"
-                title="Remove preview image"
+                className={styles.previewIconButton}
+                onClick={handlePickFile}
+                aria-label="Upload custom image"
+                title="Upload custom image"
               >
-                <Trash2 size={18} />
+                <Upload size={18} />
               </Toolbar.Button>
+              
+              {imageUrl ? (
+                <Toolbar.Button
+                  type="button"
+                  className={styles.previewIconButton}
+                  onClick={handleRemoveMetaImage}
+                  aria-label="Remove preview image"
+                  title="Remove preview image"
+                >
+                  <Trash2 size={18} />
+                </Toolbar.Button>
+              ) : null}
             </Toolbar.Root>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg"
+              onChange={handleFileChange}
+              hidden
+            />
           </>
         ) : null}
       </div>

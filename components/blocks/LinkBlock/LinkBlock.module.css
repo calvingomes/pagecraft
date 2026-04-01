@@ -121,11 +121,19 @@
   pointer-events: none;
 }
 
-.previewDeleteButton {
+.previewActions {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  display: flex;
+  gap: 12px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 2;
+}
+
+.previewIconButton {
   width: 36px;
   height: 36px;
   border: none;
@@ -135,13 +143,34 @@
   justify-content: center;
   background: var(--color-darker-grey);
   color: var(--color-white);
-  opacity: 0;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: transform 0.1s ease, background 0.2s;
+}
+
+.previewIconButton:hover {
+  transform: scale(1.1);
+  background: var(--color-black);
+}
+
+.previewEmpty {
+  background: var(--color-lighter-grey);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
 }
 
 .previewEditable:hover .previewOverlay,
-.previewEditable:hover .previewDeleteButton {
+.previewEditable:hover .previewActions {
+  opacity: 1;
+}
+
+/* If it's empty but editable, always show the overlay lightly so users know they can upload */
+.previewEmpty.previewEditable .previewOverlay {
+  opacity: 0.3;
+}
+
+.previewEmpty.previewEditable .previewActions {
   opacity: 1;
 }
 
