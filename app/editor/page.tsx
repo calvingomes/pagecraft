@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, Save } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useEditorStore } from "@/stores/editor-store";
 import { useAuthStore } from "@/stores/auth-store";
 import { PageService } from "@/lib/services/page.client";
@@ -63,7 +63,6 @@ export default function EditorPage() {
   const [avatarShape, setAvatarShape] = useState<AvatarShape>("circle");
   const [persistedAvatarUrl, setPersistedAvatarUrl] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
-  const [showSaveOverlay, setShowSaveOverlay] = useState(false);
   const [isEditorDataReady, setIsEditorDataReady] = useState(false);
   const [lastSavedPayload, setLastSavedPayload] =
     useState<EditorSnapshotPayload | null>(null);
@@ -228,6 +227,77 @@ export default function EditorPage() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasUnsavedChanges]);
 
+  const handleSave = useCallback(async () => {
+    if (!username || !user?.id || isSaving) return;
+
+    setIsSaving(true);
+
+    try {
+      const result = await saveEditorPage({
+        userId: user.id,
+        username,
+        background,
+        sidebarPosition: desktopSidebarPosition,
+        displayName,
+        bioHtml,
+        avatarUrl,
+        persistedAvatarUrl,
+        avatarShape,
+        blocks,
+      });
+
+      const resolvedAvatarUrl = result.avatarUrl;
+
+      if (resolvedAvatarUrl !== avatarUrl) {
+        setAvatarUrl(resolvedAvatarUrl);
+      }
+      setPersistedAvatarUrl(resolvedAvatarUrl);
+
+      const latestPayload: EditorSnapshotPayload = {
+        background,
+        sidebarPosition: desktopSidebarPosition,
+        displayName,
+        bioHtml,
+        avatarUrl: resolvedAvatarUrl,
+        persistedAvatarUrl: resolvedAvatarUrl,
+        avatarShape,
+        blocks: result.blocks,
+      };
+
+      setLastSavedPayload(latestPayload);
+      setAllBlocks(result.blocks);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown save error.";
+      console.error("Save failed:", message, error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [
+    username,
+    user?.id,
+    isSaving,
+    background,
+    desktopSidebarPosition,
+    displayName,
+    bioHtml,
+    avatarUrl,
+    persistedAvatarUrl,
+    avatarShape,
+    blocks,
+    setAllBlocks,
+  ]);
+
+  useEffect(() => {
+    if (!hasUnsavedChanges || isSaving || !isEditorDataReady) return;
+
+    const timer = setTimeout(() => {
+      handleSave();
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [currentSnapshot, hasUnsavedChanges, isSaving, isEditorDataReady, handleSave]);
+
   const handleAddBlock = async (
     blockType: BlockType,
     options?: AddBlockOptions,
@@ -297,55 +367,6 @@ export default function EditorPage() {
     setAllBlocks(normalized);
   };
 
-  const handleSave = async () => {
-    if (!username || !user?.id || isSaving) return;
-
-    setIsSaving(true);
-    setShowSaveOverlay(true);
-
-    try {
-      const result = await saveEditorPage({
-        userId: user.id,
-        username,
-        background,
-        sidebarPosition: desktopSidebarPosition,
-        displayName,
-        bioHtml,
-        avatarUrl,
-        persistedAvatarUrl,
-        avatarShape,
-        blocks,
-      });
-
-      const resolvedAvatarUrl = result.avatarUrl;
-
-      if (resolvedAvatarUrl !== avatarUrl) {
-        setAvatarUrl(resolvedAvatarUrl);
-      }
-      setPersistedAvatarUrl(resolvedAvatarUrl);
-
-      const latestPayload: EditorSnapshotPayload = {
-        background,
-        sidebarPosition: desktopSidebarPosition,
-        displayName,
-        bioHtml,
-        avatarUrl: resolvedAvatarUrl,
-        persistedAvatarUrl: resolvedAvatarUrl,
-        avatarShape,
-        blocks: result.blocks,
-      };
-
-      setLastSavedPayload(latestPayload);
-      setAllBlocks(result.blocks);
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Unknown save error.";
-      console.error("Save failed:", message, error);
-    } finally {
-      setIsSaving(false);
-      setShowSaveOverlay(false);
-    }
-  };
 
   if (loading || !authChecked || !viewportResolved || !isEditorDataReady) {
     return (
@@ -363,28 +384,13 @@ export default function EditorPage() {
     );
   }
 
-  const isOverlayOpen = showSaveOverlay;
-
   return (
     <EditorProvider
       username={username ?? null}
       onUpdateBlock={handleUpdateBlock}
       onRemoveBlock={handleRemoveBlock}
     >
-      <div
-        className={styles.editorRoot}
-        style={isOverlayOpen ? { filter: "blur(4px)" } : undefined}
-      >
-        <div className={styles.saveButtonContainer}>
-          <ThemeButton
-            label="Save"
-            cta={handleSave}
-            bgColor="var(--color-yellow)"
-            textColor="var(--color-white)"
-            disabled={isSaving || !hasUnsavedChanges}
-            icon={Save}
-          />
-        </div>
+      <div className={styles.editorRoot}>
         <div className={styles.logoutButtonContainer}>
           <ThemeButton
             label="Logout"
@@ -425,13 +431,9 @@ export default function EditorPage() {
           previewViewport={previewView}
           onViewportChange={setPreviewView}
           username={username}
+          isSaving={isSaving}
         />
       </div>
-      <OverlayPopup
-        open={showSaveOverlay}
-        title="Saving changes"
-        message="Your page is being saved."
-      />
     </EditorProvider>
   );
 }

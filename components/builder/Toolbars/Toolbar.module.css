@@ -207,3 +207,15 @@
   background: var(--color-success);
   cursor: default;
 }
+
+.copyButtonSaving {
+  background: var(--color-dark-grey);
+  color: var(--color-bluish-grey);
+  cursor: wait;
+  opacity: 0.8;
+}
+
+.copyButtonSaving:hover {
+  background: var(--color-dark-grey);
+  transform: none;
+}

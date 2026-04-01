@@ -43,6 +43,7 @@ export const Toolbar = (props: ToolbarDefaultProps) => {
     <ToolbarDefault
       {...props}
       onOpenLink={() => setMode("link")}
+      isSaving={props.isSaving}
     />
   );
 };

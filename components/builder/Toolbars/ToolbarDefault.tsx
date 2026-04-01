@@ -29,6 +29,7 @@ export const ToolbarDefault = ({
   previewViewport = "desktop",
   onViewportChange,
   username,
+  isSaving = false,
 }: ToolbarDefaultProps) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -66,13 +67,14 @@ export const ToolbarDefault = ({
         aria-label="Add block toolbar"
       >
         <Toolbar.Button
-          className={`${styles.toolButton} ${styles.copyButton} ${isCopied ? styles.copyButtonActive : ""}`}
-          title={isCopied ? "Copied!" : "Share"}
+          className={`${styles.toolButton} ${styles.copyButton} ${isCopied ? styles.copyButtonActive : ""} ${isSaving ? styles.copyButtonSaving : ""}`}
+          title={isSaving ? "Saving changes..." : isCopied ? "Copied!" : "Share"}
           type="button"
           onClick={handleCopyLink}
-          aria-label={isCopied ? "Link copied" : "Copy public link"}
+          disabled={isSaving}
+          aria-label={isSaving ? "Saving changes" : isCopied ? "Link copied" : "Copy public link"}
         >
-          {isCopied ? "Link copied!" : "Copy Link"}
+          {isSaving ? "Saving..." : isCopied ? "Link copied!" : "Copy Link"}
         </Toolbar.Button>
 
         <div className={styles.divider} />
