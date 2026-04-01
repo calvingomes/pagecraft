@@ -1,3 +1,10 @@
+.editorRoot :global(.react-grid-placeholder) {
+  background: color-mix(in srgb, var(--color-bluish-grey) 15%, transparent);
+  border: none;
+  border-radius: 12px;
+  opacity: 0.7;
+}
+
 .logoutButtonContainer {
   position: fixed;
   left: 24px;
@@ -18,4 +25,3 @@
   left: 24px;
   z-index: 50;
 }
-

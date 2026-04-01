@@ -373,7 +373,10 @@ export default function EditorPage() {
       onUpdateBlock={handleUpdateBlock}
       onRemoveBlock={handleRemoveBlock}
     >
-      <div style={isOverlayOpen ? { filter: "blur(4px)" } : undefined}>
+      <div
+        className={styles.editorRoot}
+        style={isOverlayOpen ? { filter: "blur(4px)" } : undefined}
+      >
         <div className={styles.saveButtonContainer}>
           <ThemeButton
             label="Save"
