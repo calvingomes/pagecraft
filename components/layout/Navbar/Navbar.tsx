@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useViewportMode } from "@/hooks/useViewportMode";
 import type { PageBackgroundId } from "@/types/page";
 import { PAGE_THEMES } from "@/lib/page-theme";
 import { deriveTextColor } from "@/lib/utils/colorUtils";
@@ -29,6 +30,7 @@ const Navbar = ({ background }: { background?: PageBackgroundId }) => {
     pathname === "/" ||
     (segments.length === 1 && !["editor", "auth", "api"].includes(segments[0]));
 
+  const { viewportMode, isResolved } = useViewportMode();
   const theme = background ? PAGE_THEMES[background] : null;
   const derivedLogoColor = theme
     ? deriveTextColor(theme.bg)
@@ -53,7 +55,7 @@ const Navbar = ({ background }: { background?: PageBackgroundId }) => {
           href="/"
           className={styles.navLogo}
           style={
-            isTransparentMobilePage && !isScrolled
+            isResolved && viewportMode === "mobile" && isTransparentMobilePage && !isScrolled
               ? { color: derivedLogoColor }
               : undefined
           }
