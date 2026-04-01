@@ -53,7 +53,7 @@ export function PageView({
     .map((b) => ({
       ...b,
       layout: isMobile ? (b.mobileLayout ?? b.layout) : b.layout,
-      styles: isMobile ? (b.mobileStyles ?? b.styles) : b.styles,
+      styles: isMobile ? { ...b.styles, ...b.mobileStyles } : b.styles,
     }) as Block);
 
   return (

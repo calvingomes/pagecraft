@@ -47,7 +47,7 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
     return blocks.map((b) => ({
       ...b,
       layout: b.mobileLayout ?? b.layout,
-      styles: b.mobileStyles ?? b.styles,
+      styles: { ...b.styles, ...b.mobileStyles },
     }) as Block);
   }, [blocks]);
 
@@ -119,7 +119,7 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
           rowHeight={MOBILE_GRID.subRowPx}
           margin={[MOBILE_GRID.gapXPx, MOBILE_GRID.subRowGapPx]}
           containerPadding={[0, 0]}
-          compactType={null}
+          compactType="vertical"
           isResizable={false}
           isDraggable={editable}
           draggableHandle=".drag-handle"

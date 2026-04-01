@@ -205,7 +205,7 @@ Current product behavior:
 - **Do:** Keep visual block height based on normalized content height; use quantized height for occupancy/reflow decisions.
 - **Do:** Use RGL `draggableHandle=".drag-handle"` so text editing/buttons do not trigger drags.
 - **Do:** Keep `isResizable={false}` in RGL; width changes come only from toolbar presets.
-- **Do:** Keep `compactType={null}` in RGL (compaction disabled) unless product behavior changes.
+- **Do:** Keep `compactType="vertical"` in RGL (compaction vertical) unless product behavior changes.
 - **Don't:** Add per-block collision or compaction loops directly inside component files.
 - **Don't:** Hardcode grid math (`0.5`, `200`, `25`, etc.) outside `lib/editor-engine`.
 - **Don't:** Import `MOBILE_GRID` in desktop-specific components or vice versa — keep viewport concerns separated at the component layer.

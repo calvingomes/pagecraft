@@ -21,10 +21,6 @@ export function SortableBlock({
 
   const toolbarVisible = isHovered;
 
-  const widthPreset = block.styles?.widthPreset ?? "small";
-  const showHoverToolbar = !!editor && block.type !== "sectionTitle";
-  const renderMode = editor ? "edit" : "view";
-  const isTransparentWrapper = shouldUseTransparentWrapper(block, renderMode);
   const viewport = gridConfig?.cols === 2 ? "mobile" : "desktop";
 
   const handleWidthChange = (preset: BlockWidthPreset) => {
@@ -62,12 +58,18 @@ export function SortableBlock({
     }
   };
 
+  const resolvedStyles = viewport === "mobile" 
+    ? { ...block.styles, ...block.mobileStyles } 
+    : block.styles;
+
+  const widthPreset = resolvedStyles?.widthPreset ?? "small";
+  const showHoverToolbar = !!editor && block.type !== "sectionTitle";
+  const renderMode = editor ? "edit" : "view";
+  const isTransparentWrapper = shouldUseTransparentWrapper(block, renderMode);
+
   const { widthPx, heightPx } = dimensions;
   const aspectRatio = `${widthPx} / ${heightPx}`;
-  const backgroundColor =
-    viewport === "mobile"
-      ? block.mobileStyles?.backgroundColor
-      : block.styles?.backgroundColor;
+  const backgroundColor = resolvedStyles?.backgroundColor;
 
   const textColor = deriveTextColor(
     !isTransparentWrapper

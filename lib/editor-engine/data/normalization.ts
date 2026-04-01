@@ -128,13 +128,13 @@ export function ensureBlocksHaveValidLayouts(
       const projectedPlaced = placed.map((b) => ({
         ...b,
         layout: viewport === "mobile" ? (b.mobileLayout ?? b.layout) : b.layout,
-        styles: viewport === "mobile" ? (b.mobileStyles ?? b.styles) : b.styles,
+        styles: viewport === "mobile" ? { ...b.styles, ...b.mobileStyles } : b.styles,
       }) as Block);
 
       const projectedBlock = {
         ...block,
         layout: viewport === "mobile" ? (block.mobileLayout ?? block.layout) : block.layout,
-        styles: viewport === "mobile" ? (block.mobileStyles ?? block.styles) : block.styles,
+        styles: viewport === "mobile" ? { ...block.styles, ...block.mobileStyles } : block.styles,
       } as Block;
 
       if (isValidLayout(currentLayout)) {
