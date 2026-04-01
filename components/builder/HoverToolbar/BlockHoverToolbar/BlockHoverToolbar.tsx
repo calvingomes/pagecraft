@@ -5,7 +5,6 @@ import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import * as Popover from "@radix-ui/react-popover";
 import {
-  Trash2,
   RectangleVertical,
   RectangleHorizontal,
   Square,
@@ -58,7 +57,6 @@ const WIDTH_PRESETS: BlockHoverToolbarIcons[] = [
 ];
 
 export function BlockHoverToolbar({
-  blockId,
   blockType,
   currentPreset = "small",
   currentBackgroundColor,
@@ -70,9 +68,6 @@ export function BlockHoverToolbar({
   const editor = useEditorContext();
   if (!editor) return null;
 
-  const handleDelete = () => {
-    editor.onRemoveBlock(blockId);
-  };
 
   const visiblePresets = WIDTH_PRESETS.filter((item) => {
     if (item.preset === "max" && viewport === "mobile") {
@@ -141,16 +136,6 @@ export function BlockHoverToolbar({
           />
         </Popover.Content>
       </Popover.Root>
-      <div className={styles.divider} />
-      <Toolbar.Button
-        type="button"
-        title="Delete block"
-        aria-label="Delete block"
-        onClick={handleDelete}
-        className={styles.deleteButton}
-      >
-        <Trash2 size={20} className={styles.sizeIcon} />
-      </Toolbar.Button>
     </Toolbar.Root>
   );
 }

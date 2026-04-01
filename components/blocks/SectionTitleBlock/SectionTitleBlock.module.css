@@ -23,23 +23,6 @@
   color: color-mix(in srgb, var(--block-text-color, var(--color-black)), transparent 65%);
 }
 
-.deleteButton {
-  width: 45px;
-  height: 45px;
-  border: none;
-  border-radius: 8px;
-  background: var(--color-danger);
-  color: var(--color-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 10;
-  position: relative;
-}
-
 .frame:hover .input,
 .input:focus {
   outline: none;
@@ -48,12 +31,6 @@
     var(--block-bg-color, var(--color-white)),
     black 12%
   );
-}
-
-.frame:hover .deleteButton,
-.frame:focus-within .deleteButton {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 .display {
