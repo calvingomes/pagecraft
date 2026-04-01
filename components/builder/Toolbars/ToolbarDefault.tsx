@@ -28,8 +28,10 @@ export const ToolbarDefault = ({
   showSidebarPositionControls = true,
   previewViewport = "desktop",
   onViewportChange,
+  username,
 }: ToolbarDefaultProps) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const [toolbarWidth, setToolbarWidth] = useState<number | null>(null);
   const toolbarContainerRef = useRef<HTMLDivElement | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
@@ -54,12 +56,33 @@ export const ToolbarDefault = ({
     event.currentTarget.value = "";
   };
 
+  const handleCopyLink = () => {
+    if (!username) return;
+    const url = `${window.location.protocol}//${window.location.host}/${username}`;
+    navigator.clipboard.writeText(url);
+    
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 3000);
+  };
+
   return (
     <div className={styles.toolbarContainer} ref={toolbarContainerRef}>
       <Toolbar.Root
         className={styles.toolbarContent}
         aria-label="Add block toolbar"
       >
+        <Toolbar.Button
+          className={`${styles.toolButton} ${styles.copyButton} ${isCopied ? styles.copyButtonActive : ""}`}
+          title={isCopied ? "Copied!" : "Share"}
+          type="button"
+          onClick={handleCopyLink}
+          aria-label={isCopied ? "Link copied" : "Copy public link"}
+        >
+          {isCopied ? "Link copied!" : "Copy Link"}
+        </Toolbar.Button>
+
+        <div className={styles.divider} />
+
         <Toolbar.Button
           className={styles.toolButton}
           title="Text"

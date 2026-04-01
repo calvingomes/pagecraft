@@ -424,6 +424,7 @@ export default function EditorPage() {
           showSidebarPositionControls={isDesktopEditing}
           previewViewport={previewView}
           onViewportChange={setPreviewView}
+          username={username}
         />
       </div>
       <OverlayPopup

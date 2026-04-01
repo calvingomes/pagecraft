@@ -196,3 +196,23 @@
   margin: 0 4px;
   align-self: center;
 }
+
+.copyButton {
+  background: var(--color-success);
+  width: auto;
+  min-width: 110px;
+  padding: 0 14px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-white);
+}
+
+.copyButton:hover {
+  background: color-mix(in srgb, var(--color-success) 85%, var(--color-black));
+  transform: scale(1.02);
+}
+
+.copyButtonActive {
+  background: var(--color-success);
+  cursor: default;
+}
