@@ -37,6 +37,8 @@ export function Footer() {
             <Link href="#" className={styles.footerBottomLink}>Privacy</Link>
             <span className={styles.footerDot}>·</span>
             <Link href="#" className={styles.footerBottomLink}>Terms</Link>
+            <span className={styles.footerDot}>·</span>
+            <Link href="#" className={styles.footerBottomLink}>Cookie Policy</Link>
           </div>
         </div>
 
