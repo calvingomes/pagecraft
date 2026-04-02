@@ -37,10 +37,6 @@ export const ToolbarDefault = ({
   const [isCopied, setIsCopied] = useState(false);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handlePaletteMouseLeave = () => {
-    setIsPaletteOpen(false);
-  };
-
   const handleImageClick = () => {
     imageInputRef.current?.click();
   };
@@ -129,7 +125,6 @@ export const ToolbarDefault = ({
               type="button"
               data-toolbar-role="palette"
               aria-label="Background color"
-              onMouseLeave={handlePaletteMouseLeave}
             >
               <Palette size={18} />
             </Toolbar.Button>
@@ -140,7 +135,6 @@ export const ToolbarDefault = ({
               align="center"
               sideOffset={14}
               className={styles.popoverContent}
-              onMouseLeave={handlePaletteMouseLeave}
             >
               <ToolbarPalette
                 background={background}
