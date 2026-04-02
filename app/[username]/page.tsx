@@ -30,7 +30,11 @@ export default async function UserPage({ params }: Props) {
 
   return (
     <>
-      <Navbar background={page.background as PageBackgroundId} />
+      <Navbar
+        background={page.background as PageBackgroundId}
+        links={[{ label: "About", href: "/", position: "left" }]}
+        cta={{ label: "Create your own", href: "/" }}
+      />
       <PageView
         username={username}
         title={(page.title as string | undefined) ?? undefined}

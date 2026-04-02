@@ -3,19 +3,26 @@
 import Link from "next/link";
 import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { ArrowRight } from "lucide-react";
+import type { NavLink, NavCTA } from "@/types/nav";
 import styles from "./DesktopNav.module.css";
 
 interface DesktopNavProps {
-  isScrolled: boolean;
+  links?: NavLink[];
+  cta?: NavCTA;
 }
 
-export const DesktopNav = ({ isScrolled }: DesktopNavProps) => {
+export const DesktopNav = ({ links = [], cta }: DesktopNavProps) => {
+  const leftLinks = links.filter((link) => (link.position ?? "left") === "left");
+  const rightLinks = links.filter((link) => link.position === "right");
+
   return (
     <div className={styles.desktopNav}>
       <div className={styles.navLeft}>
-        <Link href="/auth" className={styles.navLink}>
-          Updates
-        </Link>
+        {leftLinks.map((link) => (
+          <Link key={link.href} href={link.href} className={styles.navLink}>
+            {link.label}
+          </Link>
+        ))}
       </div>
 
       <Link href="/" className={styles.navLogo}>
@@ -23,15 +30,22 @@ export const DesktopNav = ({ isScrolled }: DesktopNavProps) => {
       </Link>
 
       <div className={styles.navRight}>
-        <ThemeButton
-          label="Sign up"
-          cta="/auth"
-          bgColor="var(--color-success)"
-          textColor="var(--color-white)"
-          buttonWidth="auto"
-          size="small"
-          icon={ArrowRight}
-        />
+        {rightLinks.map((link) => (
+          <Link key={link.href} href={link.href} className={styles.navLink}>
+            {link.label}
+          </Link>
+        ))}
+        {cta && (
+          <ThemeButton
+            label={cta.label}
+            cta={cta.href}
+            bgColor="var(--color-success)"
+            textColor="var(--color-white)"
+            buttonWidth="auto"
+            size="small"
+            icon={ArrowRight}
+          />
+        )}
       </div>
     </div>
   );

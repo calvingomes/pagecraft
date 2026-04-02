@@ -4,18 +4,25 @@ import { useState } from "react";
 import Link from "next/link";
 import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { ArrowRight, Menu, X } from "lucide-react";
+import type { NavLink, NavCTA } from "@/types/nav";
 import styles from "./MobileNav.module.css";
 
 interface MobileNavProps {
   isScrolled: boolean;
   isTransparentMobile: boolean;
   derivedLogoColor: string;
+  links?: NavLink[];
+  cta?: NavCTA;
+  secondaryCTA?: NavCTA;
 }
 
 export const MobileNav = ({
   isScrolled,
   isTransparentMobile,
   derivedLogoColor,
+  links = [],
+  cta,
+  secondaryCTA,
 }: MobileNavProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMenuClosing, setIsMenuClosing] = useState(false);
@@ -79,40 +86,40 @@ export const MobileNav = ({
             </div>
 
             <div className={styles.mobileMenuLinks}>
-              <Link
-                href="/auth"
-                className={styles.mobileMenuLink}
-                onClick={handleCloseMenu}
-              >
-                Updates
-              </Link>
-              <Link
-                href="/editor"
-                className={styles.mobileMenuLink}
-                onClick={handleCloseMenu}
-              >
-                Editor
-              </Link>
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={styles.mobileMenuLink}
+                  onClick={handleCloseMenu}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
 
             <div className={styles.mobileMenuFooter}>
-              <Link
-                href="/auth"
-                className={styles.mobileMenuLinkInline}
-                onClick={handleCloseMenu}
-              >
-                Sign in
-              </Link>
+              {secondaryCTA && (
+                <Link
+                  href={secondaryCTA.href}
+                  className={styles.mobileMenuLinkInline}
+                  onClick={handleCloseMenu}
+                >
+                  {secondaryCTA.label}
+                </Link>
+              )}
 
-              <ThemeButton
-                label="Sign up for free"
-                cta="/auth"
-                bgColor="var(--color-success)"
-                textColor="var(--color-white)"
-                buttonWidth="auto"
-                size="medium"
-                icon={ArrowRight}
-              />
+              {cta && (
+                <ThemeButton
+                  label={cta.label}
+                  cta={cta.href}
+                  bgColor="var(--color-success)"
+                  textColor="var(--color-white)"
+                  buttonWidth="auto"
+                  size="medium"
+                  icon={ArrowRight}
+                />
+              )}
             </div>
           </div>
         </div>

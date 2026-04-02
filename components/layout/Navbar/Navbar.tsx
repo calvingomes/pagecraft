@@ -1,20 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useViewportMode } from "@/hooks/useViewportMode";
 import type { PageBackgroundId } from "@/types/page";
 import { PAGE_THEMES } from "@/lib/page-theme";
 import { deriveTextColor } from "@/lib/utils/colorUtils";
-import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
-import { ArrowRight, Menu, X } from "lucide-react";
 import { DesktopNav } from "./nav/DesktopNav";
 import { MobileNav } from "./nav/MobileNav";
+import type { NavLink, NavCTA } from "@/types/nav";
 import styles from "./Navbar.module.css";
 
-const Navbar = ({ background }: { background?: PageBackgroundId }) => {
+interface NavbarProps {
+  background?: PageBackgroundId;
+  links?: NavLink[];
+  cta?: NavCTA;
+  secondaryCTA?: NavCTA;
+}
+
+const Navbar = ({
+  background,
+  links = [],
+  cta,
+  secondaryCTA,
+}: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
 
@@ -56,13 +66,16 @@ const Navbar = ({ background }: { background?: PageBackgroundId }) => {
       />
       <nav className={styles.nav}>
         <div className={styles.desktopOnly}>
-          <DesktopNav isScrolled={isScrolled} />
+          <DesktopNav links={links} cta={cta} />
         </div>
         <div className={styles.mobileOnly}>
           <MobileNav
             isScrolled={isScrolled}
             isTransparentMobile={isTransparentMobile}
             derivedLogoColor={derivedLogoColor}
+            links={links}
+            cta={cta}
+            secondaryCTA={secondaryCTA}
           />
         </div>
       </nav>

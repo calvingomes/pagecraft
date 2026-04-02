@@ -66,7 +66,7 @@ function AuthPageContent() {
 
   return (
     <>
-      <Navbar />
+      <Navbar links={[{ label: "Home", href: "/", position: "left" }]} />
       <AuthView
         handleGoogleSignIn={handleGoogleSignIn}
         initialUsername={initialUsername}
