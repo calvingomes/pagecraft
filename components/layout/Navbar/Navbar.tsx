@@ -37,12 +37,14 @@ const Navbar = ({ background }: { background?: PageBackgroundId }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const { viewportMode, isResolved } = useViewportMode();
   const segments = pathname.split("/").filter(Boolean);
-  const isTransparentMobilePage =
+  const isHomeOrUserPage =
     pathname === "/" ||
     (segments.length === 1 && !["editor", "auth", "api"].includes(segments[0]));
+  const isTransparentMobile =
+    isHomeOrUserPage && isResolved && viewportMode === "mobile";
 
-  const { viewportMode, isResolved } = useViewportMode();
   const theme = background ? PAGE_THEMES[background] : null;
   const derivedLogoColor = theme
     ? deriveTextColor(theme.bg)
@@ -50,7 +52,7 @@ const Navbar = ({ background }: { background?: PageBackgroundId }) => {
 
   return (
     <header
-      className={`${styles.navWrapper} ${isScrolled ? styles.scrolled : ""} ${isTransparentMobilePage ? styles.transparentOnMobile : ""}`}
+      className={`${styles.navWrapper} ${isScrolled ? styles.scrolled : ""} ${isTransparentMobile ? styles.transparentOnMobile : ""}`}
     >
       <Image
         src="/svg/corner.svg"
@@ -71,10 +73,7 @@ const Navbar = ({ background }: { background?: PageBackgroundId }) => {
           href="/"
           className={styles.navLogo}
           style={
-            isResolved &&
-            viewportMode === "mobile" &&
-            isTransparentMobilePage &&
-            !isScrolled
+            isTransparentMobile && !isScrolled
               ? { color: derivedLogoColor }
               : undefined
           }
@@ -87,17 +86,17 @@ const Navbar = ({ background }: { background?: PageBackgroundId }) => {
             label="Sign up"
             cta="/auth"
             bgColor={
-              isTransparentMobilePage && !isScrolled
+              isTransparentMobile && !isScrolled
                 ? "transparent"
                 : "var(--color-success)"
             }
             textColor={
-              isTransparentMobilePage && !isScrolled
+              isTransparentMobile && !isScrolled
                 ? "var(--color-white)"
                 : "var(--color-white)"
             }
             borderColor={
-              isTransparentMobilePage && !isScrolled
+              isTransparentMobile && !isScrolled
                 ? "rgba(255, 255, 255, 0.4)"
                 : undefined
             }
