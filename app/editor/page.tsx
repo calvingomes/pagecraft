@@ -272,7 +272,20 @@ export default function EditorPage() {
       };
 
       setLastSavedPayload(latestPayload);
-      setAllBlocks(result.blocks);
+
+      // Patch only blocks whose content was mutated during save (e.g. data URL → CDN URL).
+      // Using getState() avoids overwriting edits made while the save was in-flight.
+      const sentById = new Map(blocks.map((b) => [b.id, b]));
+      const resolvedById = new Map(result.blocks.map((b) => [b.id, b]));
+      const liveBlocks = useEditorStore.getState().blocks;
+      const patched = liveBlocks.map((block) => {
+        const sent = sentById.get(block.id);
+        const saved = resolvedById.get(block.id);
+        if (!sent || !saved) return block;
+        if (JSON.stringify(sent.content) === JSON.stringify(saved.content)) return block;
+        return { ...block, content: saved.content } as Block;
+      });
+      setAllBlocks(patched);
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unknown save error.";
