@@ -9,6 +9,7 @@ import { useEditorContext } from "@/contexts/EditorContext";
 
 export const LinkShare = ({ username, isSaving }: LinkShareProps) => {
   const [isCopied, setIsCopied] = useState(false);
+  const [showDesktopReminder, setShowDesktopReminder] = useState(false);
   const editor = useEditorContext();
   const isActualMobile = editor?.isActualMobile ?? false;
 
@@ -20,7 +21,14 @@ export const LinkShare = ({ username, isSaving }: LinkShareProps) => {
     navigator.clipboard.writeText(url);
 
     setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+    if (isActualMobile) {
+      setShowDesktopReminder(true);
+    }
+    
+    setTimeout(() => {
+      setIsCopied(false);
+      setShowDesktopReminder(false);
+    }, 4000);
   };
 
   if (!username) return null;
@@ -43,6 +51,12 @@ export const LinkShare = ({ username, isSaving }: LinkShareProps) => {
           {isCopied ? <Check size={16} /> : <Copy size={16} />}
         </div>
       </Tooltip>
+
+      {showDesktopReminder && (
+        <div className={styles.mobileToast}>
+          Open on desktop/laptop to edit desktop view
+        </div>
+      )}
     </div>
   );
 };
