@@ -30,6 +30,7 @@ export const LinkTitleEditor = ({ block, onUpdate, titleHtml }: LinkTitleEditorP
     content: titleHtml,
     placeholder: "Write Title...",
     editable: true,
+    autofocus: "end",
     onUpdate: (html) => {
       onUpdate({ content: { ...content, title: html } });
     },

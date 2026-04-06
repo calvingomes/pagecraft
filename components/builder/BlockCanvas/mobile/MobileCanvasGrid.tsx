@@ -16,14 +16,14 @@ import styles from "../BlockCanvas.module.css";
 
 type MobileCanvasGridProps =
   | {
-      editable: true;
-      blocks: Block[];
-      onUpdateBlock: (id: string, updates: Partial<Block>) => void;
-    }
+    editable: true;
+    blocks: Block[];
+    onUpdateBlock: (id: string, updates: Partial<Block>) => void;
+  }
   | {
-      editable: false;
-      blocks: Block[];
-    };
+    editable: false;
+    blocks: Block[];
+  };
 
 export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
   const { editable, blocks } = props;
@@ -93,6 +93,12 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
     <div ref={containerRef} className={styles.mobileCanvasWrapper}>
       <div
         className={styles.canvas}
+        onClick={() => {
+          if (editable && editor) {
+            editor.onSelectBlock(null);
+            editor.onFocusBlock(null);
+          }
+        }}
         style={{
           width: `${MOBILE_GRID.canvasPx}px`,
           maxWidth: "none",

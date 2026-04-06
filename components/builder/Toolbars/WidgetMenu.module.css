@@ -13,6 +13,13 @@
   outline: none;
 }
 
+.popoverContent[data-is-actual-mobile="true"] {
+  width: calc(100vw - 32px);
+  max-width: 400px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
 .searchContainer {
   position: relative;
   width: 100%;
@@ -66,6 +73,10 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px;
+}
+
+.popoverContent[data-is-actual-mobile="true"] .grid {
+  grid-template-columns: 1fr;
 }
 
 .widgetCard {

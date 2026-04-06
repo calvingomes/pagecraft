@@ -70,3 +70,35 @@
   box-sizing: border-box;
   flex: 1;
 }
+
+.wrapper.selected {
+  outline: 2px solid var(--color-purple);
+  outline-offset: -2px;
+  overflow: visible;
+}
+
+.mobileDragHandle {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  width: 32px;
+  height: 32px;
+  background: var(--color-purple);
+  color: var(--color-white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: grab;
+  touch-action: none;
+}
+
+.mobileDragHandle:active {
+  cursor: grabbing;
+}
+
+.selectedZone {
+  z-index: 100 !important;
+}

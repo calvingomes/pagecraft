@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useEditorContext } from "@/contexts/EditorContext";
 import { SectionTitleBlock as SectionTitleBlockType } from "@/types/editor";
+import { MOBILE_MAX_WIDTH } from "@/lib/editor-engine/data/viewport";
 import styles from "./SectionTitleBlock.module.css";
 
 export const SectionTitleBlock = ({
@@ -22,10 +23,16 @@ export const SectionTitleBlock = ({
     setLocalTitle(initialTitle);
   }, [initialTitle]);
 
-  if (!editable) {
+  const isMobileViewport = typeof window !== 'undefined' && window.innerWidth <= MOBILE_MAX_WIDTH;
+  const isFocused = editor?.focusedBlockId === block.id;
+  const showEditor = !isMobileViewport || isFocused;
+
+  if (!editable || !showEditor) {
     return initialTitle.trim() ? (
       <div className={styles.display}>{initialTitle.trim()}</div>
-    ) : null;
+    ) : (
+      editable ? <div className={styles.displayPlaceholder}>Add section title...</div> : null
+    );
   }
 
   return (
@@ -36,6 +43,7 @@ export const SectionTitleBlock = ({
         className={styles.input}
         placeholder="Add section title..."
         value={localTitle}
+        autoFocus
         onChange={(event) => {
           const next = event.target.value;
           setLocalTitle(next);

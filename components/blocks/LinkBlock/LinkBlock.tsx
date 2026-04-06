@@ -14,6 +14,7 @@ import {
   sanitizeMinimalRTH,
 } from "@/lib/utils/sanitizeRichText";
 import { getCacheBustedUrl } from "@/lib/utils/imageUtils";
+import { MOBILE_MAX_WIDTH } from "@/lib/editor-engine/data/viewport";
 import styles from "./LinkBlock.module.css";
 
 const LinkTitleEditor = dynamic(
@@ -29,6 +30,11 @@ const LinkImageEditor = dynamic(
 export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
   const editor = useEditorContext();
   const isEditable = !!editor;
+
+  const isMobileViewport = typeof window !== 'undefined' && window.innerWidth <= MOBILE_MAX_WIDTH;
+  const isFocused = editor?.focusedBlockId === block.id;
+  const showEditor = !isMobileViewport || isFocused;
+
   const content = block.content;
   const blockUrl = content.url ?? "";
   const titleHtml = sanitizeMinimalRTH(resolveLinkTitle(content));
@@ -59,12 +65,12 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
   const isCompact = widthPreset === "small" || widthPreset === "skinnyWide";
 
   const PreviewElement = (imageUrl || isEditable) && !isCompact ? (
-    <div className={`${styles.preview} ${isEditable ? styles.previewEditable : ""} ${!imageUrl && isEditable ? styles.previewEmpty : ""}`}>
+    <div className={`${styles.preview} ${isEditable && showEditor ? styles.previewEditable : ""} ${!imageUrl && isEditable ? styles.previewEmpty : ""}`}>
       {imageUrl && (
         // eslint-disable-next-line @next/next/no-img-element
         <img className={styles.previewImg} src={imageUrl} alt="" />
       )}
-      {isEditable && (
+      {isEditable && showEditor && (
         <LinkImageEditor
           block={block}
           onUpdate={(updates) => editor?.onUpdateBlock(block.id, updates)}
@@ -73,7 +79,7 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
     </div>
   ) : null;
 
-  const TitleElement = isEditable ? (
+  const TitleElement = isEditable && showEditor ? (
     <LinkTitleEditor
       block={block}
       titleHtml={titleHtml}

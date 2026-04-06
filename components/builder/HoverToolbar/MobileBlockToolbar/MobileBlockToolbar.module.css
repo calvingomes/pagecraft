@@ -1,0 +1,147 @@
+.mobileToolbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-darkest-grey);
+  border-top: 1px solid var(--color-dark-grey);
+  padding: 16px;
+  z-index: 2000;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.leftActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rightActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sizeGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-darker-grey);
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.sizeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--color-bluish-grey);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sizeButton.active {
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--color-darker-grey);
+  color: var(--color-white);
+  border-radius: 12px;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+
+.doneButton {
+  background: var(--color-purple);
+  color: var(--color-white);
+}
+
+
+.popoverContent {
+  background: var(--color-darkest-grey);
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid var(--color-dark-grey);
+  z-index: 3000;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  width: 280px;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-bluish-grey);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.popoverInput {
+  background: var(--color-darker-grey);
+  border: 1px solid var(--color-dark-grey);
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--color-white);
+  font-size: 15px;
+  width: 100%;
+}
+
+.popoverInput:focus {
+  outline: none;
+  border-color: var(--color-purple);
+}
+
+.hasValue {
+  background: var(--color-purple-faded, color-mix(in srgb, var(--color-purple), transparent 80%));
+  color: var(--color-purple-light, color-mix(in srgb, var(--color-purple), var(--color-white) 40%));
+}
+
+.sizeTrigger {
+  background: var(--color-darker-grey);
+  border: 1px solid var(--color-dark-grey);
+}
+
+.sizePopoverContent {
+  background: var(--color-darkest-grey);
+  padding: 4px;
+  border-radius: 16px;
+  border: 1px solid var(--color-dark-grey);
+  z-index: 3000;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

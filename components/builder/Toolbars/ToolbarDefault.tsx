@@ -16,6 +16,7 @@ import type { ToolbarDefaultProps } from "./Toolbar.types";
 import { ToolbarPalette } from "./ToolbarPalette";
 import { Tooltip } from "@/components/ui/Tooltip/Tooltip";
 import { WidgetMenu } from "./WidgetMenu";
+import { useEditorContext } from "@/contexts/EditorContext";
 
 export const ToolbarDefault = ({
   onAddBlock,
@@ -31,6 +32,8 @@ export const ToolbarDefault = ({
 }: ToolbarDefaultProps) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
+  const editor = useEditorContext();
+  const isActualMobile = editor?.isActualMobile ?? false;
 
   const handleImageClick = () => {
     imageInputRef.current?.click();
@@ -90,25 +93,29 @@ export const ToolbarDefault = ({
             </Popover.Content>
           </Popover.Portal>
         </Popover.Root>
-        <div className={styles.divider} />
-        <TogglePill
-          value={previewViewport}
-          onChange={onViewportChange || (() => { })}
-          variant="toolbar"
-          showBackground={false}
-          options={[
-            {
-              value: "desktop",
-              label: <Laptop size={20} />,
-              ariaLabel: "Preview desktop view",
-            },
-            {
-              value: "mobile",
-              label: <Smartphone size={20} />,
-              ariaLabel: "Preview mobile view",
-            },
-          ]}
-        />
+        {!isActualMobile && (
+          <>
+            <div className={styles.divider} />
+            <TogglePill
+              value={previewViewport}
+              onChange={onViewportChange || (() => { })}
+              variant="toolbar"
+              showBackground={false}
+              options={[
+                {
+                  value: "desktop",
+                  label: <Laptop size={20} />,
+                  ariaLabel: "Preview desktop view",
+                },
+                {
+                  value: "mobile",
+                  label: <Smartphone size={20} />,
+                  ariaLabel: "Preview mobile view",
+                },
+              ]}
+            />
+          </>
+        )}
         <div className={styles.divider} />
         <Tooltip content="Sign out" side="top">
           <Toolbar.Button

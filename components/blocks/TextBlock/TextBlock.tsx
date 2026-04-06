@@ -8,6 +8,7 @@ import {
   minimalRTHtmlToInlineForClamp,
   sanitizeMinimalRTH,
 } from "@/lib/utils/sanitizeRichText";
+import { MOBILE_MAX_WIDTH } from "@/lib/editor-engine/data/viewport";
 import styles from "./TextBlock.module.css";
 
 const TextBlockEditor = dynamic(
@@ -29,17 +30,26 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
         ? styles.clampTall
         : styles.clampSmall;
 
+  // Selection/Focus state
+  const focusedBlockId = contextEditor?.focusedBlockId;
+  const isFocused = focusedBlockId === block.id;
+
   if (editable) {
-    return (
-      <TextBlockEditor
-        block={block}
-        onUpdate={(html) => {
-          contextEditor?.onUpdateBlock(block.id, {
-            content: { text: html },
-          });
-        }}
-      />
-    );
+    const isMobileViewport = typeof window !== 'undefined' && window.innerWidth <= MOBILE_MAX_WIDTH;
+    const shouldShowEditor = !isMobileViewport || isFocused;
+
+    if (shouldShowEditor) {
+      return (
+        <TextBlockEditor
+          block={block}
+          onUpdate={(html) => {
+            contextEditor?.onUpdateBlock(block.id, {
+              content: { text: html },
+            });
+          }}
+        />
+      );
+    }
   }
 
   const html = block.content?.text ?? "";

@@ -42,10 +42,10 @@
   --color-editor-page-avatar-7: #a78bfa;
   --color-editor-page-avatar-8: #5eead4;
   --color-editor-page-avatar-9: #fdba74;
-  
+
   --color-editor-page-bg-white: var(--color-white);
   --color-editor-page-avatar-white: #e5e7eb;
-  
+
   /* Block background palette */
   --color-block-bg-white: #ffffff;
   --color-block-bg-light-grey: #f3f4f6;
@@ -55,7 +55,7 @@
   --color-block-bg-yellow: #fde047;
   --color-block-bg-orange: #f97316;
   --color-block-bg-red: #ef4444;
-  
+
   --color-block-bg-dark-grey: #4b5563;
   --color-block-bg-black: #000000;
   --color-block-bg-lavender: #e0e7ff;

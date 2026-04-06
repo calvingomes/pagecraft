@@ -14,20 +14,14 @@ import type {
   SidebarPosition,
 } from "@/types/page";
 import { AuthService } from "@/lib/services/auth.client";
-import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
-import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
-import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
-import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 import { OverlayPopup } from "@/components/layout/OverlayPopup/OverlayPopup";
 import { ensureBlocksHaveValidLayoutsForAllViewports } from "@/lib/editor-engine/data/normalization";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEditorViewportPreview } from "@/hooks/useEditorViewportPreview";
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
-import { LinkShare } from "@/components/builder/LinkShare/LinkShare";
 import { saveEditorPage } from "@/lib/editor/saveEditorPage";
 import { prepareImageBlockOptions } from "@/lib/editor/prepareImageBlockOptions";
 import { PageLoader } from "@/components/ui/PageLoader/PageLoader";
-import styles from "./editor.module.css";
 
 type EditorSnapshotPayload = {
   background: PageBackgroundId;
@@ -43,6 +37,28 @@ type EditorSnapshotPayload = {
 const serializeSnapshot = (payload: EditorSnapshotPayload) =>
   JSON.stringify(payload);
 
+import { DesktopEditor } from "@/components/builder/Editor/DesktopEditor";
+import { MobileEditor } from "@/components/builder/Editor/MobileEditor";
+
+const getDefaultContent = (
+  type: BlockType,
+  options?: AddBlockOptions,
+): Block["content"] => {
+  switch (type) {
+    case "text":
+      return { text: "" };
+    case "link":
+      return {
+        url: options?.url ?? "",
+        title: options?.title ?? "",
+      };
+    case "image":
+      return { url: options?.url ?? "", alt: options?.alt ?? "" };
+    case "sectionTitle":
+      return { title: "" };
+  }
+};
+
 export default function EditorPage() {
   const router = useRouter();
   const { username, user, loading, setLoading } = useAuthStore();
@@ -51,7 +67,12 @@ export default function EditorPage() {
   const blocks = useEditorStore((s) => s.blocks);
   const setAllBlocks = useEditorStore((s) => s.setAllBlocks);
   const setActiveViewportMode = useEditorStore((s) => s.setActiveViewportMode);
+  const setIsActualMobile = useEditorStore((s) => s.setIsActualMobile);
   const updateBlock = useEditorStore((s) => s.updateBlock);
+  const selectedBlockId = useEditorStore((s) => s.selectedBlockId);
+  const focusedBlockId = useEditorStore((s) => s.focusedBlockId);
+  const selectBlock = useEditorStore((s) => s.selectBlock);
+  const focusBlock = useEditorStore((s) => s.focusBlock);
 
   const [background, setBackground] = useState<PageBackgroundId>("page-bg-1");
   const [desktopSidebarPosition, setDesktopSidebarPosition] =
@@ -65,6 +86,20 @@ export default function EditorPage() {
   const [isEditorDataReady, setIsEditorDataReady] = useState(false);
   const [lastSavedPayload, setLastSavedPayload] =
     useState<EditorSnapshotPayload | null>(null);
+
+  const {
+    screenView,
+    canUseEditor,
+    previewView,
+    setPreviewView,
+    viewportResolved,
+  } = useEditorViewportPreview();
+
+  const isActualMobile = screenView === "mobile";
+
+  useEffect(() => {
+    setIsActualMobile(isActualMobile);
+  }, [isActualMobile, setIsActualMobile]);
 
   const currentSnapshot = useMemo(
     () =>
@@ -93,20 +128,6 @@ export default function EditorPage() {
   const hasUnsavedChanges =
     lastSavedPayload !== null &&
     currentSnapshot !== serializeSnapshot(lastSavedPayload);
-
-  const handleLogout = async () => {
-    await AuthService.signOut();
-    logout();
-    router.replace("/auth");
-  };
-
-  const {
-    screenView,
-    canUseEditor,
-    previewView,
-    setPreviewView,
-    viewportResolved,
-  } = useEditorViewportPreview();
 
   const activeEditorMode =
     screenView === "mobile"
@@ -185,7 +206,6 @@ export default function EditorPage() {
         const blocks = await BlockService.getBlocksForPage(username);
         if (!active) return;
 
-        // Run full normalization for BOTH viewports during hydration
         const normalized = ensureBlocksHaveValidLayoutsForAllViewports(blocks);
         setAllBlocks(normalized);
 
@@ -274,8 +294,6 @@ export default function EditorPage() {
 
       setLastSavedPayload(latestPayload);
 
-      // Patch only blocks whose content was mutated during save (e.g. data URL → CDN URL).
-      // Using getState() avoids overwriting edits made while the save was in-flight.
       const sentById = new Map(blocks.map((b) => [b.id, b]));
       const resolvedById = new Map(result.blocks.map((b) => [b.id, b]));
       const liveBlocks = useEditorStore.getState().blocks;
@@ -315,7 +333,7 @@ export default function EditorPage() {
 
     const timer = setTimeout(() => {
       handleSave();
-    },2000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [currentSnapshot, hasUnsavedChanges, isSaving, isEditorDataReady, handleSave]);
@@ -353,30 +371,9 @@ export default function EditorPage() {
       styles: { widthPreset },
     } as Block;
 
-    // Use the robust normalization engine to calculate safe layouts for both
-    // viewports simultaneously and resolve any existing collisions instantly.
     const nextBlocks = [...blocks, newBlock];
     const normalized = ensureBlocksHaveValidLayoutsForAllViewports(nextBlocks);
     setAllBlocks(normalized);
-  };
-
-  const getDefaultContent = (
-    type: BlockType,
-    options?: AddBlockOptions,
-  ): Block["content"] => {
-    switch (type) {
-      case "text":
-        return { text: "" };
-      case "link":
-        return {
-          url: options?.url ?? "",
-          title: options?.title ?? "",
-        };
-      case "image":
-        return { url: options?.url ?? "", alt: options?.alt ?? "" };
-      case "sectionTitle":
-        return { title: "" };
-    }
   };
 
   const handleUpdateBlock = async (id: string, updates: Partial<Block>) => {
@@ -389,6 +386,11 @@ export default function EditorPage() {
     setAllBlocks(normalized);
   };
 
+  const handleLogout = async () => {
+    await AuthService.signOut();
+    logout();
+    router.replace("/auth");
+  };
 
   if (loading || !authChecked || !viewportResolved || !isEditorDataReady) {
     return (
@@ -406,46 +408,47 @@ export default function EditorPage() {
     );
   }
 
+  const editorProps = {
+    username: username ?? null,
+    isSaving,
+    background,
+    sidebarPosition: effectiveSidebarPosition,
+    displayName,
+    bioHtml,
+    avatarUrl,
+    avatarShape,
+    setDisplayName,
+    setBioHtml,
+    setAvatarUrl,
+    setAvatarShape,
+    setBackground,
+    setSidebarPosition: setDesktopSidebarPosition,
+    onAddBlock: handleAddBlock,
+    onSave: handleSave,
+    onLogout: handleLogout,
+  };
+
   return (
     <EditorProvider
       username={username ?? null}
+      selectedBlockId={selectedBlockId}
+      focusedBlockId={focusedBlockId}
       onUpdateBlock={handleUpdateBlock}
       onRemoveBlock={handleRemoveBlock}
+      onSelectBlock={selectBlock}
+      onFocusBlock={focusBlock}
+      isActualMobile={isActualMobile}
     >
-      <div className={styles.editorRoot}>
-        <PageLayout
-          background={background}
-          sidebarPosition={effectiveSidebarPosition}
-          previewViewport={previewView}
-          framedMobilePreview
-          isEditor
-        >
-          <ProfileSidebar
-            variant="editor"
-            displayName={displayName}
-            bioHtml={bioHtml}
-            onChangeDisplayName={setDisplayName}
-            onChangeBioHtml={setBioHtml}
-            avatarUrl={avatarUrl}
-            avatarShape={avatarShape}
-            onChangeAvatarUrl={setAvatarUrl}
-            onChangeAvatarShape={setAvatarShape}
-          />
-          <BlockCanvas editable />
-        </PageLayout>
-        <LinkShare username={username} isSaving={isSaving} />
-        <Toolbar
-          onAddBlock={handleAddBlock}
-          onChangeBackground={setBackground}
-          onChangeSidebarPosition={setDesktopSidebarPosition}
-          background={background}
-          sidebarPosition={desktopSidebarPosition}
-          showSidebarPositionControls={isDesktopEditing}
-          previewViewport={previewView}
-          onViewportChange={setPreviewView}
-          onLogout={handleLogout}
+      {isActualMobile ? (
+        <MobileEditor {...editorProps} />
+      ) : (
+        <DesktopEditor
+          {...editorProps}
+          previewView={previewView}
+          setPreviewView={setPreviewView}
+          isDesktopEditing={isDesktopEditing}
         />
-      </div>
+      )}
     </EditorProvider>
   );
 }
