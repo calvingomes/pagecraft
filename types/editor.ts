@@ -81,19 +81,25 @@ export type LinkMetadataResponse = {
 
 export type EditorContextValue = {
   username: string | null;
+  selectedBlockId: string | null;
+  focusedBlockId: string | null;
   onUpdateBlock: (id: string, updates: Partial<Block>) => Promise<void>;
   onRemoveBlock: (id: string) => Promise<void>;
+  onSelectBlock: (id: string | null) => void;
+  onFocusBlock: (id: string | null) => void;
 };
 
 export type EditorState = {
   blocks: Block[];
   activeViewportMode: BlockViewportMode;
   selectedBlockId: string | null;
+  focusedBlockId: string | null;
 
   addBlock: (block: Block) => void;
   updateBlock: (id: string, updates: Partial<Block>) => void;
   removeBlock: (id: string) => void;
   selectBlock: (id: string | null) => void;
+  focusBlock: (id: string | null) => void;
   setAllBlocks: (blocks: Block[]) => void;
   setActiveViewportMode: (mode: BlockViewportMode) => void;
 };

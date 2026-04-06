@@ -23,6 +23,7 @@ import { ensureBlocksHaveValidLayoutsForAllViewports } from "@/lib/editor-engine
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEditorViewportPreview } from "@/hooks/useEditorViewportPreview";
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
+import { MobileBlockToolbar } from "@/components/builder/HoverToolbar/MobileBlockToolbar/MobileBlockToolbar";
 import { saveEditorPage } from "@/lib/editor/saveEditorPage";
 import { prepareImageBlockOptions } from "@/lib/editor/prepareImageBlockOptions";
 import { PageLoader } from "@/components/ui/PageLoader/PageLoader";
@@ -51,6 +52,10 @@ export default function EditorPage() {
   const setAllBlocks = useEditorStore((s) => s.setAllBlocks);
   const setActiveViewportMode = useEditorStore((s) => s.setActiveViewportMode);
   const updateBlock = useEditorStore((s) => s.updateBlock);
+  const selectedBlockId = useEditorStore((s) => s.selectedBlockId);
+  const focusedBlockId = useEditorStore((s) => s.focusedBlockId);
+  const selectBlock = useEditorStore((s) => s.selectBlock);
+  const focusBlock = useEditorStore((s) => s.focusBlock);
 
   const [background, setBackground] = useState<PageBackgroundId>("page-bg-1");
   const [desktopSidebarPosition, setDesktopSidebarPosition] =
@@ -314,7 +319,7 @@ export default function EditorPage() {
 
     const timer = setTimeout(() => {
       handleSave();
-    },1500);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [currentSnapshot, hasUnsavedChanges, isSaving, isEditorDataReady, handleSave]);
@@ -408,8 +413,12 @@ export default function EditorPage() {
   return (
     <EditorProvider
       username={username ?? null}
+      selectedBlockId={selectedBlockId}
+      focusedBlockId={focusedBlockId}
       onUpdateBlock={handleUpdateBlock}
       onRemoveBlock={handleRemoveBlock}
+      onSelectBlock={selectBlock}
+      onFocusBlock={focusBlock}
     >
       <div className={styles.editorRoot}>
         <PageLayout
@@ -432,6 +441,9 @@ export default function EditorPage() {
           />
           <BlockCanvas editable />
         </PageLayout>
+        {activeEditorMode === "mobile" && !!selectedBlockId && (
+          <MobileBlockToolbar />
+        )}
         <Toolbar
           onAddBlock={handleAddBlock}
           onChangeBackground={setBackground}

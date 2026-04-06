@@ -4,11 +4,20 @@ import { useState } from "react";
 import { ToolbarDefault } from "./ToolbarDefault";
 import { ToolbarLink } from "./ToolbarLink";
 import type { ToolbarDefaultProps, ToolbarMode } from "./Toolbar.types";
+import { useEditorContext } from "@/contexts/EditorContext";
 
 export const Toolbar = (props: ToolbarDefaultProps) => {
   const [mode, setMode] = useState<ToolbarMode>("default");
   const [linkUrl, setLinkUrl] = useState("");
   const [isCreatingLink, setIsCreatingLink] = useState(false);
+  const editor = useEditorContext();
+
+  const isMobile = props.previewViewport === "mobile";
+  const hasSelection = !!editor?.selectedBlockId;
+
+  if (isMobile && hasSelection) {
+    return null;
+  }
 
   const handleCreateLink = async () => {
     if (isCreatingLink) return;

@@ -11,6 +11,7 @@ export const useEditorStore = create<EditorState>()(
     blocks: [],
     activeViewportMode: "desktop",
     selectedBlockId: null,
+    focusedBlockId: null,
 
     setAllBlocks: (blocks) => set({ blocks }),
 
@@ -33,6 +34,8 @@ export const useEditorStore = create<EditorState>()(
         blocks: state.blocks.filter((block) => block.id !== id),
       })),
 
-    selectBlock: (id) => set({ selectedBlockId: id }),
+    selectBlock: (id) => set({ selectedBlockId: id, focusedBlockId: null }),
+
+    focusBlock: (id) => set({ focusedBlockId: id }),
   })),
 );
