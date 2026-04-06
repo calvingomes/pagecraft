@@ -10,11 +10,11 @@ import {
   Laptop,
   Smartphone,
   LogOut,
-  Plus,
 } from "lucide-react";
 import styles from "./Toolbar.module.css";
 import type { ToolbarDefaultProps } from "./Toolbar.types";
 import { ToolbarPalette } from "./ToolbarPalette";
+import { Tooltip } from "@/components/ui/Tooltip/Tooltip";
 import { WidgetMenu } from "./WidgetMenu";
 
 export const ToolbarDefault = ({
@@ -51,7 +51,7 @@ export const ToolbarDefault = ({
     if (!username) return;
     const url = `${window.location.protocol}//${window.location.host}/${username}`;
     navigator.clipboard.writeText(url);
-    
+
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 500);
   };
@@ -85,17 +85,19 @@ export const ToolbarDefault = ({
           onOpenChange={setIsPaletteOpen}
           modal={false}
         >
-          <Popover.Trigger asChild>
-            <Toolbar.Button
-              className={styles.toolButton}
-              title="Background color"
-              type="button"
-              data-toolbar-role="palette"
-              aria-label="Background color"
-            >
-              <Palette size={18} />
-            </Toolbar.Button>
-          </Popover.Trigger>
+          <Tooltip content="Background & Alignment" side="top">
+            <Popover.Trigger asChild>
+              <Toolbar.Button
+                className={styles.toolButton}
+                title=""
+                type="button"
+                data-toolbar-role="palette"
+                aria-label="Background color"
+              >
+                <Palette size={18} />
+              </Toolbar.Button>
+            </Popover.Trigger>
+          </Tooltip>
           <Popover.Portal>
             <Popover.Content
               side="top"
@@ -133,15 +135,17 @@ export const ToolbarDefault = ({
           ]}
         />
         <div className={`${styles.divider} ${styles.logoutDivider}`} />
-        <Toolbar.Button
-          className={`${styles.toolButton} ${styles.logoutButton}`}
-          title="Logout"
-          type="button"
-          onClick={onLogout}
-          aria-label="Logout"
-        >
-          <LogOut size={18} />
-        </Toolbar.Button>
+        <Tooltip content="Sign out" side="top">
+          <Toolbar.Button
+            className={`${styles.toolButton} ${styles.logoutButton}`}
+            title=""
+            type="button"
+            onClick={onLogout}
+            aria-label="Logout"
+          >
+            <LogOut size={18} />
+          </Toolbar.Button>
+        </Tooltip>
         <input
           ref={imageInputRef}
           type="file"
