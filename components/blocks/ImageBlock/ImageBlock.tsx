@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable css-modules/no-unused-class */
 
 import * as Label from "@radix-ui/react-label";
 import { useState } from "react";
@@ -7,6 +8,7 @@ import Image from "next/image";
 import { useEditorContext } from "@/contexts/EditorContext";
 import { VISUALLY_HIDDEN_STYLE } from "@/lib/utils/visuallyHidden";
 import { getCacheBustedUrl } from "@/lib/utils/imageUtils";
+import { ImageZoom } from "./ImageZoom";
 import styles from "./ImageBlock.module.css";
 
 export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
@@ -34,6 +36,16 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
         fill
         sizes="(max-width: 768px) 100vw, 600px"
         style={{ objectFit: "cover" }}
+      />
+
+      <ImageZoom 
+        url={imageUrl} 
+        alt={block.content.alt} 
+        showTrigger={isHovered} 
+        isEditable={isEditable}
+        onOpenChange={(open) => {
+          if (open) setIsHovered(false);
+        }}
       />
 
       {isEditable && isHovered ? (
