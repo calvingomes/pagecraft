@@ -107,7 +107,7 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
 
   const cardClasses = `${styles.card} ${styles[widthPreset] || ""} ${!PreviewElement ? styles.noPreview : ""}`;
 
-  if (isEditable && showEditor) {
+  if (isEditable) {
     return <div className={cardClasses}>{ContentBody}</div>;
   }
 

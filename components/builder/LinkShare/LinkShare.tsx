@@ -5,9 +5,12 @@ import { Copy, Check } from "lucide-react";
 import styles from "./LinkShare.module.css";
 import { LinkShareProps } from "./LinkShare.types";
 import { Tooltip } from "@/components/ui/Tooltip/Tooltip";
+import { useEditorContext } from "@/contexts/EditorContext";
 
 export const LinkShare = ({ username, isSaving }: LinkShareProps) => {
   const [isCopied, setIsCopied] = useState(false);
+  const editor = useEditorContext();
+  const isActualMobile = editor?.isActualMobile ?? false;
 
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -26,7 +29,11 @@ export const LinkShare = ({ username, isSaving }: LinkShareProps) => {
 
   return (
     <div 
-      className={`${styles.container} ${isSaving ? styles.saving : ""}`} 
+      className={`
+        ${styles.container} 
+        ${isSaving ? styles.saving : ""} 
+        ${isActualMobile ? styles.isActualMobile : ""}
+      `} 
       onClick={handleCopy}
     >
       <span className={styles.urlText}>{displayUrl}</span>

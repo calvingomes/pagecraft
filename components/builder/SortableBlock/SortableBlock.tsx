@@ -24,6 +24,7 @@ export function SortableBlock({
   const [isPaletteHovered, setIsPaletteHovered] = useState(false);
 
   const selectedBlockId = editor?.selectedBlockId;
+  const isActualMobile = editor?.isActualMobile ?? false;
   const isSelected = selectedBlockId === block.id;
   const viewport = gridConfig?.cols === 2 ? "mobile" : "desktop";
   const isMobile = viewport === "mobile";
@@ -49,27 +50,19 @@ export function SortableBlock({
     ? isSelected
     : isHovered || isPaletteHovered || isPaletteOpen;
 
-  const [lastClickTime, setLastClickTime] = useState(0);
 
   const handleClick = (e: React.MouseEvent) => {
-    if (!isMobile || !editor) return;
+    if (isActualMobile && editor) {
+      if ((e.target as HTMLElement).closest("[role='toolbar']")) return;
 
-    // Don't select if clicking inside the toolbar or palettes
-    if ((e.target as HTMLElement).closest("[role='toolbar']")) return;
+      e.stopPropagation();
 
-    e.stopPropagation();
-
-    const now = Date.now();
-    const diff = now - lastClickTime;
-
-    if (diff < 300 && isSelected) {
-      // Double tap on an already selected block -> Focus it
-      editor.onFocusBlock(block.id);
-    } else {
-      editor.onSelectBlock(block.id);
+      if (isSelected) {
+        editor.onFocusBlock(block.id);
+      } else {
+        editor.onSelectBlock(block.id);
+      }
     }
-
-    setLastClickTime(now);
   };
 
   const handleWidthChange = (preset: BlockWidthPreset) => {
@@ -115,7 +108,7 @@ export function SortableBlock({
   const showHoverToolbar = !!editor && block.type !== "sectionTitle";
   const isTransparentWrapper = shouldUseTransparentWrapper(block);
 
-  const showDeleteButton = isMobile ? isSelected : (isHovered && !!editor);
+  const showDeleteButton = isActualMobile ? isSelected : (isHovered && !!editor);
 
   const { widthPx, heightPx } = dimensions;
   const aspectRatio = `${widthPx} / ${heightPx}`;
@@ -144,7 +137,7 @@ export function SortableBlock({
         }}
       >
         <div
-          className={`${!isMobile ? "drag-handle" : ""} ${styles.wrapper} ${isSelected && isMobile ? styles.selected : ""
+          className={`${!isActualMobile ? "drag-handle" : ""} ${styles.wrapper} ${isSelected && isActualMobile ? styles.selected : ""
             } ${isTransparentWrapper ? styles.emptyWrapper : ""
             } ${(block.type === "text" || block.type === "link" || block.type === "image" || block.type === "sectionTitle") &&
               (!isTransparentWrapper || (toolbarVisible && !!editor && (block.type === "text" || block.type === "sectionTitle")))
@@ -161,7 +154,7 @@ export function SortableBlock({
               : {
                 width: `${widthPx}px`,
                 height: `${heightPx}px`,
-                cursor: editor ? (isMobile ? "default" : "grab") : "default",
+                cursor: editor ? (isActualMobile ? "default" : "grab") : "default",
               }),
             backgroundColor: !isTransparentWrapper
               ? backgroundColor || "var(--color-white)"
@@ -177,7 +170,7 @@ export function SortableBlock({
                 : "transparent",
           } as React.CSSProperties & { [key: string]: string | number }}
         >
-          {isMobile && isSelected && (
+          {isActualMobile && isSelected && (
             <div className={`drag-handle ${styles.mobileDragHandle}`}>
               <GripVertical size={18} />
             </div>
@@ -189,15 +182,16 @@ export function SortableBlock({
           </div>
         </div>
 
-        {!isMobile && showDeleteButton && (
+        {showDeleteButton && (
           <DeleteButtonCorner
             onClick={() => {
               editor?.onRemoveBlock(block.id);
+              if (isActualMobile) editor?.onSelectBlock(null);
             }}
           />
         )}
 
-        {!isMobile && showHoverToolbar && (
+        {!isActualMobile && showHoverToolbar && (
           <BlockHoverToolbar
             blockId={block.id}
             blockType={block.type}

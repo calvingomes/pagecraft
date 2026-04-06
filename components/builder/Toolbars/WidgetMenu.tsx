@@ -19,6 +19,7 @@ import toolbarStyles from "./Toolbar.module.css";
 import { Tooltip } from "@/components/ui/Tooltip/Tooltip";
 import type { BlockType } from "@/types/editor";
 import type { Widget, WidgetMenuProps } from "./WidgetMenu.types";
+import { useEditorContext } from "@/contexts/EditorContext";
 
 const WIDGETS: Widget[] = [
   { id: 'text', title: 'Text', description: 'Add text block', icon: Type },
@@ -29,9 +30,15 @@ const WIDGETS: Widget[] = [
   { id: 'map', title: 'Map', description: 'Show your location', icon: MapPin, disabled: true },
 ];
 
-export const WidgetMenu = ({ onAddBlock, onOpenLink, onImageClick }: WidgetMenuProps) => {
+export const WidgetMenu = ({ 
+  onAddBlock, 
+  onOpenLink, 
+  onImageClick 
+}: WidgetMenuProps) => {
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const editor = useEditorContext();
+  const isActualMobile = editor?.isActualMobile ?? false;
 
   const filteredWidgets = WIDGETS.filter(widget =>
     widget.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -73,6 +80,7 @@ export const WidgetMenu = ({ onAddBlock, onOpenLink, onImageClick }: WidgetMenuP
           align="center"
           sideOffset={14}
           className={styles.popoverContent}
+          data-is-actual-mobile={isActualMobile}
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <div className={styles.searchContainer}>

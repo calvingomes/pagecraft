@@ -80,7 +80,7 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
         }}
       />
 
-      {isEditable && isHovered ? (
+      {isEditable && isHovered && !editor?.isActualMobile ? (
         <div className={styles.editorControls}>
           <Popover.Root open={isCaptionPopoverOpen} onOpenChange={setIsCaptionPopoverOpen}>
             <Popover.Trigger asChild>

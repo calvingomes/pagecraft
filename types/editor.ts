@@ -87,6 +87,7 @@ export type EditorContextValue = {
   onRemoveBlock: (id: string) => Promise<void>;
   onSelectBlock: (id: string | null) => void;
   onFocusBlock: (id: string | null) => void;
+  isActualMobile: boolean;
 };
 
 export type EditorState = {
@@ -94,6 +95,7 @@ export type EditorState = {
   activeViewportMode: BlockViewportMode;
   selectedBlockId: string | null;
   focusedBlockId: string | null;
+  isActualMobile: boolean;
 
   addBlock: (block: Block) => void;
   updateBlock: (id: string, updates: Partial<Block>) => void;
@@ -102,4 +104,5 @@ export type EditorState = {
   focusBlock: (id: string | null) => void;
   setAllBlocks: (blocks: Block[]) => void;
   setActiveViewportMode: (mode: BlockViewportMode) => void;
+  setIsActualMobile: (val: boolean) => void;
 };

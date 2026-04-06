@@ -13,6 +13,7 @@ export function EditorProvider({
   onRemoveBlock,
   onSelectBlock,
   onFocusBlock,
+  isActualMobile,
   children,
 }: EditorContextValue & { children: ReactNode }) {
   return (
@@ -25,6 +26,7 @@ export function EditorProvider({
         onRemoveBlock,
         onSelectBlock,
         onFocusBlock,
+        isActualMobile,
       }}
     >
       {children}

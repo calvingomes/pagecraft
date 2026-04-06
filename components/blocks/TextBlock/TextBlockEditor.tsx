@@ -18,6 +18,7 @@ export const TextBlockEditor = ({ block, onUpdate }: TextBlockEditorProps) => {
     content: initialContent,
     placeholder: "Write something...",
     editable: true,
+    autofocus: "end",
     onUpdate,
   });
 

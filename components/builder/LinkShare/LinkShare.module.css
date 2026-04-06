@@ -24,6 +24,21 @@
   transform: translateY(0) scale(0.98);
 }
 
+.isActualMobile {
+  top: 24px;
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.isActualMobile:hover {
+  transform: translateX(-50%) translateY(-2px) scale(1.02);
+}
+
+.isActualMobile:active {
+  transform: translateX(-50%) translateY(0) scale(0.98);
+}
+
 .urlText {
   font-size: 14px;
   color: var(--color-black);

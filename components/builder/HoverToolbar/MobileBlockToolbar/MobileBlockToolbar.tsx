@@ -8,13 +8,15 @@ import {
   Square,
   RectangleHorizontal,
   RectangleVertical,
-  Trash2,
   Check,
   Palette,
-  Type
+  Type,
+  Link2
 } from "lucide-react";
 import { useEditorStore } from "@/stores/editor-store";
 import { BlockBackgroundPalette } from "../BlockBackgroundPalette/BlockBackgroundPalette";
+import { normalizeLinkUrl } from "@/lib/utils/linkBlock";
+import * as Label from "@radix-ui/react-label";
 import styles from "./MobileBlockToolbar.module.css";
 import type { BlockWidthPreset } from "@/types/editor";
 
@@ -29,9 +31,10 @@ export function MobileBlockToolbar() {
   const selectedBlockId = useEditorStore((s) => s.selectedBlockId);
   const blocks = useEditorStore((s) => s.blocks);
   const updateBlock = useEditorStore((s) => s.updateBlock);
-  const removeBlock = useEditorStore((s) => s.removeBlock);
   const selectBlock = useEditorStore((s) => s.selectBlock);
-  const focusBlock = useEditorStore((s) => s.focusBlock);
+  const [isCaptionPopoverOpen, setIsCaptionPopoverOpen] = React.useState(false);
+  const [isLinkPopoverOpen, setIsLinkPopoverOpen] = React.useState(false);
+  const [isSizePopoverOpen, setIsSizePopoverOpen] = React.useState(false);
 
   const block = blocks.find((b) => b.id === selectedBlockId);
 
@@ -69,24 +72,43 @@ export function MobileBlockToolbar() {
   return (
     <div className={styles.mobileToolbar}>
       <Toolbar.Root className={styles.controlsRow}>
-        <ToggleGroup.Root
-          type="single"
-          className={styles.sizeGroup}
-          value={currentPreset}
-          onValueChange={(val) => val && handleWidthChange(val as BlockWidthPreset)}
-        >
-          {WIDTH_PRESETS.map(({ preset, Icon, size }) => (
-            <ToggleGroup.Item
-              key={preset}
-              value={preset}
-              className={`${styles.sizeButton} ${currentPreset === preset ? styles.active : ""}`}
-            >
-              <Icon size={size} />
-            </ToggleGroup.Item>
-          ))}
-        </ToggleGroup.Root>
+        <div className={styles.leftActions}>
+          <Popover.Root open={isSizePopoverOpen} onOpenChange={setIsSizePopoverOpen}>
+            <Popover.Trigger asChild>
+              <button className={`${styles.actionButton} ${styles.sizeTrigger}`}>
+                {React.createElement(
+                  WIDTH_PRESETS.find((p) => p.preset === currentPreset)?.Icon || Square,
+                  { size: 20 }
+                )}
+              </button>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content side="top" align="start" sideOffset={24} className={styles.sizePopoverContent}>
+                <ToggleGroup.Root
+                  type="single"
+                  className={styles.sizeGroup}
+                  value={currentPreset}
+                  onValueChange={(val) => {
+                    if (val) {
+                      handleWidthChange(val as BlockWidthPreset);
+                      setIsSizePopoverOpen(false);
+                    }
+                  }}
+                >
+                  {WIDTH_PRESETS.map(({ preset, Icon, size }) => (
+                    <ToggleGroup.Item
+                      key={preset}
+                      value={preset}
+                      className={`${styles.sizeButton} ${currentPreset === preset ? styles.active : ""}`}
+                    >
+                      <Icon size={size} />
+                    </ToggleGroup.Item>
+                  ))}
+                </ToggleGroup.Root>
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
 
-        <div style={{ display: "flex", gap: "8px" }}>
           <Popover.Root>
             <Popover.Trigger asChild>
               <button className={styles.actionButton}>
@@ -94,7 +116,7 @@ export function MobileBlockToolbar() {
               </button>
             </Popover.Trigger>
             <Popover.Portal>
-              <Popover.Content side="top" align="center" sideOffset={16} className={styles.popoverContent}>
+              <Popover.Content side="top" align="center" sideOffset={24} className={styles.popoverContent}>
                 <BlockBackgroundPalette
                   currentValue={currentBg}
                   onChange={handleBackgroundColorChange}
@@ -104,25 +126,85 @@ export function MobileBlockToolbar() {
             </Popover.Portal>
           </Popover.Root>
 
-          {(block.type === "text" || block.type === "link" || block.type === "sectionTitle") && (
-            <button
-              className={`${styles.actionButton} ${styles.editButton}`}
-              onClick={() => focusBlock(block.id)}
-            >
-              <Type size={20} />
-            </button>
+          {block.type === "image" && (
+            <>
+              <Popover.Root open={isCaptionPopoverOpen} onOpenChange={setIsCaptionPopoverOpen}>
+                <Popover.Trigger asChild>
+                  <button className={`${styles.actionButton} ${block.content.caption ? styles.hasValue : ""}`}>
+                    <Type size={20} />
+                  </button>
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Content side="top" align="center" sideOffset={24} className={styles.popoverContent}>
+                    <div className={styles.inputWrapper}>
+                      <Label.Root className={styles.inputLabel}>Caption</Label.Root>
+                      <input
+                        type="text"
+                        placeholder="Add caption..."
+                        className={styles.popoverInput}
+                        value={block.content.caption ?? ""}
+                        autoFocus
+                        onChange={(e) => {
+                          updateBlock(block.id, {
+                            content: { ...block.content, caption: e.target.value }
+                          });
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") setIsCaptionPopoverOpen(false);
+                        }}
+                      />
+                    </div>
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
+
+              <Popover.Root open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
+                <Popover.Trigger asChild>
+                  <button className={`${styles.actionButton} ${block.content.linkUrl ? styles.hasValue : ""}`}>
+                    <Link2 size={20} />
+                  </button>
+                </Popover.Trigger>
+                <Popover.Portal>
+                  <Popover.Content side="top" align="center" sideOffset={24} className={styles.popoverContent}>
+                    <div className={styles.inputWrapper}>
+                      <Label.Root className={styles.inputLabel}>Link URL</Label.Root>
+                      <input
+                        type="text"
+                        placeholder="https://..."
+                        className={styles.popoverInput}
+                        value={block.content.linkUrl ?? ""}
+                        autoFocus
+                        onChange={(e) => {
+                          updateBlock(block.id, {
+                            content: { ...block.content, linkUrl: e.target.value }
+                          });
+                        }}
+                        onBlur={() => {
+                          if (!block.content.linkUrl?.trim()) return;
+                          updateBlock(block.id, {
+                            content: { ...block.content, linkUrl: normalizeLinkUrl(block.content.linkUrl) }
+                          });
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            if (block.content.linkUrl?.trim()) {
+                              updateBlock(block.id, {
+                                content: { ...block.content, linkUrl: normalizeLinkUrl(block.content.linkUrl) }
+                              });
+                            }
+                            setIsLinkPopoverOpen(false);
+                          }
+                        }}
+                      />
+                    </div>
+                  </Popover.Content>
+                </Popover.Portal>
+              </Popover.Root>
+            </>
           )}
+        </div>
 
-          <button
-            className={`${styles.actionButton} ${styles.deleteButton}`}
-            onClick={() => {
-              removeBlock(block.id);
-              selectBlock(null);
-            }}
-          >
-            <Trash2 size={20} />
-          </button>
-
+        <div className={styles.rightActions}>
           <button
             className={`${styles.actionButton} ${styles.doneButton}`}
             onClick={() => selectBlock(null)}

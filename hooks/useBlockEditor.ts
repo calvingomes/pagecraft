@@ -9,6 +9,7 @@ type UseBlockEditorProps = {
   editable: boolean;
   onUpdate?: (html: string) => void;
   editorProps?: EditorOptions["editorProps"];
+  autofocus?: EditorOptions["autofocus"];
 };
 
 export function useBlockEditor({
@@ -17,6 +18,7 @@ export function useBlockEditor({
   editable,
   onUpdate,
   editorProps,
+  autofocus,
 }: UseBlockEditorProps) {
   const lastSyncedContent = useRef(sanitizeMinimalRTH(content));
   const [isEmpty, setIsEmpty] = useState(!content);
@@ -30,6 +32,7 @@ export function useBlockEditor({
 
   const editor = useEditor(
     {
+      autofocus,
       extensions: minimalRTEWithPlaceholder({
         placeholder: placeholder ?? "",
         showOnlyWhenEditable: true,

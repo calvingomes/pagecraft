@@ -13,10 +13,10 @@ export const Toolbar = (props: ToolbarDefaultProps) => {
   const [isCreatingLink, setIsCreatingLink] = useState(false);
   const editor = useEditorContext();
 
-  const isMobile = props.previewViewport === "mobile";
+  const isActualMobile = editor?.isActualMobile ?? false;
   const hasSelection = !!editor?.selectedBlockId;
 
-  if (isMobile && hasSelection) {
+  if (isActualMobile && hasSelection) {
     return null;
   }
 
