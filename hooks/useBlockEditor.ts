@@ -68,7 +68,7 @@ export function useBlockEditor({
             lastSyncedContent.current = final;
             callback(final);
           }
-        }, 1500);
+        }, 500);
       },
       onBlur: ({ editor }) => {
         const callback = onUpdateRef.current;

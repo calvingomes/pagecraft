@@ -1,0 +1,140 @@
+.popoverContent {
+  width: 480px;
+  background: var(--color-darker-grey);
+  border: 1px solid color-mix(in srgb, var(--color-white) 10%, transparent);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: slideUp 0.15s ease-out;
+  outline: none;
+}
+
+.searchContainer {
+  position: relative;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-bluish-grey);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--color-white) 8%, transparent);
+  background: color-mix(in srgb, var(--color-black) 40%, transparent);
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-purple);
+}
+
+.searchInput::placeholder {
+  color: var(--color-bluish-grey);
+}
+
+.sectionHeader {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-bluish-grey);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.menuSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.widgetCard {
+  background: color-mix(in srgb, var(--color-white) 3%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-white) 5%, transparent);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.1s;
+}
+
+.widgetCard:hover:not(.disabled) {
+  background: color-mix(in srgb, var(--color-white) 6%, transparent);
+  border-color: color-mix(in srgb, var(--color-white) 15%, transparent);
+}
+
+.widgetCard.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.iconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-black) 30%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-white);
+  flex-shrink: 0;
+}
+
+.widgetInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.widgetTitle {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-white);
+  margin-bottom: 2px;
+}
+
+.widgetDescription {
+  display: block;
+  font-size: 11px;
+  color: var(--color-bluish-grey);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
