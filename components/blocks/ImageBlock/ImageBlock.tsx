@@ -167,6 +167,15 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
                       },
                     });
                   }}
+                  onBlur={() => {
+                    if (!editor?.onUpdateBlock || !linkUrl.trim()) return;
+                    editor.onUpdateBlock(block.id, {
+                      content: {
+                        ...block.content,
+                        linkUrl: normalizeLinkUrl(linkUrl),
+                      },
+                    });
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       if (!editor?.onUpdateBlock) return;
