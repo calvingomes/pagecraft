@@ -27,12 +27,9 @@ export const ToolbarDefault = ({
   showSidebarPositionControls = true,
   previewViewport = "desktop",
   onViewportChange,
-  username,
-  isSaving = false,
   onLogout,
 }: ToolbarDefaultProps) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleImageClick = () => {
@@ -47,38 +44,16 @@ export const ToolbarDefault = ({
     event.currentTarget.value = "";
   };
 
-  const handleCopyLink = () => {
-    if (!username) return;
-    const url = `${window.location.protocol}//${window.location.host}/${username}`;
-    navigator.clipboard.writeText(url);
-
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 500);
-  };
-
   return (
     <div className={styles.toolbarContainer}>
       <Toolbar.Root
         className={styles.toolbarContent}
         aria-label="Add block toolbar"
       >
-        <Toolbar.Button
-          className={`${styles.toolButton} ${styles.copyButton} ${isCopied ? styles.copyButtonActive : ""} ${isSaving ? styles.copyButtonSaving : ""}`}
-          title={isSaving ? "Saving changes..." : isCopied ? "Copied!" : "Share"}
-          type="button"
-          onClick={handleCopyLink}
-          disabled={isSaving}
-          aria-label={isSaving ? "Saving changes" : isCopied ? "Link copied" : "Copy public link"}
-        >
-          {isSaving ? "Saving..." : isCopied ? "Link copied!" : "Copy Link"}
-        </Toolbar.Button>
-
-        <div className={styles.divider} />
-
-        <WidgetMenu 
-          onAddBlock={onAddBlock} 
-          onOpenLink={onOpenLink} 
-          onImageClick={handleImageClick} 
+        <WidgetMenu
+          onAddBlock={onAddBlock}
+          onOpenLink={onOpenLink}
+          onImageClick={handleImageClick}
         />
         <Popover.Root
           open={isPaletteOpen}
@@ -118,7 +93,7 @@ export const ToolbarDefault = ({
         <div className={styles.divider} />
         <TogglePill
           value={previewViewport}
-          onChange={onViewportChange || (() => {})}
+          onChange={onViewportChange || (() => { })}
           variant="toolbar"
           showBackground={false}
           options={[
@@ -134,7 +109,7 @@ export const ToolbarDefault = ({
             },
           ]}
         />
-        <div className={`${styles.divider} ${styles.logoutDivider}`} />
+        <div className={styles.divider} />
         <Tooltip content="Sign out" side="top">
           <Toolbar.Button
             className={`${styles.toolButton} ${styles.logoutButton}`}

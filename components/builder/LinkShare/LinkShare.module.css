@@ -1,0 +1,58 @@
+.container {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  background: var(--color-white);
+  border: 1px solid color-mix(in srgb, var(--color-black) 5%, transparent);
+  border-radius: 12px;
+  padding: 6px 6px 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 12px 20px color-mix(in srgb, var(--color-black) 8%, transparent);
+  cursor: pointer;
+  z-index: 1000;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
+  user-select: none;
+}
+
+.container:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.container:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.urlText {
+  font-size: 14px;
+  color: var(--color-black);
+  letter-spacing: -0.01em;
+}
+
+.copyButton {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-mid-grey);
+  background: transparent;
+  transition: background 0.2s, color 0.2s;
+}
+
+.container:hover .copyButton {
+  background: var(--color-block-bg-light-grey);
+  color: var(--color-dark-grey);
+}
+
+.copied {
+  background: var(--color-success) !important;
+  color: var(--color-white) !important;
+}
+
+.saving {
+  opacity: 0.6;
+  cursor: wait;
+}

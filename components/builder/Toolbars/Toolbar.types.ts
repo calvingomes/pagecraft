@@ -23,8 +23,6 @@ export type ToolbarDefaultProps = {
   showSidebarPositionControls?: boolean;
   previewViewport?: PreviewViewport;
   onViewportChange?: (viewport: PreviewViewport) => void;
-  username?: string | null;
-  isSaving?: boolean;
   onLogout?: () => void;
 };
 

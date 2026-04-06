@@ -19,7 +19,7 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
   const [isCaptionPopoverOpen, setIsCaptionPopoverOpen] = useState(false);
-  
+
   const captionInputId = `image-caption-${block.id}`;
   const caption = block.content.caption ?? "";
   const linkUrl = block.content.linkUrl ?? "";
@@ -52,10 +52,10 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
       }}
     >
       {hasLink ? (
-        <a 
-          href={linkUrl} 
-          target="_blank" 
-          rel="noopener noreferrer" 
+        <a
+          href={linkUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           className={styles.imageBlockLink}
         >
           {ImageElement}
@@ -70,10 +70,10 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
         </div>
       )}
 
-      <ImageZoom 
-        url={imageUrl} 
-        alt={block.content.alt} 
-        showTrigger={isHovered} 
+      <ImageZoom
+        url={imageUrl}
+        alt={block.content.alt}
+        showTrigger={isHovered}
         isEditable={isEditable}
         onOpenChange={(open) => {
           if (open) setIsHovered(false);
@@ -84,8 +84,8 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
         <div className={styles.editorControls}>
           <Popover.Root open={isCaptionPopoverOpen} onOpenChange={setIsCaptionPopoverOpen}>
             <Popover.Trigger asChild>
-              <button 
-                className={`${styles.controlTrigger} ${caption ? styles.controlTriggerHasValue : ""}`}
+              <button
+                className={styles.controlTrigger}
                 title="Add caption"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -93,10 +93,10 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
               </button>
             </Popover.Trigger>
             <Popover.Portal>
-              <Popover.Content 
-                className={styles.popoverContent} 
-                side="bottom" 
-                align="end" 
+              <Popover.Content
+                className={styles.popoverContent}
+                side="bottom"
+                align="end"
                 sideOffset={8}
                 onOpenAutoFocus={(e) => e.preventDefault()}
                 onCloseAutoFocus={(e) => e.preventDefault()}
@@ -132,8 +132,8 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
 
           <Popover.Root open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
             <Popover.Trigger asChild>
-              <button 
-                className={`${styles.controlTrigger} ${linkUrl ? styles.controlTriggerHasValue : ""}`}
+              <button
+                className={styles.controlTrigger}
                 title="Add link"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -141,10 +141,10 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
               </button>
             </Popover.Trigger>
             <Popover.Portal>
-              <Popover.Content 
-                className={styles.popoverContent} 
-                side="bottom" 
-                align="end" 
+              <Popover.Content
+                className={styles.popoverContent}
+                side="bottom"
+                align="end"
                 sideOffset={8}
                 onOpenAutoFocus={(e) => e.preventDefault()}
                 onCloseAutoFocus={(e) => e.preventDefault()}

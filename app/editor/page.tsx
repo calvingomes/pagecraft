@@ -23,6 +23,7 @@ import { ensureBlocksHaveValidLayoutsForAllViewports } from "@/lib/editor-engine
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEditorViewportPreview } from "@/hooks/useEditorViewportPreview";
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
+import { LinkShare } from "@/components/builder/LinkShare/LinkShare";
 import { saveEditorPage } from "@/lib/editor/saveEditorPage";
 import { prepareImageBlockOptions } from "@/lib/editor/prepareImageBlockOptions";
 import { PageLoader } from "@/components/ui/PageLoader/PageLoader";
@@ -432,6 +433,7 @@ export default function EditorPage() {
           />
           <BlockCanvas editable />
         </PageLayout>
+        <LinkShare username={username} isSaving={isSaving} />
         <Toolbar
           onAddBlock={handleAddBlock}
           onChangeBackground={setBackground}
@@ -441,8 +443,6 @@ export default function EditorPage() {
           showSidebarPositionControls={isDesktopEditing}
           previewViewport={previewView}
           onViewportChange={setPreviewView}
-          username={username}
-          isSaving={isSaving}
           onLogout={handleLogout}
         />
       </div>

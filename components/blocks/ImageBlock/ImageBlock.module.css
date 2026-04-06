@@ -38,10 +38,6 @@
   color: var(--color-white);
 }
 
-.controlTriggerHasValue {
-  color: var(--color-success) !important;
-}
-
 .popoverContent {
   background: var(--color-darker-grey);
   border: 1px solid color-mix(in srgb, var(--color-white) 12%, transparent);
