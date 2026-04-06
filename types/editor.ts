@@ -63,7 +63,7 @@ export interface LinkBlock extends BaseBlock {
 
 export interface ImageBlock extends BaseBlock {
   type: "image";
-  content: { url: string; alt?: string; caption?: string };
+  content: { url: string; alt?: string; caption?: string; linkUrl?: string };
 }
 
 export interface SectionTitleBlock extends BaseBlock {
