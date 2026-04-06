@@ -392,7 +392,7 @@ export default function EditorPage() {
 
   if (loading || !authChecked || !viewportResolved || !isEditorDataReady) {
     return (
-      <PageLoader label="Loading editor..." backgroundColor="var(--color-lighter-grey)" />
+      <PageLoader label="Loading editor" backgroundColor="var(--color-lighter-grey)" />
     );
   }
 

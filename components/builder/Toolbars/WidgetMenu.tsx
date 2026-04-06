@@ -120,7 +120,9 @@ export const WidgetMenu = ({
             <Dialog.Description className={styles.visuallyHidden}>
               Choose a widget type to add to your page.
             </Dialog.Description>
-            {renderContent()}
+            <div className={styles.dialogScrollArea}>
+              {renderContent()}
+            </div>
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
