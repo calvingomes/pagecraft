@@ -6,18 +6,16 @@ import * as Toolbar from "@radix-ui/react-toolbar";
 import { useRef, useState, type ChangeEvent } from "react";
 import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
 import {
-  Type,
-  Link2,
-  Image as ImageIcon,
   Palette,
-  Heading,
   Laptop,
   Smartphone,
   LogOut,
+  Plus,
 } from "lucide-react";
 import styles from "./Toolbar.module.css";
 import type { ToolbarDefaultProps } from "./Toolbar.types";
 import { ToolbarPalette } from "./ToolbarPalette";
+import { WidgetMenu } from "./WidgetMenu";
 
 export const ToolbarDefault = ({
   onAddBlock,
@@ -77,42 +75,11 @@ export const ToolbarDefault = ({
 
         <div className={styles.divider} />
 
-        <Toolbar.Button
-          className={styles.toolButton}
-          title="Text"
-          type="button"
-          onClick={() => onAddBlock?.("text")}
-          aria-label="Add text block"
-        >
-          <Type size={18} />
-        </Toolbar.Button>
-        <Toolbar.Button
-          className={styles.toolButton}
-          title="Link"
-          type="button"
-          onClick={onOpenLink}
-          aria-label="Add link block"
-        >
-          <Link2 size={18} />
-        </Toolbar.Button>
-        <Toolbar.Button
-          className={styles.toolButton}
-          title="Image"
-          type="button"
-          onClick={handleImageClick}
-          aria-label="Add image block"
-        >
-          <ImageIcon size={18} />
-        </Toolbar.Button>
-        <Toolbar.Button
-          className={styles.toolButton}
-          title="Section title"
-          type="button"
-          onClick={() => onAddBlock?.("sectionTitle")}
-          aria-label="Add section title block"
-        >
-          <Heading size={18} />
-        </Toolbar.Button>
+        <WidgetMenu 
+          onAddBlock={onAddBlock} 
+          onOpenLink={onOpenLink} 
+          onImageClick={handleImageClick} 
+        />
         <Popover.Root
           open={isPaletteOpen}
           onOpenChange={setIsPaletteOpen}

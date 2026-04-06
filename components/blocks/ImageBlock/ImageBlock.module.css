@@ -67,7 +67,7 @@
   width: 100%;
   padding: 8px 12px;
   border-radius: 10px;
-  border: 1px solid var(--color-success);
+  border: 1px solid var(--color-purple);
   background: color-mix(in srgb, var(--color-black) 40%, transparent);
   color: var(--color-white);
   font-size: var(--font-size-sm);
@@ -75,7 +75,7 @@
 
 .popoverInput:focus {
   outline: none;
-  border-color: var(--color-success);
+  border-color: var(--color-purple);
 }
 
 .externalLinkIndicator {
