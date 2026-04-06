@@ -91,7 +91,6 @@ export const WidgetMenu = ({
               className={styles.searchInput}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              autoFocus
             />
           </div>
 

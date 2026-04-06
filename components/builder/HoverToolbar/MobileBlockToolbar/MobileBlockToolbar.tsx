@@ -76,10 +76,10 @@ export function MobileBlockToolbar() {
           <Popover.Root open={isSizePopoverOpen} onOpenChange={setIsSizePopoverOpen}>
             <Popover.Trigger asChild>
               <button className={`${styles.actionButton} ${styles.sizeTrigger}`}>
-                {React.createElement(
-                  WIDTH_PRESETS.find((p) => p.preset === currentPreset)?.Icon || Square,
-                  { size: 20 }
-                )}
+                {(() => {
+                  const p = WIDTH_PRESETS.find((p) => p.preset === currentPreset) || WIDTH_PRESETS[0];
+                  return React.createElement(p.Icon, { size: p.size });
+                })()}
               </button>
             </Popover.Trigger>
             <Popover.Portal>
@@ -116,7 +116,13 @@ export function MobileBlockToolbar() {
               </button>
             </Popover.Trigger>
             <Popover.Portal>
-              <Popover.Content side="top" align="center" sideOffset={24} className={styles.popoverContent}>
+              <Popover.Content
+                side="top"
+                align="center"
+                sideOffset={24}
+                className={styles.popoverContent}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+              >
                 <BlockBackgroundPalette
                   currentValue={currentBg}
                   onChange={handleBackgroundColorChange}
@@ -135,7 +141,13 @@ export function MobileBlockToolbar() {
                   </button>
                 </Popover.Trigger>
                 <Popover.Portal>
-                  <Popover.Content side="top" align="center" sideOffset={24} className={styles.popoverContent}>
+                  <Popover.Content
+                    side="top"
+                    align="center"
+                    sideOffset={24}
+                    className={styles.popoverContent}
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                  >
                     <div className={styles.inputWrapper}>
                       <Label.Root className={styles.inputLabel}>Caption</Label.Root>
                       <input
@@ -143,7 +155,6 @@ export function MobileBlockToolbar() {
                         placeholder="Add caption..."
                         className={styles.popoverInput}
                         value={block.content.caption ?? ""}
-                        autoFocus
                         onChange={(e) => {
                           updateBlock(block.id, {
                             content: { ...block.content, caption: e.target.value }
@@ -165,7 +176,13 @@ export function MobileBlockToolbar() {
                   </button>
                 </Popover.Trigger>
                 <Popover.Portal>
-                  <Popover.Content side="top" align="center" sideOffset={24} className={styles.popoverContent}>
+                  <Popover.Content
+                    side="top"
+                    align="center"
+                    sideOffset={24}
+                    className={styles.popoverContent}
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                  >
                     <div className={styles.inputWrapper}>
                       <Label.Root className={styles.inputLabel}>Link URL</Label.Root>
                       <input
@@ -173,7 +190,6 @@ export function MobileBlockToolbar() {
                         placeholder="https://..."
                         className={styles.popoverInput}
                         value={block.content.linkUrl ?? ""}
-                        autoFocus
                         onChange={(e) => {
                           updateBlock(block.id, {
                             content: { ...block.content, linkUrl: e.target.value }

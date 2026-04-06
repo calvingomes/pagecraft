@@ -40,12 +40,12 @@
 }
 
 .controlTriggerHasValue {
-  background: var(--color-success);
-  color: color-mix(in srgb, var(--color-success), var(--color-white) 65%);
+  background: var(--color-purple-faded, color-mix(in srgb, var(--color-purple), transparent 80%));
+  color: var(--color-purple-light, color-mix(in srgb, var(--color-purple), var(--color-white) 40%));
 }
 
 .controlTriggerHasValue:hover {
-  background: color-mix(in srgb, var(--color-success) 85%, var(--color-white));
+  background: var(--color-purple-faded, color-mix(in srgb, var(--color-purple), transparent 70%));
   color: var(--color-white);
 }
 
