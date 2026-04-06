@@ -2,8 +2,8 @@
 /* eslint-disable css-modules/no-unused-class */
 
 import * as Toolbar from "@radix-ui/react-toolbar";
-import { Trash2, Upload } from "lucide-react";
-import { useRef, type ChangeEvent } from "react";
+import { Loader2, Trash2, Upload } from "lucide-react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { fileToWebpDataUrl } from "@/lib/uploads/imageWebp";
 import { LinkBlock as LinkBlockType } from "@/types/editor";
 import styles from "./LinkBlock.module.css";
@@ -15,13 +15,19 @@ type LinkImageEditorProps = {
 
 export const LinkImageEditor = ({ block, onUpdate }: LinkImageEditorProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const content = block.content;
 
-  const handlePickFile = () => fileInputRef.current?.click();
+  const handlePickFile = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    fileInputRef.current?.click();
+  };
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    setIsUploading(true);
     try {
       const dataUrl = await fileToWebpDataUrl(file, "link-preview.webp");
       onUpdate({
@@ -30,11 +36,14 @@ export const LinkImageEditor = ({ block, onUpdate }: LinkImageEditorProps) => {
     } catch (e) {
       console.error(e);
     } finally {
+      setIsUploading(false);
       event.target.value = "";
     }
   };
 
-  const handleRemoveMetaImage = () => {
+  const handleRemoveMetaImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     onUpdate({ content: { ...content, imageUrl: "", metaImageRemoved: true } });
   };
 
@@ -42,11 +51,25 @@ export const LinkImageEditor = ({ block, onUpdate }: LinkImageEditorProps) => {
     <>
       <div className={styles.previewOverlay} />
       <Toolbar.Root className={styles.previewActions}>
-        <Toolbar.Button className={styles.previewIconButton} onClick={handlePickFile} title="Upload Custom Preview">
-          <Upload size={18} />
+        <Toolbar.Button
+          className={styles.previewIconButton}
+          onClick={handlePickFile}
+          disabled={isUploading}
+          title="Upload Custom Preview"
+        >
+          {isUploading ? (
+            <Loader2 size={18} className={styles.spin} />
+          ) : (
+            <Upload size={18} />
+          )}
         </Toolbar.Button>
         {content.imageUrl && (
-          <Toolbar.Button className={styles.previewIconButton} onClick={handleRemoveMetaImage} title="Remove Preview Image">
+          <Toolbar.Button
+            className={styles.previewIconButton}
+            onClick={handleRemoveMetaImage}
+            disabled={isUploading}
+            title="Remove Preview Image"
+          >
             <Trash2 size={18} />
           </Toolbar.Button>
         )}

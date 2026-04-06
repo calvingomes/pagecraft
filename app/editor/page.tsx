@@ -14,7 +14,6 @@ import type {
   SidebarPosition,
 } from "@/types/page";
 import { AuthService } from "@/lib/services/auth.client";
-import { OverlayPopup } from "@/components/layout/OverlayPopup/OverlayPopup";
 import { ensureBlocksHaveValidLayoutsForAllViewports } from "@/lib/editor-engine/data/normalization";
 import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useEditorViewportPreview } from "@/hooks/useEditorViewportPreview";
@@ -89,7 +88,6 @@ export default function EditorPage() {
 
   const {
     screenView,
-    canUseEditor,
     previewView,
     setPreviewView,
     viewportResolved,
@@ -398,15 +396,6 @@ export default function EditorPage() {
     );
   }
 
-  if (!canUseEditor) {
-    return (
-      <OverlayPopup
-        open={true}
-        title="Editor is desktop-only!"
-        message="Open this page on desktop to continue."
-      />
-    );
-  }
 
   const editorProps = {
     username: username ?? null,

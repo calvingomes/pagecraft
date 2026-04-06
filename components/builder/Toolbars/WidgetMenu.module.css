@@ -13,11 +13,31 @@
   outline: none;
 }
 
-.popoverContent[data-is-actual-mobile="true"] {
-  width: calc(100vw - 32px);
-  max-width: 400px;
-  max-height: 380px;
-  overflow-y: auto;
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--color-black) 40%, transparent);
+  backdrop-filter: blur(4px);
+  z-index: 2500;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.dialogContent {
+  position: fixed;
+  bottom: 84px;
+  left: 16px;
+  right: 16px;
+  background: var(--color-darker-grey);
+  border: 1px solid var(--color-dark-grey);
+  border-radius: 20px;
+  padding: 16px;
+  z-index: 2600;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: slideUp 0.15s ease-out;
+  outline: none;
 }
 
 .searchContainer {
@@ -75,7 +95,7 @@
   gap: 8px;
 }
 
-.popoverContent[data-is-actual-mobile="true"] .grid {
+.dialogContent .grid {
   grid-template-columns: 1fr;
 }
 
@@ -148,4 +168,25 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }

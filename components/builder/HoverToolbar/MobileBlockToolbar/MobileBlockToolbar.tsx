@@ -187,7 +187,7 @@ export function MobileBlockToolbar() {
                       <Label.Root className={styles.inputLabel}>Link URL</Label.Root>
                       <input
                         type="text"
-                        placeholder="https://..."
+                        placeholder="Paste or type a link..."
                         className={styles.popoverInput}
                         value={block.content.linkUrl ?? ""}
                         onChange={(e) => {

@@ -2,14 +2,13 @@
 
 import { useMemo, useState } from "react";
 import {
-  canUseEditorAtWidth,
   getEditorViewportCapabilities,
 } from "@/lib/editor-engine/data/viewport";
 import { useViewportMode } from "@/hooks/useViewportMode";
 import type { PreviewViewport } from "@/types/page";
 
 export function useEditorViewportPreview() {
-  const { viewportMode, viewportWidth, isResolved } = useViewportMode();
+  const { viewportMode, isResolved } = useViewportMode();
   const [overrideView, setOverrideView] = useState<PreviewViewport | null>(
     null,
   );
@@ -28,8 +27,7 @@ export function useEditorViewportPreview() {
 
   return {
     screenView: viewportMode,
-    canUseEditor:
-      viewportWidth === null ? false : canUseEditorAtWidth(viewportWidth),
+    canUseEditor: true,
     previewView,
     setPreviewView: (next: PreviewViewport | null) => {
       if (!capabilities.allowManualPreviewToggle) return;

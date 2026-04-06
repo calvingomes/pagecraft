@@ -19,8 +19,11 @@ PageCraft is a link-in-bio page builder. Users drag blocks (text, links, images,
 
 ### Two Modes
 
-- **Editor** (`/editor`): Zustand stores + react-grid-layout + Tiptap. Data mutates through `editor-store`, saved via `lib/editor/saveEditorPage.ts`.
-- **View Page** (`/[username]`): Server Component fetches data via `ServerPageService`, passes unified blocks to `PageView` (Client Component). No stores, no RGL — pure props.
+- **Editor** (`/editor`): Unlocked for all viewports.
+  - **DesktopEditor** (`>=960px`): Mouse-based, includes mobile preview frame.
+  - **MobileEditor** (`<960px`): Touch-optimized 1-tap select / 2-tap focus model with floating `MobileBlockToolbar`.
+  - Both use Zustand + RGL + Tiptap.
+- **View Page** (`/[username]`): Server Component fetches data via `ServerPageService`, passes unified blocks to `PageView`. No stores, no RGL — pure props.
 
 ### Viewport-Aware Unified Block Model
 

@@ -12,7 +12,7 @@
   min-height: 100vh;
   padding-top: 100px;
   background: var(--page-bg);
-  padding-bottom: 80px;
+  padding-bottom: 160px;
 }
 
 .inner {
@@ -51,7 +51,7 @@
   border: 1px solid var(--color-light-grey);
   border-radius: 20px;
   overflow: hidden;
-  padding: 20px;
+  padding: 20px 20px 120px 20px;
 }
 
 .pageLayout[data-preview="mobile"][data-framed-mobile-preview="true"]

@@ -257,3 +257,15 @@
   color: color-mix(in srgb, var(--block-text-color, var(--color-black)), transparent 65%);
   pointer-events: none;
 }
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

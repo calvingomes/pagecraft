@@ -270,11 +270,15 @@ blocks/LinkBlock/
 - **Active Elevation**: Hovered or focused blocks are elevated to `z-index: 100` via `SortableBlock.module.css` to ensure hover toolbars and popovers are never obscured by neighboring blocks.
 - **Portal Usage**: Always use `Popover.Portal` for toolbars to ensure they render at the top of the document's stacking context.
 
-### Editor Preview Modes (`app/editor/page.tsx` + `components/layout/PageLayout/`)
+### Editor Architecture & Viewport Modes (`app/editor/page.tsx`)
 
-- Screen buckets are defined as: desktop `>=1360`, tablet `960-1359`, mobile `<960`.
-- Viewport logic should be centralized in `lib/editor-engine/data/viewport.ts` and hooks (`hooks/useViewportMode.ts`, `hooks/useEditorViewportPreview.ts`).
-- The editor route itself is blocked on narrow screens; interactive editor access requires viewport width `>=1000px`.
+- **Unlocked Viewports**: The editor is accessible at any width. No artificial blocks on mobile/tablet.
+- **Dynamic Editor Selection**:
+  - **`DesktopEditor`**: Active on screens `>=960px`. Designed for mouse/keyboard.
+  - **`MobileEditor`**: Active on screens `<960px`. Designed for touch.
+- **Shared Layout, Unique Interaction**: Both editors use `MOBILE_GRID` geometry for mobile views.
+  - **Desktop**: Relies on mouse-hover for toolbars.
+  - **Mobile**: Uses a **1st tap to select / 2nd tap to focus** model.
 - Within the desktop editor, keep the **desktop/mobile preview toggle** enabled so users can edit and preview the mobile layout from desktop.
 - `PageLayout` exposes `previewViewport` (`"desktop" | "mobile"`) and `framedMobilePreview` (boolean): editor passes `framedMobilePreview={true}` for the framed mobile preview, while view pages keep it `false` for clean public mobile layout.
 - In mobile preview mode, only page content is previewed (`ProfileSidebar` + `BlockCanvas`); editor chrome (save/signout buttons, preview toggle, bottom toolbar) remains outside the preview frame.

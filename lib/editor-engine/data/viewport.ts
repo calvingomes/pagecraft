@@ -8,7 +8,6 @@ export const MOBILE_MAX_WIDTH = 959;
 export const TABLET_MIN_WIDTH = 960;
 export const TABLET_MAX_WIDTH = 1359;
 export const DESKTOP_MIN_WIDTH = 1360;
-export const EDITOR_MIN_WIDTH = 100;
 
 export function resolveViewportMode(width: number): ViewportMode {
   if (width <= MOBILE_MAX_WIDTH) return "mobile";
@@ -45,9 +44,6 @@ export function getEditorViewportCapabilities(
   };
 }
 
-export function canUseEditorAtWidth(width: number): boolean {
-  return width >= EDITOR_MIN_WIDTH;
-}
 
 export function getViewEffectiveSidebarPosition(
   mode: ViewportMode,

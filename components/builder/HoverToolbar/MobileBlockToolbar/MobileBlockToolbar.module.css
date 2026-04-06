@@ -1,15 +1,18 @@
 .mobileToolbar {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 440px;
   display: flex;
   flex-direction: column;
-  background: var(--color-darkest-grey);
-  border-top: 1px solid var(--color-dark-grey);
-  padding: 16px;
+  background: var(--color-darker-grey);
+  border: 1px solid var(--color-dark-grey);
+  border-radius: 20px;
+  padding: 12px;
   z-index: 2000;
-  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
 }
 
 .controlsRow {
