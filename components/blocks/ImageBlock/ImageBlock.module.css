@@ -38,6 +38,16 @@
   color: var(--color-white);
 }
 
+.controlTriggerHasValue {
+  background: var(--color-success);
+  color: color-mix(in srgb, var(--color-success), var(--color-white) 65%);
+}
+
+.controlTriggerHasValue:hover {
+  background: color-mix(in srgb, var(--color-success) 85%, var(--color-white));
+  color: var(--color-white);
+}
+
 .popoverContent {
   background: var(--color-darker-grey);
   border: 1px solid color-mix(in srgb, var(--color-white) 12%, transparent);

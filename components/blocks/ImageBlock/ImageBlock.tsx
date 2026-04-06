@@ -85,7 +85,7 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
           <Popover.Root open={isCaptionPopoverOpen} onOpenChange={setIsCaptionPopoverOpen}>
             <Popover.Trigger asChild>
               <button
-                className={styles.controlTrigger}
+                className={`${styles.controlTrigger} ${caption ? styles.controlTriggerHasValue : ""}`}
                 title="Add caption"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -133,7 +133,7 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
           <Popover.Root open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
             <Popover.Trigger asChild>
               <button
-                className={styles.controlTrigger}
+                className={`${styles.controlTrigger} ${linkUrl ? styles.controlTriggerHasValue : ""}`}
                 title="Add link"
                 onClick={(e) => e.stopPropagation()}
               >
