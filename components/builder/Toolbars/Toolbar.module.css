@@ -108,6 +108,14 @@
   background: color-mix(in srgb, var(--color-success) 80%, var(--color-black));
 }
 
+.pasteButton:disabled {
+  background: var(--color-dark-grey);
+  color: var(--color-bluish-grey);
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none !important;
+}
+
 .palettePopover {
   padding: 16px;
   border-radius: 12px;

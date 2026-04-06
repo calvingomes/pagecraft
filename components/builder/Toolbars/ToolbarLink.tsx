@@ -5,6 +5,7 @@ import * as Label from "@radix-ui/react-label";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import { ArrowLeft, Check } from "lucide-react";
 import { VISUALLY_HIDDEN_STYLE } from "@/lib/utils/visuallyHidden";
+import { isSupportedLinkUrl } from "@/lib/utils/linkBlock";
 import styles from "./Toolbar.module.css";
 import type { ToolbarLinkProps } from "./Toolbar.types";
 
@@ -15,6 +16,12 @@ export function ToolbarLink({
   onCreateLink,
 }: ToolbarLinkProps) {
   const inputId = "toolbar-link-url";
+  const isValid = isSupportedLinkUrl(linkUrl);
+
+  const handleSubmit = () => {
+    if (!isValid) return;
+    void onCreateLink();
+  };
 
   return (
     <Toolbar.Root
@@ -36,20 +43,22 @@ export function ToolbarLink({
         id={inputId}
         className={styles.linkInput}
         placeholder="Add link here"
+        autoFocus
         value={linkUrl}
         name="link-url"
         onChange={(e) => onChangeLinkUrl(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
-            void onCreateLink();
+            handleSubmit();
           }
         }}
       />
       <Toolbar.Button
         type="button"
         className={styles.pasteButton}
-        onClick={() => void onCreateLink()}
+        onClick={handleSubmit}
+        disabled={!isValid}
         aria-label="Create link"
       >
         <Check size={18} />

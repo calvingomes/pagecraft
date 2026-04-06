@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ToolbarDefault } from "./ToolbarDefault";
 import { ToolbarLink } from "./ToolbarLink";
 import type { ToolbarDefaultProps, ToolbarMode } from "./Toolbar.types";
+import { normalizeLinkUrl } from "@/lib/utils/linkBlock";
 
 export const Toolbar = (props: ToolbarDefaultProps) => {
   const [mode, setMode] = useState<ToolbarMode>("default");
@@ -21,7 +22,8 @@ export const Toolbar = (props: ToolbarDefaultProps) => {
     setMode("default");
 
     try {
-      await props.onAddBlock("link", { url });
+      const normalizedUrl = normalizeLinkUrl(url);
+      await props.onAddBlock("link", { url: normalizedUrl });
     } finally {
       setIsCreatingLink(false);
     }

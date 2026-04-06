@@ -9,12 +9,20 @@ export function resolveLinkTitle(content: LinkBlock["content"]): string {
 
 export function isSupportedLinkUrl(value: string): boolean {
   if (!value) return false;
-  try {
-    const { protocol } = new URL(value);
-    return protocol === "http:" || protocol === "https:";
-  } catch {
-    return false;
+  // Regex to match:
+  // 1. Optional http:// or https://
+  // 2. Optional www.
+  // 3. Domain part (at least one dot and a suffix of 2+ chars)
+  const urlRegex = /^(https?:\/\/)?(www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/;
+  return urlRegex.test(value.trim());
+}
+
+export function normalizeLinkUrl(value: string): string {
+  const trimmed = value.trim();
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
   }
+  return `https://${trimmed}`;
 }
 
 export function getLinkHostOrUrl(value: string): string {
