@@ -57,7 +57,7 @@
 
 .hexInput:focus {
   outline: none;
-  border-color: var(--color-success);
+  border-color: var(--color-purple);
 }
 
 .transparentSwatch {

@@ -110,7 +110,6 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
                   placeholder="Add caption..."
                   className={styles.popoverInput}
                   value={caption}
-                  autoFocus
                   onChange={(event) => {
                     if (!editor?.onUpdateBlock) return;
                     editor.onUpdateBlock(block.id, {
@@ -157,7 +156,6 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
                   placeholder="Paste or type a link..."
                   className={styles.popoverInput}
                   value={linkUrl}
-                  autoFocus
                   onChange={(e) => {
                     if (!editor?.onUpdateBlock) return;
                     editor.onUpdateBlock(block.id, {
