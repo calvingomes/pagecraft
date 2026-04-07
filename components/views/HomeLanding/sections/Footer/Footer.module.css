@@ -68,38 +68,9 @@
 }
 
 .footerBottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding-top: 28px;
 }
 
-.footerBottomRight {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.footerDot {
-  color: var(--color-mid-grey);
-  font-size: var(--font-size-sm);
-}
-
-.footerBottomLink {
-  font-size: var(--font-size-sm);
-  color: var(--color-mid-grey);
-  text-decoration: none;
-}
-
-.footerBottomLink:hover {
-  color: var(--color-darker-grey);
-}
-
-.footerLogo {
-  font-weight: 600;
-  font-size: var(--font-size-sm);
-  color: var(--color-black);
-}
 
 @media (--bp-mobile) {
   .footer {

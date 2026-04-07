@@ -7,6 +7,7 @@ import type {
 
 export type PageLayoutProps = {
   children: ReactNode;
+  footer?: ReactNode;
   background?: PageBackgroundId;
   sidebarPosition?: SidebarPosition;
   previewViewport?: PreviewViewport;

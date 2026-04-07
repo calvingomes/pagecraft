@@ -1,6 +1,6 @@
-import Link from "next/link";
 import Image from "next/image";
 import { ClaimInput } from "@/components/ui/ClaimInput/ClaimInput";
+import { BottomBar } from "@/components/layout/Footer/BottomBar";
 import styles from "./Footer.module.css";
 
 export function Footer() {
@@ -31,16 +31,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className={styles.footerBottom}>
-          <span className={styles.footerLogo}>PageCraft</span>
-          <div className={styles.footerBottomRight}>
-            <Link href="#" className={styles.footerBottomLink}>Privacy</Link>
-            <span className={styles.footerDot}>·</span>
-            <Link href="#" className={styles.footerBottomLink}>Terms</Link>
-            <span className={styles.footerDot}>·</span>
-            <Link href="#" className={styles.footerBottomLink}>Cookie Policy</Link>
-          </div>
-        </div>
+        <BottomBar className={styles.footerBottom} />
 
       </div>
     </footer>

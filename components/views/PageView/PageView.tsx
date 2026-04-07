@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
+import { BottomBar } from "@/components/layout/Footer/BottomBar";
 import { PageLoader } from "@/components/ui/PageLoader/PageLoader";
 import { getViewEffectiveSidebarPosition } from "@/lib/editor-engine/data/viewport";
 import { useViewportMode } from "@/hooks/useViewportMode";
@@ -75,6 +76,7 @@ export function PageView({
       background={background}
       sidebarPosition={effectiveSidebarPosition}
       previewViewport={renderMode}
+      footer={<BottomBar />}
     >
       <div className={`${styles.container} ${isMounted ? styles.visible : ""}`}>
         {isMounted && (

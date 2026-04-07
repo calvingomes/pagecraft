@@ -1,0 +1,51 @@
+@import "@styles/media.css";
+
+.bottomBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: transparent;
+}
+
+.bottomBarContents {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.logo {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-black);
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dot {
+  color: var(--color-mid-grey);
+  font-size: var(--font-size-sm);
+}
+
+.link {
+  font-size: var(--font-size-sm);
+  color: var(--color-mid-grey);
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.link:hover {
+  color: var(--color-darker-grey);
+}
+
+@media (--bp-mobile) {
+  .bottomBarContents {
+    gap: 16px;
+    align-items: flex-start;
+  }
+}

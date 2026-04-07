@@ -7,6 +7,7 @@ import type { PageLayoutProps } from "./PageLayout.types";
 
 export function PageLayout({
   children,
+  footer,
   background = "page-bg-1",
   sidebarPosition = "left",
   previewViewport = "desktop",
@@ -48,6 +49,8 @@ export function PageLayout({
         <aside className={styles.sidebarSlot}>{sidebar}</aside>
         <section className={styles.contentSlot}>{content}</section>
       </div>
+
+      {footer && <footer className={styles.footerSlot}>{footer}</footer>}
     </main>
   );
 }
