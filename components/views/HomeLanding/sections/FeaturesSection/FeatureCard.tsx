@@ -23,12 +23,23 @@ export function FeatureCard({
 
       <div className={styles.media}>
         {feature.mediaSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={feature.mediaSrc}
-            alt={feature.mediaAlt}
-            className={styles.mediaImage}
-          />
+          feature.mediaType === "video" ? (
+            <video
+              src={feature.mediaSrc}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className={styles.video}
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={feature.mediaSrc}
+              alt={feature.mediaAlt}
+              className={styles.mediaImage}
+            />
+          )
         ) : (
           <span>{feature.mediaAlt}</span>
         )}

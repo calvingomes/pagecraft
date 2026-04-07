@@ -15,11 +15,11 @@ export function HeroSection() {
       <div className="container">
         <div className={styles.content}>
           <h1 id="home-hero-title" className={styles.title}>
-            Personal Page<br />
-            <span className={styles.titleAccent}>For Creatives</span>
+            Craft your corner<br />
+            <span className={styles.titleAccent}>of the web.</span>
           </h1>
           <p className={styles.subtitle}>
-            Share who you are and attract more clients
+            Build a page that actually looks like you
           </p>
           <div className={styles.actionContainer}>
             <ClaimInput />

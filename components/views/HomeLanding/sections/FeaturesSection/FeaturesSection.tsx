@@ -8,31 +8,31 @@ const CARD_SCALES = [0.93, 0.96, 1];
 
 const FEATURES: FeatureItem[] = [
   {
-    id: "personal-page",
-    title: "Your link, your brand",
+    id: "drag-and-drop",
+    title: "Your canvas, your rules",
     description:
-      "One link to share your work, social profiles, and anything else that matters. Fully yours.",
-    mediaType: "image",
-    mediaSrc: "",
-    mediaAlt: "Personal page preview",
+      "Drag blocks, arrange them however you want, and build a page that's completely yours. No templates, no restrictions.",
+    mediaType: "video",
+    mediaSrc: "/videos/showcase.mp4",
+    mediaAlt: "Drag and drop preview",
   },
   {
-    id: "drag-drop",
-    title: "Drag, drop, done",
+    id: "dual-viewport",
+    title: "Looks right everywhere",
     description:
-      "Build your page with a visual grid editor. No code. No templates forcing your hand.",
-    mediaType: "image",
-    mediaSrc: "",
-    mediaAlt: "Drag and drop editor",
+      "Edit your desktop and mobile layouts independently. What your visitors see is always exactly what you intended.",
+    mediaType: "video",
+    mediaSrc: "/videos/showcase.mp4",
+    mediaAlt: "Dual viewport preview",
   },
   {
-    id: "mobile-desktop",
-    title: "Looks great everywhere",
+    id: "publish-and-share",
+    title: "Live in seconds",
     description:
-      "Edit your desktop and mobile layouts independently. Your page adapts to every screen.",
-    mediaType: "image",
-    mediaSrc: "",
-    mediaAlt: "Responsive layout preview",
+      "Copy your pagecraft.me link, open a new tab, and it's already there. No save button, no waiting. Just live.",
+    mediaType: "video",
+    mediaSrc: "/videos/showcase.mp4",
+    mediaAlt: "Publish and share preview",
   },
 ];
 

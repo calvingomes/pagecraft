@@ -5,7 +5,7 @@ import { useScrollProgress } from "@/hooks/useScrollProgress";
 import styles from "./RunningText.module.css";
 
 const TEXT =
-  "Build your page. One link that puts everything in one place — your work, your socials, your story. Drag blocks, pick a layout, and publish in minutes. Build your page. One link that puts everything in one place — your work, your socials, your story. Drag blocks, pick a layout, and publish in minutes.";
+  "PageCraft gives you a canvas to drag, drop, and arrange blocks into a page that actually looks and feels like you. No templates, no grids you can't escape. Build it exactly how you want, publish, and share one link that's entirely yours.";
 
 const words = TEXT.split(" ");
 
