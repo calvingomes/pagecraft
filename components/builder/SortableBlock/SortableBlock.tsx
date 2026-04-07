@@ -46,7 +46,7 @@ export function SortableBlock({
     }
   };
 
-  const toolbarVisible = isMobile
+  const toolbarVisible = isActualMobile
     ? isSelected
     : isHovered || isPaletteHovered || isPaletteOpen;
 
