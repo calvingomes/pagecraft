@@ -85,6 +85,7 @@ export const LinkBlock = ({ block }: { block: LinkBlockType }) => {
       titleHtml={titleHtml}
       onUpdate={(updates) => editor?.onUpdateBlock(block.id, updates)}
       isTitleEmpty={!titleText && !metaTitle}
+      isFocused={isFocused}
     />
   ) : clampedTitleHtml ? (
     <div className={styles.title} dangerouslySetInnerHTML={{ __html: clampedTitleHtml }} />

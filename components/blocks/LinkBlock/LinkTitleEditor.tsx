@@ -19,9 +19,10 @@ type LinkTitleEditorProps = {
   onUpdate: (updates: Partial<LinkBlockType>) => void;
   titleHtml: string;
   isTitleEmpty: boolean;
+  isFocused: boolean;
 };
 
-export const LinkTitleEditor = ({ block, onUpdate, titleHtml }: LinkTitleEditorProps) => {
+export const LinkTitleEditor = ({ block, onUpdate, titleHtml, isFocused }: LinkTitleEditorProps) => {
   const content = block.content;
   const blockUrl = (content.url ?? "").trim();
   const canFetch = isSupportedLinkUrl(blockUrl);
@@ -30,7 +31,7 @@ export const LinkTitleEditor = ({ block, onUpdate, titleHtml }: LinkTitleEditorP
     content: titleHtml,
     placeholder: "Write Title...",
     editable: true,
-    autofocus: "end",
+    autofocus: isFocused ? "end" : false,
     onUpdate: (html) => {
       onUpdate({ content: { ...content, title: html } });
     },

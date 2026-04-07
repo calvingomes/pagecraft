@@ -8,17 +8,18 @@ import styles from "./TextBlock.module.css";
 
 type TextBlockEditorProps = {
   block: TextBlockType;
+  isFocused: boolean;
   onUpdate: (html: string) => void;
 };
 
-export const TextBlockEditor = ({ block, onUpdate }: TextBlockEditorProps) => {
+export const TextBlockEditor = ({ block, isFocused, onUpdate }: TextBlockEditorProps) => {
   const initialContent = block.content?.text ?? "";
 
   const { editor } = useBlockEditor({
     content: initialContent,
     placeholder: "Write something...",
     editable: true,
-    autofocus: "end",
+    autofocus: isFocused ? "end" : false,
     onUpdate,
   });
 

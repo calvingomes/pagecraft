@@ -42,6 +42,7 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
       return (
         <TextBlockEditor
           block={block}
+          isFocused={isFocused}
           onUpdate={(html) => {
             contextEditor?.onUpdateBlock(block.id, {
               content: { text: html },
