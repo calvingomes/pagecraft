@@ -32,7 +32,6 @@ export default async function UserPage({ params }: Props) {
     <>
       <Navbar
         background={page.background as PageBackgroundId}
-        links={[{ label: "About", href: "/", position: "left" }]}
         cta={{ label: "Create your own", href: "/" }}
       />
       <PageView
