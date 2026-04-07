@@ -37,7 +37,7 @@
 
   /* Fluid typography (min, preferred, max) */
   --font-size-fluid-display: clamp(40px, 6vw, 80px);
-  --font-size-fluid-brand: clamp(96px, 18vw, 200px);
+  --font-size-fluid-brand: clamp(74px, 18vw, 200px);
   --font-size-fluid-h1: clamp(40px, 4vw, 56px);
   --font-size-fluid-h1-secondary: clamp(32px, 4vw, 48px);
   --font-size-fluid-h2-plus: clamp(28px, 4vw, 52px);
