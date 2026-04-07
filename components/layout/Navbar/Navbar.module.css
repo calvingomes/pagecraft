@@ -43,8 +43,8 @@
 }
 
 .nav {
-  width: 100%;
-  max-width: 600px;
+  width: fit-content;
+  min-width: 500px;
   height: 78px;
   background: var(--color-white);
   border-bottom-left-radius: 16px;
@@ -68,7 +68,8 @@
 
 @media (--bp-mobile) {
   .nav {
-    max-width: 100%;
+    width: 100%;
+    min-width: 0;
     height: 64px;
     padding: 0 16px;
     border-radius: 0;

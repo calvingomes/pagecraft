@@ -8,6 +8,7 @@ export default function HomePage() {
         links={[{ label: "Updates", href: "/auth", position: "left" }]}
         cta={{ label: "Sign up", href: "/auth" }}
         secondaryCTA={{ label: "Sign in", href: "/auth" }}
+        transparentOnMobile={true}
       />
       <HomeLanding />
     </>

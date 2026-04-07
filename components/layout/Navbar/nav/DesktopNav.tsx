@@ -13,19 +13,10 @@ interface DesktopNavProps {
 }
 
 export const DesktopNav = ({ links = [], cta }: DesktopNavProps) => {
-  const leftLinks = links.filter((link) => (link.position ?? "left") === "left");
-  const rightLinks = links.filter((link) => link.position === "right");
+  const hasLinksOrCTA = links.length > 0 || !!cta;
 
   return (
-    <div className={styles.desktopNav}>
-      <div className={styles.navLeft}>
-        {leftLinks.map((link) => (
-          <Link key={link.href} href={link.href} className={styles.navLink}>
-            {link.label}
-          </Link>
-        ))}
-      </div>
-
+    <div className={`${styles.desktopNav} ${!hasLinksOrCTA ? styles.centeredLogo : ""}`}>
       <Link href="/" className={styles.navLogo}>
         <Image
           src="/logo/pagecraft-logo.svg"
@@ -38,24 +29,26 @@ export const DesktopNav = ({ links = [], cta }: DesktopNavProps) => {
         PageCraft
       </Link>
 
-      <div className={styles.navRight}>
-        {rightLinks.map((link) => (
-          <Link key={link.href} href={link.href} className={styles.navLink}>
-            {link.label}
-          </Link>
-        ))}
-        {cta && (
-          <ThemeButton
-            label={cta.label}
-            cta={cta.href}
-            bgColor="var(--color-success)"
-            textColor="var(--color-white)"
-            buttonWidth="auto"
-            size="small"
-            icon={ArrowRight}
-          />
-        )}
-      </div>
+      {hasLinksOrCTA && (
+        <div className={styles.navRight}>
+          {links.map((link) => (
+            <Link key={link.href} href={link.href} className={styles.navLink}>
+              {link.label}
+            </Link>
+          ))}
+          {cta && (
+            <ThemeButton
+              label={cta.label}
+              cta={cta.href}
+              bgColor="var(--color-success)"
+              textColor="var(--color-white)"
+              buttonWidth="auto"
+              size="small"
+              icon={ArrowRight}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };

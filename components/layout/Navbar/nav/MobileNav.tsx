@@ -11,7 +11,6 @@ import styles from "./MobileNav.module.css";
 interface MobileNavProps {
   isScrolled: boolean;
   isTransparentMobile: boolean;
-  derivedLogoColor: string;
   links?: NavLink[];
   cta?: NavCTA;
   secondaryCTA?: NavCTA;
@@ -20,7 +19,6 @@ interface MobileNavProps {
 export const MobileNav = ({
   isScrolled,
   isTransparentMobile,
-  derivedLogoColor,
   links = [],
   cta,
   secondaryCTA,
@@ -40,15 +38,7 @@ export const MobileNav = ({
     <div
       className={`${styles.mobileNav} ${isTransparentMobile ? styles.transparentOnMobile : ""} ${isScrolled ? styles.scrolled : ""}`}
     >
-      <Link
-        href="/"
-        className={styles.navLogo}
-        style={
-          isTransparentMobile && !isScrolled
-            ? { color: derivedLogoColor }
-            : undefined
-        }
-      >
+      <Link href="/" className={styles.navLogo}>
         <Image
           src="/logo/pagecraft-logo.svg"
           alt=""
@@ -60,14 +50,30 @@ export const MobileNav = ({
         PageCraft
       </Link>
 
-      <button
-        type="button"
-        className={styles.mobileMenuTrigger}
-        onClick={() => setIsMobileMenuOpen(true)}
-        aria-label="Open navigation menu"
-      >
-        <Menu size={20} />
-      </button>
+      {links.length > 0 ? (
+        <button
+          type="button"
+          className={styles.mobileMenuTrigger}
+          onClick={() => setIsMobileMenuOpen(true)}
+          aria-label="Open navigation menu"
+        >
+          <Menu size={20} />
+        </button>
+      ) : (
+        cta && (
+          <div className={styles.ctaWrapper}>
+            <ThemeButton
+              label={cta.label}
+              cta={cta.href}
+              bgColor="var(--color-success)"
+              textColor="var(--color-white)"
+              buttonWidth="auto"
+              size="small"
+              icon={ArrowRight}
+            />
+          </div>
+        )
+      )}
 
       {isMobileMenuOpen && (
         <div
