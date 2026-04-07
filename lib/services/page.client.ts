@@ -6,6 +6,7 @@ import type {
 } from "@/types/page";
 
 export interface PageData {
+  uid?: string;
   title?: string;
   background?: PageBackgroundId;
   sidebar_position?: SidebarPosition;
@@ -13,6 +14,7 @@ export interface PageData {
   bio_html?: string;
   avatar_url?: string;
   avatar_shape?: AvatarShape;
+  og_image_url?: string;
   updated_at?: string;
 }
 

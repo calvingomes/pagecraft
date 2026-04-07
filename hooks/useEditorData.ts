@@ -132,6 +132,7 @@ export function useEditorData() {
     if (!username || !user?.id || isSaving) return;
 
     setIsSaving(true);
+
     const hasPageChanges =
       !lastSavedPayload ||
       background !== lastSavedPayload.background ||
@@ -140,6 +141,11 @@ export function useEditorData() {
       bioHtml !== lastSavedPayload.bioHtml ||
       avatarUrl !== lastSavedPayload.avatarUrl ||
       avatarShape !== lastSavedPayload.avatarShape;
+
+    const hasBrandingChanges =
+      !lastSavedPayload ||
+      displayName !== (lastSavedPayload?.displayName ?? "") ||
+      avatarUrl !== (lastSavedPayload?.avatarUrl ?? "");
 
     try {
       const result = await saveEditorPage({
@@ -154,6 +160,7 @@ export function useEditorData() {
         avatarShape,
         blocks,
         skipPageUpdate: !hasPageChanges,
+        skipOgUpdate: !hasBrandingChanges,
       });
 
       const resolvedAvatarUrl = result.avatarUrl;

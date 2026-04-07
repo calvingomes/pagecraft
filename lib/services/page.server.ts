@@ -21,7 +21,7 @@ export const ServerPageService = {
     const { data } = await supabase
       .from("pages")
       .select(
-        "title, background, sidebar_position, display_name, bio_html, avatar_url, avatar_shape, updated_at",
+        "uid, title, background, sidebar_position, display_name, bio_html, avatar_url, avatar_shape, og_image_url, updated_at",
       )
       .eq("username", username)
       .maybeSingle();
@@ -67,5 +67,18 @@ export const ServerPageService = {
     }
 
     return blocks;
+  },
+
+  getAllPageUsernames: async (
+    client?: ReturnType<typeof createSupabaseServerClient>,
+  ): Promise<{ username: string; updated_at: string }[]> => {
+    const supabase = client ?? createSupabaseServerClient();
+    const { data } = await supabase
+      .from("pages")
+      .select("username, updated_at")
+      .eq("published", true)
+      .order("updated_at", { ascending: false });
+
+    return (data ?? []) as { username: string; updated_at: string }[];
   },
 };

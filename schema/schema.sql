@@ -32,6 +32,7 @@ create table if not exists public.pages (
   bio_html text,
   avatar_url text,
   avatar_shape text,
+  og_image_url text,
   storage_bytes_used bigint not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

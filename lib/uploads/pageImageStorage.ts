@@ -10,7 +10,8 @@ const STORAGE_BUCKET =
 
 export type PageImageScope =
   | { kind: "avatar" }
-  | { kind: "block-image"; blockId: string };
+  | { kind: "block-image"; blockId: string }
+  | { kind: "og-image" };
 
 export type UploadedPageImage = {
   downloadUrl: string;
@@ -48,6 +49,7 @@ function ensureAllowedImage(file: File) {
 function getScopePath(uid: string, username: string, scope: PageImageScope) {
   const base = `users/${uid}/pages/${username}`;
   if (scope.kind === "avatar") return `${base}/avatar_${Date.now()}.webp`;
+  if (scope.kind === "og-image") return `${base}/social_preview.jpg`;
   return `${base}/blocks/${scope.blockId}.webp`;
 }
 
@@ -75,6 +77,7 @@ function getLegacyScopePath(
 ) {
   const base = `users/${uid}/pages/${username}`;
   if (scope.kind === "avatar") return `${base}/avatar`;
+  if (scope.kind === "og-image") return `${base}/social_preview.jpg`;
   return `${base}/blocks/${scope.blockId}`;
 }
 

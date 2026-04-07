@@ -34,6 +34,7 @@ export type SaveEditorPageInput = {
   avatarShape: AvatarShape;
   blocks: Block[];
   skipPageUpdate?: boolean;
+  skipOgUpdate?: boolean;
 };
 
 export type SaveEditorPageResult = {
@@ -138,6 +139,7 @@ export async function saveEditorPage({
   avatarShape,
   blocks,
   skipPageUpdate,
+  skipOgUpdate,
 }: SaveEditorPageInput): Promise<SaveEditorPageResult> {
   const { error: profileError } = await supabase.from("profiles").upsert(
     {
@@ -194,6 +196,36 @@ export async function saveEditorPage({
       { onConflict: "username" },
     );
     throwIfError(pageError, "Saving page settings failed");
+
+    // AFTER SUCCESSFUL SAVE: Generate and update the social preview (OG Image)
+    // Only update if branding has changed
+    if (!skipOgUpdate) {
+      try {
+        const { generateOgImageBlob } = await import("@/lib/uploads/ogGenerator");
+        const { htmlToText } = await import("@/lib/utils/htmlToText");
+        
+        // Strip HTML from displayName before generating the card
+        const cleanDisplayName = htmlToText(displayName || username);
+        const ogBlob = await generateOgImageBlob(username, cleanDisplayName, resolvedAvatarUrl);
+        const ogFile = new File([ogBlob], "social_preview.jpg", { type: "image/jpeg" });
+        
+        const upload = await uploadPageImage({
+          uid: userId,
+          username,
+          file: ogFile,
+          scope: { kind: "og-image" },
+        });
+
+        // Store the persistent OG URL back to the page record
+        await supabase
+          .from("pages")
+          .update({ og_image_url: upload.downloadUrl })
+          .eq("username", username);
+
+      } catch (ogError) {
+        console.error("Social preview generation failed during save:", ogError);
+      }
+    }
   }
 
   const resolvedBlocks = await Promise.all(
