@@ -1,16 +1,17 @@
-import type { Block } from "@/types/editor";
+import type { BlockType, BlockStyles } from "@/types/editor";
 
 export function shouldUseTransparentWrapper(
-  block: Block,
+  blockType: BlockType,
+  styles?: BlockStyles,
 ): boolean {
-  if (block.type === "sectionTitle") {
+  if (blockType === "sectionTitle") {
     return true;
   }
 
-  const canToggleBackground = block.type === "text" || block.type === "link";
+  const canToggleBackground = blockType === "text" || blockType === "link";
   if (!canToggleBackground) {
     return false;
   }
 
-  return block.styles?.transparentWrapper === true;
+  return styles?.transparentWrapper === true;
 }

@@ -10,29 +10,25 @@ export type BlockWidthPreset =
   | "max" // 875x200
   | "full"; // 875x100
 
+export type BlockStyles = {
+  width?: number;
+  height?: number;
+  widthPreset?: BlockWidthPreset;
+  transparentWrapper?: boolean;
+  backgroundColor?: string;
+};
+
 interface BaseBlock {
   id: string;
   order: number;
   updated_at?: string;
-  styles?: {
-    width?: number;
-    height?: number;
-    widthPreset?: BlockWidthPreset;
-    transparentWrapper?: boolean;
-    backgroundColor?: string;
-  };
+  styles?: BlockStyles;
   // Desktop fallback/default placement
   layout?: {
     x: number;
     y: number;
   };
-  mobileStyles?: {
-    width?: number;
-    height?: number;
-    widthPreset?: BlockWidthPreset;
-    transparentWrapper?: boolean;
-    backgroundColor?: string;
-  };
+  mobileStyles?: BlockStyles;
   mobileLayout?: {
     x: number;
     y: number;

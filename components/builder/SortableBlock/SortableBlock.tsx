@@ -106,8 +106,9 @@ export function SortableBlock({
 
   const widthPreset = resolvedStyles?.widthPreset ?? "small";
   const showHoverToolbar = !!editor && block.type !== "sectionTitle";
-  const isTransparentWrapper = shouldUseTransparentWrapper(block);
+  const isTransparentWrapper = shouldUseTransparentWrapper(block.type, resolvedStyles);
 
+  const isFocused = editor?.focusedBlockId === block.id;
   const showDeleteButton = isActualMobile ? isSelected : (isHovered && !!editor);
 
   const { widthPx, heightPx } = dimensions;
@@ -158,14 +159,14 @@ export function SortableBlock({
               }),
             backgroundColor: !isTransparentWrapper
               ? backgroundColor || "var(--color-white)"
-              : toolbarVisible && !!editor && (block.type === "text" || block.type === "sectionTitle")
+              : (isFocused || (isHovered && !isActualMobile)) && !!editor && (block.type === "text" || block.type === "sectionTitle")
                 ? "var(--color-white)"
                 : "transparent",
             color: textColor,
             "--block-text-color": textColor,
             "--block-bg-color": !isTransparentWrapper
               ? backgroundColor || "var(--color-white)"
-              : toolbarVisible && !!editor && (block.type === "text" || block.type === "sectionTitle")
+              : (isFocused || (isHovered && !isActualMobile)) && !!editor && (block.type === "text" || block.type === "sectionTitle")
                 ? "var(--color-white)"
                 : "transparent",
           } as React.CSSProperties & { [key: string]: string | number }}
