@@ -7,9 +7,11 @@ import type { WebpOptions } from "@/types/uploads";
 
 export type { WebpOptions } from "@/types/uploads";
 
+import { IMAGE_LIMITS } from "@/lib/uploads/uploadConfig";
+
 const DEFAULT_WEBP_OPTIONS: Required<WebpOptions> = {
   maxSizeMB: 2,
-  maxWidthOrHeight: 1600,
+  maxWidthOrHeight: IMAGE_LIMITS.DEFAULT,
   quality: 0.6,
 };
 

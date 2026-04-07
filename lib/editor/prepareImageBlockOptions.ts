@@ -1,5 +1,6 @@
 import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.types";
 import { fileToWebpDataUrl } from "@/lib/uploads/imageWebp";
+import { IMAGE_LIMITS } from "@/lib/uploads/uploadConfig";
 
 export async function prepareImageBlockOptions(
   blockId: string,
@@ -13,7 +14,7 @@ export async function prepareImageBlockOptions(
     options.file,
     `block-${blockId}.webp`,
     {
-      maxWidthOrHeight: 2000,
+      maxWidthOrHeight: IMAGE_LIMITS.BLOCK,
     },
   );
 

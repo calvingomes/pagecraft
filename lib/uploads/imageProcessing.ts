@@ -1,5 +1,6 @@
 import imageCompression from "browser-image-compression";
 import type { WebpOptions } from "@/types/uploads";
+import { IMAGE_LIMITS } from "@/lib/uploads/uploadConfig";
 
 export function dataUrlToFile(dataUrl: string, fileName: string): File {
   const parts = dataUrl.split(",");
@@ -28,7 +29,7 @@ export async function convertFileToWebp(
   const compressed = await imageCompression(file, {
     fileType: "image/webp",
     maxSizeMB: options.maxSizeMB ?? 1,
-    maxWidthOrHeight: options.maxWidthOrHeight ?? 1600,
+    maxWidthOrHeight: options.maxWidthOrHeight ?? IMAGE_LIMITS.DEFAULT,
     useWebWorker: true,
     initialQuality: options.quality ?? 0.6,
   });

@@ -11,6 +11,7 @@ import {
 } from "@/lib/uploads/pageImageStorage";
 import { dataUrlToFile } from "@/lib/uploads/imageProcessing";
 import { dataUrlToWebpFile } from "@/lib/uploads/imageWebp";
+import { IMAGE_LIMITS } from "@/lib/uploads/uploadConfig";
 
 type DbLikeError = {
   message?: string;
@@ -162,7 +163,7 @@ export async function saveEditorPage({
     resolvedAvatarUrl = "";
   } else if (isDataUrl(avatarUrl)) {
     const file = await dataUrlToWebpFile(avatarUrl, `avatar-${username}.webp`, {
-      maxWidthOrHeight: 1600,
+      maxWidthOrHeight: IMAGE_LIMITS.AVATAR,
     });
     try {
       const upload = await uploadPageImage({
