@@ -8,7 +8,7 @@
   padding: 6px 6px 6px 12px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 6px;
   box-shadow: 0 12px 20px color-mix(in srgb, var(--color-black) 8%, transparent);
   cursor: pointer;
   z-index: 1000;
@@ -43,6 +43,12 @@
   font-size: 14px;
   color: var(--color-black);
   letter-spacing: -0.01em;
+}
+
+.logoImage {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 .copyButton {

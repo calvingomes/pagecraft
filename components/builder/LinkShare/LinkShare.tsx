@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { Copy, Check } from "lucide-react";
 import styles from "./LinkShare.module.css";
 import { LinkShareProps } from "./LinkShare.types";
@@ -44,6 +45,13 @@ export const LinkShare = ({ username, isSaving }: LinkShareProps) => {
       `} 
       onClick={handleCopy}
     >
+      <Image
+        src="/logo/pagecraft-logo.svg"
+        alt=""
+        width={20}
+        height={20}
+        className={styles.logoImage}
+      />
       <span className={styles.urlText}>{displayUrl}</span>
 
       <Tooltip content={isCopied ? "Copied!" : "Copy public link"} side="top">

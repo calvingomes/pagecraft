@@ -14,6 +14,15 @@
   color: var(--color-forest-green);
   text-decoration: none;
   transition: color 300ms ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoImage {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 .transparentOnMobile .navLogo {
@@ -105,6 +114,9 @@
   font-weight: 700;
   color: var(--color-forest-green);
   text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .mobileMenuClose {

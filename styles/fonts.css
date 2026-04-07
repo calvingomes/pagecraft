@@ -1,4 +1,4 @@
-@font-face {
+/* @font-face {
   font-family: "Belanosima";
   src: url("/fonts/belanosima-v4-latin-regular.woff2") format("woff2");
   font-weight: 400;
@@ -20,10 +20,10 @@
   font-weight: 700;
   font-style: normal;
   font-display: swap;
-}
+} */
 
 :root {
-  --font-belanosima: "Belanosima", sans-serif;
+  /* --font-belanosima: "Belanosima", sans-serif; */
 
   --font-size-xs: 12px;
   --font-size-sm: 14px;

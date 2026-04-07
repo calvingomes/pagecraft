@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { ArrowRight } from "lucide-react";
 import type { NavLink, NavCTA } from "@/types/nav";
@@ -26,6 +27,14 @@ export const DesktopNav = ({ links = [], cta }: DesktopNavProps) => {
       </div>
 
       <Link href="/" className={styles.navLogo}>
+        <Image
+          src="/logo/pagecraft-logo.svg"
+          alt=""
+          width={26}
+          height={26}
+          priority
+          className={styles.logoImage}
+        />
         PageCraft
       </Link>
 

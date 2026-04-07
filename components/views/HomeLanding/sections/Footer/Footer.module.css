@@ -58,11 +58,9 @@
 }
 
 .footerBrandText {
-  font-family: var(--font-belanosima);
   font-size: var(--font-size-fluid-brand);
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1;
-  letter-spacing: -0.04em;
   text-align: center;
   margin: 0;
   white-space: nowrap;

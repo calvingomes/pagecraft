@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { ArrowRight, Menu, X } from "lucide-react";
 import type { NavLink, NavCTA } from "@/types/nav";
@@ -48,6 +49,14 @@ export const MobileNav = ({
             : undefined
         }
       >
+        <Image
+          src="/logo/pagecraft-logo.svg"
+          alt=""
+          width={24}
+          height={24}
+          priority
+          className={styles.logoImage}
+        />
         PageCraft
       </Link>
 
@@ -73,6 +82,13 @@ export const MobileNav = ({
           >
             <div className={styles.mobileMenuHeader}>
               <Link href="/" className={styles.mobileMenuLogo}>
+                <Image
+                  src="/logo/pagecraft-logo.svg"
+                  alt=""
+                  width={24}
+                  height={24}
+                  priority
+                />
                 PageCraft
               </Link>
               <button
