@@ -1,6 +1,8 @@
 export type BlockType = "text" | "link" | "image" | "sectionTitle";
 export type BlockViewportMode = "desktop" | "mobile";
 
+import type { PageBackgroundId, SidebarPosition, AvatarShape } from "./page";
+
 export type BlockWidthPreset =
   | "small" // 200x200
   | "large" // 420x420
@@ -101,4 +103,15 @@ export type EditorState = {
   setAllBlocks: (blocks: Block[]) => void;
   setActiveViewportMode: (mode: BlockViewportMode) => void;
   setIsActualMobile: (val: boolean) => void;
+};
+
+export type EditorSnapshotPayload = {
+  background: PageBackgroundId;
+  sidebarPosition: SidebarPosition;
+  displayName: string;
+  bioHtml: string;
+  avatarUrl: string;
+  persistedAvatarUrl: string;
+  avatarShape: AvatarShape;
+  blocks: Block[];
 };

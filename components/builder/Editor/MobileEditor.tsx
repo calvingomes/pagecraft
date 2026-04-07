@@ -8,7 +8,7 @@ import { MobileBlockToolbar } from "@/components/builder/HoverToolbar/MobileBloc
 import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
 import { useEditorStore } from "@/stores/editor-store";
 import type { EditorLayoutProps } from "./Editor.types";
-import styles from "../../../app/editor/editor.module.css";
+import styles from "./Editor.module.css";
 
 export const MobileEditor = ({
   username,

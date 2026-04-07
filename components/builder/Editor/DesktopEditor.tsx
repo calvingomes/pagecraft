@@ -6,7 +6,7 @@ import { Toolbar } from "@/components/builder/Toolbars/Toolbar";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 import { LinkShare } from "@/components/builder/LinkShare/LinkShare";
 import type { EditorLayoutProps } from "./Editor.types";
-import styles from "../../../app/editor/editor.module.css";
+import styles from "./Editor.module.css";
 
 export const DesktopEditor = ({
   username,
