@@ -47,8 +47,25 @@ function ensureAllowedImage(file: File) {
 
 function getScopePath(uid: string, username: string, scope: PageImageScope) {
   const base = `users/${uid}/pages/${username}`;
-  if (scope.kind === "avatar") return `${base}/avatar.webp`;
+  if (scope.kind === "avatar") return `${base}/avatar_${Date.now()}.webp`;
   return `${base}/blocks/${scope.blockId}.webp`;
+}
+
+async function cleanUpOldAvatars(uid: string, username: string) {
+  const base = `users/${uid}/pages/${username}`;
+  const { data: files } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .list(base);
+
+  if (files) {
+    const avatarFiles = files
+      .filter((f) => f.name.startsWith("avatar") && f.name.endsWith(".webp"))
+      .map((f) => `${base}/${f.name}`);
+
+    if (avatarFiles.length > 0) {
+      await supabase.storage.from(STORAGE_BUCKET).remove(avatarFiles);
+    }
+  }
 }
 
 function getLegacyScopePath(
@@ -86,6 +103,11 @@ export async function uploadPageImage({
 
   if (projected > MAX_TOTAL_UPLOAD_BYTES) {
     throw new Error("Total upload limit reached (25MB).");
+  }
+
+  // Cleanup old avatars before uploading new one to avoid orphans
+  if (scope.kind === "avatar") {
+    await cleanUpOldAvatars(uid, username);
   }
 
   const storagePath = getScopePath(uid, username, scope);
