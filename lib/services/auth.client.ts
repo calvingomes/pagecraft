@@ -26,16 +26,16 @@ export const AuthService = {
   },
 
   /**
-   * Sign in with Google OAuth
+   * Sign in with an OAuth provider
    */
-  signInWithGoogle: async (username?: string) => {
+  signInWithOAuth: async (provider: "google" | "github" | "figma", username?: string) => {
     let redirectTo = `${window.location.origin}/auth`;
     if (username) {
       redirectTo += `?username=${encodeURIComponent(username)}`;
     }
 
     await supabase.auth.signInWithOAuth({
-      provider: "google",
+      provider,
       options: {
         redirectTo,
       },

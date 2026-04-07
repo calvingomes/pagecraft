@@ -60,15 +60,15 @@ function AuthPageContent() {
     return <PageLoader label={claiming ? "Creating your page..." : undefined} />;
   }
 
-  const handleGoogleSignIn = async (username?: string) => {
-    await AuthService.signInWithGoogle(username);
+  const handleOAuthSignIn = async (provider: "google" | "github" | "figma", username?: string) => {
+    await AuthService.signInWithOAuth(provider, username);
   };
 
   return (
     <>
-      <Navbar links={[{ label: "Home", href: "/", position: "left" }]} />
+      <Navbar />
       <AuthView
-        handleGoogleSignIn={handleGoogleSignIn}
+        handleOAuthSignIn={handleOAuthSignIn}
         initialUsername={initialUsername}
       />
     </>

@@ -2,14 +2,42 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
 import type { AuthMode, AuthViewProps } from "./AuthView.types";
 import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
 import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
 import styles from "./AuthView.module.css";
 
-const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
+const GoogleIcon = (props: Partial<React.ComponentProps<typeof Image>>) => (
+  <Image
+    src="/svg/google.svg"
+    alt="Google"
+    width={18}
+    height={18}
+    {...props}
+  />
+);
+const GithubIcon = (props: Partial<React.ComponentProps<typeof Image>>) => (
+  <Image
+    src="/svg/github.svg"
+    alt="GitHub"
+    width={18}
+    height={18}
+    {...props}
+  />
+);
+// const FigmaIcon = (props: Partial<React.ComponentProps<typeof Image>>) => (
+//   <Image
+//     src="/svg/figma.svg"
+//     alt="Figma"
+//     width={18}
+//     height={18}
+//     {...props}
+//   />
+// );
+
+const AuthView = (props: AuthViewProps) => {
+  const { handleOAuthSignIn, initialUsername } = props;
   const [mode, setMode] = useState<AuthMode>(
     initialUsername ? "signup" : "signin",
   );
@@ -84,9 +112,8 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
           {isSignUp && (
             <>
               <div
-                className={`${styles.usernameInputWrapper} ${
-                  availabilityStatus === "available" ? styles.statusAvailable : ""
-                } ${availabilityStatus === "taken" ? styles.statusTaken : ""}`}
+                className={`${styles.usernameInputWrapper} ${availabilityStatus === "available" ? styles.statusAvailable : ""
+                  } ${availabilityStatus === "taken" ? styles.statusTaken : ""}`}
               >
                 <span className={styles.usernamePrefix}>pagecraft.me/</span>
                 <input
@@ -102,19 +129,16 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
 
               {/* Status Message */}
               <div
-                className={`${styles.statusMessage} ${
-                  availabilityStatus === "available"
+                className={`${styles.statusMessage} ${availabilityStatus === "available"
                     ? styles.statusMessageAvailable
                     : ""
-                } ${
-                  availabilityStatus === "taken"
+                  } ${availabilityStatus === "taken"
                     ? styles.statusMessageTaken
                     : ""
-                } ${
-                  availabilityStatus === "checking"
+                  } ${availabilityStatus === "checking"
                     ? styles.statusMessageChecking
                     : ""
-                }`}
+                  }`}
               >
                 {availabilityStatus === "checking" && "Checking availability..."}
                 {availabilityStatus === "available" && "Username available!"}
@@ -124,23 +148,42 @@ const AuthView = ({ handleGoogleSignIn, initialUsername }: AuthViewProps) => {
             </>
           )}
 
-          <ThemeButton
-            label={
-              isSignUp
-                ? "Create an account with Google"
-                : "Continue with Google"
-            }
-            cta={() => handleGoogleSignIn(username)}
-            bgColor={
-              canProceed ? "var(--color-yellow)" : "var(--color-light-grey)"
-            }
-            textColor={
-              canProceed ? "var(--color-white)" : "var(--color-mid-grey)"
-            }
-            icon={ArrowRight}
-            disabled={!canProceed}
-            size="large"
-          />
+          <div className={styles.socialContainer}>
+            <ThemeButton
+              label="Google"
+              cta={() => handleOAuthSignIn("google", username)}
+              bgColor="color-mix(in srgb, #ea4335 5%, white)"
+              textColor="var(--color-darker-grey)"
+              borderColor="color-mix(in srgb, #ea4335 15%, #dcdcdc)"
+              icon={GoogleIcon}
+              size="large"
+              buttonWidth="full"
+              disabled={!canProceed}
+            />
+            <ThemeButton
+              label="GitHub"
+              cta={() => handleOAuthSignIn("github", username)}
+              bgColor="color-mix(in srgb, #0070f3 5%, white)"
+              textColor="var(--color-darker-grey)"
+              borderColor="color-mix(in srgb, #0070f3 15%, #dcdcdc)"
+              icon={GithubIcon}
+              size="large"
+              buttonWidth="full"
+              disabled={!canProceed}
+            />
+            {/* will enable it once figma approves app */}
+            {/* <ThemeButton
+              label="Figma"
+              cta={() => handleOAuthSignIn("figma", username)}
+              bgColor="color-mix(in srgb, #a259ff 5%, white)"
+              textColor="var(--color-darker-grey)"
+              borderColor="color-mix(in srgb, #a259ff 15%, #dcdcdc)"
+              icon={FigmaIcon}
+              size="large"
+              buttonWidth="full"
+              disabled={!canProceed}
+            /> */}
+          </div>
         </div>
       </div>
     </div>
