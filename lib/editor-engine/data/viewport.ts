@@ -15,6 +15,13 @@ export function resolveViewportMode(width: number): ViewportMode {
   return "desktop";
 }
 
+export function resolveViewportModeFromUA(userAgent: string): ViewportMode {
+  const ua = userAgent.toLowerCase();
+  const isMobile =
+    /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+  return isMobile ? "mobile" : "desktop";
+}
+
 
 export type EditorViewportCapabilities = {
   allowManualPreviewToggle: boolean;

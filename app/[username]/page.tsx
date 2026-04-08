@@ -10,6 +10,8 @@ import { Navbar } from "@/components/layout/Navbar/Navbar";
 import { notFound } from "next/navigation";
 import { type Metadata } from "next";
 import { htmlToText } from "@/lib/utils/htmlToText";
+import { headers } from "next/headers";
+import { resolveViewportModeFromUA } from "@/lib/editor-engine/data/viewport";
 
 type Props = {
   params: Promise<{ username: string }>;
@@ -65,6 +67,10 @@ export default async function UserPage({ params }: Props) {
     notFound();
   }
 
+  const headersList = await headers();
+  const userAgent = headersList.get("user-agent") || "";
+  const initialViewportMode = resolveViewportModeFromUA(userAgent);
+
   return (
     <>
       <Navbar
@@ -74,6 +80,7 @@ export default async function UserPage({ params }: Props) {
       />
       <PageView
         username={username}
+        initialViewportMode={initialViewportMode}
         title={(page.title as string | undefined) ?? undefined}
         background={
           (page.background as PageBackgroundId | undefined) ?? undefined

@@ -36,10 +36,20 @@ export const ProfileSidebarView = (props: ProfileSidebarViewProps) => {
   })();
 
   const avatarClassName = `${styles.avatar} ${avatarShape === "square" ? styles.avatarSquare : ""}`;
-  const asideStyle = zoom < 1 ? ({ width: `${MOBILE_GRID.canvasPx}px`, zoom } as React.CSSProperties) : undefined;
+  
+  // To avoid CLS during hydration, we only apply the zoom-based width 
+  // if zoom is actually active (< 1).
+  const asideStyle: React.CSSProperties = {
+    opacity: 1, // Ensure visible immediately for SSR
+  };
+  
+  if (zoom < 1) {
+    asideStyle.width = `${MOBILE_GRID.canvasPx}px`;
+    asideStyle.zoom = zoom;
+  }
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} className={styles.viewWrapper}>
       <aside className={`${styles.sidebar} ${styles.sidebarCenter}`} style={asideStyle}>
         <div className={styles.profileCard}>
           <div className={styles.avatarWrap}>
@@ -47,18 +57,20 @@ export const ProfileSidebarView = (props: ProfileSidebarViewProps) => {
               {avatarUrl ? (
                 <Image
                   src={avatarUrl}
-                  alt="Profile image"
+                  alt={displayNameText}
                   width={200}
                   height={200}
                   className={styles.avatarImage}
                   priority
+                  loading="eager"
+                  fetchPriority="high"
                 />
               ) : (
                 avatarLetter
               )}
             </div>
           </div>
-          <div>
+          <div className={styles.profileContent}>
             <div
               className={styles.name}
               role="heading"

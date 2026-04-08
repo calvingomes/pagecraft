@@ -7,12 +7,10 @@ import type {
   SidebarPosition,
   ViewportMode,
 } from "@/types/page";
-import { useState, useEffect } from "react";
 import { ProfileSidebar } from "@/components/layout/ProfileSidebar/ProfileSidebar";
 import { BlockCanvas } from "@/components/builder/BlockCanvas/BlockCanvas";
 import { PageLayout } from "@/components/layout/PageLayout/PageLayout";
 import { BottomBar } from "@/components/layout/Footer/BottomBar";
-import { PageLoader } from "@/components/ui/PageLoader/PageLoader";
 import { getViewEffectiveSidebarPosition } from "@/lib/editor-engine/data/viewport";
 import { useViewportMode } from "@/hooks/useViewportMode";
 import styles from "./PageView.module.css";
@@ -44,15 +42,6 @@ export function PageView({
   initialViewportMode = "desktop",
   updatedAt,
 }: PageViewProps) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    const handle = requestAnimationFrame(() => {
-      setIsMounted(true);
-    });
-    return () => cancelAnimationFrame(handle);
-  }, []);
-
   const { viewportMode } = useViewportMode(initialViewportMode);
 
   const effectiveSidebarPosition = getViewEffectiveSidebarPosition(
@@ -78,32 +67,24 @@ export function PageView({
       previewViewport={renderMode}
       footer={<BottomBar />}
     >
-      <div className={`${styles.container} ${isMounted ? styles.visible : ""}`}>
-        {isMounted && (
-          <ProfileSidebar
-            variant="view"
-            username={username}
-            displayName={displayName}
-            bioHtml={bioHtml}
-            avatarUrl={avatarUrl}
-            avatarShape={avatarShape}
-            updatedAt={updatedAt}
-          />
-        )}
+      <div className={styles.container}>
+        <ProfileSidebar
+          variant="view"
+          username={username}
+          displayName={displayName}
+          bioHtml={bioHtml}
+          avatarUrl={avatarUrl}
+          avatarShape={avatarShape}
+          updatedAt={updatedAt}
+        />
       </div>
-      <div className={`${styles.container} ${isMounted ? styles.visible : ""}`}>
-        {isMounted ? (
-          <BlockCanvas
-            editable={false}
-            blocks={visibleBlocks}
-            renderMode={renderMode}
-            title={title}
-          />
-        ) : (
-          <div className={styles.loaderWrapper}>
-            <PageLoader backgroundColor="transparent" />
-          </div>
-        )}
+      <div className={styles.container}>
+        <BlockCanvas
+          editable={false}
+          blocks={visibleBlocks}
+          renderMode={renderMode}
+          title={title}
+        />
       </div>
     </PageLayout>
   );

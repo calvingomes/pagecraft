@@ -13,9 +13,31 @@
   position: relative;
 }
 
+.gridContainer {
+  min-height: var(--grid-height);
+}
+
 @media (--bp-mobile) {
-  .canvas {
+  .gridContainer {
     width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .canvas {
+    width: 370px;
+    margin: 0 auto;
+    zoom: 1;
+  }
+
+  /* Scale BOTH the content and the container height to prevent gaps */
+  @media (max-width: 320px) {
+    .canvas { zoom: 0.86; }
+    .gridContainer { min-height: calc(var(--grid-height) * 0.86); }
+  }
+  @media (min-width: 321px) and (max-width: 350px) {
+    .canvas { zoom: 0.94; }
+    .gridContainer { min-height: calc(var(--grid-height) * 0.94); }
   }
 }
 

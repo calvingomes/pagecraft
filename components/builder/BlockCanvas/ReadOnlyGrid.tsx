@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
 /* eslint-disable css-modules/no-unused-class */
+import React, { useMemo } from "react";
 import type { Block } from "@/types/editor";
 import type { BlockCanvasRenderMode } from "@/types/builder";
 import { DESKTOP_GRID, MOBILE_GRID } from "@/lib/editor-engine/grid/grid-config";
@@ -36,19 +36,36 @@ export const ReadOnlyGrid = ({ blocks, renderMode }: ReadOnlyGridProps) => {
   }, 0);
 
   const containerHeight = Math.round(maxLatentY * (config.cellPx + config.gapYPx));
+  
+  // Setup zoom style while avoiding hydration mismatch
+  const canvasStyle: React.CSSProperties = {
+    position: "relative",
+    height: `${containerHeight}px`,
+    width: `${config.canvasPx}px`,
+    margin: "0 auto",
+  };
+
+  if (isMobile && zoom < 1) {
+    canvasStyle.zoom = zoom;
+    canvasStyle.maxWidth = "none";
+  }
+
+  const scaledHeight = isMobile ? Math.round(containerHeight * zoom) : containerHeight;
 
   return (
-    <div ref={containerRef} style={{ width: "100%" }}>
+    <div 
+      ref={containerRef} 
+      className={styles.gridContainer}
+      style={{ 
+        width: "100%", 
+        overflow: "hidden",
+        minHeight: `${scaledHeight}px`,
+        "--grid-height": `${containerHeight}px`,
+      } as React.CSSProperties}
+    >
       <div
         className={styles.canvas}
-        style={{
-          position: "relative",
-          height: `${containerHeight}px`,
-          width: `${config.canvasPx}px`,
-          margin: "0 auto",
-          zoom: isMobile ? zoom : undefined,
-          maxWidth: isMobile ? "none" : undefined,
-        }}
+        style={canvasStyle}
       >
         {visibleBlocks.map((block) => {
           const itemStyle = blockToStyle(block, config);

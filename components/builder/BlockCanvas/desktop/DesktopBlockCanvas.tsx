@@ -1,5 +1,6 @@
 "use client";
 
+/* eslint-disable css-modules/no-unused-class */
 import { useMemo, useRef } from "react";
 import ReactGridLayout from "react-grid-layout";
 import type { Layout } from "react-grid-layout";

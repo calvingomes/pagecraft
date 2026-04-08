@@ -25,6 +25,15 @@
   margin: 0 0 40px;
 }
 
+.viewWrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+.profileContent {
+  width: 100%;
+}
+
 .avatar {
   width: 200px;
   height: 200px;
@@ -143,6 +152,14 @@
   .sidebarCenter .bioEditor :global(.ProseMirror),
   .sidebarCenter .bio {
     margin-top: 12px;
+  }
+
+  /* Stepping stones for smaller screens to minimize the hydration pop */
+  @media (max-width: 320px) {
+    .sidebarCenter { zoom: 0.86; }
+  }
+  @media (min-width: 321px) and (max-width: 350px) {
+    .sidebarCenter { zoom: 0.94; }
   }
 }
 
