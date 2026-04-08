@@ -23,6 +23,7 @@ import type { BlockWidthPreset } from "@/types/editor";
 const WIDTH_PRESETS = [
   { preset: "small", Icon: Square, size: 16 },
   { preset: "wide", Icon: RectangleHorizontal, size: 24 },
+  { preset: "skinnyWide", Icon: RectangleHorizontal, size: 16 },
   { preset: "tall", Icon: RectangleVertical, size: 24 },
   { preset: "large", Icon: Square, size: 24 },
 ] as const;
@@ -69,6 +70,14 @@ export function MobileBlockToolbar() {
   const currentPreset = block.mobileStyles?.widthPreset ?? block.styles?.widthPreset ?? "small";
   const currentBg = block.mobileStyles?.backgroundColor ?? block.styles?.backgroundColor;
 
+  // Filter presets based on block type
+  const visiblePresets = WIDTH_PRESETS.filter((p) => {
+    if (p.preset === "skinnyWide") {
+      return block.type === "text" || block.type === "link";
+    }
+    return true;
+  });
+
   return (
     <div className={styles.mobileToolbar}>
       <Toolbar.Root className={styles.controlsRow}>
@@ -95,7 +104,7 @@ export function MobileBlockToolbar() {
                     }
                   }}
                 >
-                  {WIDTH_PRESETS.map(({ preset, Icon, size }) => (
+                  {visiblePresets.map(({ preset, Icon, size }) => (
                     <ToggleGroup.Item
                       key={preset}
                       value={preset}

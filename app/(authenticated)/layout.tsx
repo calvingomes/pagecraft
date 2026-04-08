@@ -12,7 +12,7 @@ export default function AuthenticatedLayout({
 
   if (!authChecked) {
     return (
-      <PageLoader label="Validating session..." backgroundColor="var(--color-lighter-grey)" />
+      <PageLoader label="Validating session" backgroundColor="var(--color-lighter-grey)" />
     );
   }
 

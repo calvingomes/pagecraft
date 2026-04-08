@@ -34,8 +34,14 @@ describe("grid-math", () => {
       expect(h).toBe(1);
     });
 
-    it("handles skinnyWide half-row height", () => {
+    it("handles skinnyWide half-row height on desktop", () => {
       const { w, h } = spansForPreset("skinnyWide", DESKTOP_GRID);
+      expect(w).toBe(2);
+      expect(h).toBe(0.5);
+    });
+
+    it("handles skinnyWide half-row height on mobile", () => {
+      const { w, h } = spansForPreset("skinnyWide", MOBILE_GRID);
       expect(w).toBe(2);
       expect(h).toBe(0.5);
     });
