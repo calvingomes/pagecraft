@@ -26,6 +26,26 @@ describe("normalization", () => {
       expect(normalized[0].order).toBe(0);
       expect(normalized[1].order).toBe(1);
     });
+
+    it("unpacks mobile data from styles JSONB", () => {
+      const raw = [
+        { 
+          id: "1", 
+          type: "text", 
+          styles: { 
+            mobileLayout: { x: 0, y: 10 },
+            mobileStyles: { widthPreset: "wide" },
+            visibility: { desktop: true, mobile: false }
+          } 
+        }
+      ];
+      const normalized = normalizeStoredBlocks(raw as RawStoredBlock[]);
+      expect(normalized[0].mobileLayout).toEqual({ x: 0, y: 10 });
+      expect(normalized[0].mobileStyles?.widthPreset).toBe("wide");
+      expect(normalized[0].visibility?.mobile).toBe(false);
+      // Ensure they were cleaned out of the styles object
+      expect(normalized[0].styles?.mobileLayout).toBeUndefined();
+    });
   });
 
   describe("ensureBlocksHaveValidLayouts", () => {
@@ -74,6 +94,35 @@ describe("normalization", () => {
       
       expect(block2?.layout).toEqual({ x: 0, y: 0 });
       expect(block1?.layout).not.toEqual({ x: 0, y: 0 });
+    });
+
+    it("ignores hidden blocks during collision checks (no ghost blocks)", () => {
+      const blocks: Partial<Block>[] = [
+        { 
+          id: "hidden-desktop", 
+          type: "text", 
+          layout: { x: 0, y: 0 }, 
+          visibility: { desktop: false, mobile: true },
+          styles: { widthPreset: "small" }, 
+          order: 0 
+        },
+        { 
+          id: "visible-desktop", 
+          type: "text", 
+          layout: { x: 0, y: 0 }, 
+          visibility: { desktop: true, mobile: true },
+          styles: { widthPreset: "small" }, 
+          order: 1 
+        }
+      ];
+      
+      const healed = ensureBlocksHaveValidLayouts(blocks as Block[], DESKTOP_GRID, "desktop");
+      
+      // The hidden block 'hidden-desktop' (order 0) is hidden on desktop.
+      // The visible block 'visible-desktop' (order 1) starts at (0,0).
+      // Because the hidden block is ignored during collision, the visible block should STAY at (0,0).
+      const visible = healed.find(b => b.id === "visible-desktop");
+      expect(visible?.layout).toEqual({ x: 0, y: 0 });
     });
   });
 });

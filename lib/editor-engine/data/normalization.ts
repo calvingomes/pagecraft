@@ -65,13 +65,19 @@ export function ensureBlocksHaveValidLayouts(
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
     .map((block) => {
       const currentLayout = block[layoutKey];
+      const isHidden = viewport === "mobile" 
+        ? block.visibility?.mobile === false 
+        : block.visibility?.desktop === false;
 
-      // To evaluate collision, we must project the 'placed' blocks so math helpers see the right coordinates/styles
-      const projectedPlaced = placed.map((b) => ({
-        ...b,
-        layout: viewport === "mobile" ? (b.mobileLayout ?? b.layout) : b.layout,
-        styles: viewport === "mobile" ? { ...b.styles, ...b.mobileStyles } : b.styles,
-      }) as Block);
+      // To evaluate collision correctly, we only mark 'placed' blocks that are actually visible on this viewport.
+      // Hidden blocks should not 'consume' space or block other elements.
+      const projectedPlaced = placed
+        .filter((b) => (viewport === "mobile" ? b.visibility?.mobile !== false : b.visibility?.desktop !== false))
+        .map((b) => ({
+          ...b,
+          layout: viewport === "mobile" ? (b.mobileLayout ?? b.layout) : b.layout,
+          styles: viewport === "mobile" ? { ...b.styles, ...b.mobileStyles } : b.styles,
+        }) as Block);
 
       const projectedBlock = {
         ...block,
@@ -79,7 +85,9 @@ export function ensureBlocksHaveValidLayouts(
         styles: viewport === "mobile" ? { ...block.styles, ...block.mobileStyles } : block.styles,
       } as Block;
 
-      if (isValidLayout(currentLayout)) {
+      // If the block is hidden, we still ensure it has a valid layout (in case it is toggled on later),
+      // but we don't let it collide with the current 'visible' projection.
+      if (!isHidden && isValidLayout(currentLayout)) {
         const candidate = { x: currentLayout.x, y: currentLayout.y };
         if (canPlaceBlockAt(projectedBlock, candidate, projectedPlaced, config)) {
           placed.push(block);

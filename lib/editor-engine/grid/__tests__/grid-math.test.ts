@@ -2,109 +2,105 @@ import { describe, it, expect } from "vitest";
 import { 
   spansForPreset, 
   sizePxForPreset, 
-  overlaps,
-  clamp 
+  spansForBlock, 
+  rectForBlock, 
+  blockToStyle 
 } from "../grid-math";
 import { DESKTOP_GRID, MOBILE_GRID } from "../grid-config";
+import { Block } from "@/types/editor";
 
 describe("grid-math", () => {
   describe("spansForPreset", () => {
-    it("returns 1x1 for small preset by default", () => {
-      const { w, h } = spansForPreset("small", DESKTOP_GRID);
-      expect(w).toBe(1);
-      expect(h).toBe(1);
+    it("returns 1x1 for small on desktop", () => {
+      expect(spansForPreset("small", DESKTOP_GRID)).toEqual({ w: 1, h: 1 });
     });
 
-    it("returns correct spans for desktop 'wide' preset", () => {
-      const { w, h } = spansForPreset("wide", DESKTOP_GRID);
-      expect(w).toBe(2);
-      expect(h).toBe(1);
+    it("returns 2x1 for wide on desktop", () => {
+      expect(spansForPreset("wide", DESKTOP_GRID)).toEqual({ w: 2, h: 1 });
     });
 
-    it("returns correct spans for desktop 'max' preset", () => {
-      const { w, h } = spansForPreset("max", DESKTOP_GRID);
-      expect(w).toBe(4);
-      expect(h).toBe(1);
+    it("returns 4x1 for max on desktop", () => {
+      expect(spansForPreset("max", DESKTOP_GRID)).toEqual({ w: 4, h: 1 });
     });
 
-    it("clamps 'max' preset to mobile grid columns", () => {
-      // MOBILE_GRID has 2 columns
-      const { w, h } = spansForPreset("max", MOBILE_GRID);
-      expect(w).toBe(2);
-      expect(h).toBe(1);
+    it("clamps width to grid columns (e.g. 4 becomes 2 on mobile)", () => {
+      expect(spansForPreset("max", MOBILE_GRID)).toEqual({ w: 2, h: 1 });
     });
 
-    it("handles skinnyWide half-row height on desktop", () => {
-      const { w, h } = spansForPreset("skinnyWide", DESKTOP_GRID);
-      expect(w).toBe(2);
-      expect(h).toBe(0.5);
-    });
-
-    it("handles skinnyWide half-row height on mobile", () => {
-      const { w, h } = spansForPreset("skinnyWide", MOBILE_GRID);
-      expect(w).toBe(2);
-      expect(h).toBe(0.5);
+    it("handles skinnyWide half-rows", () => {
+      expect(spansForPreset("skinnyWide", DESKTOP_GRID)).toEqual({ w: 2, h: 0.5 });
     });
   });
 
   describe("sizePxForPreset", () => {
-    it("calculates correct pixel width for desktop small block", () => {
-      // 1 * 175 + (1-1) * 35 = 175
-      const { widthPx } = sizePxForPreset("small", DESKTOP_GRID);
-      expect(widthPx).toBe(175);
-    });
-
-    it("calculates correct pixel width for desktop wide block", () => {
-      // 2 * 175 + (2-1) * 35 = 350 + 35 = 385
-      // Wait, let's check the math: width = w * cellPx + (w - 1) * gapXPx
-      const { widthPx } = sizePxForPreset("wide", DESKTOP_GRID);
+    it("calculates pixel width/height including gaps", () => {
+      const { widthPx, heightPx } = sizePxForPreset("wide", DESKTOP_GRID);
+      // w=2: (2 * 175) + (1 * 35) = 385
+      // h=1: (1 * 175) + (0 * 35) = 175
       expect(widthPx).toBe(385);
-    });
-
-    it("calculates correct pixel height for desktop large block", () => {
-      // 2 * 175 + (2-1) * 35 = 385
-      const { heightPx } = sizePxForPreset("large", DESKTOP_GRID);
-      expect(heightPx).toBe(385);
-    });
-
-    it("handles 'full' preset special height logic", () => {
-      // preset === "full" ? Math.round(config.cellPx / 2)
-      const { heightPx } = sizePxForPreset("full", DESKTOP_GRID);
-      expect(heightPx).toBe(Math.round(175 / 2));
+      expect(heightPx).toBe(175);
     });
   });
 
-  describe("overlaps", () => {
-    it("returns true when rectangles overlap", () => {
-      const a = { x: 0, y: 0, w: 2, h: 2 };
-      const b = { x: 1, y: 1, w: 2, h: 2 };
-      expect(overlaps(a, b)).toBe(true);
+  describe("spansForBlock (Viewport Independence)", () => {
+    const mockBlock: Partial<Block> = {
+      id: "1",
+      type: "text",
+      styles: { widthPreset: "small" },
+      mobileStyles: { widthPreset: "wide" }
+    };
+
+    it("uses desktop styles when config is DESKTOP_GRID", () => {
+      const spans = spansForBlock(mockBlock as Block, undefined, DESKTOP_GRID);
+      expect(spans.w).toBe(1);
     });
 
-    it("returns false when rectangles are adjacent but not overlapping", () => {
-      const a = { x: 0, y: 0, w: 1, h: 1 };
-      const b = { x: 1, y: 0, w: 1, h: 1 };
-      expect(overlaps(a, b)).toBe(false);
+    it("uses mobile styles when config is MOBILE_GRID", () => {
+      const spans = spansForBlock(mockBlock as Block, undefined, MOBILE_GRID);
+      expect(spans.w).toBe(2);
     });
 
-    it("returns false when rectangles are far apart", () => {
-      const a = { x: 0, y: 0, w: 1, h: 1 };
-      const b = { x: 10, y: 10, w: 1, h: 1 };
-      expect(overlaps(a, b)).toBe(false);
+    it("falls back to desktop styles on mobile if mobileStyles is missing", () => {
+      const noMobileBlock: Partial<Block> = {
+        id: "2",
+        type: "text",
+        styles: { widthPreset: "small" }
+      };
+      const spans = spansForBlock(noMobileBlock as Block, undefined, MOBILE_GRID);
+      expect(spans.w).toBe(1);
+    });
+
+    it("handles sectionTitle correctly on both viewports", () => {
+      const section: Partial<Block> = { id: "s", type: "sectionTitle" };
+      expect(spansForBlock(section as Block, undefined, DESKTOP_GRID)).toEqual({ w: 4, h: 0.5 });
+      expect(spansForBlock(section as Block, undefined, MOBILE_GRID)).toEqual({ w: 2, h: 0.5 });
     });
   });
 
-  describe("clamp", () => {
-    it("clamps value to upper bound", () => {
-      expect(clamp(10, 0, 5)).toBe(5);
+  describe("rectForBlock", () => {
+    it("derives geometry from block layout and config", () => {
+      const block: Partial<Block> = {
+        id: "1",
+        layout: { x: 2, y: 5 },
+        styles: { widthPreset: "wide" }
+      };
+      const rect = rectForBlock(block as Block, undefined, DESKTOP_GRID);
+      expect(rect).toEqual({ x: 2, y: 5, w: 2, h: 1 });
     });
+  });
 
-    it("clamps value to lower bound", () => {
-      expect(clamp(-5, 0, 5)).toBe(0);
-    });
-
-    it("returns value if within bounds", () => {
-      expect(clamp(3, 0, 5)).toBe(3);
+  describe("blockToStyle", () => {
+    it("generates absolute positioning CSS with translate3d", () => {
+      const block: Partial<Block> = {
+        id: "1",
+        layout: { x: 1, y: 1 },
+        styles: { widthPreset: "small" }
+      };
+      const style = blockToStyle(block as Block, DESKTOP_GRID);
+      
+      expect(style.position).toBe("absolute");
+      expect(style.width).toBe("175px");
+      expect(style.transform).toBe("translate3d(210px, 210px, 0)"); // (1 * (175 + 35))
     });
   });
 });

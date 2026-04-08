@@ -78,7 +78,13 @@ export function spansForBlock(
     return { w: config.cols, h: 0.5 };
   }
 
-  const preset = overridePreset ?? block.styles?.widthPreset;
+  const isMobile = config.cols <= 2;
+  const preset =
+    overridePreset ??
+    (isMobile
+      ? (block.mobileStyles?.widthPreset ?? block.styles?.widthPreset)
+      : block.styles?.widthPreset);
+
   return spansForPreset(preset, config);
 }
 
@@ -96,7 +102,11 @@ export function sizePxForBlock(
     };
   }
 
-  const preset = block.styles?.widthPreset;
+  const isMobile = config.cols <= 2;
+  const preset = isMobile
+    ? (block.mobileStyles?.widthPreset ?? block.styles?.widthPreset)
+    : block.styles?.widthPreset;
+
   return sizePxForPreset(preset, config);
 }
 

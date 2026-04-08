@@ -25,9 +25,24 @@ export const useEditorStore = create<EditorState>()(
 
     updateBlock: (id, updates) =>
       set((state) => ({
-        blocks: state.blocks.map((block) =>
-          block.id === id ? ({ ...block, ...updates } as Block) : block,
-        ),
+        blocks: state.blocks.map((block) => {
+          if (block.id !== id) return block;
+
+          const newBlock = { ...block, ...updates };
+
+          // Deep merge known nested style/state objects to prevent data loss
+          if (updates.styles && block.styles) {
+            newBlock.styles = { ...block.styles, ...updates.styles };
+          }
+          if (updates.mobileStyles && block.mobileStyles) {
+            newBlock.mobileStyles = { ...block.mobileStyles, ...updates.mobileStyles };
+          }
+          if (updates.visibility && block.visibility) {
+            newBlock.visibility = { ...block.visibility, ...updates.visibility };
+          }
+
+          return newBlock as Block;
+        }),
       })),
 
     removeBlock: (id) =>
