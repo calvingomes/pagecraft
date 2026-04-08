@@ -14,6 +14,8 @@ interface MobileNavProps {
   links?: NavLink[];
   cta?: NavCTA;
   secondaryCTA?: NavCTA;
+  logoColor?: string;
+  textColor?: string;
 }
 
 export const MobileNav = ({
@@ -22,6 +24,8 @@ export const MobileNav = ({
   links = [],
   cta,
   secondaryCTA,
+  logoColor,
+  textColor,
 }: MobileNavProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMenuClosing, setIsMenuClosing] = useState(false);
@@ -38,7 +42,7 @@ export const MobileNav = ({
     <div
       className={`${styles.mobileNav} ${isTransparentMobile ? styles.transparentOnMobile : ""} ${isScrolled ? styles.scrolled : ""}`}
     >
-      <Link href="/" className={styles.navLogo}>
+      <Link href="/" className={styles.navLogo} style={{ color: logoColor || textColor }}>
         <Image
           src="/logo/pagecraft-logo.svg"
           alt=""
@@ -56,6 +60,7 @@ export const MobileNav = ({
           className={styles.mobileMenuTrigger}
           onClick={() => setIsMobileMenuOpen(true)}
           aria-label="Open navigation menu"
+          style={{ color: textColor }}
         >
           <Menu size={20} />
         </button>
@@ -87,7 +92,7 @@ export const MobileNav = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.mobileMenuHeader}>
-              <Link href="/" className={styles.mobileMenuLogo}>
+              <Link href="/" className={styles.mobileMenuLogo} style={{ color: logoColor }}>
                 <Image
                   src="/logo/pagecraft-logo.svg"
                   alt=""
@@ -114,6 +119,7 @@ export const MobileNav = ({
                   href={link.href}
                   className={styles.mobileMenuLink}
                   onClick={handleCloseMenu}
+                  style={{ color: textColor }}
                 >
                   {link.label}
                 </Link>
@@ -126,6 +132,7 @@ export const MobileNav = ({
                   href={secondaryCTA.href}
                   className={styles.mobileMenuLinkInline}
                   onClick={handleCloseMenu}
+                  style={{ color: textColor }}
                 >
                   {secondaryCTA.label}
                 </Link>

@@ -12,6 +12,8 @@ interface NavbarProps {
   cta?: NavCTA;
   secondaryCTA?: NavCTA;
   transparentOnMobile?: boolean;
+  logoColor?: string;
+  textColor?: string;
 }
 
 const Navbar = ({
@@ -19,6 +21,8 @@ const Navbar = ({
   cta,
   secondaryCTA,
   transparentOnMobile = false,
+  logoColor,
+  textColor,
 }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -49,7 +53,7 @@ const Navbar = ({
       />
       <nav className={styles.nav}>
         <div className={styles.desktopOnly}>
-          <DesktopNav links={links} cta={cta} />
+          <DesktopNav links={links} cta={cta} logoColor={logoColor} textColor={textColor} />
         </div>
         <div className={styles.mobileOnly}>
           <MobileNav
@@ -58,6 +62,8 @@ const Navbar = ({
             links={links}
             cta={cta}
             secondaryCTA={secondaryCTA}
+            logoColor={logoColor}
+            textColor={textColor}
           />
         </div>
       </nav>

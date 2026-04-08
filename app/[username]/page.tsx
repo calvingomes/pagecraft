@@ -70,6 +70,8 @@ export default async function UserPage({ params }: Props) {
     <>
       <Navbar
         cta={{ label: "Craft your page", href: "/" }}
+        logoColor="var(--color-forest-green)"
+        transparentOnMobile
       />
       <PageView
         username={username}

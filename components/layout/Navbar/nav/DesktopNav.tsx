@@ -10,14 +10,16 @@ import styles from "./DesktopNav.module.css";
 interface DesktopNavProps {
   links?: NavLink[];
   cta?: NavCTA;
+  logoColor?: string;
+  textColor?: string;
 }
 
-export const DesktopNav = ({ links = [], cta }: DesktopNavProps) => {
+export const DesktopNav = ({ links = [], cta, logoColor, textColor }: DesktopNavProps) => {
   const hasLinksOrCTA = links.length > 0 || !!cta;
 
   return (
     <div className={`${styles.desktopNav} ${!hasLinksOrCTA ? styles.centeredLogo : ""}`}>
-      <Link href="/" className={styles.navLogo}>
+      <Link href="/" className={styles.navLogo} style={{ color: logoColor }}>
         <Image
           src="/logo/pagecraft-logo.svg"
           alt=""
@@ -32,7 +34,7 @@ export const DesktopNav = ({ links = [], cta }: DesktopNavProps) => {
       {hasLinksOrCTA && (
         <div className={styles.navRight}>
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className={styles.navLink}>
+            <Link key={link.href} href={link.href} className={styles.navLink} style={{ color: textColor }}>
               {link.label}
             </Link>
           ))}
