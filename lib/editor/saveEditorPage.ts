@@ -142,6 +142,16 @@ export async function saveEditorPage({
   skipPageUpdate,
   skipOgUpdate,
 }: SaveEditorPageInput): Promise<SaveEditorPageResult> {
+  const { data: currentPage, error: fetchPageError } = await supabase
+    .from("pages")
+    .select("storage_bytes_used")
+    .eq("username", username)
+    .single();
+
+  throwIfError(fetchPageError, "Fetching current page state failed");
+  const currentStorageBytes = currentPage?.storage_bytes_used || 0;
+  let totalByteDelta = 0;
+
   const { error: profileError } = await supabase.from("profiles").upsert(
     {
       id: userId,
@@ -155,11 +165,12 @@ export async function saveEditorPage({
 
   if (avatarUrl === "" && persistedAvatarUrl) {
     try {
-      await deletePageImage({
+      const released = await deletePageImage({
         uid: userId,
         username,
         scope: { kind: "avatar" },
       });
+      totalByteDelta -= released;
     } catch (error) {
       throw new Error(`Deleting avatar failed: ${formatErrorMessage(error)}`);
     }
@@ -176,6 +187,7 @@ export async function saveEditorPage({
         scope: { kind: "avatar" },
       });
       resolvedAvatarUrl = upload.downloadUrl;
+      totalByteDelta += upload.sizeBytes;
     } catch (error) {
       throw new Error(`Uploading avatar failed: ${formatErrorMessage(error)}`);
     }
@@ -217,6 +229,8 @@ export async function saveEditorPage({
           scope: { kind: "og-image" },
         });
 
+        totalByteDelta += upload.sizeBytes;
+
         // Store the persistent OG URL back to the page record
         await supabase
           .from("pages")
@@ -252,18 +266,20 @@ export async function saveEditorPage({
 
       try {
         const file = dataUrlToFile(contentUrl, `block-${block.id}.webp`);
-        const uploaded = await uploadPageImage({
+        const upload = await uploadPageImage({
           uid: userId,
           username,
           file,
           scope: { kind: "block-image", blockId: block.id },
         });
 
+        totalByteDelta += upload.sizeBytes;
+
         return {
           ...block,
           content: {
             ...block.content,
-            [isLink ? "imageUrl" : "url"]: uploaded.downloadUrl,
+            [isLink ? "imageUrl" : "url"]: upload.downloadUrl,
           },
         } as Block;
       } catch (error) {
@@ -322,7 +338,7 @@ export async function saveEditorPage({
     .map((row) => String(row.id));
 
   if (staleImageBlockIds.length > 0) {
-    await Promise.all(
+    const releasedSizes = await Promise.all(
       staleImageBlockIds.map((blockId) =>
         deletePageImage({
           uid: userId,
@@ -331,6 +347,7 @@ export async function saveEditorPage({
         }),
       ),
     );
+    totalByteDelta -= releasedSizes.reduce((acc, s) => acc + s, 0);
   }
 
   if (staleIds.length > 0) {
@@ -341,6 +358,15 @@ export async function saveEditorPage({
       .in("id", staleIds);
 
     throwIfError(deleteStaleError, "Deleting removed blocks failed");
+  }
+
+  // ATOMIC BYTE ACCOUNTING UPDATE
+  if (totalByteDelta !== 0) {
+    const finalBytes = Math.max(0, currentStorageBytes + totalByteDelta);
+    await supabase
+      .from("pages")
+      .update({ storage_bytes_used: finalBytes })
+      .eq("username", username);
   }
 
   const { data: updatedPage, error: finalPageError } = await supabase

@@ -17,7 +17,6 @@ export type UploadedPageImage = {
   downloadUrl: string;
   storagePath: string;
   sizeBytes: number;
-  totalBytesUsed: number;
 };
 
 type UploadPageImageArgs = {
@@ -100,22 +99,10 @@ export async function uploadPageImage({
     data: { publicUrl },
   } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath);
 
-  const nextBytes = Math.max(0, currentUsed - previousBytes + file.size);
-
-  const { error: pageUpdateError } = await supabase
-    .from("pages")
-    .update({ storage_bytes_used: nextBytes })
-    .eq("username", username);
-
-  if (pageUpdateError) {
-    throw pageUpdateError;
-  }
-
   return {
     downloadUrl: publicUrl,
     storagePath,
     sizeBytes: file.size,
-    totalBytesUsed: nextBytes,
   };
 }
 
@@ -132,21 +119,9 @@ export async function deletePageImage({
     .remove([storagePath]);
 
   if (removeError) {
-    // Ignore missing files; continue byte accounting update.
+    // Ignore missing files
   }
 
   const released = Math.max(0, previousSizeBytes);
-  const currentUsed = await getQuotaBytes(username);
-  const nextBytes = Math.max(0, currentUsed - released);
-
-  const { error: pageUpdateError } = await supabase
-    .from("pages")
-    .update({ storage_bytes_used: nextBytes })
-    .eq("username", username);
-
-  if (pageUpdateError) {
-    throw pageUpdateError;
-  }
-
-  return nextBytes;
+  return released;
 }

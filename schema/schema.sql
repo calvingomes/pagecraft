@@ -187,42 +187,29 @@ on conflict (id) do update set
   file_size_limit = excluded.file_size_limit,
   allowed_mime_types = excluded.allowed_mime_types;
 
+-- Consolidated Storage Policy: Users manage their own folders
 drop policy if exists "Pagecraft media public read" on storage.objects;
-create policy "Pagecraft media public read"
-  on storage.objects for select
-  using (bucket_id = 'pagecraft-bucket');
-
 drop policy if exists "Pagecraft media owner insert" on storage.objects;
-create policy "Pagecraft media owner insert"
-  on storage.objects for insert
-  to authenticated
-  with check (
-    bucket_id = 'pagecraft-bucket'
-    and (storage.foldername(name))[1] = 'users'
-    and (storage.foldername(name))[2] = auth.uid()::text
-  );
-
 drop policy if exists "Pagecraft media owner update" on storage.objects;
-create policy "Pagecraft media owner update"
-  on storage.objects for update
-  to authenticated
-  using (
-    bucket_id = 'pagecraft-bucket'
-    and (storage.foldername(name))[1] = 'users'
-    and (storage.foldername(name))[2] = auth.uid()::text
-  )
-  with check (
-    bucket_id = 'pagecraft-bucket'
-    and (storage.foldername(name))[1] = 'users'
-    and (storage.foldername(name))[2] = auth.uid()::text
-  );
-
 drop policy if exists "Pagecraft media owner delete" on storage.objects;
-create policy "Pagecraft media owner delete"
-  on storage.objects for delete
-  to authenticated
-  using (
-    bucket_id = 'pagecraft-bucket'
-    and (storage.foldername(name))[1] = 'users'
-    and (storage.foldername(name))[2] = auth.uid()::text
-  );
+drop policy if exists "Users can manage their own files" on storage.objects;
+
+create policy "Users can manage their own files"
+on storage.objects
+for all -- covers SELECT, INSERT, UPDATE, DELETE
+to authenticated
+using ( 
+  bucket_id = 'pagecraft-bucket' 
+  AND (storage.foldername(name))[1] = 'users'
+  AND (storage.foldername(name))[2] = auth.uid()::text 
+)
+with check ( 
+  bucket_id = 'pagecraft-bucket' 
+  AND (storage.foldername(name))[1] = 'users'
+  AND (storage.foldername(name))[2] = auth.uid()::text 
+);
+
+-- Public read access for the bucket
+create policy "Public read access"
+on storage.objects for select
+using ( bucket_id = 'pagecraft-bucket' );
