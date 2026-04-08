@@ -46,6 +46,7 @@
   justify-content: center;
   color: var(--color-mid-grey);
   font-size: var(--font-size-sm);
+  border: 2px solid var(--color-light-lime-green);
 }
 
 .mediaImage,

@@ -13,7 +13,7 @@ const FEATURES: FeatureItem[] = [
     description:
       "Drag blocks, arrange them however you want, and build a page that's completely yours. No templates, no restrictions.",
     mediaType: "video",
-    mediaSrc: "/videos/showcase.mp4",
+    mediaSrc: "/videos/card-1.mp4",
     mediaAlt: "Drag and drop preview",
   },
   {
@@ -22,7 +22,7 @@ const FEATURES: FeatureItem[] = [
     description:
       "Edit your desktop and mobile layouts independently. What your visitors see is always exactly what you intended.",
     mediaType: "video",
-    mediaSrc: "/videos/showcase.mp4",
+    mediaSrc: "/videos/card-2.mp4",
     mediaAlt: "Dual viewport preview",
   },
   {
@@ -31,7 +31,7 @@ const FEATURES: FeatureItem[] = [
     description:
       "Copy your pagecraft.me link, open a new tab, and it's already there. No save button, no waiting. Just live.",
     mediaType: "video",
-    mediaSrc: "/videos/showcase.mp4",
+    mediaSrc: "/videos/card-3.mp4",
     mediaAlt: "Publish and share preview",
   },
 ];
