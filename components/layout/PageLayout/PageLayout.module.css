@@ -15,6 +15,9 @@
   background: var(--page-bg);
   padding-bottom: 40px;
 }
+.pageLayout[data-is-editor="true"] {
+  padding-bottom: 150px;
+}
 
 .inner {
   width: 100%;
