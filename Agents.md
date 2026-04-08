@@ -31,6 +31,7 @@ PageCraft is a "link-in-bio" style page builder that allows users to create a si
 - **Rich Text**: Tiptap (Headless wrapper around ProseMirror)
 - **UI Primitives**: Radix UI (Dialog, Popover, Toolbar, Toggle Group, Radio Group, Label, Slot)
 - **Icons**: Lucide React
+- **Testing**: Vitest + jsdom (Run via `bun run test`)
 - **Image Processing**: browser-image-compression (client-side WebP conversion)
 
 ---
@@ -409,3 +410,19 @@ Blocks are stored as a unified list and rendered per viewport mode (`"desktop"` 
 - For palette-style popovers that should match trigger container size, set width from the toolbar container and keep inner palette wrapper at `width: 100%`.
 - If overlay is open in editor, hide or blur editor chrome (save/signout/toggles/toolbar) through a single wrapper state instead of z-index fights across independent stacking contexts.
 - For visually hidden labels, prefer the shared `lib/utils/visuallyHidden.ts` style constant over duplicating `.visuallyHidden` classes across CSS modules.
+
+---
+
+## 14. Testing Strategy
+
+The application uses **Vitest** for fast unit testing and environment-accurate logic verification.
+
+- **Unit Tests**: Co-located in `__tests__` directories (e.g., `lib/editor-engine/grid/__tests__/`).
+- **Pre-commit Gate**: A Husky `pre-commit` hook runs `bun lint` and `bun run test`. Commits are blocked if either fails.
+- **Core Targets**:
+  - `lib/editor-engine/grid/grid-math.ts`: Spans, pixel calculations, and collision overlap detection.
+  - `lib/editor-engine/data/normalization.ts`: Layout "healing" (ensuring non-overlapping blocks on load).
+
+**Run Commands:**
+- `bun run test`: Executes the full suite once.
+- `bun run test:watch`: Continuous test runner for development.

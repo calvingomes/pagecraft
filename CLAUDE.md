@@ -9,6 +9,7 @@ bun run dev      # Start dev server (http://localhost:3000)
 bun run build    # Production build
 bun run start    # Start production server
 npm run lint     # Run ESLint
+bun run test     # Run Vitest suite (pre-commit gate)
 ```
 
 **Setup**: Copy `.env.example` to `.env.local` with Supabase credentials. Run `schema.sql` in Supabase SQL editor.
@@ -32,7 +33,15 @@ PageCraft is a link-in-bio page builder. Users drag blocks (text, links, images,
 
 ### Viewport-Aware Unified Block Model
 
-Blocks are one array. `layout/styles` → desktop; `mobileLayout/mobileStyles` → mobile; `visibility.desktop|mobile` → per-viewport. All mutations must call `ensureBlocksHaveValidLayoutsForAllViewports()` from `lib/editor-engine/data/normalization.ts`.
+Blocks are one array. `layout/styles` → desktop; `mobileLayout/mobileStyles` → mobile; `visibility.desktop|mobile` → per-viewport. All mutations must call `ensureBlocksHaveValidLayoutsForAllViewports()` from `lib/editor-engine/data/normalization.ts` to ensure non-overlapping safety.
+
+### Testing Strategy
+
+The project uses **Vitest** + **jsdom**.
+- `bun run test`: Run suite once.
+- `bun run test:watch`: Development mode.
+- **Pre-commit**: Husky runs lint + tests. Commits fail if tests fail.
+- **Targets**: Grid math (`grid-math.ts`) and layout safety (`normalization.ts`).
 
 ### Editor Engine (`lib/editor-engine/`)
 
@@ -79,7 +88,7 @@ All Supabase calls are wrapped here. `page.server.ts` is server-only; the rest a
 3. Register in `components/builder/BlockRegistry/blockRegistry.tsx`
 4. Add span defaults in `lib/editor-engine/grid/grid-math.ts` → `spansForPreset`
 5. Handle creation in `app/editor/page.tsx` toolbar action
-6. Handle normalization in `lib/editor-engine/data/normalization.ts` → `normalizeStoredBlocks`
+6. Handle normalization in `lib/editor-engine/data/normalization.ts` → `normalizeStoredBlocks` (ensure `widthPreset: "full"` for sections)
 7. Handle viewport-specific rendering in both `DesktopBlockCanvas` and `MobileCanvasGrid`
 
 ## Code Style & Conventions

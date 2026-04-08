@@ -16,98 +16,29 @@ export function isValidLayout(layout: unknown): layout is GridLayout {
   );
 }
 
-// Normalizes older stored shapes (e.g. `data` instead of `content`).
+// Normalizes stored blocks to ensure they match current schema and have valid defaults.
 export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
   return rawBlocks.map((raw, index) => {
     const type = raw.type as BlockType;
     const order = typeof raw.order === "number" ? raw.order : index;
 
-    const rawStyles = { ...((raw.styles as Record<string, unknown>) || {}) };
-    const mobileLayout =
-      (raw.mobileLayout ?? rawStyles.mobileLayout) as Block["mobileLayout"] ?? undefined;
-    const mobileStyles =
-      (raw.mobileStyles ?? rawStyles.mobileStyles) as Block["mobileStyles"] ?? undefined;
-    const visibility =
-      (raw.visibility ?? rawStyles.visibility) as Block["visibility"] ?? undefined;
+    // Clean up sections - titles are always full-width half-rows
+    if (type === "sectionTitle") {
+      const styles = (raw.styles as Record<string, unknown>) || {};
+      return {
+        ...(raw as unknown as Block),
+        order,
+        styles: {
+          ...styles,
+          widthPreset: "full",
+        },
+      } as Block;
+    }
 
-    delete rawStyles.mobileLayout;
-    delete rawStyles.mobileStyles;
-    delete rawStyles.visibility;
-
-    // Base normalization for unified state
-    const normalizedBase = {
+    return {
       ...(raw as unknown as Block),
       order,
-      styles: Object.keys(rawStyles).length > 0 ? rawStyles : undefined,
-      mobileLayout,
-      mobileStyles,
-      visibility,
-    };
-
-    if (raw.content) {
-      if (type === "sectionTitle") {
-        const rawStyles =
-          raw.styles && typeof raw.styles === "object" && raw.styles !== null
-            ? (raw.styles as Record<string, unknown>)
-            : undefined;
-
-        return {
-          ...normalizedBase,
-          styles: {
-            ...(rawStyles as object),
-            widthPreset: "full",
-          },
-        } as Block;
-      }
-
-      return normalizedBase as Block;
-    }
-
-    const data =
-      raw.data && typeof raw.data === "object" && raw.data !== null
-        ? (raw.data as Record<string, unknown>)
-        : undefined;
-
-    switch (type) {
-      case "text":
-        return {
-          ...normalizedBase,
-          content: {
-            text: typeof data?.text === "string" ? data.text : "",
-          },
-        } as Block;
-      case "link":
-        return {
-          ...normalizedBase,
-          content: {
-            url: typeof data?.url === "string" ? data.url : "",
-            title: typeof data?.title === "string" ? data.title : "",
-            imageUrl: typeof data?.imageUrl === "string" ? data.imageUrl.split("?")[0] : undefined,
-            iconUrl: typeof data?.iconUrl === "string" ? data.iconUrl.split("?")[0] : undefined,
-          },
-        } as Block;
-      case "image":
-        return {
-          ...normalizedBase,
-          content: {
-            url: typeof data?.url === "string" ? data.url.split("?")[0] : "",
-            alt: typeof data?.alt === "string" ? data.alt : "",
-          },
-        } as Block;
-      case "sectionTitle":
-        return {
-          ...normalizedBase,
-          styles: {
-            ...((raw.styles as Record<string, unknown> | undefined) ?? {}),
-            widthPreset: "full",
-          },
-          content: {
-            title: typeof data?.title === "string" ? data.title : "",
-          },
-        } as Block;
-      default:
-        return normalizedBase as Block;
-    }
+    } as Block;
   });
 }
 
