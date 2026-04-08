@@ -1,0 +1,54 @@
+@import "@styles/media.css";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100vw;
+  padding: 80px 24px 40px;
+  text-align: center;
+  background: var(--color-faint-lime-green);
+  box-sizing: border-box;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+
+.title {
+  font-size: var(--font-size-fluid-h1);
+  font-weight: 800;
+  color: var(--color-forest-green);
+  margin-bottom: 24px;
+  line-height: 1;
+  max-width: 600px;
+}
+
+.description {
+  font-size: var(--font-size-fluid-lg);
+  color: var(--color-mid-grey);
+  max-width: 400px;
+  margin-bottom: 48px;
+  line-height: 1.5;
+}
+
+.ctaWrapper {
+  display: flex;
+  justify-content: center;
+}
+
+@media (--bp-mobile) {
+  .container {
+    padding: 100px 20px 40px;
+  }
+
+  .title {
+    margin-bottom: 16px;
+  }
+
+  .description {
+    font-size: var(--font-size-lg, 18px);
+    margin-bottom: 40px;
+  }
+}

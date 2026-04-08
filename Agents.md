@@ -62,9 +62,9 @@ components/
   blocks/       — Visual block components (TextBlock, LinkBlock, ImageBlock, SectionTitleBlock)
   builder/      — Editor infrastructure (canvas, toolbars, dnd, registry)
   layout/       — Page-level layout shells (Navbar, PageLayout, ProfileSidebar)
-  ui/           — Generic reusable UI primitives (Button, etc.)
+  ui/           — Generic reusable UI primitives (Button, ErrorState, etc.)
   views/        — Full-page view compositions (AuthView, HomeLanding, PageView)
-app/            — Next.js App Router pages and API routes
+app/            — Next.js App Router pages, error boundaries, and API routes
 styles/         — Global CSS custom properties and media queries
 ```
 
@@ -280,7 +280,7 @@ blocks/LinkBlock/
   - **Desktop**: Relies on mouse-hover for toolbars.
   - **Mobile**: Uses a **1st tap to select / 2nd tap to focus** model.
 - Within the desktop editor, keep the **desktop/mobile preview toggle** enabled so users can edit and preview the mobile layout from desktop.
-- `PageLayout` exposes `previewViewport` (`"desktop" | "mobile"`) and `framedMobilePreview` (boolean): editor passes `framedMobilePreview={true}` for the framed mobile preview, while view pages keep it `false` for clean public mobile layout.
+- `PageLayout` exposes `previewViewport` (`"desktop" | "mobile"`), `framedMobilePreview` (boolean), and `isEditor` (boolean): editor passes `framedMobilePreview={true}` and `isEditor={true}` to apply specific spacing (e.g., increased bottom padding via `data-is-editor`).
 - In mobile preview mode, only page content is previewed (`ProfileSidebar` + `BlockCanvas`); editor chrome (save/signout buttons, preview toggle, bottom toolbar) remains outside the preview frame.
 - Mobile preview frame is sized from `MOBILE_GRID.canvasPx` (currently `370px`) and intentionally styled (frame/background) to make preview boundaries explicit.
 - Sticky sidebar styling is viewport-driven: sticky only when `data-preview="desktop"` and sidebar is not `center`.
@@ -289,7 +289,18 @@ blocks/LinkBlock/
 
 ---
 
-## 7. State Management & Data Services
+## 7. Error Handling & 404s
+
+The application uses Next.js file-based error handling to provide a graceful UX:
+
+- **`app/not-found.tsx`**: Global 404 page for unmatched routes.
+- **`app/error.tsx`**: Global error boundary for unhandled client-side or render-time errors. Provides a "Try again" recovery button.
+- **`app/[username]/not-found.tsx`**: Specialized 404 for missing profiles. Instead of a generic error, it encourages visitors to claim the requested username.
+- **`ErrorState` Component**: Shared UI component for all error/404 states, ensuring consistent branding and layout.
+
+---
+
+## 8. State Management & Data Services
 
 - **Data Services** (`lib/services/`) handle all Supabase interactions.
   - `auth.client.ts`: Client-side auth operations.

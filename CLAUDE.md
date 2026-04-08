@@ -24,6 +24,11 @@ PageCraft is a link-in-bio page builder. Users drag blocks (text, links, images,
   - **MobileEditor** (`<960px`): Touch-optimized 1-tap select / 2-tap focus model with floating `MobileBlockToolbar`.
   - Both use Zustand + RGL + Tiptap.
 - **View Page** (`/[username]`): Server Component fetches data via `ServerPageService`, passes unified blocks to `PageView`. No stores, no RGL — pure props.
+- **Error Handling**: 
+  - `app/error.tsx`: Global render/client error boundary.
+  - `app/not-found.tsx`: Global 404.
+  - `app/[username]/not-found.tsx`: Profile-specific "Claim yours" 404.
+  - `ErrorState.tsx`: Unified UI for all errors.
 
 ### Viewport-Aware Unified Block Model
 
@@ -92,9 +97,9 @@ All Supabase calls are wrapped here. `page.server.ts` is server-only; the rest a
 
 **Types**: All shared types in `types/` — one file per domain. Component-specific prop types can go in co-located `*.types.ts`. No inline type definitions in stores/lib/hooks unless truly private.
 
-**Theming**: `SortableBlock` injects `--block-bg-color` and `--block-text-color` into scope. Block children use these variables. Use `deriveTextColor(bgColor)` from `@/lib/utils/colorUtils` for automated contrast.
+**Theming**: `SortableBlock` injects `--block-bg-color` and `--block-text-color` into scope. Block children use these variables. Use `deriveTextColor(bgColor)` from `@/lib/utils/colorUtils` for automated contrast. `Navbar` supports `logoColor` and `textColor` overrides for theme-specific branding.
 
-**Stacking**: RGL items baseline at `z-index: 1`. Hovered/focused blocks elevate to `z-index: 100`. Always use `Popover.Portal` / `Dialog.Portal` for layered UI.
+**Layout**: `PageLayout` uses `isEditor` flag to apply `data-is-editor` attribute for specific spacing (e.g., increased bottom padding for toolbar clearance).
 
 **BlockWidthPreset quirks**:
 - `skinnyWide` toolbar only for `text` and `link` blocks

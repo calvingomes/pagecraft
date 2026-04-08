@@ -7,6 +7,7 @@ import type {
 } from "@/types/page";
 import { PageView } from "@/components/views/PageView/PageView";
 import { Navbar } from "@/components/layout/Navbar/Navbar";
+import { notFound } from "next/navigation";
 import { type Metadata } from "next";
 import { htmlToText } from "@/lib/utils/htmlToText";
 
@@ -19,9 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const page = await ServerPageService.getPageByUsername(username);
 
   if (!page) {
-    return {
-      title: "Page Not Found",
-    };
+    notFound();
   }
 
   const displayName = htmlToText(page.display_name || username);
@@ -63,7 +62,7 @@ export default async function UserPage({ params }: Props) {
   ]);
 
   if (!page) {
-    return <div>Page not found</div>;
+    notFound();
   }
 
   return (
