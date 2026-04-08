@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://pagecraft.me"),
   title: "PageCraft | Craft your corner of the web",
   description:
     "PageCraft is a block-based page builder and link-in-bio tool. Drag blocks, arrange your own layout, and publish a page that actually looks like you.",
@@ -16,6 +17,21 @@ export const metadata: Metadata = {
     siteName: "PageCraft",
     type: "website",
     url: "https://pagecraft.me",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "PageCraft | Craft your corner of the web",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "PageCraft | Craft your corner of the web",
+    description:
+      "PageCraft is a block-based page builder and link-in-bio tool. Drag blocks, arrange your own layout, and publish a page that actually looks like you.",
+    images: ["/og-image.png"],
   },
 };
 export default function RootLayout({
