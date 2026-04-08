@@ -3,7 +3,7 @@ import type { BlockType } from "@/types/editor";
 import type { AddBlockOptions } from "./Toolbar.types";
 
 export interface Widget {
-  id: BlockType | 'link' | 'email' | 'map';
+  id: BlockType | 'link' | 'more';
   title: string;
   description: string;
   icon: LucideIcon;

@@ -8,8 +8,7 @@ import {
   Heading,
   Image as ImageIcon,
   Link2,
-  Mail,
-  MapPin,
+  Plus,
   Menu
 } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
@@ -26,14 +25,13 @@ const WIDGETS: Widget[] = [
   { id: 'sectionTitle', title: 'Section Title', description: 'Add a section header', icon: Heading },
   { id: 'image', title: 'Image or Video', description: 'Upload media', icon: ImageIcon },
   { id: 'link', title: 'Website', description: 'Just a link', icon: Link2 },
-  { id: 'email', title: 'Email', description: 'Open compose in one tap', icon: Mail, disabled: true },
-  { id: 'map', title: 'Map', description: 'Show your location', icon: MapPin, disabled: true },
+  { id: 'more', title: 'More coming soon', description: 'Stay tuned', icon: Plus, disabled: true },
 ];
 
-export const WidgetMenu = ({ 
-  onAddBlock, 
-  onOpenLink, 
-  onImageClick 
+export const WidgetMenu = ({
+  onAddBlock,
+  onOpenLink,
+  onImageClick
 }: WidgetMenuProps) => {
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -45,8 +43,8 @@ export const WidgetMenu = ({
     widget.description.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleWidgetClick = (widgetId: BlockType | 'link' | 'email' | 'map') => {
-    if (widgetId === 'email' || widgetId === 'map') return;
+  const handleWidgetClick = (widgetId: BlockType | 'link' | 'more') => {
+    if (widgetId === 'more') return;
 
     setIsOpen(false);
 
@@ -112,7 +110,7 @@ export const WidgetMenu = ({
         </Tooltip>
         <Dialog.Portal>
           <Dialog.Overlay className={styles.dialogOverlay} />
-          <Dialog.Content 
+          <Dialog.Content
             className={styles.dialogContent}
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
