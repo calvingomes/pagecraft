@@ -33,18 +33,8 @@ body {
 }
 
 body {
-  font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    sans-serif;
-
   background-color: var(--color-lighter-grey);
+  font-family: var(--font-primary);
   line-height: 1.5;
 }
 
