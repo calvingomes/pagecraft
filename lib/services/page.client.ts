@@ -4,6 +4,7 @@ import type {
   PageBackgroundId,
   SidebarPosition,
 } from "@/types/page";
+import { isReservedUsername } from "@/lib/utils/reservedUsernames";
 
 export interface PageData {
   uid?: string;
@@ -23,6 +24,12 @@ export const PageService = {
    * Check if a username is available
    */
   checkUsernameAvailability: async (username: string): Promise<boolean> => {
+    // 1. Check reserved list
+    if (isReservedUsername(username)) {
+      return false;
+    }
+
+    // 2. Check database
     const { data } = await supabase
       .from("usernames")
       .select("username")
@@ -35,6 +42,11 @@ export const PageService = {
    * Claim a username and initialize user profile/page
    */
   claimUsername: async (username: string, userId: string) => {
+    // 0. Final safety check for reserved usernames
+    if (isReservedUsername(username)) {
+      throw new Error(`The username "${username}" is reserved and cannot be claimed.`);
+    }
+
     // 1. Insert into usernames table
     const { error: usernameError } = await supabase.from("usernames").insert({
       username,
