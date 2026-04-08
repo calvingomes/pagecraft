@@ -69,7 +69,7 @@ export default async function UserPage({ params }: Props) {
   return (
     <>
       <Navbar
-        cta={{ label: "Create your own", href: "/" }}
+        cta={{ label: "Craft your page", href: "/" }}
       />
       <PageView
         username={username}

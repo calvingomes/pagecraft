@@ -159,14 +159,14 @@ export function SortableBlock({
               }),
             backgroundColor: !isTransparentWrapper
               ? backgroundColor || "var(--color-white)"
-              : (isFocused || (isHovered && !isActualMobile)) && !!editor && (block.type === "text" || block.type === "sectionTitle")
+              : !!editor && ((isHovered && !isActualMobile && (block.type === "text" || block.type === "sectionTitle")) || (isFocused && block.type === "sectionTitle"))
                 ? "var(--color-white)"
                 : "transparent",
             color: textColor,
             "--block-text-color": textColor,
             "--block-bg-color": !isTransparentWrapper
               ? backgroundColor || "var(--color-white)"
-              : (isFocused || (isHovered && !isActualMobile)) && !!editor && (block.type === "text" || block.type === "sectionTitle")
+              : !!editor && ((isHovered && !isActualMobile && (block.type === "text" || block.type === "sectionTitle")) || (isFocused && block.type === "sectionTitle"))
                 ? "var(--color-white)"
                 : "transparent",
           } as React.CSSProperties & { [key: string]: string | number }}
@@ -198,6 +198,7 @@ export function SortableBlock({
             blockType={block.type}
             currentPreset={widthPreset}
             currentBackgroundColor={backgroundColor}
+            isTransparentBackground={isTransparentWrapper}
             onWidthChange={handleWidthChange}
             onBackgroundColorChange={handleBackgroundColorChange as (color: string | null) => void}
             onPaletteOpenChange={setIsPaletteOpen}

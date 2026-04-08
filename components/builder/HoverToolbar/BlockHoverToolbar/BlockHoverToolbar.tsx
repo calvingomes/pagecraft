@@ -61,6 +61,7 @@ export function BlockHoverToolbar({
   blockType,
   currentPreset = "small",
   currentBackgroundColor,
+  isTransparentBackground = false,
   onWidthChange,
   onBackgroundColorChange,
   onPaletteOpenChange,
@@ -158,6 +159,7 @@ export function BlockHoverToolbar({
           >
             <BlockBackgroundPalette
               currentValue={currentBackgroundColor}
+              isTransparent={isTransparentBackground}
               onChange={onBackgroundColorChange ?? (() => {})}
               showTransparentOption={blockType === "text"}
             />

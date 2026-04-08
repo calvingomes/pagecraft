@@ -48,6 +48,8 @@ export const TextBlock = ({ block }: { block: TextBlockType }) => {
               content: { text: html },
             });
           }}
+          onFocus={() => contextEditor?.onFocusBlock(block.id)}
+          onBlur={() => contextEditor?.onFocusBlock(null)}
         />
       );
     }

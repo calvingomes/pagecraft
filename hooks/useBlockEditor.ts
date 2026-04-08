@@ -8,6 +8,8 @@ type UseBlockEditorProps = {
   placeholder?: string;
   editable: boolean;
   onUpdate?: (html: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
   editorProps?: EditorOptions["editorProps"];
   autofocus?: EditorOptions["autofocus"];
 };
@@ -17,6 +19,8 @@ export function useBlockEditor({
   placeholder,
   editable,
   onUpdate,
+  onFocus,
+  onBlur,
   editorProps,
   autofocus,
 }: UseBlockEditorProps) {
@@ -73,7 +77,11 @@ export function useBlockEditor({
           }
         }, 500);
       },
+      onFocus: () => {
+        onFocus?.();
+      },
       onBlur: ({ editor }) => {
+        onBlur?.();
         const callback = onUpdateRef.current;
         if (!callback) return;
 

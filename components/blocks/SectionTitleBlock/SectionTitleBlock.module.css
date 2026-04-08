@@ -3,7 +3,7 @@
   align-items: center;
   gap: 12px;
   margin: 0;
-  padding: 20px;
+  padding: 8px;
 }
 
 .input {
@@ -11,7 +11,7 @@
   height: 55px;
   border: none;
   border-radius: 16px;
-  padding: 8px 20px;
+  padding: 8px;
   font-size: var(--font-size-lg);
   font-weight: 700;
   line-height: 1;

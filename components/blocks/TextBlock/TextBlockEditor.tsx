@@ -10,9 +10,11 @@ type TextBlockEditorProps = {
   block: TextBlockType;
   isFocused: boolean;
   onUpdate: (html: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
 };
 
-export const TextBlockEditor = ({ block, isFocused, onUpdate }: TextBlockEditorProps) => {
+export const TextBlockEditor = ({ block, isFocused, onUpdate, onFocus, onBlur }: TextBlockEditorProps) => {
   const initialContent = block.content?.text ?? "";
 
   const { editor } = useBlockEditor({
@@ -21,6 +23,8 @@ export const TextBlockEditor = ({ block, isFocused, onUpdate }: TextBlockEditorP
     editable: true,
     autofocus: isFocused ? "end" : false,
     onUpdate,
+    onFocus,
+    onBlur,
   });
 
   if (!editor) return null;

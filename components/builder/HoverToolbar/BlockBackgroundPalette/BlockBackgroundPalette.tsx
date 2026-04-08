@@ -26,12 +26,14 @@ const PREDEFINED_COLORS = [
 
 interface BlockBackgroundPaletteProps {
   currentValue?: string;
+  isTransparent?: boolean;
   onChange: (value: string | null) => void;
   showTransparentOption?: boolean;
 }
 
 export function BlockBackgroundPalette({
   currentValue,
+  isTransparent = false,
   onChange,
   showTransparentOption = false,
 }: BlockBackgroundPaletteProps) {
@@ -57,7 +59,7 @@ export function BlockBackgroundPalette({
 
         <RadioGroup.Root
           className={styles.radioGroup}
-          value={currentValue === undefined ? "transparent" : (currentValue || "")}
+          value={isTransparent ? "transparent" : (currentValue || "")}
           onValueChange={(val) => {
             if (val === "transparent") {
               onChange(null);
@@ -72,7 +74,7 @@ export function BlockBackgroundPalette({
               key="transparent"
               value="transparent"
               className={`${styles.swatch} ${styles.transparentSwatch} ${
-                currentValue === undefined ? styles.selected : ""
+                isTransparent ? styles.selected : ""
               }`}
               aria-label="No background"
             >
