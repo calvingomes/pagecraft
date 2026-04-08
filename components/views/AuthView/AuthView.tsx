@@ -67,11 +67,11 @@ const AuthView = (props: AuthViewProps) => {
 
         <div className={styles.leftContent}>
           <h1 className={styles.tagline}>
-            Your link.
+            Your page
             <br />
-            <span className={styles.taglineAccent}>Your brand.</span>
+            <span className={styles.taglineAccent}>is waiting.</span>
           </h1>
-          <p className={styles.leftSubtitle}>One link for everything you do.</p>
+          <p className={styles.leftSubtitle}>Build a page that actually looks like you</p>
         </div>
 
         <div className={styles.rectStack}>
@@ -103,8 +103,8 @@ const AuthView = (props: AuthViewProps) => {
             </h1>
             <p className={styles.subtitle}>
               {isSignUp
-                ? "Get your own link-in-bio page in seconds."
-                : "Sign in to continue to your PageCraft."}
+                ? "Claim your username and start building"
+                : "Sign in to continue to your PageCraft"}
             </p>
           </div>
 
@@ -130,8 +130,8 @@ const AuthView = (props: AuthViewProps) => {
               {/* Status Message */}
               <div
                 className={`${styles.statusMessage} ${availabilityStatus === "available"
-                    ? styles.statusMessageAvailable
-                    : ""
+                  ? styles.statusMessageAvailable
+                  : ""
                   } ${availabilityStatus === "taken"
                     ? styles.statusMessageTaken
                     : ""
@@ -156,7 +156,7 @@ const AuthView = (props: AuthViewProps) => {
               textColor="var(--color-darker-grey)"
               borderColor="color-mix(in srgb, #ea4335 15%, #dcdcdc)"
               icon={GoogleIcon}
-              size="large"
+              size="medium"
               buttonWidth="full"
               disabled={!canProceed}
             />
@@ -167,7 +167,7 @@ const AuthView = (props: AuthViewProps) => {
               textColor="var(--color-darker-grey)"
               borderColor="color-mix(in srgb, #0070f3 15%, #dcdcdc)"
               icon={GithubIcon}
-              size="large"
+              size="medium"
               buttonWidth="full"
               disabled={!canProceed}
             />
@@ -179,7 +179,7 @@ const AuthView = (props: AuthViewProps) => {
               textColor="var(--color-darker-grey)"
               borderColor="color-mix(in srgb, #a259ff 15%, #dcdcdc)"
               icon={FigmaIcon}
-              size="large"
+              size="medium"
               buttonWidth="full"
               disabled={!canProceed}
             /> */}
