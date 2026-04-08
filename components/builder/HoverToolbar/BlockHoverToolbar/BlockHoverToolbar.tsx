@@ -9,6 +9,7 @@ import {
   RectangleVertical,
   RectangleHorizontal,
   Square,
+  Minus,
 } from "lucide-react";
 import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "./../HoverToolbar.module.css";
@@ -21,38 +22,38 @@ import type {
 const WIDTH_PRESETS: BlockHoverToolbarIcons[] = [
   {
     preset: "small",
-    title: "Small",
+    title: "Small (1x1)",
     Icon: Square,
     iconSize: 12,
   },
   {
+    preset: "skinnyWide",
+    title: "Skinny Wide (2x0.5)",
+    Icon: Minus,
+    iconSize: 20,
+  },
+  {
     preset: "wide",
-    title: "Wide",
+    title: "Wide (2x1)",
     Icon: RectangleHorizontal,
     iconSize: 20,
   },
   {
-    preset: "skinnyWide",
-    title: "Skinny Wide",
-    Icon: RectangleHorizontal,
-    iconSize: 16,
-  },
-  {
-    preset: "max",
-    title: "Max",
-    Icon: RectangleHorizontal,
-    iconSize: 24,
-  },
-  {
     preset: "tall",
-    title: "Tall",
+    title: "Tall (1x2)",
     Icon: RectangleVertical,
     iconSize: 20,
   },
   {
     preset: "large",
-    title: "Large",
+    title: "Large (2x2)",
     Icon: Square,
+    iconSize: 24,
+  },
+  {
+    preset: "max",
+    title: "Full Width",
+    Icon: RectangleHorizontal,
     iconSize: 24,
   },
 ];

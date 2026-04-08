@@ -11,7 +11,8 @@ import {
   Check,
   Palette,
   Type,
-  Link2
+  Link2,
+  Minus
 } from "lucide-react";
 import { useEditorStore } from "@/stores/editor-store";
 import { BlockBackgroundPalette } from "../BlockBackgroundPalette/BlockBackgroundPalette";
@@ -21,11 +22,11 @@ import styles from "./MobileBlockToolbar.module.css";
 import type { BlockWidthPreset } from "@/types/editor";
 
 const WIDTH_PRESETS = [
-  { preset: "small", Icon: Square, size: 16 },
-  { preset: "wide", Icon: RectangleHorizontal, size: 24 },
-  { preset: "skinnyWide", Icon: RectangleHorizontal, size: 16 },
-  { preset: "tall", Icon: RectangleVertical, size: 24 },
-  { preset: "large", Icon: Square, size: 24 },
+  { preset: "small", Icon: Square, size: 16, title: "Small (1x1)" },
+  { preset: "skinnyWide", Icon: Minus, size: 24, title: "Skinny Wide (2x0.5)" },
+  { preset: "wide", Icon: RectangleHorizontal, size: 24, title: "Wide (2x1)" },
+  { preset: "tall", Icon: RectangleVertical, size: 24, title: "Tall (1x2)" },
+  { preset: "large", Icon: Square, size: 24, title: "Large (2x2)" },
 ] as const;
 
 export function MobileBlockToolbar() {
@@ -104,10 +105,12 @@ export function MobileBlockToolbar() {
                     }
                   }}
                 >
-                  {visiblePresets.map(({ preset, Icon, size }) => (
+                  {visiblePresets.map(({ preset, Icon, size, title }) => (
                     <ToggleGroup.Item
                       key={preset}
                       value={preset}
+                      title={title}
+                      aria-label={title}
                       className={`${styles.sizeButton} ${currentPreset === preset ? styles.active : ""}`}
                     >
                       <Icon size={size} />
