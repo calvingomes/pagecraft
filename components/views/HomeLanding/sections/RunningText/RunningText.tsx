@@ -13,7 +13,7 @@ export function RunningText() {
   const sectionRef = useRef<HTMLElement>(null);
 
   // Use custom hook for scroll progress (0-1)
-  const progress = useScrollProgress(sectionRef, 0.9, 0.3);
+  const progress = useScrollProgress(sectionRef, 1, 0.5);
 
   // Derive litCount from progress (minimum 1)
   const litCount = Math.max(1, Math.round(progress * words.length));

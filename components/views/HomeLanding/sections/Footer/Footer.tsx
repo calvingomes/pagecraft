@@ -18,7 +18,7 @@ export function Footer() {
         {/* Top: Headline + ClaimInput centered */}
         <div className={styles.footerTop}>
           <h2 className={styles.footerHeadline}>
-            Claim your page today
+            Your page is waiting
           </h2>
           <div className={styles.claimWrapper}>
             <ClaimInput />
