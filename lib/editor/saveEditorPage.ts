@@ -4,7 +4,7 @@ import type {
   PageBackgroundId,
   SidebarPosition,
 } from "@/types/page";
-import type { Block } from "@/types/editor";
+import type { Block, ImageBlock, LinkBlock } from "@/types/editor";
 import {
   deletePageImage,
   uploadPageImage,
@@ -40,6 +40,7 @@ export type SaveEditorPageInput = {
 export type SaveEditorPageResult = {
   avatarUrl: string;
   blocks: Block[];
+  updatedAt: string;
 };
 
 function isPlainObject(value: unknown): value is UnknownRecord {
@@ -230,15 +231,21 @@ export async function saveEditorPage({
 
   const resolvedBlocks = await Promise.all(
     blocks.map(async (block) => {
-      if (block.type !== "image") return block;
+      if (block.type !== "image" && block.type !== "link") return block;
 
-      const contentUrl = (block.content?.url ?? "").split("?")[0];
+      const isLink = block.type === "link";
+      const imageUrl = isLink 
+        ? (block as LinkBlock).content.imageUrl 
+        : (block as ImageBlock).content.url;
+      
+      const contentUrl = (imageUrl ?? "").split("?")[0];
+      
       if (!contentUrl || !isDataUrl(contentUrl)) {
         return {
           ...block,
           content: {
             ...block.content,
-            url: contentUrl,
+            [isLink ? "imageUrl" : "url"]: contentUrl,
           },
         } as Block;
       }
@@ -256,12 +263,12 @@ export async function saveEditorPage({
           ...block,
           content: {
             ...block.content,
-            url: uploaded.downloadUrl,
+            [isLink ? "imageUrl" : "url"]: uploaded.downloadUrl,
           },
         } as Block;
       } catch (error) {
         throw new Error(
-          `Uploading image block failed (${block.id}): ${formatErrorMessage(error)}`,
+          `Uploading ${block.type} block image failed (${block.id}): ${formatErrorMessage(error)}`,
         );
       }
     }),
@@ -275,11 +282,26 @@ export async function saveEditorPage({
   );
 
   if (blockRows.length > 0) {
-    const { error: upsertBlocksError } = await supabase
+    const { data: savedBlocks, error: upsertBlocksError } = await supabase
       .from("blocks")
-      .upsert(blockRows, { onConflict: "id" });
+      .upsert(blockRows, { onConflict: "id" })
+      .select();
 
     throwIfError(upsertBlocksError, "Saving blocks failed");
+
+    // Update resolvedBlocks with the ones returned from DB (to get updated_at)
+    if (savedBlocks) {
+      const savedById = new Map(savedBlocks.map((b) => [b.id, b]));
+      resolvedBlocks.forEach((block, index) => {
+        const saved = savedById.get(block.id);
+        if (saved) {
+          resolvedBlocks[index] = {
+            ...block,
+            updated_at: saved.updated_at,
+          };
+        }
+      });
+    }
   }
 
   // Cleanup stale blocks
@@ -296,7 +318,7 @@ export async function saveEditorPage({
   const staleIds = staleRows.map((row) => String(row.id));
 
   const staleImageBlockIds = staleRows
-    .filter((row) => String(row.type) === "image")
+    .filter((row) => String(row.type) === "image" || String(row.type) === "link")
     .map((row) => String(row.id));
 
   if (staleImageBlockIds.length > 0) {
@@ -321,8 +343,21 @@ export async function saveEditorPage({
     throwIfError(deleteStaleError, "Deleting removed blocks failed");
   }
 
+  const { data: updatedPage, error: finalPageError } = await supabase
+    .from("pages")
+    .select("updated_at")
+    .eq("username", username)
+    .single();
+  
+  throwIfError(finalPageError, "Fetching final page state failed");
+
+  if (!updatedPage) {
+    throw new Error("Fetching final page state failed: No page data returned");
+  }
+
   return {
     avatarUrl: resolvedAvatarUrl,
     blocks: resolvedBlocks,
+    updatedAt: updatedPage.updated_at,
   };
 }

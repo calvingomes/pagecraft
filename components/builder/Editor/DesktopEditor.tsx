@@ -17,6 +17,7 @@ export const DesktopEditor = ({
   bioHtml,
   avatarUrl,
   avatarShape,
+  updatedAt,
   setDisplayName,
   setBioHtml,
   setAvatarUrl,
@@ -46,6 +47,7 @@ export const DesktopEditor = ({
           onChangeBioHtml={setBioHtml}
           avatarUrl={avatarUrl}
           avatarShape={avatarShape}
+          updatedAt={updatedAt}
           onChangeAvatarUrl={setAvatarUrl}
           onChangeAvatarShape={setAvatarShape}
         />

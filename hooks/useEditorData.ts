@@ -37,6 +37,7 @@ export function useEditorData() {
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [avatarShape, setAvatarShape] = useState<AvatarShape>("circle");
   const [persistedAvatarUrl, setPersistedAvatarUrl] = useState<string>("");
+  const [updatedAt, setUpdatedAt] = useState<string>("");
   
   const [isSaving, setIsSaving] = useState(false);
   const [isEditorDataReady, setIsEditorDataReady] = useState(false);
@@ -70,6 +71,7 @@ export function useEditorData() {
           if (pageData.avatar_shape === "circle" || pageData.avatar_shape === "square") {
             nextAvatarShape = pageData.avatar_shape;
           }
+          if (pageData.updated_at) setUpdatedAt(pageData.updated_at);
         }
 
         if (!active) return;
@@ -166,6 +168,7 @@ export function useEditorData() {
       const resolvedAvatarUrl = result.avatarUrl;
       if (resolvedAvatarUrl !== avatarUrl) setAvatarUrl(resolvedAvatarUrl);
       setPersistedAvatarUrl(resolvedAvatarUrl);
+      setUpdatedAt(result.updatedAt);
 
       const latestPayload: EditorSnapshotPayload = {
         background,
@@ -187,8 +190,13 @@ export function useEditorData() {
         const sent = sentById.get(block.id);
         const saved = resolvedById.get(block.id);
         if (!sent || !saved) return block;
-        if (JSON.stringify(sent.content) === JSON.stringify(saved.content)) return block;
-        return { ...block, content: saved.content } as Block;
+        
+        // Sync content and updated_at from DB
+        return { 
+          ...block, 
+          content: saved.content,
+          updated_at: saved.updated_at
+        } as Block;
       });
       setAllBlocks(patched);
     } catch (error) {
@@ -260,6 +268,7 @@ export function useEditorData() {
     bioHtml, setBioHtml,
     avatarUrl, setAvatarUrl,
     avatarShape, setAvatarShape,
+    updatedAt,
     isSaving, isEditorDataReady,
     onAddBlock, onUpdateBlock, onRemoveBlock,
     onSave: handleSave,

@@ -19,6 +19,7 @@ export const MobileEditor = ({
   bioHtml,
   avatarUrl,
   avatarShape,
+  updatedAt,
   setDisplayName,
   setBioHtml,
   setAvatarUrl,
@@ -46,6 +47,7 @@ export const MobileEditor = ({
           onChangeBioHtml={setBioHtml}
           avatarUrl={avatarUrl}
           avatarShape={avatarShape}
+          updatedAt={updatedAt}
           onChangeAvatarUrl={setAvatarUrl}
           onChangeAvatarShape={setAvatarShape}
         />

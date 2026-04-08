@@ -10,12 +10,14 @@ import { sanitizeMinimalRTH } from "@/lib/utils/sanitizeRichText";
 import { AvatarHoverToolbar } from "@/components/builder/HoverToolbar/AvatarHoverToolbar/AvatarHoverToolbar";
 import { useBlockEditor } from "@/hooks/useBlockEditor";
 import { DeleteButtonCorner } from "@/components/builder/DeleteButtonCorner/DeleteButtonCorner";
+import { getCacheBustedUrl } from "@/lib/utils/imageUtils";
 
 type ProfileSidebarEditorProps = {
   displayName?: string;
   bioHtml?: string;
   avatarUrl?: string;
   avatarShape?: "circle" | "square";
+  updatedAt?: string;
   onChangeDisplayName?: (displayName: string) => void;
   onChangeBioHtml?: (bioHtml: string) => void;
   onChangeAvatarUrl?: (avatarUrl: string) => void;
@@ -29,7 +31,8 @@ export const ProfileSidebarEditor = (props: ProfileSidebarEditorProps) => {
   const displayNameText = displayNameRaw.includes("<") ? htmlToText(displayNameRaw) : displayNameRaw;
   const safeBioHtml = sanitizeMinimalRTH(props.bioHtml ?? "");
   const avatarShape = props.avatarShape ?? "circle";
-  const avatarUrl = props.avatarUrl ?? "";
+  const avatarUrlRaw = props.avatarUrl ?? "";
+  const avatarUrl = getCacheBustedUrl(avatarUrlRaw, props.updatedAt);
 
   const [showAvatarHoverToolbar, setShowAvatarHoverToolbar] = useState(false);
 

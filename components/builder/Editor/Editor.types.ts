@@ -11,6 +11,7 @@ export interface EditorLayoutProps {
   bioHtml: string;
   avatarUrl: string;
   avatarShape: AvatarShape;
+  updatedAt?: string;
   setDisplayName: (val: string) => void;
   setBioHtml: (val: string) => void;
   setAvatarUrl: (val: string) => void;

@@ -48,6 +48,7 @@ export default function EditorPage() {
     bioHtml: data.bioHtml,
     avatarUrl: data.avatarUrl,
     avatarShape: data.avatarShape,
+    updatedAt: data.updatedAt,
     setDisplayName: data.setDisplayName,
     setBioHtml: data.setBioHtml,
     setAvatarUrl: data.setAvatarUrl,
