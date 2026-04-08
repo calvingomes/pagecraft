@@ -17,11 +17,32 @@ export const AuthService = {
 
   /**
    * Get the current user (directly from auth.getUser)
+   * Includes self-healing logic to sync username from DB if missing in metadata.
    */
   getUser: async (): Promise<User | null> => {
     const {
       data: { user },
     } = await supabase.auth.getUser();
+
+    if (!user) return null;
+
+    // Self-healing: If metadata is missing username, check the database
+    if (!user.user_metadata?.username) {
+      const { data: usernameData } = await supabase
+        .from("usernames")
+        .select("username")
+        .eq("uid", user.id)
+        .maybeSingle();
+
+      if (usernameData?.username) {
+        // Sync back to metadata for future sessions
+        const { data: updatedUser } = await supabase.auth.updateUser({
+          data: { username: usernameData.username },
+        });
+        return updatedUser.user;
+      }
+    }
+
     return user;
   },
 
@@ -38,6 +59,9 @@ export const AuthService = {
       provider,
       options: {
         redirectTo,
+        queryParams: {
+          prompt: "select_account",
+        },
       },
     });
   },

@@ -28,7 +28,7 @@ describe("reservedUsernames utility", () => {
 
   it("should return false for empty or null input", () => {
     expect(isReservedUsername("")).toBe(false);
-    // @ts-ignore
+    // @ts-expect-error - testing null input which is not allowed by types
     expect(isReservedUsername(null)).toBe(false);
   });
 

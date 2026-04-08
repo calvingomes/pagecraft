@@ -53,20 +53,26 @@ function getScopePath(uid: string, username: string, scope: PageImageScope) {
   return `${base}/blocks/${scope.blockId}.webp`;
 }
 
+
 async function cleanUpOldAvatars(uid: string, username: string) {
   const base = `users/${uid}/pages/${username}`;
+
   const { data: files } = await supabase.storage
     .from(STORAGE_BUCKET)
     .list(base);
+
+  const filesToRemove: string[] = [];
 
   if (files) {
     const avatarFiles = files
       .filter((f) => f.name.startsWith("avatar") && f.name.endsWith(".webp"))
       .map((f) => `${base}/${f.name}`);
+    
+    filesToRemove.push(...avatarFiles);
+  }
 
-    if (avatarFiles.length > 0) {
-      await supabase.storage.from(STORAGE_BUCKET).remove(avatarFiles);
-    }
+  if (filesToRemove.length > 0) {
+    await supabase.storage.from(STORAGE_BUCKET).remove(filesToRemove);
   }
 }
 
