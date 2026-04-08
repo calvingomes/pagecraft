@@ -68,23 +68,18 @@ export function SortableBlock({
   const handleWidthChange = (preset: BlockWidthPreset) => {
     if (!editor?.onUpdateBlock) return;
     const stylesKey = viewport === "mobile" ? "mobileStyles" : "styles";
-    const currentStyles =
-      viewport === "mobile" ? block.mobileStyles : block.styles;
     editor.onUpdateBlock(block.id, {
-      [stylesKey]: { ...(currentStyles ?? {}), widthPreset: preset },
+      [stylesKey]: { widthPreset: preset },
     });
   };
 
   const handleBackgroundColorChange = (color: string | null) => {
     if (!editor?.onUpdateBlock) return;
     const stylesKey = viewport === "mobile" ? "mobileStyles" : "styles";
-    const currentStyles =
-      viewport === "mobile" ? block.mobileStyles : block.styles;
 
     if (color === null) {
       editor.onUpdateBlock(block.id, {
         [stylesKey]: {
-          ...(currentStyles ?? {}),
           transparentWrapper: true,
           backgroundColor: undefined,
         },
@@ -92,7 +87,6 @@ export function SortableBlock({
     } else {
       editor.onUpdateBlock(block.id, {
         [stylesKey]: {
-          ...(currentStyles ?? {}),
           transparentWrapper: false,
           backgroundColor: color,
         },
