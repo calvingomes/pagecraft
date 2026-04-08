@@ -22,23 +22,32 @@ export function normalizeStoredBlocks(rawBlocks: RawStoredBlock[]): Block[] {
     const type = raw.type as BlockType;
     const order = typeof raw.order === "number" ? raw.order : index;
 
-    // Clean up sections - titles are always full-width half-rows
-    if (type === "sectionTitle") {
-      const styles = (raw.styles as Record<string, unknown>) || {};
-      return {
-        ...(raw as unknown as Block),
-        order,
-        styles: {
-          ...styles,
-          widthPreset: "full",
-        },
-      } as Block;
-    }
+    // Unpack mobile data from styles JSONB if it was parked there by the unified save logic
+    const styles = (raw.styles as Record<string, unknown>) || {};
+    const mobileLayout = (raw.mobileLayout || styles.mobileLayout || null) as GridLayout | null;
+    const mobileStyles = raw.mobileStyles || styles.mobileStyles || null;
+    const visibility = raw.visibility || styles.visibility || null;
 
-    return {
+    const baseBlock = {
       ...(raw as unknown as Block),
       order,
-    } as Block;
+      mobileLayout,
+      mobileStyles,
+      visibility,
+      styles: { ...styles },
+    };
+
+    // Clean up sections - titles are always full-width half-rows
+    if (type === "sectionTitle") {
+      baseBlock.styles.widthPreset = "full";
+    }
+
+    // Remove the nested versions from styles to keep memory clean
+    delete baseBlock.styles.mobileLayout;
+    delete baseBlock.styles.mobileStyles;
+    delete baseBlock.styles.visibility;
+
+    return baseBlock as Block;
   });
 }
 

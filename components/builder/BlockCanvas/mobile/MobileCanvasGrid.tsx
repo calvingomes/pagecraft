@@ -61,18 +61,6 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
     );
   };
 
-  const handleLayoutChange = (newLayout: Layout[]) => {
-    if (!editable || !props.onUpdateBlock) return;
-
-    for (const item of newLayout) {
-      props.onUpdateBlock(item.i, {
-        mobileLayout: {
-          x: item.x,
-          y: item.y / MOBILE_GRID.rowScale,
-        },
-      });
-    }
-  };
 
   const handleDragStop = async (newLayout: Layout[]) => {
     if (!editable || !editor?.onUpdateBlock) return;
@@ -118,7 +106,6 @@ export const MobileCanvasGrid = (props: MobileCanvasGridProps) => {
           isDraggable={editable}
           draggableHandle=".drag-handle"
           onDragStart={handleDragStart}
-          onLayoutChange={handleLayoutChange}
           onDragStop={handleDragStop}
         >
           {visibleBlocks.map((block) => (
