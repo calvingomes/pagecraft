@@ -22,9 +22,9 @@ export function getCacheBustedUrl(
       ? new Date(version).getTime()
       : version;
 
-  // Strip any existing query params (e.g. legacy ?v=... from previous uploads)
+  // Strip any existing query params to avoid duplication
   const cleanUrl = url.split("?")[0];
-  const separator = "?"; // Clean URL won't have params anymore
+  const separator = "?";
 
   return `${cleanUrl}${separator}v=${timestamp || "1"}`;
 }

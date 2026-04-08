@@ -70,17 +70,6 @@ async function cleanUpOldAvatars(uid: string, username: string) {
   }
 }
 
-function getLegacyScopePath(
-  uid: string,
-  username: string,
-  scope: PageImageScope,
-) {
-  const base = `users/${uid}/pages/${username}`;
-  if (scope.kind === "avatar") return `${base}/avatar`;
-  if (scope.kind === "og-image") return `${base}/social_preview.jpg`;
-  return `${base}/blocks/${scope.blockId}`;
-}
-
 async function getQuotaBytes(username: string) {
   const { data } = await supabase
     .from("pages")
@@ -126,11 +115,6 @@ export async function uploadPageImage({
     throw uploadError;
   }
 
-  const legacyPath = getLegacyScopePath(uid, username, scope);
-  if (legacyPath !== storagePath) {
-    await supabase.storage.from(STORAGE_BUCKET).remove([legacyPath]);
-  }
-
   const {
     data: { publicUrl },
   } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(storagePath);
@@ -161,13 +145,10 @@ export async function deletePageImage({
   previousSizeBytes = 0,
 }: DeletePageImageArgs): Promise<number> {
   const storagePath = getScopePath(uid, username, scope);
-  const legacyPath = getLegacyScopePath(uid, username, scope);
-  const pathsToRemove =
-    legacyPath === storagePath ? [storagePath] : [storagePath, legacyPath];
 
   const { error: removeError } = await supabase.storage
     .from(STORAGE_BUCKET)
-    .remove(pathsToRemove);
+    .remove([storagePath]);
 
   if (removeError) {
     // Ignore missing files; continue byte accounting update.
