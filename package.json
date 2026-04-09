@@ -2,6 +2,11 @@
   "name": "pagecraft",
   "version": "0.1.0",
   "private": true,
+  "browserslist": [
+    "last 2 versions",
+    "> 0.5%",
+    "not dead"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
