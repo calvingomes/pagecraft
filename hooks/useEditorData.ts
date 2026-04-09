@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { usePostHog } from 'posthog-js/react';
 import { useAuthStore } from "@/stores/auth-store";
 import { useEditorStore } from "@/stores/editor-store";
 import { PageService } from "@/lib/services/page.client";
@@ -24,6 +25,7 @@ import type { AddBlockOptions } from "@/components/builder/Toolbars/Toolbar.type
 
 export function useEditorData() {
   const { username, user } = useAuthStore();
+  const posthog = usePostHog();
   const blocks = useEditorStore((s) => s.blocks);
   const setAllBlocks = useEditorStore((s) => s.setAllBlocks);
   const updateBlockInStore = useEditorStore((s) => s.updateBlock);
@@ -133,6 +135,7 @@ export function useEditorData() {
   const handleSave = useCallback(async () => {
     if (!username || !user?.id || isSaving) return;
 
+    const isFirstSave = !updatedAt;
     setIsSaving(true);
 
     const hasPageChanges =
@@ -164,6 +167,10 @@ export function useEditorData() {
         skipPageUpdate: !hasPageChanges,
         skipOgUpdate: !hasBrandingChanges,
       });
+
+      if (isFirstSave) {
+        posthog.capture('first_save_complete');
+      }
 
       const resolvedAvatarUrl = result.avatarUrl;
       if (resolvedAvatarUrl !== avatarUrl) setAvatarUrl(resolvedAvatarUrl);
@@ -204,7 +211,7 @@ export function useEditorData() {
     } finally {
       setIsSaving(false);
     }
-  }, [username, user?.id, isSaving, background, desktopSidebarPosition, displayName, bioHtml, avatarUrl, persistedAvatarUrl, avatarShape, blocks, setAllBlocks, lastSavedPayload]);
+  }, [username, user?.id, isSaving, background, desktopSidebarPosition, displayName, bioHtml, avatarUrl, persistedAvatarUrl, avatarShape, blocks, setAllBlocks, lastSavedPayload, posthog, updatedAt]);
 
   // --- Auto-save ---
   useEffect(() => {

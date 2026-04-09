@@ -75,6 +75,7 @@ export const MobileNav = ({
               buttonWidth="auto"
               size="small"
               icon={ArrowRight}
+              trackingEvent={cta.trackingEvent}
             />
           </div>
         )
@@ -147,6 +148,7 @@ export const MobileNav = ({
                   buttonWidth="auto"
                   size="medium"
                   icon={ArrowRight}
+                  trackingEvent={cta.trackingEvent}
                 />
               )}
             </div>

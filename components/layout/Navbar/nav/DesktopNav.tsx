@@ -47,6 +47,7 @@ export const DesktopNav = ({ links = [], cta, logoColor, textColor }: DesktopNav
               buttonWidth="auto"
               size="small"
               icon={ArrowRight}
+              trackingEvent={cta.trackingEvent}
             />
           )}
         </div>

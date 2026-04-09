@@ -7,4 +7,5 @@ export type NavLink = {
 export type NavCTA = {
   label: string;
   href: string;
+  trackingEvent?: string;
 };

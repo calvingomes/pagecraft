@@ -426,3 +426,29 @@ The application uses **Vitest** for fast unit testing and environment-accurate l
 **Run Commands:**
 - `bun run test`: Executes the full suite once.
 - `bun run test:watch`: Continuous test runner for development.
+
+---
+
+## 15. Analytics (PostHog)
+
+The application uses PostHog for anonymous usage tracking. **Anonymity is a project requirement** — do not use `posthog.identify()` or `posthog.alias()` to link sessions to specific user IDs or emails.
+
+- **Infrastructure**:
+  - `app/providers.tsx`: Configures `PHProvider` with `persistence: 'memory'` (cookieless).
+  - `app/PostHogPageView.tsx`: Automatically tracks `$pageview` events on route changes.
+- **Manual Event Pattern**:
+  - Use the `trackingEvent` prop in `ThemeButton` to trigger anonymous captures on clicks.
+  - This prop is passed through `NavCTA` and block-level UI components to bridge the Server/Client boundary.
+- **Implementation Rules**:
+  - **Do:** Use descriptive, kebab-case event names (e.g., `signup_google`, `claim_cta_click`).
+  - **Do:** Update the centralized event reference in `app/providers.tsx` whenever adding a new event.
+  - **Don't:** Capture PII (Personally Identifiable Information) in event properties.
+  - **Don't:** Add tracking to loops or high-frequency events (e.g., dragging) without throttling.
+
+### Event Reference (Centralized in `providers.tsx`)
+- `claim_cta_click`: Homepage hero claim button.
+- `username_page_cta_click`: "Craft your page" CTA on profiles.
+- `signup_google` / `signup_github`: First-time account setup completion.
+- `editor_opened`: Tracks editor load platform (mobile vs desktop).
+- `viewport_preview_toggle`: Pre-save preview switching in the desktop editor.
+- `first_save_complete`: Tracks the literal first successful save of a user's page.

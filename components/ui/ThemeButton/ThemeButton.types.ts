@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 
 export interface ThemeButtonProps {
   label: string;
-  cta: (() => void) | ((e: React.FormEvent) => void) | string;
+  cta: (() => void) | ((e: React.FormEvent<HTMLFormElement>) => void) | string;
   icon?: LucideIcon | React.ElementType;
   bgColor: string;
   textColor?: string;
@@ -11,4 +11,5 @@ export interface ThemeButtonProps {
   buttonWidth?: string;
   disabled?: boolean;
   size?: "small" | "medium" | "large";
+  trackingEvent?: string;
 }

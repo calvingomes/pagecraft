@@ -43,6 +43,13 @@ The project uses **Vitest** + **jsdom**.
 - **Pre-commit**: Husky runs lint + tests. Commits fail if tests fail.
 - **Targets**: Grid math (`grid-math.ts`) and layout safety (`normalization.ts`).
 
+### Analytics
+
+PostHog is used for strictly anonymous tracking (`persistence: 'memory'`).
+- **Path**: Manual events are documented in `app/providers.tsx`.
+- **Pattern**: Pass `trackingEvent="event_name"` to `ThemeButton`. This bridges Server Components to the PostHog capture in the Client Component.
+- **Identification**: Do **NOT** use `posthog.identify()`. Anonymity is mandatory.
+
 ### Editor Engine (`lib/editor-engine/`)
 
 The core grid/collision system. All grid constants come from `DESKTOP_GRID` / `MOBILE_GRID` in `lib/editor-engine/grid/grid-config.ts`.

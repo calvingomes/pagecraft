@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
+import { PHProvider } from "./providers";
+import { PostHogPageView } from "./PostHogPageView";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -49,7 +52,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={jakarta.variable}>
-      <body>{children}</body>
+      <body>
+        <PHProvider>
+          <Suspense fallback={null}>
+            <PostHogPageView />
+          </Suspense>
+          {children}
+        </PHProvider>
+      </body>
     </html>
   );
 }

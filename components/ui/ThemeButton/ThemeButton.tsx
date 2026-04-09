@@ -3,6 +3,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { usePostHog } from 'posthog-js/react';
 import { deriveTextColor } from "@/lib/utils/colorUtils";
 import type { ThemeButtonProps } from "./ThemeButton.types";
 import styles from "./ThemeButton.module.css";
@@ -17,7 +18,9 @@ export const ThemeButton = ({
   buttonWidth,
   disabled = false,
   size = "large",
+  trackingEvent,
 }: ThemeButtonProps) => {
+  const posthog = usePostHog();
   const isLink = typeof cta === "string";
   const resolvedTextColor = textColor ?? deriveTextColor(bgColor);
   const customStyle = { 
@@ -28,6 +31,12 @@ export const ThemeButton = ({
   };
 
   const buttonClasses = `${styles.button} ${styles[size]}`;
+
+  const handleClick = () => {
+    if (trackingEvent) {
+      posthog.capture(trackingEvent);
+    }
+  };
 
   const content = (
     <>
@@ -43,7 +52,12 @@ export const ThemeButton = ({
 
   if (isLink) {
     return (
-      <Link href={cta as string} className={buttonClasses} style={customStyle}>
+      <Link 
+        href={cta as string} 
+        className={buttonClasses} 
+        style={customStyle}
+        onClick={handleClick}
+      >
         {content}
       </Link>
     );
@@ -53,7 +67,10 @@ export const ThemeButton = ({
     <button
       type="button"
       className={buttonClasses}
-      onClick={cta as () => void}
+      onClick={() => {
+        handleClick();
+        (cta as () => void)();
+      }}
       style={customStyle}
       disabled={disabled}
     >

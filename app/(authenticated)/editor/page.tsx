@@ -1,6 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
+import { usePostHog } from 'posthog-js/react';
 import { useAuthStore } from "@/stores/auth-store";
 import { useEditorStore } from "@/stores/editor-store";
 import { EditorProvider } from "@/contexts/EditorContext";
@@ -23,6 +25,18 @@ export default function EditorPage() {
 
   const data = useEditorData();
   const viewport = useViewportEditor(data.desktopSidebarPosition);
+  const posthog = usePostHog();
+  const trackedOpenedRef = useRef(false);
+
+  // Track editor entry
+  useEffect(() => {
+    if (data.isEditorDataReady && !trackedOpenedRef.current) {
+      posthog.capture('editor_opened', { 
+        editor_type: viewport.isActualMobile ? 'mobile' : 'desktop' 
+      });
+      trackedOpenedRef.current = true;
+    }
+  }, [data.isEditorDataReady, viewport.isActualMobile, posthog]);
 
   const handleLogout = async () => {
     await AuthService.signOut();
@@ -77,7 +91,10 @@ export default function EditorPage() {
         <DesktopEditor
           {...editorProps}
           previewView={viewport.previewView}
-          setPreviewView={viewport.setPreviewView}
+          setPreviewView={(view) => {
+            posthog.capture('viewport_preview_toggle', { mode: view });
+            viewport.setPreviewView(view);
+          }}
           isDesktopEditing={viewport.isDesktopEditing}
         />
       )}

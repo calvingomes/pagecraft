@@ -19,8 +19,8 @@ export const ClaimInput = () => {
     setUsername(value);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
     if (!username) return;
     router.push(`/auth?username=${encodeURIComponent(username)}`);
   };
@@ -48,6 +48,7 @@ export const ClaimInput = () => {
         <ThemeButton
           label="Claim"
           cta={handleSubmit}
+          trackingEvent="claim_cta_click"
           icon={ArrowRight}
           bgColor="var(--color-yellow)"
           size="large"

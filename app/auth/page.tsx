@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { usePostHog } from 'posthog-js/react';
 import { AuthService } from "@/lib/services/auth.client";
 import { PageService } from "@/lib/services/page.client";
 import { BlockService } from "@/lib/services/block.client";
@@ -15,6 +16,7 @@ import { PageLoader } from "@/components/ui/PageLoader/PageLoader";
 function AuthPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const posthog = usePostHog();
   const { authChecked } = useAuthGuard("auth");
   const { user, setUsername: setUsernameInStore } = useAuthStore();
   const [claiming, setClaiming] = useState(false);
@@ -37,6 +39,12 @@ function AuthPageContent() {
         await BlockService.createStarterBlocks(initialUsername, user.id);
         await AuthService.updateUserMetadata({ username: initialUsername });
 
+        const provider = user.app_metadata?.provider || 'unknown';
+        posthog.capture(`signup_${provider}`, { 
+          username: initialUsername,
+          method: provider 
+        });
+
         setUsernameInStore(initialUsername);
         router.replace("/editor");
       } catch (error) {
@@ -54,6 +62,7 @@ function AuthPageContent() {
     claiming,
     router,
     setUsernameInStore,
+    posthog,
   ]);
 
   if (!authChecked || claiming) {
