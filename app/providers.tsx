@@ -24,8 +24,11 @@ export function PHProvider({ children }: { children: React.ReactNode }) {
       if (token) {
         posthog.init(token, {
           api_host: host,
-          persistence: 'memory',
+          persistence: 'localStorage',
           capture_pageview: false,
+          loaded: (ph) => {
+            if (process.env.NODE_ENV === 'development') ph.opt_out_capturing();
+          },
         });
       }
     }
