@@ -153,6 +153,29 @@
   justify-content: space-between;
 }
 
+.onboardingActions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.signOutLink {
+  background: none;
+  border: none;
+  color: var(--color-mid-grey);
+  font-size: var(--font-size-sm);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.signOutLink:hover {
+  color: var(--color-darker-grey);
+}
+
 .statusMessage {
   font-size: var(--font-size-xs);
   margin-top: -20px;

@@ -2,10 +2,16 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 import type { AuthMode, AuthViewProps } from "./AuthView.types";
 import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
 import { useUsernameAvailability } from "@/hooks/useUsernameAvailability";
+import { useAuthStore } from "@/stores/auth-store";
+import { AuthService } from "@/lib/services/auth.client";
+import { PageService } from "@/lib/services/page.client";
+import { BlockService } from "@/lib/services/block.client";
 import styles from "./AuthView.module.css";
 
 const GoogleIcon = (props: Partial<React.ComponentProps<typeof Image>>) => (
@@ -37,17 +43,54 @@ const GithubIcon = (props: Partial<React.ComponentProps<typeof Image>>) => (
 // );
 
 const AuthView = (props: AuthViewProps) => {
-  const { handleOAuthSignIn, initialUsername } = props;
-  const [mode, setMode] = useState<AuthMode>(
-    initialUsername ? "signup" : "signin",
-  );
+  const { initialUsername } = props;
+  const router = useRouter();
+  const { user, setUsername: setUsernameInStore } = useAuthStore();
+
+  const [mode, setMode] = useState<AuthMode>(() => {
+    if (user && !user.user_metadata?.username) return "on-boarding";
+    if (initialUsername) return "signup";
+    return "signin";
+  });
   const [username, setUsername] = useState(initialUsername ?? "");
+  const [isCompleting, setIsCompleting] = useState(false);
   const availabilityStatus = useUsernameAvailability(username);
 
+  const handleOAuthSignIn = async (provider: "google" | "github" | "figma", username?: string) => {
+    const usernameToClaim = mode === "signup" ? username : undefined;
+    await AuthService.signInWithOAuth(provider, usernameToClaim);
+  };
+
   const isSignUp = mode === "signup";
+  const isOnboarding = mode === "on-boarding";
+  const isSignIn = mode === "signin";
+
   const canProceed =
-    !isSignUp ||
+    isSignIn ||
     (username.trim().length >= 3 && availabilityStatus === "available");
+
+  const handleCompleteOnboarding = async () => {
+    if (!user || !canProceed || isCompleting) return;
+
+    setIsCompleting(true);
+    try {
+      await PageService.claimUsername(username, user.id);
+      await BlockService.createStarterBlocks(username, user.id);
+      await AuthService.updateUserMetadata({ username });
+
+      setUsernameInStore(username);
+      router.replace("/editor");
+    } catch (error) {
+      console.error("Onboarding failed:", error);
+      setIsCompleting(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await AuthService.signOut();
+    setUsername("");
+    setMode("signin");
+  };
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
@@ -87,29 +130,37 @@ const AuthView = (props: AuthViewProps) => {
 
       <div className={styles.rightPanel}>
         <div className={styles.formContainer}>
-          <TogglePill<AuthMode>
-            value={mode}
-            onChange={setMode}
-            variant="dark"
-            options={[
-              { value: "signup", label: "Sign up" },
-              { value: "signin", label: "Sign in" },
-            ]}
-          />
+          {!isOnboarding && (
+            <TogglePill<AuthMode>
+              value={mode}
+              onChange={setMode}
+              variant="dark"
+              options={[
+                { value: "signup", label: "Sign up" },
+                { value: "signin", label: "Sign in" },
+              ]}
+            />
+          )}
 
           <div className={styles.header}>
             <h1 className={styles.title}>
-              {isSignUp ? "Create your page" : "Welcome back"}
+              {isOnboarding
+                ? "One last thing!"
+                : isSignUp
+                  ? "Create your page"
+                  : "Welcome back"}
             </h1>
             <p className={styles.subtitle}>
-              {isSignUp
-                ? "Claim your username and start building"
-                : "Sign in to continue to your PageCraft"}
+              {isOnboarding
+                ? "Your page lives at pagecraft.me/you. What's it going to be?"
+                : isSignUp
+                  ? "Your page lives at pagecraft.me/you. What's it going to be?"
+                  : "Sign in to continue to your PageCraft"}
             </p>
           </div>
 
-          {/* Username input — sign-up only */}
-          {isSignUp && (
+          {/* Username input — sign-up or onboarding */}
+          {(isSignUp || isOnboarding) && (
             <>
               <div
                 className={`${styles.usernameInputWrapper} ${availabilityStatus === "available" ? styles.statusAvailable : ""
@@ -148,31 +199,48 @@ const AuthView = (props: AuthViewProps) => {
             </>
           )}
 
-          <div className={styles.socialContainer}>
-            <ThemeButton
-              label="Google"
-              cta={() => handleOAuthSignIn("google", username)}
-              bgColor="color-mix(in srgb, #ea4335 5%, white)"
-              textColor="var(--color-darker-grey)"
-              borderColor="color-mix(in srgb, #ea4335 15%, #dcdcdc)"
-              icon={GoogleIcon}
-              size="medium"
-              buttonWidth="full"
-              disabled={!canProceed}
-            />
-            <ThemeButton
-              label="GitHub"
-              cta={() => handleOAuthSignIn("github", username)}
-              bgColor="color-mix(in srgb, #0070f3 5%, white)"
-              textColor="var(--color-darker-grey)"
-              borderColor="color-mix(in srgb, #0070f3 15%, #dcdcdc)"
-              icon={GithubIcon}
-              size="medium"
-              buttonWidth="full"
-              disabled={!canProceed}
-            />
-            {/* will enable it once figma approves app */}
-            {/* <ThemeButton
+          {isOnboarding ? (
+            <div className={styles.onboardingActions}>
+              <ThemeButton
+                label={isCompleting ? "Creating your page..." : "Claim & Continue"}
+                cta={handleCompleteOnboarding}
+                bgColor="var(--color-yellow)"
+                textColor="var(--color-black)"
+                size="medium"
+                buttonWidth="full"
+                disabled={!canProceed || isCompleting}
+                icon={ArrowRight}
+              />
+              <button className={styles.signOutLink} onClick={handleSignOut}>
+                Sign in with a different account
+              </button>
+            </div>
+          ) : (
+            <div className={styles.socialContainer}>
+              <ThemeButton
+                label="Google"
+                cta={() => handleOAuthSignIn("google", username)}
+                bgColor="color-mix(in srgb, #ea4335 5%, white)"
+                textColor="var(--color-darker-grey)"
+                borderColor="color-mix(in srgb, #ea4335 15%, #dcdcdc)"
+                icon={GoogleIcon}
+                size="medium"
+                buttonWidth="full"
+                disabled={!canProceed}
+              />
+              <ThemeButton
+                label="GitHub"
+                cta={() => handleOAuthSignIn("github", username)}
+                bgColor="color-mix(in srgb, #0070f3 5%, white)"
+                textColor="var(--color-darker-grey)"
+                borderColor="color-mix(in srgb, #0070f3 15%, #dcdcdc)"
+                icon={GithubIcon}
+                size="medium"
+                buttonWidth="full"
+                disabled={!canProceed}
+              />
+              {/* will enable it once figma approves app */}
+              {/* <ThemeButton
               label="Figma"
               cta={() => handleOAuthSignIn("figma", username)}
               bgColor="color-mix(in srgb, #a259ff 5%, white)"
@@ -183,7 +251,8 @@ const AuthView = (props: AuthViewProps) => {
               buttonWidth="full"
               disabled={!canProceed}
             /> */}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

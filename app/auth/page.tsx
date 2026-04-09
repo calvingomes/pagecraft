@@ -69,15 +69,11 @@ function AuthPageContent() {
     return <PageLoader label={claiming ? "Creating your page..." : undefined} />;
   }
 
-  const handleOAuthSignIn = async (provider: "google" | "github" | "figma", username?: string) => {
-    await AuthService.signInWithOAuth(provider, username);
-  };
-
   return (
     <>
       <Navbar />
       <AuthView
-        handleOAuthSignIn={handleOAuthSignIn}
+        key={user?.id ?? 'guest'}
         initialUsername={initialUsername}
       />
     </>

@@ -1,6 +1,5 @@
-export type AuthMode = "signup" | "signin";
+export type AuthMode = "signup" | "signin" | "on-boarding";
 
 export type AuthViewProps = {
-  handleOAuthSignIn: (provider: "google" | "github" | "figma", username?: string) => Promise<void>;
   initialUsername?: string;
 };
