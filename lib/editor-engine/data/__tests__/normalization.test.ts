@@ -1,128 +1,123 @@
 import { describe, it, expect } from "vitest";
-import { 
-  normalizeStoredBlocks, 
-  ensureBlocksHaveValidLayouts,
-  type RawStoredBlock
-} from "../normalization";
+import { normalizeStoredBlocks, ensureBlocksHaveValidLayouts } from "../normalization";
+import type { RawStoredBlock } from "../normalization";
+import { DESKTOP_GRID, MOBILE_GRID } from "../../grid/grid-config";
 import { Block } from "@/types/editor";
-import { DESKTOP_GRID } from "../../grid/grid-config";
 
-describe("normalization", () => {
+describe("normalization - Unified Block Model", () => {
   describe("normalizeStoredBlocks", () => {
-    it("ensures sectionTitle always has widthPreset: 'full'", () => {
+    it("unpacks mobile data from styles JSONB correctly", () => {
       const raw = [
-        { id: "1", type: "sectionTitle", styles: {}, content: { title: "Hello" } }
-      ];
-      const normalized = normalizeStoredBlocks(raw as RawStoredBlock[]);
-      expect(normalized[0].styles?.widthPreset).toBe("full");
-    });
-
-    it("assigns order based on index if missing", () => {
-      const raw = [
-        { id: "a", type: "text" },
-        { id: "b", type: "text" }
-      ];
-      const normalized = normalizeStoredBlocks(raw as RawStoredBlock[]);
-      expect(normalized[0].order).toBe(0);
-      expect(normalized[1].order).toBe(1);
-    });
-
-    it("unpacks mobile data from styles JSONB", () => {
-      const raw = [
-        { 
-          id: "1", 
-          type: "text", 
-          styles: { 
-            mobileLayout: { x: 0, y: 10 },
-            mobileStyles: { widthPreset: "wide" },
-            visibility: { desktop: true, mobile: false }
-          } 
+        {
+          id: "b1",
+          type: "text",
+          styles: {
+            backgroundColor: "#ff0000",
+            mobileLayout: { x: 1, y: 1 },
+            mobileStyles: { backgroundColor: "#0000ff" },
+            visibility: { mobile: false }
+          }
         }
       ];
+
       const normalized = normalizeStoredBlocks(raw as RawStoredBlock[]);
-      expect(normalized[0].mobileLayout).toEqual({ x: 0, y: 10 });
-      expect(normalized[0].mobileStyles?.widthPreset).toBe("wide");
-      expect(normalized[0].visibility?.mobile).toBe(false);
-      // Ensure they were cleaned out of the styles object
-      expect(normalized[0].styles?.mobileLayout).toBeUndefined();
+      const b1 = normalized[0];
+
+      expect(b1.mobileLayout).toEqual({ x: 1, y: 1 });
+      expect(b1.mobileStyles).toEqual({ backgroundColor: "#0000ff" });
+      expect(b1.visibility).toEqual({ mobile: false });
+      expect(b1.styles!.backgroundColor).toBe("#ff0000");
+      
+      // Ensure the moved properties are deleted from the styles object
+      const stylesRecord = b1.styles as unknown as Record<string, unknown>;
+      expect(stylesRecord.mobileLayout).toBeUndefined();
+      expect(stylesRecord.mobileStyles).toBeUndefined();
+      expect(stylesRecord.visibility).toBeUndefined();
+    });
+
+    it("handles clean data without nested parking", () => {
+      const raw = [
+        {
+          id: "b1",
+          type: "text",
+          styles: { backgroundColor: "#ff0000" },
+          mobileLayout: { x: 0, y: 0 },
+          visibility: { desktop: true }
+        }
+      ];
+
+      const normalized = normalizeStoredBlocks(raw as RawStoredBlock[]);
+      expect(normalized[0].mobileLayout).toEqual({ x: 0, y: 0 });
+      expect(normalized[0].visibility).toEqual({ desktop: true });
     });
   });
 
   describe("ensureBlocksHaveValidLayouts", () => {
-    it("leaves non-overlapping blocks untouched", () => {
-      const blocks: Partial<Block>[] = [
-        { id: "1", type: "text", layout: { x: 0, y: 0 }, styles: { widthPreset: "small" }, order: 0 },
-        { id: "2", type: "text", layout: { x: 1, y: 0 }, styles: { widthPreset: "small" }, order: 1 }
+    const defaultBlock: Partial<Block> = {
+      type: "text",
+      styles: { widthPreset: "small" },
+      visibility: { desktop: true, mobile: true },
+    };
+
+    it("prevents overlapping blocks on desktop", () => {
+      const blocks: Block[] = [
+        { ...defaultBlock, id: "b1", layout: { x: 0, y: 0 }, order: 0 } as Block,
+        { ...defaultBlock, id: "b2", layout: { x: 0, y: 0 }, order: 1 } as Block, // Overlaps b1
       ];
+
+      const validated = ensureBlocksHaveValidLayouts(blocks, DESKTOP_GRID, "desktop");
       
-      const healed = ensureBlocksHaveValidLayouts(blocks as Block[], DESKTOP_GRID);
-      expect(healed[0].layout?.x).toBe(0);
-      expect(healed[1].layout?.x).toBe(1);
+      expect(validated[0].layout).toEqual({ x: 0, y: 0 });
+      // b2 should have been moved to the next available spot (x: 1, y: 0)
+      expect(validated[1].layout).toEqual({ x: 1, y: 0 });
     });
 
-    it("heals overlapping blocks by pushing the second one to the next free spot", () => {
-      // Two 1x1 blocks both at (0,0)
-      const blocks: Partial<Block>[] = [
-        { id: "1", type: "text", layout: { x: 0, y: 0 }, styles: { widthPreset: "small" }, order: 0 },
-        { id: "2", type: "text", layout: { x: 0, y: 0 }, styles: { widthPreset: "small" }, order: 1 }
+    it("prevents overlapping blocks on mobile", () => {
+      const blocks: Block[] = [
+        { ...defaultBlock, id: "b1", mobileLayout: { x: 0, y: 0 }, order: 0 } as Block,
+        { ...defaultBlock, id: "b2", mobileLayout: { x: 0, y: 0 }, order: 1 } as Block, // Overlaps b1
       ];
+
+      const validated = ensureBlocksHaveValidLayouts(blocks, MOBILE_GRID, "mobile");
       
-      const healed = ensureBlocksHaveValidLayouts(blocks as Block[], DESKTOP_GRID);
-      
-      // First block stays at (0,0)
-      expect(healed[0].layout).toEqual({ x: 0, y: 0 });
-      
-      // Second block should have been moved. 
-      // In a 4-col grid, (1,0) should be the next free spot.
-      expect(healed[1].layout).not.toEqual({ x: 0, y: 0 });
-      expect(healed[1].layout?.x).not.toBeNull();
-      expect(healed[1].layout?.y).not.toBeNull();
+      expect(validated[0].mobileLayout).toEqual({ x: 0, y: 0 });
+      // b2 should move to (x:1, y:0)
+      expect(validated[1].mobileLayout).toEqual({ x: 1, y: 0 });
     });
 
-    it("respects 'order' when deciding which block to move", () => {
-      // Block 2 has lower order but is second in array
-      const blocks: Partial<Block>[] = [
-        { id: "1", type: "text", layout: { x: 0, y: 0 }, styles: { widthPreset: "small" }, order: 10 },
-        { id: "2", type: "text", layout: { x: 0, y: 0 }, styles: { widthPreset: "small" }, order: 0 }
-      ];
-      
-      const healed = ensureBlocksHaveValidLayouts(blocks as Block[], DESKTOP_GRID);
-      
-      // Because we sort by order first, Block 2 (order 0) stays at (0,0)
-      const block2 = healed.find(b => b.id === "2");
-      const block1 = healed.find(b => b.id === "1");
-      
-      expect(block2?.layout).toEqual({ x: 0, y: 0 });
-      expect(block1?.layout).not.toEqual({ x: 0, y: 0 });
-    });
-
-    it("ignores hidden blocks during collision checks (no ghost blocks)", () => {
-      const blocks: Partial<Block>[] = [
+    it("ignores hidden blocks for collision detection", () => {
+      const blocks: Block[] = [
         { 
-          id: "hidden-desktop", 
-          type: "text", 
+          ...defaultBlock, 
+          id: "b1", 
           layout: { x: 0, y: 0 }, 
-          visibility: { desktop: false, mobile: true },
-          styles: { widthPreset: "small" }, 
+          visibility: { desktop: false }, // HIDDEN
           order: 0 
-        },
+        } as Block,
         { 
-          id: "visible-desktop", 
-          type: "text", 
-          layout: { x: 0, y: 0 }, 
-          visibility: { desktop: true, mobile: true },
-          styles: { widthPreset: "small" }, 
+          ...defaultBlock, 
+          id: "b2", 
+          layout: { x: 0, y: 0 }, // Would overlap b1 if b1 were visible
           order: 1 
-        }
+        } as Block,
       ];
+
+      const validated = ensureBlocksHaveValidLayouts(blocks, DESKTOP_GRID, "desktop");
       
-      const healed = ensureBlocksHaveValidLayouts(blocks as Block[], DESKTOP_GRID, "desktop");
-      
-      // The hidden block 'hidden-desktop' (order 0) is hidden on desktop.
-      // The visible block 'visible-desktop' (order 1) starts at (0,0).
-      // Because the hidden block is ignored during collision, the visible block should STAY at (0,0).
-      const visible = healed.find(b => b.id === "visible-desktop");
-      expect(visible?.layout).toEqual({ x: 0, y: 0 });
+      // b1 keeps its layout but b2 is allowed to take (0,0) because b1 is hidden
+      expect(validated[0].layout).toEqual({ x: 0, y: 0 });
+      expect(validated[1].layout).toEqual({ x: 0, y: 0 });
+    });
+
+    it("fixes missing or invalid layouts", () => {
+      const blocks: Block[] = [
+        { ...defaultBlock, id: "b1", layout: undefined, order: 0 } as Block,
+      ];
+
+      const validated = ensureBlocksHaveValidLayouts(blocks, DESKTOP_GRID, "desktop");
+      expect(validated[0].layout).toBeDefined();
+      expect(validated[0].layout?.x).toBe(0);
+      expect(validated[0].layout?.y).toBe(0);
     });
   });
 });

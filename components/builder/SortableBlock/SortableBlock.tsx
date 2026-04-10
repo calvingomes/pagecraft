@@ -117,6 +117,7 @@ export function SortableBlock({
 
   return (
     <div
+      data-testid="block-item"
       className={`${styles.hoverZone} ${isSelected && isMobile ? styles.selectedZone : ""}`}
       style={fluid ? { height: "auto" } : undefined}
       onMouseEnter={handleMouseEnter}

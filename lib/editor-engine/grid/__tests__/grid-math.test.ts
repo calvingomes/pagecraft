@@ -30,6 +30,18 @@ describe("grid-math", () => {
     it("handles skinnyWide half-rows", () => {
       expect(spansForPreset("skinnyWide", DESKTOP_GRID)).toEqual({ w: 2, h: 0.5 });
     });
+
+    it("handles full width preset with 1.0 height", () => {
+      expect(spansForPreset("full", DESKTOP_GRID)).toEqual({ w: 4, h: 1 });
+    });
+
+    it("handles large preset", () => {
+      expect(spansForPreset("large", DESKTOP_GRID)).toEqual({ w: 2, h: 2 });
+    });
+
+    it("handles tall preset", () => {
+      expect(spansForPreset("tall", DESKTOP_GRID)).toEqual({ w: 1, h: 2 });
+    });
   });
 
   describe("sizePxForPreset", () => {
@@ -39,6 +51,12 @@ describe("grid-math", () => {
       // h=1: (1 * 175) + (0 * 35) = 175
       expect(widthPx).toBe(385);
       expect(heightPx).toBe(175);
+    });
+
+    it("calculates special height for full width preset", () => {
+      const { heightPx } = sizePxForPreset("full", DESKTOP_GRID);
+      // Math.round(175 / 2) = 88
+      expect(heightPx).toBe(88);
     });
   });
 
@@ -101,6 +119,18 @@ describe("grid-math", () => {
       expect(style.position).toBe("absolute");
       expect(style.width).toBe("175px");
       expect(style.transform).toBe("translate3d(210px, 210px, 0)"); // (1 * (175 + 35))
+    });
+
+    it("handles zero dimensions gracefully", () => {
+      const block: Partial<Block> = {
+        id: "z",
+        layout: { x: 0, y: 0 },
+        styles: { widthPreset: "small" }
+      };
+      // For width 1, h 1:
+      // width = 1 * 175 + 0 * 35 = 175
+      const style = blockToStyle(block as Block, DESKTOP_GRID);
+      expect(style.width).toBe("175px");
     });
   });
 });

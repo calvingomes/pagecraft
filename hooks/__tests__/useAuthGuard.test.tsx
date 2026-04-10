@@ -55,7 +55,7 @@ describe("useAuthGuard", () => {
         setLoading: mockSetLoading,
         logout: vi.fn(),
       };
-      return selector(state);
+      return selector(state as never);
     });
 
     // Default mock implementation for getUser
@@ -129,13 +129,14 @@ describe("useAuthGuard", () => {
   it("should handle the 'Old User' scenario: ignore ?username= in URL if user already has a name", async () => {
     // Setup URL search params mock
     const originalLocation = window.location;
-    // @ts-expect-error - Mocking window.location is intentional
-    delete (window as { location?: Location }).location;
-    window.location = {
-      ...originalLocation,
-      search: "?username=claimed-name",
-      origin: "https://example.com",
-    };
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: {
+        ...originalLocation,
+        search: "?username=claimed-name",
+        origin: "https://example.com",
+      },
+    });
 
     const mockUser = {
       id: "user-123",
@@ -150,6 +151,9 @@ describe("useAuthGuard", () => {
     });
 
     // Cleanup
-    window.location = originalLocation;
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: originalLocation,
+    });
   });
 });
