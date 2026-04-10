@@ -1,7 +1,7 @@
 "use client";
 
 import * as Label from "@radix-ui/react-label";
-import React, { useState } from "react";
+import React, { useState, useId } from "react";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ThemeButton } from "../ThemeButton/ThemeButton";
@@ -10,8 +10,9 @@ import styles from "./ClaimInput.module.css";
 
 export const ClaimInput = () => {
   const router = useRouter();
+  const generatedId = useId();
   const [username, setUsername] = useState("");
-  const inputId = "claim-username-input";
+  const inputId = `claim-username-input-${generatedId}`;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
@@ -27,11 +28,9 @@ export const ClaimInput = () => {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <div className={styles.inputWrapper}>
+      <Label.Root className={styles.inputWrapper} htmlFor={inputId}>
         <span className={styles.prefix}>pagecraft.me/</span>
-        <Label.Root htmlFor={inputId} style={VISUALLY_HIDDEN_STYLE}>
-          Username
-        </Label.Root>
+        <span style={VISUALLY_HIDDEN_STYLE}>Username</span>
 
         <input
           id={inputId}
@@ -42,7 +41,7 @@ export const ClaimInput = () => {
           className={styles.input}
           required
         />
-      </div>
+      </Label.Root>
 
       <div className={styles.buttonWrapper}>
         <ThemeButton
