@@ -14,6 +14,8 @@ vi.mock("@/lib/supabase/client", () => {
       getSession: vi.fn(),
       getUser: vi.fn(),
       signInWithOAuth: vi.fn(),
+      signInWithPassword: vi.fn(),
+      signUp: vi.fn(),
       signOut: vi.fn(),
       updateUser: vi.fn(),
       onAuthStateChange: vi.fn(),
@@ -37,6 +39,8 @@ type SupabaseMock = {
     getSession: Mock;
     getUser: Mock;
     signInWithOAuth: Mock;
+    signInWithPassword: Mock;
+    signUp: Mock;
     signOut: Mock;
     updateUser: Mock;
     onAuthStateChange: Mock;
@@ -160,6 +164,42 @@ describe("AuthService", () => {
       Object.defineProperty(window, "location", {
         configurable: true,
         value: originalLocation,
+      });
+    });
+  });
+
+  describe("signInWithEmail", () => {
+    it("calls supabase.auth.signInWithPassword", async () => {
+      asMock(supabase.auth.signInWithPassword).mockResolvedValue({
+        data: { user: { id: "123" } },
+        error: null,
+      });
+
+      await AuthService.signInWithEmail("test@example.com", "password123");
+
+      expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
+        email: "test@example.com",
+        password: "password123",
+      });
+    });
+  });
+
+  describe("signUpWithEmail", () => {
+    it("calls supabase.auth.signUp with correct params", async () => {
+      asMock(supabase.auth.signUp).mockResolvedValue({
+        data: { user: { id: "123" }, session: null },
+        error: null,
+      });
+
+      await AuthService.signUpWithEmail("test@example.com", "password123", "testuser");
+
+      expect(supabase.auth.signUp).toHaveBeenCalledWith({
+        email: "test@example.com",
+        password: "password123",
+        options: {
+          data: { username: "testuser" },
+          emailRedirectTo: "http://localhost:3000/auth",
+        },
       });
     });
   });

@@ -1,5 +1,8 @@
-import { vi } from "vitest";
+import { expect, vi } from "vitest";
+import * as matchers from "@testing-library/jest-dom/matchers";
 import "@testing-library/jest-dom";
+
+expect.extend(matchers);
 
 // Inject dummy environment variables for tests
 process.env.NEXT_PUBLIC_SUPABASE_URL = "https://test.supabase.co";

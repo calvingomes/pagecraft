@@ -21,5 +21,5 @@ test("should not show preview toggle on a mobile-width browser window", async ({
   await page.setViewportSize({ width: 800, height: 900 });
   await page.goto("/editor");
   await page.waitForSelector('[data-is-editor="true"]');
-  await expect(page.getByRole("button", { name: "Preview mobile view" })).not.toBeVisible();
+  await expect(page.getByRole("radio", { name: "Preview mobile view" })).not.toBeVisible();
 });
