@@ -21,7 +21,8 @@ test("should render mobile layout when viewport is narrow", async ({ page }) => 
   const username = getTestUsername();
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto(`/${username}`);
-  await expect(page.locator('main[data-preview="mobile"]')).toBeVisible();
+  // Wait for client-side viewport detection to hydrate (useViewportMode fires after mount)
+  await expect(page.locator('main[data-preview="mobile"]')).toBeVisible({ timeout: 10000 });
 });
 
 test("should contain correct og:title meta tag", async ({ page }) => {

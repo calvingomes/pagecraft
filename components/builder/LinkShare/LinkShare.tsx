@@ -37,13 +37,15 @@ export const LinkShare = ({ username, isSaving }: LinkShareProps) => {
   const displayUrl = `${window.location.host}/${username}`.replace(/^www\./, "");
 
   return (
-    <div 
+    <div
       className={`
-        ${styles.container} 
-        ${isSaving ? styles.saving : ""} 
+        ${styles.container}
+        ${isSaving ? styles.saving : ""}
         ${isActualMobile ? styles.isActualMobile : ""}
-      `} 
+      `}
       onClick={handleCopy}
+      data-testid="link-share"
+      data-saving={isSaving ? "true" : undefined}
     >
       <Image
         src="/logo/pagecraft-logo.svg"

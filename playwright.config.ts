@@ -41,5 +41,10 @@ export default defineConfig({
     command: "bun run dev",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
+    env: {
+      ...process.env,
+      NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN: "",
+      NEXT_PUBLIC_POSTHOG_HOST: "",
+    },
   },
 });

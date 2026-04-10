@@ -51,13 +51,9 @@ async function globalSetup() {
   }
   process.env.TEST_USERNAME = process.env.TEST_USERNAME || username;
 
-  // Extract project ID from Supabase URL (e.g., https://[project-id].supabase.co)
-  const projectId = supabaseUrl.match(/https:\/\/(.*?)\.supabase/)?.[1];
-  if (!projectId) {
-    throw new Error("Could not extract project ID from Supabase URL.");
-  }
-
-  const storageKey = `sb-${projectId}-auth-token`;
+  // Use the Supabase client's own storage key so it always matches what the browser client reads
+  const storageKey = (supabase.auth as unknown as { storageKey: string }).storageKey;
+  console.log(`Using storage key for session: ${storageKey}`);
   
   // Format for Playwright storageState
   const storageState = {
@@ -74,6 +70,51 @@ async function globalSetup() {
       },
     ],
   };
+
+  // Ensure the test user has a page row (in case onboarding was skipped)
+  await supabase.from("pages").upsert(
+    {
+      username,
+      uid: data.user!.id,
+      published: true,
+      background: "page-bg-1",
+      sidebar_position: "left",
+    },
+    { onConflict: "username" },
+  );
+
+  // Ensure the test user has at least one block so view-page tests find content
+  const { data: existingBlocks } = await supabase
+    .from("blocks")
+    .select("id")
+    .eq("page_username", username)
+    .limit(1);
+
+  if (!existingBlocks || existingBlocks.length === 0) {
+    await supabase.from("blocks").insert([
+      {
+        id: crypto.randomUUID(),
+        page_username: username,
+        uid: data.user!.id,
+        viewport_mode: "desktop",
+        type: "text",
+        order: 0,
+        content: { text: `<p>Hi, I'm ${username} 👋</p>` },
+        layout: { x: 0, y: 0 },
+      },
+      {
+        id: crypto.randomUUID(),
+        page_username: username,
+        uid: data.user!.id,
+        viewport_mode: "desktop",
+        type: "link",
+        order: 1,
+        content: { url: "https://example.com", title: "My Website" },
+        layout: { x: 1, y: 0 },
+      },
+    ]);
+    console.log(`Created starter blocks for ${username}`);
+  }
 
   const authDir = path.join(process.cwd(), "playwright", ".auth");
   fs.mkdirSync(authDir, { recursive: true });

@@ -1,16 +1,30 @@
 import type { NextConfig } from "next";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseHost = supabaseUrl ? new URL(supabaseUrl).hostname : undefined;
+const supabaseOrigin = (() => {
+  if (!supabaseUrl) return null;
+  try {
+    return new URL(supabaseUrl);
+  } catch {
+    return null;
+  }
+})();
+const isLocalSupabaseHost =
+  supabaseOrigin?.hostname === "localhost" ||
+  supabaseOrigin?.hostname === "127.0.0.1";
 
 const nextConfig: NextConfig = {
   images: {
+    dangerouslyAllowLocalIP: Boolean(isLocalSupabaseHost),
     remotePatterns: [
-      ...(supabaseHost
+      ...(supabaseOrigin
         ? [
             {
-              protocol: "https" as const,
-              hostname: supabaseHost,
+              protocol: supabaseOrigin.protocol.replace(":", "") as
+                | "http"
+                | "https",
+              hostname: supabaseOrigin.hostname,
+              port: supabaseOrigin.port || undefined,
               pathname: "/storage/v1/object/public/**",
             },
           ]

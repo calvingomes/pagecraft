@@ -114,46 +114,56 @@ alter table public.pages enable row level security;
 alter table public.blocks enable row level security;
 
 -- Public read policies for published content
+drop policy if exists "Public read pages" on public.pages;
 create policy "Public read pages"
   on public.pages for select
   using (true);
 
+drop policy if exists "Public read blocks" on public.blocks;
 create policy "Public read blocks"
   on public.blocks for select
   using (true);
 
+drop policy if exists "Public read usernames" on public.usernames;
 create policy "Public read usernames"
   on public.usernames for select
   using (true);
 
+drop policy if exists "Public read profiles" on public.profiles;
 create policy "Public read profiles"
   on public.profiles for select
   using (true);
 
 -- Owner write policies
+drop policy if exists "Owner write profile" on public.profiles;
 create policy "Owner write profile"
   on public.profiles for all
   using (auth.uid() = id)
   with check (auth.uid() = id);
 
+drop policy if exists "Owner create username" on public.usernames;
 create policy "Owner create username"
   on public.usernames for insert
   with check (auth.uid() = uid);
 
+drop policy if exists "No update username" on public.usernames;
 create policy "No update username"
   on public.usernames for update
   using (false)
   with check (false);
 
+drop policy if exists "No delete username" on public.usernames;
 create policy "No delete username"
   on public.usernames for delete
   using (false);
 
+drop policy if exists "Owner write page" on public.pages;
 create policy "Owner write page"
   on public.pages for all
   using (auth.uid() = uid)
   with check (auth.uid() = uid);
 
+drop policy if exists "Owner write blocks" on public.blocks;
 create policy "Owner write blocks"
   on public.blocks for all
   using (
@@ -210,6 +220,7 @@ with check (
 );
 
 -- Public read access for the bucket
+drop policy if exists "Public read access" on storage.objects;
 create policy "Public read access"
 on storage.objects for select
 using ( bucket_id = 'pagecraft-bucket' );
