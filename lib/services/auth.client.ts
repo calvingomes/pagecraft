@@ -67,6 +67,30 @@ export const AuthService = {
   },
 
   /**
+   * Sign up with email and password
+   */
+  signUpWithEmail: async (email: string, password: string, username: string) => {
+    return await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { username },
+        emailRedirectTo: `${window.location.origin}/auth`,
+      },
+    });
+  },
+
+  /**
+   * Sign in with email and password
+   */
+  signInWithEmail: async (email: string, password: string) => {
+    return await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+  },
+
+  /**
    * Sign out the current user
    */
   signOut: async () => {

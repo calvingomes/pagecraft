@@ -1,30 +1,20 @@
 "use client";
 
 import { ReactLenis } from "lenis/react";
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 
 interface SmoothScrollProps {
   children: ReactNode;
 }
 
 export function SmoothScroll({ children }: SmoothScrollProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      setMounted(true);
-    });
-  }, []);
-
-  // Use prefers-reduced-motion to disable smooth scroll if requested
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    requestAnimationFrame(() => {
-      setPrefersReducedMotion(mediaQuery.matches);
-    });
-
     const listener = (e: MediaQueryListEvent) => {
       setPrefersReducedMotion(e.matches);
     };
@@ -32,19 +22,17 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
     return () => mediaQuery.removeEventListener("change", listener);
   }, []);
 
-  if (!mounted || prefersReducedMotion) {
-    return <>{children}</>;
-  }
-
+  // Always render ReactLenis to keep children mounted consistently.
+  // When reduced motion is preferred, use instant lerp (effectively disabling smooth scroll).
   return (
-    <ReactLenis 
-      root 
-      options={{ 
-        lerp: 0.1, 
-        duration: 1.2,
+    <ReactLenis
+      root
+      options={{
+        lerp: prefersReducedMotion ? 1 : 0.1,
+        duration: prefersReducedMotion ? 0 : 1.2,
         orientation: "vertical",
         gestureOrientation: "vertical",
-        smoothWheel: true,
+        smoothWheel: !prefersReducedMotion,
       }}
     >
       {children}
