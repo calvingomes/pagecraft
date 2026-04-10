@@ -43,7 +43,6 @@ export const SectionTitleBlock = ({
         className={styles.input}
         placeholder="Add section title..."
         value={localTitle}
-        autoFocus
         onFocus={() => editor?.onFocusBlock(block.id)}
         onBlur={() => editor?.onFocusBlock(null)}
         onChange={(event) => {

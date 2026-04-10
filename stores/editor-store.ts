@@ -48,6 +48,9 @@ export const useEditorStore = create<EditorState>()(
     removeBlock: (id) =>
       set((state) => ({
         blocks: state.blocks.filter((block) => block.id !== id),
+        selectedBlockId:
+          state.selectedBlockId === id ? null : state.selectedBlockId,
+        focusedBlockId: state.focusedBlockId === id ? null : state.focusedBlockId,
       })),
 
     selectBlock: (id) => set({ selectedBlockId: id, focusedBlockId: null }),

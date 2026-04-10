@@ -1,6 +1,6 @@
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const clean = hex.replace("#", "").slice(0, 6);
-  if (clean.length !== 6) return null;
+  if (clean.length !== 6 || !/^[0-9a-fA-F]{6}$/.test(clean)) return null;
   return {
     r: parseInt(clean.slice(0, 2), 16),
     g: parseInt(clean.slice(2, 4), 16),

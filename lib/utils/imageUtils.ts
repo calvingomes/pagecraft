@@ -19,7 +19,7 @@ export function getCacheBustedUrl(
     version instanceof Date
       ? version.getTime()
       : typeof version === "string"
-      ? new Date(version).getTime()
+      ? version
       : version;
 
   // Strip any existing query params to avoid duplication

@@ -42,6 +42,11 @@ export const ToolbarDefault = ({
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    const allowedTypes = new Set(["image/png", "image/jpeg", "image/webp"]);
+    if (!allowedTypes.has(file.type)) {
+      event.currentTarget.value = "";
+      return;
+    }
 
     onAddBlock?.("image", { file, alt: file.name });
     event.currentTarget.value = "";
