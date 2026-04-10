@@ -16,4 +16,8 @@
   .section {
     padding: 20px 0 0;
   }
+
+  .stack {
+    padding-bottom: 80px;
+  }
 }

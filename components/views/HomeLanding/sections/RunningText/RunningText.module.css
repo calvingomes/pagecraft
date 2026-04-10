@@ -31,7 +31,7 @@
 
 @media (--bp-mobile) {
   .section {
-    padding: 68px 0;
+    padding: 48px 0 68px;
   }
 
   .text {
