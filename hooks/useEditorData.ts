@@ -56,7 +56,21 @@ export function useEditorData() {
     let active = true;
     const loadPageData = async () => {
       try {
-        const pageData = await PageService.getPageByUsername(username);
+        let pageData = await PageService.getPageByUsername(username);
+        
+        // SELF-HEALING: If page data is missing but user is authenticated, 
+        // initialize the database records. This handles cases where initial 
+        // onboarding was skipped (e.g. email confirmation sign-up).
+        if (!pageData && user?.id) {
+          try {
+            await PageService.claimUsername(username, user.id);
+            await BlockService.createStarterBlocks(username, user.id);
+            pageData = await PageService.getPageByUsername(username);
+          } catch (e) {
+            console.error("[useEditorData] Self-healing failed:", e);
+          }
+        }
+
         let nextBackground: PageBackgroundId = "page-bg-1";
         let nextSidebarPosition: SidebarPosition = "left";
         let nextDisplayName = username;
@@ -102,6 +116,21 @@ export function useEditorData() {
           blocks: normalized,
         };
         setLastSavedPayload(initialPayload);
+      } catch (error) {
+        // Keep editor usable even when local DB setup is incomplete or transiently failing.
+        console.error("[useEditorData] Failed to load editor data:", error);
+        if (!active) return;
+        setAllBlocks([]);
+        setLastSavedPayload({
+          background: "page-bg-1",
+          sidebarPosition: "left",
+          displayName: username,
+          bioHtml: "",
+          avatarUrl: "",
+          persistedAvatarUrl: "",
+          avatarShape: "circle",
+          blocks: [],
+        });
       } finally {
         if (active) setIsEditorDataReady(true);
       }

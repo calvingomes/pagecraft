@@ -120,7 +120,8 @@
   align-items: center;
   background: var(--color-white);
   border-radius: 12px;
-  padding: 14px 20px;
+  height: 52px;
+  padding: 0 20px;
   margin-top: 16px;
   margin-bottom: 24px;
   border: 1.5px solid var(--color-light-grey);
@@ -139,7 +140,75 @@
   border-color: var(--color-danger);
 }
 
+.standardInputWrapper {
+  display: flex;
+  align-items: center;
+  background: var(--color-white);
+  border-radius: 12px;
+  height: 52px;
+  padding: 0 20px;
+  margin-bottom: 12px;
+  border: 1.5px solid var(--color-light-grey);
+  transition: border-color 150ms var(--ease-snappy);
+}
 
+.standardInputWrapper:focus-within {
+  border-color: var(--color-yellow);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  color: var(--color-mid-grey);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-light-grey);
+}
+
+.dividerText {
+  padding: 0 12px;
+}
+
+.confirmationState {
+  background: color-mix(in srgb, var(--color-success) 10%, white);
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px dashed var(--color-success);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.formContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.emailForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.credentialFields {
+  display: flex;
+  flex-direction: column;
+}
+
+.authSubmitButton {
+  margin-top: 14px;
+}
 
 .socialContainer {
   width: 100%;
@@ -148,7 +217,7 @@
   gap: 10px;
 }
 
-.socialContainer>* {
+.socialContainer > * {
   flex: 1;
   justify-content: space-between;
 }
@@ -219,6 +288,24 @@
   font-weight: 400;
 }
 
+.passwordToggle {
+  background: none;
+  border: none;
+  color: var(--color-mid-grey);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 150ms ease;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.passwordToggle:hover {
+  color: var(--color-darker-grey);
+}
+
 /* ---- Mobile ---- */
 @media (--bp-mobile) {
   .authPageWrapper {
@@ -243,9 +330,6 @@
   }
 
   .formContainer {
-    position: static;
-    transform: none;
-    margin-top: 25vh;
     min-height: auto;
     width: 100%;
     max-width: 500px;

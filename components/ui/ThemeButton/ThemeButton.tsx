@@ -19,6 +19,7 @@ export const ThemeButton = ({
   disabled = false,
   size = "large",
   trackingEvent,
+  type = "button",
 }: ThemeButtonProps) => {
   const posthog = usePostHog();
   const isLink = typeof cta === "string";
@@ -65,7 +66,7 @@ export const ThemeButton = ({
 
   return (
     <button
-      type="button"
+      type={type}
       className={buttonClasses}
       onClick={() => {
         handleClick();

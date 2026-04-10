@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import type { AuthMode, AuthViewProps } from "./AuthView.types";
 import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
 import { TogglePill } from "@/components/ui/TogglePill/TogglePill";
@@ -54,23 +54,100 @@ const AuthView = (props: AuthViewProps) => {
   });
   const [username, setUsername] = useState(initialUsername ?? "");
   const [isCompleting, setIsCompleting] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
   const availabilityStatus = useUsernameAvailability(username);
+
+  // Clear error message when switching modes or typing
+  useEffect(() => {
+    setError(null);
+  }, [mode, email, password, username]);
 
   const handleOAuthSignIn = async (provider: "google" | "github" | "figma", username?: string) => {
     const usernameToClaim = mode === "signup" ? username : undefined;
     await AuthService.signInWithOAuth(provider, usernameToClaim);
   };
 
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      if (mode === "signup") {
+        if (!username || availabilityStatus !== "available") {
+          setError("Please choose a valid username first.");
+          setIsLoading(false);
+          return;
+        }
+
+        const { data, error: signUpError } = await AuthService.signUpWithEmail(
+          email,
+          password,
+          username
+        );
+
+        if (signUpError) throw signUpError;
+
+        if (data.session) {
+          // Instantly logged in (email confirmation disabled in Supabase)
+          // Ensure we claim the username and create starter blocks
+          await PageService.claimUsername(username, data.session.user.id);
+          await BlockService.createStarterBlocks(username, data.session.user.id);
+          await AuthService.updateUserMetadata({ username });
+
+          setUsernameInStore(username);
+          router.replace("/editor");
+        } else {
+          // Email confirmation required
+          setUnconfirmedEmail(email);
+        }
+      } else {
+        const { error: signInError } = await AuthService.signInWithEmail(
+          email,
+          password
+        );
+
+        if (signInError) throw signInError;
+        router.replace("/editor");
+      }
+    } catch (err: unknown) {
+      const error = err as { message?: string };
+      setError(error.message || "Authentication failed.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const isSignUp = mode === "signup";
   const isOnboarding = mode === "on-boarding";
   const isSignIn = mode === "signin";
 
-  const canProceed =
-    isSignIn ||
-    (username.trim().length >= 3 && availabilityStatus === "available");
+  const hasValidUsername = username.trim().length >= 3 && availabilityStatus === "available";
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const hasValidEmail = emailRegex.test(email.trim());
+  const hasValidSignInPassword = password.length >= 6;
+  const hasValidSignUpPassword = password.length >= 8;
+
+  const canSubmitEmail = isSignIn
+    ? (hasValidEmail && hasValidSignInPassword)
+    : (hasValidEmail && hasValidSignUpPassword && hasValidUsername);
+
+  const canSubmitSocial = isSignIn ? true : hasValidUsername;
+  const canSubmitOnboarding = hasValidUsername;
 
   const handleCompleteOnboarding = async () => {
-    if (!user || !canProceed || isCompleting) return;
+    if (!user || !canSubmitOnboarding || isCompleting) return;
 
     setIsCompleting(true);
     try {
@@ -89,6 +166,10 @@ const AuthView = (props: AuthViewProps) => {
   const handleSignOut = async () => {
     await AuthService.signOut();
     setUsername("");
+    setEmail("");
+    setPassword("");
+    setError(null);
+    setUnconfirmedEmail(null);
     setMode("signin");
   };
 
@@ -159,98 +240,158 @@ const AuthView = (props: AuthViewProps) => {
             </p>
           </div>
 
-          {/* Username input — sign-up or onboarding */}
-          {(isSignUp || isOnboarding) && (
-            <>
-              <div
-                className={`${styles.usernameInputWrapper} ${availabilityStatus === "available" ? styles.statusAvailable : ""
-                  } ${availabilityStatus === "taken" ? styles.statusTaken : ""}`}
-              >
-                <span className={styles.usernamePrefix}>pagecraft.me/</span>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={handleUsernameChange}
-                  placeholder="your-name"
-                  className={styles.usernameInput}
-                  autoComplete="off"
-                  spellCheck={false}
-                />
+          {unconfirmedEmail ? (
+            <div className={styles.confirmationState}>
+              <div className={styles.statusMessageAvailable}>
+                Check your email! We&apos;ve sent a confirmation link to <strong>{unconfirmedEmail}</strong>.
               </div>
-
-              {/* Status Message */}
-              <div
-                className={`${styles.statusMessage} ${availabilityStatus === "available"
-                  ? styles.statusMessageAvailable
-                  : ""
-                  } ${availabilityStatus === "taken"
-                    ? styles.statusMessageTaken
-                    : ""
-                  } ${availabilityStatus === "checking"
-                    ? styles.statusMessageChecking
-                    : ""
-                  }`}
-              >
-                {availabilityStatus === "checking" && "Checking availability..."}
-                {availabilityStatus === "available" && "Username available!"}
-                {availabilityStatus === "taken" && "This handle is already taken."}
-                {availabilityStatus === "error" && "Error checking availability."}
-              </div>
-            </>
-          )}
-
-          {isOnboarding ? (
-            <div className={styles.onboardingActions}>
-              <ThemeButton
-                label={isCompleting ? "Creating your page..." : "Claim & Continue"}
-                cta={handleCompleteOnboarding}
-                bgColor="var(--color-yellow)"
-                textColor="var(--color-black)"
-                size="medium"
-                buttonWidth="full"
-                disabled={!canProceed || isCompleting}
-                icon={ArrowRight}
-              />
-              <button className={styles.signOutLink} onClick={handleSignOut}>
-                Sign in with a different account
+              <button className={styles.signOutLink} onClick={() => setUnconfirmedEmail(null)}>
+                Back to sign in
               </button>
             </div>
           ) : (
-            <div className={styles.socialContainer}>
-              <ThemeButton
-                label="Google"
-                cta={() => handleOAuthSignIn("google", username)}
-                bgColor="color-mix(in srgb, #ea4335 5%, white)"
-                textColor="var(--color-darker-grey)"
-                borderColor="color-mix(in srgb, #ea4335 15%, #dcdcdc)"
-                icon={GoogleIcon}
-                size="medium"
-                buttonWidth="full"
-                disabled={!canProceed}
-              />
-              <ThemeButton
-                label="GitHub"
-                cta={() => handleOAuthSignIn("github", username)}
-                bgColor="color-mix(in srgb, #0070f3 5%, white)"
-                textColor="var(--color-darker-grey)"
-                borderColor="color-mix(in srgb, #0070f3 15%, #dcdcdc)"
-                icon={GithubIcon}
-                size="medium"
-                buttonWidth="full"
-                disabled={!canProceed}
-              />
-              {/* will enable it once figma approves app */}
-              {/* <ThemeButton
-              label="Figma"
-              cta={() => handleOAuthSignIn("figma", username)}
-              bgColor="color-mix(in srgb, #a259ff 5%, white)"
-              textColor="var(--color-darker-grey)"
-              borderColor="color-mix(in srgb, #a259ff 15%, #dcdcdc)"
-              icon={FigmaIcon}
-              size="medium"
-              buttonWidth="full"
-              disabled={!canProceed}
-            /> */}
+            <div className={styles.formContent}>
+              <form onSubmit={handleEmailAuth} className={styles.emailForm}>
+                {/* Username input — sign-up or onboarding */}
+                {(isSignUp || isOnboarding) && (
+                  <>
+                    <div
+                      className={`${styles.usernameInputWrapper} ${availabilityStatus === "available" ? styles.statusAvailable : ""
+                        } ${availabilityStatus === "taken" ? styles.statusTaken : ""}`}
+                    >
+                      <span className={styles.usernamePrefix}>pagecraft.me/</span>
+                      <input
+                        type="text"
+                        value={username}
+                        onChange={handleUsernameChange}
+                        placeholder="your-name"
+                        className={styles.usernameInput}
+                        autoComplete="off"
+                        spellCheck={false}
+                      />
+                    </div>
+
+                    {/* Status Message */}
+                    <div
+                      className={`${styles.statusMessage} ${availabilityStatus === "available"
+                        ? styles.statusMessageAvailable
+                        : ""
+                        } ${availabilityStatus === "taken"
+                          ? styles.statusMessageTaken
+                          : ""
+                        } ${availabilityStatus === "checking"
+                          ? styles.statusMessageChecking
+                          : ""
+                        }`}
+                    >
+                      {availabilityStatus === "checking" && "Checking availability..."}
+                      {availabilityStatus === "available" && "Username available!"}
+                      {availabilityStatus === "taken" && "This handle is already taken."}
+                      {availabilityStatus === "error" && "Error checking availability."}
+                    </div>
+                  </>
+                )}
+
+                {/* Email and Password Fields */}
+                {!isOnboarding && (
+                  <div className={styles.credentialFields}>
+                    <div className={styles.standardInputWrapper}>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Email address"
+                        className={styles.usernameInput}
+                        required
+                      />
+                    </div>
+                    <div className={styles.standardInputWrapper}>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        className={styles.usernameInput}
+                        required
+                        minLength={isSignUp ? 8 : 6}
+                      />
+                      <button
+                        type="button"
+                        className={styles.passwordToggle}
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
+
+                    {error && (
+                      <div className={styles.statusMessageTaken} style={{ marginTop: 0, marginBottom: 16 }}>
+                        {error}
+                      </div>
+                    )}
+
+                    <div className={styles.authSubmitButton}>
+                      <ThemeButton
+                        label={isSignUp ? (isLoading ? "Creating your account..." : "Create account") : (isLoading ? "Signing in..." : "Sign in")}
+                        cta={() => { }}
+                        type="submit"
+                        bgColor="var(--color-yellow)"
+                        textColor="var(--color-black)"
+                        size="large"
+                        disabled={!canSubmitEmail || isLoading}
+                        icon={ArrowRight}
+                      />
+                    </div>
+
+                    <div className={styles.divider}>
+                      <span className={styles.dividerText}>or</span>
+                    </div>
+                  </div>
+                )}
+              </form>
+
+              {isOnboarding ? (
+                <div className={styles.onboardingActions}>
+                  <ThemeButton
+                    label={isCompleting ? "Creating your page..." : "Claim & Continue"}
+                    cta={handleCompleteOnboarding}
+                    bgColor="var(--color-yellow)"
+                    textColor="var(--color-black)"
+                    size="large"
+                    disabled={!canSubmitOnboarding || isCompleting}
+                    icon={ArrowRight}
+                  />
+                  <button className={styles.signOutLink} onClick={handleSignOut}>
+                    Sign in with a different account
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.socialContainer}>
+                  <ThemeButton
+                    label="Google"
+                    cta={() => handleOAuthSignIn("google", username)}
+                    bgColor="var(--color-white)"
+                    textColor="var(--color-darker-grey)"
+                    borderColor="color-mix(in srgb, #ea4335 15%, #dcdcdc)"
+                    icon={GoogleIcon}
+                    size="medium"
+                    buttonWidth="full"
+                    disabled={!canSubmitSocial || isLoading}
+                  />
+                  <ThemeButton
+                    label="GitHub"
+                    cta={() => handleOAuthSignIn("github", username)}
+                    bgColor="var(--color-white)"
+                    textColor="var(--color-darker-grey)"
+                    borderColor="color-mix(in srgb, #0070f3 15%, #dcdcdc)"
+                    icon={GithubIcon}
+                    size="medium"
+                    buttonWidth="full"
+                    disabled={!canSubmitSocial || isLoading}
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

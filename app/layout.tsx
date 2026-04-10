@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import "./globals.css";
 import { PHProvider } from "./providers";
 import { PostHogPageView } from "./PostHogPageView";
+import { SmoothScroll } from "@/components/layout/SmoothScroll";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -45,6 +46,7 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
 };
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -54,10 +56,12 @@ export default function RootLayout({
     <html lang="en" className={jakarta.variable}>
       <body>
         <PHProvider>
-          <Suspense fallback={null}>
-            <PostHogPageView />
-          </Suspense>
-          {children}
+          <SmoothScroll>
+            <Suspense fallback={null}>
+              <PostHogPageView />
+            </Suspense>
+            {children}
+          </SmoothScroll>
         </PHProvider>
       </body>
     </html>

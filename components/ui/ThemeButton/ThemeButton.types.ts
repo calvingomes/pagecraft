@@ -12,4 +12,5 @@ export interface ThemeButtonProps {
   disabled?: boolean;
   size?: "small" | "medium" | "large";
   trackingEvent?: string;
+  type?: "button" | "submit" | "reset";
 }

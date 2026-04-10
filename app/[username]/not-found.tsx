@@ -15,7 +15,7 @@ export default function ProfileNotFound() {
         logoColor="var(--color-forest-green)"
         transparentOnMobile
       />
-      <main style={{ padding: "0 24px" }}>
+      <main style={{ minHeight: "100vh" }}>
         <ErrorState
           title="This page hasn't been crafted yet"
           description={`The username "${username}" hasn't been claimed yet. Want to make it yours?`}
