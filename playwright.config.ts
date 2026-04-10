@@ -2,8 +2,10 @@ import { defineConfig, devices } from "@playwright/test";
 import path from "path";
 import dotenv from "dotenv";
 
-// Read from .env.local
-dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
+// Read from .env.local in local dev only (CI injects env vars directly)
+if (!process.env.CI) {
+  dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
+}
 
 export default defineConfig({
   testDir: "./tests/e2e",
