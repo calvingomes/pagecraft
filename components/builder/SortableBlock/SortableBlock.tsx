@@ -118,6 +118,8 @@ export function SortableBlock({
   return (
     <div
       data-testid="block-item"
+      data-block-id={block.id}
+      data-block-type={block.type}
       className={`${styles.hoverZone} ${isSelected && isMobile ? styles.selectedZone : ""}`}
       style={fluid ? { height: "auto" } : undefined}
       onMouseEnter={handleMouseEnter}
@@ -133,7 +135,7 @@ export function SortableBlock({
         }}
       >
         <div
-          className={`${!isActualMobile ? "drag-handle" : ""} ${styles.wrapper} ${isSelected && isActualMobile ? styles.selected : ""
+          className={`${(editor && !isActualMobile) ? "drag-handle" : ""} ${styles.wrapper} ${isSelected && isActualMobile ? styles.selected : ""
             } ${isTransparentWrapper ? styles.emptyWrapper : ""
             } ${(block.type === "text" || block.type === "link" || block.type === "image" || block.type === "sectionTitle") &&
               (!isTransparentWrapper || (toolbarVisible && !!editor && (block.type === "text" || block.type === "sectionTitle")))
