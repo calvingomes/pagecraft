@@ -22,6 +22,7 @@ export function SortableBlock({
   const [isHovered, setIsHovered] = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isPaletteHovered, setIsPaletteHovered] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
 
   const selectedBlockId = editor?.selectedBlockId;
   const isActualMobile = editor?.isActualMobile ?? false;

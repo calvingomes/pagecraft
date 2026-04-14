@@ -64,12 +64,6 @@ export default function MapInterface({
 
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
-  useEffect(() => {
-    if (!mapboxToken) {
-      console.error("Mapbox Token is missing");
-    }
-  }, [mapboxToken]);
-
   return (
     <div 
       style={{ 
