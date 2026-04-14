@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
   const query = req.nextUrl.searchParams.get("q");
-  const apiKey = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+  const apiKey = process.env.MAPBOX_ACCESS_TOKEN;
 
   if (!query) {
     return NextResponse.json({ error: "Missing query" }, { status: 400 });
