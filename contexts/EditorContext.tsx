@@ -14,6 +14,8 @@ export function EditorProvider({
   onSelectBlock,
   onFocusBlock,
   isActualMobile,
+  isMapUnlocked,
+  setIsMapUnlocked,
   children,
 }: EditorContextValue & { children: ReactNode }) {
   return (
@@ -27,6 +29,8 @@ export function EditorProvider({
         onSelectBlock,
         onFocusBlock,
         isActualMobile,
+        isMapUnlocked,
+        setIsMapUnlocked,
       }}
     >
       {children}

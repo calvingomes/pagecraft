@@ -28,18 +28,24 @@ export function SortableBlock({
   const isActualMobile = editor?.isActualMobile ?? false;
   const isSelected = selectedBlockId === block.id;
 
-  // Performance optimization: Sync selection state into unlocked state during render pass to avoid cascading renders
-  // We reset 'isUnlocked' if the block was previously selected and is now deselected
-  const [prevIsSelected, setPrevIsSelected] = useState(isSelected);
-  if (isSelected !== prevIsSelected) {
-    setPrevIsSelected(isSelected);
-    if (!isSelected && isUnlocked) {
-      setIsUnlocked(false);
-    }
-  }
+  const isMapUnlocked = editor?.isMapUnlocked ?? false;
+  const setIsMapUnlocked = editor?.setIsMapUnlocked;
 
   const viewport = gridConfig?.cols === 2 ? "mobile" : "desktop";
   const isMobile = viewport === "mobile";
+
+  // Sync selection state into unlocked state during render pass for Map blocks
+  const [prevIsSelected, setPrevIsSelected] = useState(isSelected);
+  if (isSelected !== prevIsSelected) {
+    setPrevIsSelected(isSelected);
+    if (block.type === "map" && setIsMapUnlocked) {
+      if (isSelected && (isActualMobile || isMobile)) {
+        setIsMapUnlocked(true);
+      } else {
+        setIsMapUnlocked(false);
+      }
+    }
+  }
 
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -146,7 +152,7 @@ export function SortableBlock({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={(e) => {
-        if (isUnlocked) {
+        if (isMapUnlocked) {
           e.stopPropagation();
           return;
         }
@@ -162,7 +168,7 @@ export function SortableBlock({
         }}
       >
         <div
-          className={`${(editor && !isActualMobile && !isUnlocked) ? "drag-handle" : ""} ${styles.wrapper} ${isSelected && isActualMobile ? styles.selected : ""
+          className={`${(editor && !isActualMobile && !isMapUnlocked) ? "drag-handle" : ""} ${styles.wrapper} ${isSelected && isActualMobile ? styles.selected : ""
             } ${isTransparentWrapper ? styles.emptyWrapper : ""
             } ${(block.type === "text" || block.type === "link" || block.type === "image" || block.type === "sectionTitle") &&
               (!isTransparentWrapper || (toolbarVisible && !!editor && (block.type === "text" || block.type === "sectionTitle")))
@@ -204,7 +210,7 @@ export function SortableBlock({
             <div className={styles.blockContent}>
               <BlockRenderer
                 block={block}
-                isMapUnlocked={isUnlocked}
+                isMapUnlocked={isMapUnlocked}
                 gridConfig={gridConfig}
               />
             </div>
@@ -231,8 +237,8 @@ export function SortableBlock({
             onBackgroundColorChange={handleBackgroundColorChange as (color: string | null) => void}
             onPaletteOpenChange={setIsPaletteOpen}
             onPaletteHoverChange={handlePaletteHoverChange}
-            onUnlock={() => setIsUnlocked(!isUnlocked)}
-            isUnlocked={isUnlocked}
+            onUnlock={() => setIsMapUnlocked?.(!isMapUnlocked)}
+            isUnlocked={isMapUnlocked}
             visible={toolbarVisible}
             viewport={viewport}
           />
