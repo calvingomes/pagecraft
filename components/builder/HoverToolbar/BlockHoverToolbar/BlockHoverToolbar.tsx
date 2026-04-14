@@ -10,10 +10,14 @@ import {
   RectangleHorizontal,
   Square,
   Minus,
+  Search,
+  Move,
+  Check,
 } from "lucide-react";
 import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "./../HoverToolbar.module.css";
 import { BlockBackgroundPalette } from "./../BlockBackgroundPalette/BlockBackgroundPalette";
+import { MapSearchPalette } from "@/components/blocks/MapBlock/MapSearchPalette";
 import type {
   BlockHoverToolbarProps,
   BlockHoverToolbarIcons,
@@ -59,6 +63,7 @@ const WIDTH_PRESETS: BlockHoverToolbarIcons[] = [
 ];
 
 export function BlockHoverToolbar({
+  blockId,
   blockType,
   currentPreset = "small",
   currentBackgroundColor,
@@ -69,8 +74,12 @@ export function BlockHoverToolbar({
   onPaletteHoverChange,
   visible = false,
   viewport = "desktop",
+  onMapSearch,
+  onMapUnlock,
+  isMapUnlocked,
 }: BlockHoverToolbarProps) {
   const [isInternalPaletteOpen, setIsInternalPaletteOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [prevVisible, setPrevVisible] = useState(visible);
   const editor = useEditorContext();
 
@@ -78,6 +87,7 @@ export function BlockHoverToolbar({
     setPrevVisible(visible);
     if (!visible) {
       setIsInternalPaletteOpen(false);
+      setIsSearchOpen(false);
     }
   }
 
@@ -126,47 +136,117 @@ export function BlockHoverToolbar({
           </ToggleGroup.Item>
         ))}
       </ToggleGroup.Root>
-      <div className={styles.divider} />
-      <Popover.Root
-        open={isInternalPaletteOpen}
-        onOpenChange={(open) => {
-          setIsInternalPaletteOpen(open);
-          onPaletteOpenChange?.(open);
-        }}
-      >
-        <Popover.Trigger asChild>
+
+      {blockType === "map" && (
+        <>
+          <div className={styles.divider} />
+          
+          <Popover.Root
+            open={isSearchOpen}
+            onOpenChange={(open) => {
+              setIsSearchOpen(open);
+              onPaletteOpenChange?.(open);
+            }}
+          >
+            <Popover.Trigger asChild>
+              <Toolbar.Button
+                type="button"
+                title="Search location"
+                aria-label="Search location"
+                className={`${styles.sizeButton} ${isSearchOpen ? styles.active : ""}`}
+                onMouseEnter={() => onPaletteHoverChange?.(true)}
+                onMouseLeave={() => onPaletteHoverChange?.(false)}
+              >
+                <Search size={18} />
+              </Toolbar.Button>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content
+                side="top"
+                align="center"
+                sideOffset={12}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                className={styles.popoverContent}
+                onMouseEnter={() => onPaletteHoverChange?.(true)}
+                onMouseLeave={() => onPaletteHoverChange?.(false)}
+              >
+                <MapSearchPalette
+                  onSelect={(result) => {
+                    if (onMapSearch) onMapSearch();
+                    // The actual state update happens via SortableBlock -> editor.onUpdateBlock
+                    editor.onUpdateBlock(blockId, {
+                      content: {
+                        address: result.label,
+                        lat: result.lat,
+                        lng: result.lng,
+                        zoom: 12, // Default zoom for new search
+                      }
+                    });
+                    setIsSearchOpen(false);
+                    onPaletteHoverChange?.(false); // Explicitly clear hover when selecting
+                  }}
+                />
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
+
           <Toolbar.Button
             type="button"
-            title="Update background color"
-            aria-label="Update background color"
-            className={styles.sizeButton}
-            style={{
-              backgroundColor: currentBackgroundColor || "var(--color-white)",
-              color: "transparent",
-            }}
-            onMouseEnter={() => onPaletteHoverChange?.(true)}
-            onMouseLeave={() => onPaletteHoverChange?.(false)}
-          />
-        </Popover.Trigger>
-        <Popover.Portal>
-          <Popover.Content
-            side="top"
-            align="center"
-            sideOffset={12}
-            onOpenAutoFocus={(e) => e.preventDefault()}
-            className={styles.popoverContent}
-            onMouseEnter={() => onPaletteHoverChange?.(true)}
-            onMouseLeave={() => onPaletteHoverChange?.(false)}
+            title={isMapUnlocked ? "Finish adjusting map" : "Adjust map position"}
+            aria-label={isMapUnlocked ? "Finish adjusting" : "Adjust position"}
+            className={`${styles.sizeButton} ${isMapUnlocked ? styles.active : ""}`}
+            onClick={onMapUnlock}
           >
-            <BlockBackgroundPalette
-              currentValue={currentBackgroundColor}
-              isTransparent={isTransparentBackground}
-              onChange={onBackgroundColorChange ?? (() => {})}
-              showTransparentOption={blockType === "text"}
-            />
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root>
+            {isMapUnlocked ? <Check size={18} /> : <Move size={18} />}
+          </Toolbar.Button>
+        </>
+      )}
+
+      {blockType !== "map" && (
+        <>
+          <div className={styles.divider} />
+          <Popover.Root
+            open={isInternalPaletteOpen}
+            onOpenChange={(open) => {
+              setIsInternalPaletteOpen(open);
+              onPaletteOpenChange?.(open);
+            }}
+          >
+            <Popover.Trigger asChild>
+              <Toolbar.Button
+                type="button"
+                title="Update background color"
+                aria-label="Update background color"
+                className={styles.sizeButton}
+                style={{
+                  backgroundColor: currentBackgroundColor || "var(--color-white)",
+                  color: "transparent",
+                }}
+                onMouseEnter={() => onPaletteHoverChange?.(true)}
+                onMouseLeave={() => onPaletteHoverChange?.(false)}
+              />
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content
+                side="top"
+                align="center"
+                sideOffset={12}
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                className={styles.popoverContent}
+                onMouseEnter={() => onPaletteHoverChange?.(true)}
+                onMouseLeave={() => onPaletteHoverChange?.(false)}
+              >
+                <BlockBackgroundPalette
+                  currentValue={currentBackgroundColor}
+                  isTransparent={isTransparentBackground}
+                  onChange={onBackgroundColorChange ?? (() => {})}
+                  showTransparentOption={blockType === "text"}
+                />
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
+        </>
+      )}
     </Toolbar.Root>
   );
 }

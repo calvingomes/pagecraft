@@ -13,6 +13,9 @@ export type BlockHoverToolbarProps = {
   onPaletteHoverChange?: (hovering: boolean) => void;
   visible?: boolean;
   viewport?: "desktop" | "mobile";
+  onMapSearch?: () => void;
+  onMapUnlock?: () => void;
+  isMapUnlocked?: boolean;
 };
 
 export type BlockHoverToolbarIcons = {
