@@ -65,11 +65,8 @@ export default function MapInterface({
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
   useEffect(() => {
-    if (mapboxToken === "your_mapbox_token_here") {
-      console.warn("Mapbox Token is still set to placeholder in .env.local");
-    }
     if (!mapboxToken) {
-      console.error("Mapbox Token is missing entirely");
+      console.error("Mapbox Token is missing");
     }
   }, [mapboxToken]);
 
