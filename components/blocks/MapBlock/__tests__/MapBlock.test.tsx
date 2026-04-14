@@ -1,27 +1,27 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { useState, useEffect } from "react";
 import { MapBlock } from "../MapBlock";
 import type { MapBlock as MapBlockType } from "@/types/editor";
 
 // Mock next/dynamic to render synchronously in tests
 vi.mock("next/dynamic", () => ({
-  default: (loader: any) => {
-    const Component = (props: any) => {
-      const [C, setC] = (require("react") as any).useState(null);
-      (require("react") as any).useEffect(() => {
-        loader().then((mod: any) => setC(() => mod.default));
-      }, []);
-      return C ? <C {...props} /> : null;
+  default: (loader: () => Promise<{ default: React.ComponentType<{ block: unknown; isMapUnlocked?: boolean }> }>) => {
+    const MockDynamic = (props: { block: unknown; isMapUnlocked?: boolean }) => {
+      const [Component, setComponent] = useState<React.ComponentType<{ block: unknown; isMapUnlocked?: boolean }> | null>(null);
+      useEffect(() => {
+        loader().then((mod) => setComponent(() => mod.default));
+      }, []); // removed loader from deps to avoid exhaustive-deps warning
+      return Component ? <Component {...props} /> : null;
     };
-    Component.displayName = "DynamicComponent";
-    return Component;
+    return MockDynamic;
   },
 }));
 
 // Mock MapInterface to isolate testing to MapBlock state logic
 vi.mock("../MapInterface", () => ({
   __esModule: true,
-  default: ({ onMoveEnd, isUnlocked }: any) => (
+  default: ({ onMoveEnd, isUnlocked }: { onMoveEnd: (lat: number, lng: number, zoom: number) => void; isUnlocked: boolean }) => (
     <div data-testid="mock-map">
       {isUnlocked && (
         <button 
@@ -53,6 +53,7 @@ describe("MapBlock", () => {
     },
     order: 0,
     styles: { widthPreset: "small" },
+    mobileStyles: {},
   };
 
   beforeEach(() => {

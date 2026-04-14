@@ -3,7 +3,7 @@
 This file provides the operational overview for PageCraft, focusing on commands, environment setup, and testing.
 
 > [!TIP]
-> **Coding Rules & Constants**: For layout math, naming conventions, and internal project rules, refer to [Agents.md](Agents.md).
+> **Coding Rules & Constants**: For layout math, naming conventions, and project rules, refer to [Agents.md](Agents.md). To add a new block type, follow the 8-step guide in [NEW_BLOCK.md](NEW_BLOCK.md).
 
 ## Commands
 
@@ -25,6 +25,7 @@ bun run test:e2e # Run Playwright E2E suite
 **PageCraft** is a block-based "link-in-bio" builder that allows users to create single-page profiles with draggable blocks (text, links, images).
 
 - **Dual-Viewport Layout**: Users can customize their layout **independently** for Desktop and Mobile views using a "Viewport-Aware Unified Block Model." 
+- **Modular Block Architecture**: Uses a plugin-based `ActionRegistry` for block-specific tools and a centralized `blockRegistry` for dynamic rendering.
 - **Editor vs. View**: The editor (`/editor`) uses Zustand + RGL + Tiptap. The public view page (`/[username]`) uses a high-performance, zero-dependency `ReadOnlyGrid`.
 
 ---

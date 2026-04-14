@@ -32,27 +32,37 @@ Grid logic is centralized in `lib/editor-engine/`. Access values via `DESKTOP_GR
 ## 2. Coding Rules & Principles
 
 ### Types & State
-- **One file per domain** in `types/` (e.g., `types/editor.ts`, `types/grid.ts`).
+- **One file per domain** in `types/`. 
+  - `types/editor.ts`: Core block and engine types.
+  - `types/builder.ts`: Editor UI, Toolbar, and Renderer types.
+  - `types/blocks.ts`: Component-level block interfaces.
 - **No inline types** in components/hooks unless truly private.
 - **Zustand**: Keep stores thin. Use `EditorContext` to pass actions to blocks; avoid direct store imports in leaf components.
+
+### Modular Block Architecture
+- **Block Registry**: All blocks must be registered in `components/builder/BlockRegistry/blockRegistry.tsx`.
+- **Action Registry**: Block-specific toolbar tools belong in `components/builder/HoverToolbar/BlockActions/ActionRegistry.tsx`. Do NOT bloat `BlockHoverToolbar.tsx` with block-specific conditionals.
+- **Component Isolation**: Block components should be "dumb" and receive interaction-locking state (`isMapUnlocked`, etc.) via props from the `BlockRenderer`.
+
+### Performance Patterns
+- **Render-pass State Synchronization**: Avoid `useEffect` for syncing props into local state. Use the "State sync during render" pattern:
+  ```tsx
+  const [prevVal, setPrevVal] = useState(propVal);
+  if (propVal !== prevVal) {
+    setPrevVal(propVal);
+    setInternalState(propVal);
+  }
+  ```
+- **Heavy Dependencies**: Load libraries (e.g., Mapbox, Tiptap) via `next/dynamic` with `{ ssr: false }`.
 
 ### CSS Modules
 - **Modular Styles**: One `.module.css` per component. No hardcoded colors/breakpoints—use `styles/colors.css` and `styles/media.css`.
 - **Dynamic Theming**: Use `deriveTextColor(bgColor)` for contrast. Child components must use `--block-bg-color` and `--block-text-color`.
 - **Breakpoints**: Mobile `< 960px` | Tablet `960px - 1359px` | Desktop `≥ 1360px`.
 
-### Component Architecture
-- **View/Editor Split**: Heavy dependencies (Tiptap, RGL) belong in `*Editor.tsx`. Load these via `next/dynamic` with `{ ssr: false }`.
-- **ReadOnly Mode**: Public view pages must use `ReadOnlyGrid` and zero-dependency block versions. No RGL or stores on the visitor path.
-- **RGL Usage**: `isResizable={false}`, `compactType="vertical"`, `draggableHandle=".drag-handle"`.
-
 ### UI (Radix UI)
 - Use Radix primitives for Dialogs, Popovers, and Toolbars.
 - **Portals**: Always use `Popover.Portal` / `Dialog.Portal` for layered UI to avoid z-index conflicts.
-
-### File Uploads
-- **WebP focus**: Always convert images to WebP via `lib/uploads/` before uploading. Use `.webp` extensions in storage.
-- **SEO**: Use Next.js `Image` for internal assets; `<img>` for external links (add `// eslint-disable-next-line @next/next/no-img-element`).
 
 ---
 
@@ -83,10 +93,12 @@ Grid logic is centralized in `lib/editor-engine/`. Access values via `DESKTOP_GR
 
 ## 5. Adding a New Block Type — Checklist
 
-1.  Add interface to `types/editor.ts` (include in `Block` union and `BlockType`).
-2.  Create `components/blocks/YourBlock/YourBlock.tsx` + `YourBlock.module.css`.
-3.  Register in `components/builder/BlockRegistry/blockRegistry.tsx`.
-4.  Add span defaults in `lib/editor-engine/grid/grid-math.ts` → `spansForPreset`.
-5.  Handle creation in `app/editor/page.tsx` toolbar action.
-6.  Handle normalization in `lib/editor-engine/data/normalization.ts`.
-7.  Check viewport rendering in `DesktopBlockCanvas` and `MobileCanvasGrid`.
+Refer to [NEW_BLOCK.md](NEW_BLOCK.md) for the full 8-step integration guide.
+1. Add types (`types/editor.ts`, `types/blocks.ts`).
+2. Create component + modular CSS.
+3. Register in `blockRegistry`.
+4. Add to `WidgetMenu`.
+5. Define spans in `grid-math.ts`.
+6. Handle normalization.
+7. Integrate custom tools in `ActionRegistry`.
+8. Verify via Unit & E2E tests.

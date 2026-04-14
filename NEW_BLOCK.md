@@ -1,41 +1,40 @@
 # Adding a New Block — Step-by-Step
 
-Follow these 7 steps to ensure a block is fully integrated into types, logic, and the editor UI.
+Follow these 8 steps to ensure a new block is modular, performant, and correctly typed.
 
-## 1. Define Types (`types/editor.ts`)
-- Add your type string to `BlockType` (e.g., `"map"`).
-- Create the interface (e.g., `export interface MapBlock extends BaseBlock { type: "map"; content: { ... } }`).
-- Add it to the `Block` union.
+## 1. Define Types (`types/editor.ts` & `types/blocks.ts`)
+- **Core**: Add your type string to `BlockType` (e.g., `"map"`) and create your block interface (e.g., `MapBlock`) in `types/editor.ts`. Add it to the `Block` union.
+- **Component**: Put any component-specific interfaces or API types in `types/blocks.ts`. **NO INLINE TYPES** in the component file.
 
 ## 2. Create Component (`components/blocks/`)
-Create `YourBlock/YourBlock.tsx` and `YourBlock.module.css`.
-- Use `"use client"` and `useEditorContext()`.
-- Use `--block-bg-color` and `--block-text-color` for theming.
-- Split heavy editors into `*Editor.tsx` using `next/dynamic` (ssr: false) if they use Tiptap.
+- Create `YourBlock/` directory with `YourBlock.tsx` and `YourBlock.module.css`.
+- Use CSS variables for theming: `--block-bg-color` and `--block-text-color`.
+- Split heavy logic or external libraries into sub-components loaded via `next/dynamic` (ssr: false).
 
 ## 3. Register Block (`components/builder/BlockRegistry/blockRegistry.tsx`)
-- Import your types and component.
-- Add your block to the `blockRegistry` map so the `BlockRenderer` knows how to draw it.
+- Add your component to the `blockRegistry` map. This allows the `BlockRenderer` to dynamically load and display your block.
 
 ## 4. Add to Widget Menu (`components/builder/Toolbars/WidgetMenu.tsx`)
-- Add an entry to the `WIDGETS` array (Icon, Title, Description).
-- New blocks are created via the `onAddBlock` handler. Ensure your type is uniquely identifiable.
+- Add your block's icon, title, and description to the `WIDGETS` array. This makes it available for users to add to their page.
 
 ## 5. Set Sizes & Presets (`lib/editor-engine/grid/grid-math.ts`)
-- If your block uses standard presets (`small`, `wide`, `large`), it works automatically. 
-- Only update `spansForPreset` if you need a unique custom size.
+- If your block requires a custom default size or fixed aspect ratio, update `spansForPreset` or `spansForBlock`.
 
 ## 6. Handle Normalization (`lib/editor-engine/data/normalization.ts`)
-- Update `normalizeStoredBlocks` ONLY if your block requires a specialized default (e.g., Sections must always be `widthPreset: "full"`).
+- Update `normalizeStoredBlocks` ONLY if your block requires specialized defaults (e.g., specific content fields that must exist).
 
-## 7. Refine Editor UI
-- **Toolbar Customization**: If your block (like Map) shouldn't have a background color picker, update `BlockHoverToolbar.tsx` to hide it.
-- **Wrapper Logic**: Check `lib/blockWrapper.ts` to determine if your block should use the transparent wrapper logic.
-- **Sortable Shell**: check `SortableBlock.tsx` if you need custom cursor or interaction behavior.
+## 7. Modular Toolbar Actions (`components/builder/HoverToolbar/BlockActions/`)
+- **Plugin Pattern**: Create a specialized `YourActions.tsx` (e.g., `MapActions.tsx`) for your block's specific tools.
+- **Register**: Add your action component to the `ActionRegistry` mapping in `ActionRegistry.tsx`.
+- **Hiding Defaults**: If your block should NOT use the default background color picker, simply don't register it in your custom action component.
+
+## 8. Performance: State Sync
+- If your block is interactive (e.g., panning a map, adjusting an editor), avoid using `useEffect` to sync props back into state. 
+- Use the **Render-pass State Synchronization** pattern documented in [Agents.md](Agents.md) to avoid cascading renders.
 
 ---
 
-## 8. Testing & Validation
-- **Unit Test**: Create `__tests__/YourBlock.test.tsx` using the standard pattern (mock `EditorContext`).
-- **Sanity Check**: Run `bun run test` to ensure grid logic and normalization are still passing.
-- **E2E**: Verify block creation, persistence after save, and cross-viewport visibility in the browser.
+## Testing & Validation Checklist
+- [ ] **Unit Test**: co-locate `__tests__/YourBlock.test.tsx`.
+- [ ] **Lint**: Run `bun run lint` to verify zero inline types and unused variables.
+- [ ] **E2E**: Verify block creation, "Move" mode interactivity, and persistence across page refreshes.

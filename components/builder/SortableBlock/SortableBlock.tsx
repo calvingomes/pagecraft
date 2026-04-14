@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { GripVertical } from "lucide-react";
 import type { BlockWidthPreset } from "@/types/editor";
 import { useEditorContext } from "@/contexts/EditorContext";
@@ -22,21 +22,21 @@ export function SortableBlock({
   const [isHovered, setIsHovered] = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isPaletteHovered, setIsPaletteHovered] = useState(false);
-  const [isMapUnlocked, setIsMapUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
 
   const selectedBlockId = editor?.selectedBlockId;
   const isActualMobile = editor?.isActualMobile ?? false;
   const isSelected = selectedBlockId === block.id;
 
-  // Track previous selection state to only reset on deselection
-  const wasSelected = useRef(isSelected);
-  useEffect(() => {
-    // Only reset if we were selected and are no longer selected
-    if (wasSelected.current && !isSelected && isMapUnlocked) {
-      setIsMapUnlocked(false);
+  // Performance optimization: Sync selection state into unlocked state during render pass to avoid cascading renders
+  // We reset 'isUnlocked' if the block was previously selected and is now deselected
+  const [prevIsSelected, setPrevIsSelected] = useState(isSelected);
+  if (isSelected !== prevIsSelected) {
+    setPrevIsSelected(isSelected);
+    if (!isSelected && isUnlocked) {
+      setIsUnlocked(false);
     }
-    wasSelected.current = isSelected;
-  }, [isSelected, isMapUnlocked]);
+  }
 
   const viewport = gridConfig?.cols === 2 ? "mobile" : "desktop";
   const isMobile = viewport === "mobile";
@@ -58,12 +58,14 @@ export function SortableBlock({
     }
   };
 
-  // Reset palette hover state when popover closes to prevent stuck toolbars
-  useEffect(() => {
-    if (!isPaletteOpen) {
+  // Performance optimization: Reset palette hover state during render pass if the palette is closed
+  const [prevIsPaletteOpen, setPrevIsPaletteOpen] = useState(isPaletteOpen);
+  if (isPaletteOpen !== prevIsPaletteOpen) {
+    setPrevIsPaletteOpen(isPaletteOpen);
+    if (!isPaletteOpen && isPaletteHovered) {
       setIsPaletteHovered(false);
     }
-  }, [isPaletteOpen]);
+  }
 
   const toolbarVisible = isActualMobile
     ? isSelected
@@ -144,7 +146,7 @@ export function SortableBlock({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={(e) => {
-        if (isMapUnlocked) {
+        if (isUnlocked) {
           e.stopPropagation();
           return;
         }
@@ -160,7 +162,7 @@ export function SortableBlock({
         }}
       >
         <div
-          className={`${(editor && !isActualMobile && !isMapUnlocked) ? "drag-handle" : ""} ${styles.wrapper} ${isSelected && isActualMobile ? styles.selected : ""
+          className={`${(editor && !isActualMobile && !isUnlocked) ? "drag-handle" : ""} ${styles.wrapper} ${isSelected && isActualMobile ? styles.selected : ""
             } ${isTransparentWrapper ? styles.emptyWrapper : ""
             } ${(block.type === "text" || block.type === "link" || block.type === "image" || block.type === "sectionTitle") &&
               (!isTransparentWrapper || (toolbarVisible && !!editor && (block.type === "text" || block.type === "sectionTitle")))
@@ -202,7 +204,7 @@ export function SortableBlock({
             <div className={styles.blockContent}>
               <BlockRenderer
                 block={block}
-                isMapUnlocked={isMapUnlocked}
+                isMapUnlocked={isUnlocked}
                 gridConfig={gridConfig}
               />
             </div>
@@ -229,9 +231,8 @@ export function SortableBlock({
             onBackgroundColorChange={handleBackgroundColorChange as (color: string | null) => void}
             onPaletteOpenChange={setIsPaletteOpen}
             onPaletteHoverChange={handlePaletteHoverChange}
-            onMapUnlock={() => setIsMapUnlocked(!isMapUnlocked)}
-            isMapUnlocked={isMapUnlocked}
-            onMapSearch={() => setIsMapUnlocked(true)}
+            onUnlock={() => setIsUnlocked(!isUnlocked)}
+            isUnlocked={isUnlocked}
             visible={toolbarVisible}
             viewport={viewport}
           />

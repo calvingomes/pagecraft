@@ -1,18 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Map, { MapRef } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-interface MapInterfaceProps {
-  lat: number;
-  lng: number;
-  zoom: number;
-  isUnlocked: boolean;
-  onMoveEnd: (lat: number, lng: number, zoom: number) => void;
-  width?: number;
-  height?: number;
-}
+import type { MapInterfaceProps } from "@/types/blocks";
 
 export default function MapInterface({
   lat,
@@ -24,19 +16,22 @@ export default function MapInterface({
   height,
 }: MapInterfaceProps) {
   const mapRef = useRef<MapRef | null>(null);
-  const [viewState, setViewState] = React.useState({
+  const [viewState, setViewState] = useState({
     latitude: lat,
     longitude: lng,
-    zoom: zoom
+    zoom: zoom,
   });
 
-  useEffect(() => {
+  // Performance optimization: Sync props into state during render pass to avoid cascading renders in useEffect
+  const [prevCoords, setPrevCoords] = useState({ lat, lng, zoom });
+  if (lat !== prevCoords.lat || lng !== prevCoords.lng || zoom !== prevCoords.zoom) {
+    setPrevCoords({ lat, lng, zoom });
     setViewState({
       latitude: lat,
       longitude: lng,
-      zoom: zoom
+      zoom,
     });
-  }, [lat, lng, zoom]);
+  }
 
   useEffect(() => {
     if (!mapRef.current) return;

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { MapResult, MapboxFeature } from "@/types/blocks";
 
 export const runtime = "nodejs";
 
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
 
     const data = await res.json();
     
-    const results = data.features.map((f: any) => ({
+    const results: MapResult[] = data.features.map((f: MapboxFeature) => ({
       label: f.place_name,
       lat: f.geometry.coordinates[1],
       lng: f.geometry.coordinates[0],

@@ -3,15 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import styles from "./MapSearchPalette.module.css";
 
-interface MapResult {
-  label: string;
-  lat: number;
-  lng: number;
-}
-
-interface MapSearchPaletteProps {
-  onSelect: (result: MapResult) => void;
-}
+import type { MapResult, MapSearchPaletteProps } from "@/types/blocks";
 
 export function MapSearchPalette({ onSelect }: MapSearchPaletteProps) {
   const [query, setQuery] = useState("");

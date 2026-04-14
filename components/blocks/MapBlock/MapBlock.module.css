@@ -78,15 +78,6 @@
   }
 }
 
-.mapOverlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, 
-    color-mix(in srgb, var(--color-black) 2%, transparent) 0%, 
-    color-mix(in srgb, var(--color-black) 5%, transparent) 100%
-  );
-  pointer-events: none;
-}
 
 .addressLabel {
   position: absolute;
