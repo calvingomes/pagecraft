@@ -1,4 +1,4 @@
-export type BlockType = "text" | "link" | "image" | "sectionTitle";
+export type BlockType = "text" | "link" | "image" | "sectionTitle" | "map";
 export type BlockViewportMode = "desktop" | "mobile";
 
 import type { PageBackgroundId, SidebarPosition, AvatarShape } from "./page";
@@ -69,7 +69,17 @@ export interface SectionTitleBlock extends BaseBlock {
   content: { title: string };
 }
 
-export type Block = TextBlock | LinkBlock | ImageBlock | SectionTitleBlock;
+export interface MapBlock extends BaseBlock {
+  type: "map";
+  content: { 
+    address?: string; 
+    lat?: number; 
+    lng?: number; 
+    zoom?: number;
+  };
+}
+
+export type Block = TextBlock | LinkBlock | ImageBlock | SectionTitleBlock | MapBlock;
 
 export type LinkMetadataResponse = {
   title: string | null;

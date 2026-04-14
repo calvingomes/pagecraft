@@ -9,7 +9,8 @@ import {
   Image as ImageIcon,
   Link2,
   Plus,
-  Menu
+  Menu,
+  Map
 } from "lucide-react";
 import * as Popover from "@radix-ui/react-popover";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -25,6 +26,7 @@ const WIDGETS: Widget[] = [
   { id: 'sectionTitle', title: 'Section Title', description: 'Add a section header', icon: Heading },
   { id: 'image', title: 'Image or Video', description: 'Upload media', icon: ImageIcon },
   { id: 'link', title: 'Website', description: 'Just a link', icon: Link2 },
+  { id: 'map', title: 'Map', description: 'Embed a map view', icon: Map },
   { id: 'more', title: 'More coming soon', description: 'Stay tuned', icon: Plus, disabled: true },
 ];
 
