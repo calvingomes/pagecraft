@@ -17,5 +17,7 @@ export const getDefaultContent = (
       return { url: options?.url ?? "", alt: options?.alt ?? "" };
     case "sectionTitle":
       return { title: "" };
+    case "map":
+      return { address: "", zoom: 12 };
   }
 };

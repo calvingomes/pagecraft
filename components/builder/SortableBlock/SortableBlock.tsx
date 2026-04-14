@@ -22,10 +22,22 @@ export function SortableBlock({
   const [isHovered, setIsHovered] = useState(false);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isPaletteHovered, setIsPaletteHovered] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
 
   const selectedBlockId = editor?.selectedBlockId;
   const isActualMobile = editor?.isActualMobile ?? false;
   const isSelected = selectedBlockId === block.id;
+
+  // Performance optimization: Sync selection state into unlocked state during render pass to avoid cascading renders
+  // We reset 'isUnlocked' if the block was previously selected and is now deselected
+  const [prevIsSelected, setPrevIsSelected] = useState(isSelected);
+  if (isSelected !== prevIsSelected) {
+    setPrevIsSelected(isSelected);
+    if (!isSelected && isUnlocked) {
+      setIsUnlocked(false);
+    }
+  }
+
   const viewport = gridConfig?.cols === 2 ? "mobile" : "desktop";
   const isMobile = viewport === "mobile";
 
@@ -45,6 +57,15 @@ export function SortableBlock({
       setIsPaletteHovered(false);
     }
   };
+
+  // Performance optimization: Reset palette hover state during render pass if the palette is closed
+  const [prevIsPaletteOpen, setPrevIsPaletteOpen] = useState(isPaletteOpen);
+  if (isPaletteOpen !== prevIsPaletteOpen) {
+    setPrevIsPaletteOpen(isPaletteOpen);
+    if (!isPaletteOpen && isPaletteHovered) {
+      setIsPaletteHovered(false);
+    }
+  }
 
   const toolbarVisible = isActualMobile
     ? isSelected
@@ -118,11 +139,19 @@ export function SortableBlock({
   return (
     <div
       data-testid="block-item"
+      data-block-id={block.id}
+      data-block-type={block.type}
       className={`${styles.hoverZone} ${isSelected && isMobile ? styles.selectedZone : ""}`}
       style={fluid ? { height: "auto" } : undefined}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onClick={handleClick}
+      onClick={(e) => {
+        if (isUnlocked) {
+          e.stopPropagation();
+          return;
+        }
+        handleClick(e);
+      }}
     >
       <div
         className={styles.frame}
@@ -133,7 +162,7 @@ export function SortableBlock({
         }}
       >
         <div
-          className={`${!isActualMobile ? "drag-handle" : ""} ${styles.wrapper} ${isSelected && isActualMobile ? styles.selected : ""
+          className={`${(editor && !isActualMobile && !isUnlocked) ? "drag-handle" : ""} ${styles.wrapper} ${isSelected && isActualMobile ? styles.selected : ""
             } ${isTransparentWrapper ? styles.emptyWrapper : ""
             } ${(block.type === "text" || block.type === "link" || block.type === "image" || block.type === "sectionTitle") &&
               (!isTransparentWrapper || (toolbarVisible && !!editor && (block.type === "text" || block.type === "sectionTitle")))
@@ -173,7 +202,11 @@ export function SortableBlock({
           )}
           <div className={styles.content}>
             <div className={styles.blockContent}>
-              <BlockRenderer block={block} />
+              <BlockRenderer
+                block={block}
+                isMapUnlocked={isUnlocked}
+                gridConfig={gridConfig}
+              />
             </div>
           </div>
         </div>
@@ -198,6 +231,8 @@ export function SortableBlock({
             onBackgroundColorChange={handleBackgroundColorChange as (color: string | null) => void}
             onPaletteOpenChange={setIsPaletteOpen}
             onPaletteHoverChange={handlePaletteHoverChange}
+            onUnlock={() => setIsUnlocked(!isUnlocked)}
+            isUnlocked={isUnlocked}
             visible={toolbarVisible}
             viewport={viewport}
           />

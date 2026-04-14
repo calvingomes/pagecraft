@@ -1,6 +1,9 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides the operational overview for PageCraft, focusing on commands, environment setup, and testing.
+
+> [!TIP]
+> **Coding Rules & Constants**: For layout math, naming conventions, and project rules, refer to [Agents.md](Agents.md). To add a new block type, follow the 8-step guide in [NEW_BLOCK.md](NEW_BLOCK.md).
 
 ## Commands
 
@@ -13,173 +16,43 @@ bun run test     # Run Vitest suite (pre-commit gate)
 bun run test:e2e # Run Playwright E2E suite
 ```
 
-**Setup**: Copy `.env.example` to `.env.local` with Supabase credentials. Run `schema.sql` in Supabase SQL editor.
+**Setup**: Copy `.env.example` to `.env.local` with Supabase credentials. Ensure Supabase CLI is running (`supabase start`).
+
+---
 
 ## Architecture Overview
 
-PageCraft is a link-in-bio page builder. Users drag blocks (text, links, images, section titles) onto a canvas with independent desktop and mobile layouts.
+**PageCraft** is a block-based "link-in-bio" builder that allows users to create single-page profiles with draggable blocks (text, links, images).
 
-### Two Modes
+- **Dual-Viewport Layout**: Users can customize their layout **independently** for Desktop and Mobile views using a "Viewport-Aware Unified Block Model." 
+- **Modular Block Architecture**: Uses a plugin-based `ActionRegistry` for block-specific tools and a centralized `blockRegistry` for dynamic rendering.
+- **Editor vs. View**: The editor (`/editor`) uses Zustand + RGL + Tiptap. The public view page (`/[username]`) uses a high-performance, zero-dependency `ReadOnlyGrid`.
 
-- **Editor** (`/editor`): Unlocked for all viewports.
-  - **DesktopEditor** (`>=960px`): Mouse-based, includes mobile preview frame.
-  - **MobileEditor** (`<960px`): Touch-optimized 1-tap select / 2-tap focus model with floating `MobileBlockToolbar`.
-  - Both use Zustand + RGL + Tiptap.
-- **View Page** (`/[username]`): Server Component fetches data via `ServerPageService`, passes unified blocks to `PageView`. No stores, no RGL — pure props.
-- **Error Handling**: 
-  - `app/error.tsx`: Global render/client error boundary.
-  - `app/not-found.tsx`: Global 404.
-  - `app/[username]/not-found.tsx`: Profile-specific "Claim yours" 404.
-  - `ErrorState.tsx`: Unified UI for all errors.
+---
 
-### Viewport-Aware Unified Block Model
+## Testing Strategy
 
-Blocks are one array. `layout/styles` → desktop; `mobileLayout/mobileStyles` → mobile; `visibility.desktop|mobile` → per-viewport. All mutations must call `ensureBlocksHaveValidLayoutsForAllViewports()` from `lib/editor-engine/data/normalization.ts` to ensure non-overlapping safety.
+### Unit Tests (Vitest)
+- Co-located in `__tests__` directories (e.g., `*.test.ts`).
+- **Pre-commit**: Husky blocks commits if lint or unit tests fail.
+- Supabase is mocked via `createSupabaseChainMock` in `vitest.setup.ts`.
 
-### Testing Strategy
-
-**Unit tests**: Vitest + jsdom + @testing-library/react.
-- `bun run test`: Run suite once.
-- `bun run test:watch`: Development mode.
-- **Pre-commit**: Husky runs lint + unit tests. Commits fail if either fails.
-- Test files are co-located: `*.test.ts` / `*.test.tsx` next to source file.
-- Pure logic: plain Vitest, no RTL. Component tests: RTL where needed.
-- Unit tests are fully offline — Supabase is mocked via `createSupabaseChainMock` in `vitest.setup.ts`.
-
-**Unit test coverage**:
-- Grid math: `lib/editor-engine/grid/__tests__/`
-- Layout normalization + viewport occupancy: `lib/editor-engine/data/__tests__/`, `lib/editor-engine/grid/__tests__/`
-- Collision detection: `lib/editor-engine/layout/__tests__/`
-- RGL ↔ block model conversions: `lib/editor-engine/rgl/__tests__/`
-- Rich text sanitization: `lib/utils/__tests__/`
-- Image processing / WebP: `lib/uploads/__tests__/`
-- Auth store + service clients: `stores/__tests__/`, `lib/services/__tests__/`
-- Hooks: `hooks/__tests__/` — `useAuthGuard`, `useLinkMetadata`, `useUsernameAvailability`, `useViewportEditor`
-- Block components (read-only + editable): `components/blocks/*/` — TextBlock, LinkBlock, ImageBlock, SectionTitleBlock
-- Editor save flow: `lib/editor/__tests__/`
-
-**Component test pattern** (RTL):
-- Mock `@/contexts/EditorContext` via `vi.mock` and control return value per-test with `mockReturnValue(null)` (read-only) or `mockReturnValue(mockEditor)` (editable).
-- Import the component with `await import(...)` after mocks are declared.
-- Mock `next/dynamic` → `() => () => null` to prevent lazy-load in jsdom.
-- Use `vi.stubGlobal("innerWidth", value)` + `vi.unstubAllGlobals()` in `afterEach` when testing mobile/desktop viewport branches.
-
-**E2E tests**: Playwright (Chromium only).
-- `bun run test:e2e`: Run full E2E suite locally (requires `.env.local` and `bun run dev` or running server).
-- Config: `playwright.config.ts` at root. `webServer` starts `bun run dev` automatically.
-- Tests live in `tests/e2e/` directory.
-- Auth state cached in `playwright/.auth/user.json` (gitignored).
-- **CI**: GitHub Actions runs E2E on every push/PR to `main` (`.github/workflows/e2e.yml`). Required secrets: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`, `NEXT_PUBLIC_SUPABASE_STORAGE_BUCKET`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`, `NEXT_PUBLIC_POSTHOG_HOST`, `TEST_EMAIL`, `TEST_PASSWORD`. Playwright HTML report uploaded as artifact on failure.
+### E2E Tests (Playwright)
+- Tests live in `tests/e2e/`.
+- Auth state is cached in `playwright/.auth/user.json`.
+- Uses a dedicated test user for local/CI environments to bypass Google OAuth.
 
 ### E2E Authentication
+Playwright's global setup (`global-setup.ts`) handles the auth handshake:
+1. Signs in via `supabase.auth.signInWithPassword()`.
+2. Writes the session to `playwright/.auth/user.json`.
+3. Sets `storageState` to this JSON for all editor-scoped tests.
 
-The app uses Google OAuth only in the UI. For E2E, a dedicated test account bypasses OAuth entirely:
-
-- Email/password auth is enabled in Supabase (invisible to end users — UI remains Google-only).
-- A permanent test user (`TEST_EMAIL` / `TEST_PASSWORD` in `.env.local`) is used by Playwright's global setup.
-- `tests/e2e/global-setup.ts` signs in via `supabase.auth.signInWithPassword()` and writes session to `playwright/.auth/user.json` and username to `playwright/.auth/test-user.json`.
-- All editor-scoped tests use `storageState: 'playwright/.auth/user.json'` — no OAuth dance needed.
-- The test user must have a valid row in the `profiles` / pages table for the editor to load correctly.
-
-**Do not** test Google OAuth itself in the E2E suite — it's a third-party flow outside our control.
+**Do not** test Google OAuth itself; it is an external dependency.
 
 ### Key E2E User Flows
-
-1. Editor loads correctly for authenticated user
-2. Add block → save → view page reflects change
-3. Block deletion persists after reload
-4. Image upload → WebP conversion → renders on view page
-5. Mobile preview toggle in desktop editor
-6. Unauthenticated user redirected from editor
-
-### Out of Scope for Testing
-
-- Block visibility toggle — no UI exists yet; E2E spec is written but `test.skip`'d
-- PostHog tracking events
-- CSS/styling
-- RGL drag internals (library behaviour)
-- Generated Supabase types
-
-### Analytics
-
-PostHog is used for tracking (`persistence: 'localStorage'`).
-- **Path**: Manual events are documented in `app/providers.tsx`.
-- **Pattern**: Pass `trackingEvent="event_name"` to `ThemeButton`. This bridges Server Components to the PostHog capture in the Client Component.
-- **Identification**: Do **NOT** use `posthog.identify()`. Anonymity is mandatory.
-
-### Editor Engine (`lib/editor-engine/`)
-
-The core grid/collision system. All grid constants come from `DESKTOP_GRID` / `MOBILE_GRID` in `lib/editor-engine/grid/grid-config.ts`.
-
-- **Desktop**: 4 cols, 175px cells, 35px gaps, 805px canvas
-- **Mobile**: 2 cols, 170px cells, 30px gaps, 370px canvas
-- Both use `rowScale: 2` (half-row sub-divisions)
-
-Key functions:
-- `spansForPreset(preset, config?)` / `sizePxForBlock(block, config?)` — `lib/editor-engine/grid/grid-math.ts`
-- `canPlaceBlockAt()` / `findFirstFreeSpot()` — `lib/editor-engine/layout/collision.ts`
-- `blockToRglItem(block, config)` / `rglLayoutToBlockUpdates(newLayout, snapshot, config)` — `lib/editor-engine/rgl/`
-
-Never hardcode grid values (`175`, `35`, etc.) outside `lib/editor-engine`.
-
-### Canvas Components (`components/builder/BlockCanvas/`)
-
-`BlockCanvas` dispatches between editable (store-backed) and readonly (props-only) paths. Readonly canvas paths must never import `editor-store` or drag hooks.
-
-- `desktop/DesktopBlockCanvas.tsx` — 4-col RGL, handles drag-stop → `rglLayoutToBlockUpdates`
-- `mobile/MobileCanvasGrid.tsx` — 2-col RGL with `transformScale`, projects `mobileLayout/mobileStyles`
-- `SortableBlock` — grid item shell with drag handle, hover toolbar, delete button
-- `BlockRegistry/blockRegistry.tsx` — single map from `BlockType → ReactNode`
-
-RGL is always `isResizable={false}`, `compactType="vertical"`, `draggableHandle=".drag-handle"`.
-
-### State Management
-
-- `editor-store.ts` — unified blocks array, `activeViewportMode`, block mutations
-- `auth-store.ts` — user/username/loading
-- `EditorContext` — injects `onUpdateBlock` / `onRemoveBlock` callbacks into block components so they don't import the store directly
-
-Store files are thin — types live in `types/`.
-
-### Services (`lib/services/`)
-
-All Supabase calls are wrapped here. `page.server.ts` is server-only; the rest are client-side.
-
-## Adding a New Block Type
-
-1. Add interface to `types/editor.ts`, include in `Block` union and `BlockType`
-2. Create `components/blocks/YourBlock/YourBlock.tsx` + `YourBlock.module.css`
-3. Register in `components/builder/BlockRegistry/blockRegistry.tsx`
-4. Add span defaults in `lib/editor-engine/grid/grid-math.ts` → `spansForPreset`
-5. Handle creation in `app/editor/page.tsx` toolbar action
-6. Handle normalization in `lib/editor-engine/data/normalization.ts` → `normalizeStoredBlocks` (ensure `widthPreset: "full"` for sections)
-7. Handle viewport-specific rendering in both `DesktopBlockCanvas` and `MobileCanvasGrid`
-
-## Code Style & Conventions
-
-**Imports**: use `@/` path aliases. Order: external → `@/types` → `@/lib` → `@/stores` → `@/contexts` → `@/components` → relative. No barrel files (`index.ts`). Import `type` for type-only imports.
-
-**Components**: `"use client"` only where needed. Prefer `const` arrow functions. Avoid `React.FC`. Early returns over nested ternaries.
-
-**Naming**:
-- Components/files: `PascalCase.tsx`
-- CSS modules: `PascalCase.module.css`, class names `camelCase`
-- Stores: `kebab-case.ts`; Hooks/lib/types: `camelCase.ts`
-
-**CSS Modules**: Use variables from `styles/colors.css` and `styles/media.css`. No hardcoded colors or breakpoints. No dead CSS classes. `@import "@styles/media.css"` at top of any module needing breakpoints. Breakpoints: desktop ≥1360px, tablet 960–1359px, mobile <960px.
-
-**Types**: All shared types in `types/` — one file per domain. Component-specific prop types can go in co-located `*.types.ts`. No inline type definitions in stores/lib/hooks unless truly private.
-
-**Theming**: `SortableBlock` injects `--block-bg-color` and `--block-text-color` into scope. Block children use these variables. Use `deriveTextColor(bgColor)` from `@/lib/utils/colorUtils` for automated contrast. `Navbar` supports `logoColor` and `textColor` overrides for theme-specific branding.
-
-**Layout**: `PageLayout` uses `isEditor` flag to apply `data-is-editor` attribute for specific spacing (e.g., increased bottom padding for toolbar clearance).
-
-**BlockWidthPreset quirks**:
-- `skinnyWide` toolbar only for `text` and `link` blocks
-- `max` toolbar only for `text` blocks on desktop (hide on mobile)
-- `sectionTitle` transparent wrapper only in view mode, not editor mode
-- `full` blocks are always full-width (`h = 0.5`); `sectionTitle` is `config.canvasPx × config.subRowPx`
-
-## File Uploads
-
-All image flows go through `lib/uploads/`. Always convert to WebP before uploading (`toWebpFile` / `fileToWebpDataUrl`). Use `.webp` extensions in Supabase Storage paths.
+1. **Editor Integrity**: Loads correctly for authenticated users.
+2. **Persistence**: Add/Delete block → Save → View Page verification.
+3. **Images**: Upload → WebP conversion → Render check.
+4. **Previews**: Desktop/Mobile toggle in editor.
+5. **Security**: Unauthenticated redirects.
