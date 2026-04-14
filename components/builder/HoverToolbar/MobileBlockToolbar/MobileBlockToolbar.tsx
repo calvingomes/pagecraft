@@ -12,10 +12,12 @@ import {
   Palette,
   Type,
   Link2,
-  Minus
+  Minus,
+  Search
 } from "lucide-react";
 import { useEditorStore } from "@/stores/editor-store";
 import { BlockBackgroundPalette } from "../BlockBackgroundPalette/BlockBackgroundPalette";
+import { MapSearchPalette } from "@/components/blocks/MapBlock/MapSearchPalette";
 import { normalizeLinkUrl } from "@/lib/utils/linkBlock";
 import * as Label from "@radix-ui/react-label";
 import styles from "./MobileBlockToolbar.module.css";
@@ -143,6 +145,40 @@ export function MobileBlockToolbar() {
               </Popover.Content>
             </Popover.Portal>
           </Popover.Root>
+
+          {/* Block-Specific Tools */}
+          {block.type === "map" && (
+            <Popover.Root>
+              <Popover.Trigger asChild>
+                <button className={styles.actionButton}>
+                  <Search size={20} />
+                </button>
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Content
+                  side="top"
+                  align="center"
+                  sideOffset={24}
+                  className={styles.popoverContent}
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                >
+                  <MapSearchPalette
+                    onSelect={(result) => {
+                      updateBlock(block.id, {
+                        content: {
+                          ...block.content,
+                          address: result.label,
+                          lat: result.lat,
+                          lng: result.lng,
+                          zoom: 12,
+                        }
+                      });
+                    }}
+                  />
+                </Popover.Content>
+              </Popover.Portal>
+            </Popover.Root>
+          )}
 
           {block.type === "image" && (
             <>

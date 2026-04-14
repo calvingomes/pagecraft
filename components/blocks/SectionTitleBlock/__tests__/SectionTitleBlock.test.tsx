@@ -27,6 +27,8 @@ const mockEditor = {
   onSelectBlock: vi.fn(),
   onFocusBlock: vi.fn(),
   isActualMobile: false,
+  isMapUnlocked: false,
+  setIsMapUnlocked: vi.fn(),
 };
 
 describe("SectionTitleBlock — read-only (useEditorContext returns null)", () => {

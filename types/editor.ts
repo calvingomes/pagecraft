@@ -96,6 +96,8 @@ export type EditorContextValue = {
   onSelectBlock: (id: string | null) => void;
   onFocusBlock: (id: string | null) => void;
   isActualMobile: boolean;
+  isMapUnlocked: boolean;
+  setIsMapUnlocked: (val: boolean) => void;
 };
 
 export type EditorState = {
@@ -104,6 +106,8 @@ export type EditorState = {
   selectedBlockId: string | null;
   focusedBlockId: string | null;
   isActualMobile: boolean;
+  isMapUnlocked: boolean;
+  setIsMapUnlocked: (val: boolean) => void;
 
   addBlock: (block: Block) => void;
   updateBlock: (id: string, updates: Partial<Block>) => void;

@@ -20,7 +20,9 @@ export default function EditorPage() {
     selectedBlockId, 
     focusedBlockId, 
     selectBlock, 
-    focusBlock 
+    focusBlock,
+    isMapUnlocked,
+    setIsMapUnlocked
   } = useEditorStore();
 
   const data = useEditorData();
@@ -84,6 +86,8 @@ export default function EditorPage() {
       onSelectBlock={selectBlock}
       onFocusBlock={focusBlock}
       isActualMobile={viewport.isActualMobile}
+      isMapUnlocked={isMapUnlocked}
+      setIsMapUnlocked={setIsMapUnlocked}
     >
       {viewport.isActualMobile ? (
         <MobileEditor {...editorProps} />

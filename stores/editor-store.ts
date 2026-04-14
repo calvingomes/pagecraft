@@ -13,6 +13,7 @@ export const useEditorStore = create<EditorState>()(
     selectedBlockId: null,
     focusedBlockId: null,
     isActualMobile: false,
+    isMapUnlocked: false,
 
     setAllBlocks: (blocks) => set({ blocks }),
 
@@ -51,12 +52,16 @@ export const useEditorStore = create<EditorState>()(
         selectedBlockId:
           state.selectedBlockId === id ? null : state.selectedBlockId,
         focusedBlockId: state.focusedBlockId === id ? null : state.focusedBlockId,
+        // Reset unlock state if the removed block was the selected one
+        isMapUnlocked: state.selectedBlockId === id ? false : state.isMapUnlocked,
       })),
 
-    selectBlock: (id) => set({ selectedBlockId: id, focusedBlockId: null }),
+    selectBlock: (id) => set({ selectedBlockId: id, focusedBlockId: null, isMapUnlocked: false }),
 
     focusBlock: (id) => set({ focusedBlockId: id }),
 
     setIsActualMobile: (val) => set({ isActualMobile: val }),
+
+    setIsMapUnlocked: (val) => set({ isMapUnlocked: val }),
   })),
 );

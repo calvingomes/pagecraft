@@ -26,6 +26,8 @@ const mockEditor = {
   onSelectBlock: vi.fn(),
   onFocusBlock: vi.fn(),
   isActualMobile: false,
+  isMapUnlocked: false,
+  setIsMapUnlocked: vi.fn(),
 };
 
 const makeBlock = (overrides: Partial<TextBlockType> = {}): TextBlockType => ({
