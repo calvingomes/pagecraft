@@ -100,43 +100,47 @@ export function BlockHoverToolbar({
       onPointerDown={(e) => e.stopPropagation()}
       aria-label="Block controls"
     >
-      <ToggleGroup.Root
-        type="single"
-        className={styles.sizeGroup}
-        value={currentPreset}
-        onValueChange={(nextPreset) => {
-          if (!nextPreset) return;
-          onWidthChange(nextPreset as BlockHoverToolbarIcons["preset"]);
-        }}
-      >
-        {visiblePresets.map(({ preset, Icon, title, iconSize }) => (
-          <ToggleGroup.Item
-            key={preset}
-            value={preset}
-            title={title}
-            aria-label={title}
-            className={`${styles.sizeButton} ${
-              currentPreset === preset ? styles.active : ""
-            }`}
+      {visible && (
+        <>
+          <ToggleGroup.Root
+            type="single"
+            className={styles.sizeGroup}
+            value={currentPreset}
+            onValueChange={(nextPreset) => {
+              if (!nextPreset) return;
+              onWidthChange(nextPreset as BlockHoverToolbarIcons["preset"]);
+            }}
           >
-            <Icon size={iconSize} className={styles.sizeIcon} />
-          </ToggleGroup.Item>
-        ))}
-      </ToggleGroup.Root>
+            {visiblePresets.map(({ preset, Icon, title, iconSize }) => (
+              <ToggleGroup.Item
+                key={preset}
+                value={preset}
+                title={title}
+                aria-label={title}
+                className={`${styles.sizeButton} ${
+                  currentPreset === preset ? styles.active : ""
+                }`}
+              >
+                <Icon size={iconSize} className={styles.sizeIcon} />
+              </ToggleGroup.Item>
+            ))}
+          </ToggleGroup.Root>
 
-      {/* Modular Block Actions Plugin */}
-      {ActionComponent && (
-        <ActionComponent
-          blockId={blockId}
-          blockType={blockType}
-          currentBackgroundColor={currentBackgroundColor}
-          isTransparentBackground={isTransparentBackground}
-          onBackgroundColorChange={onBackgroundColorChange}
-          onPaletteOpenChange={onPaletteOpenChange}
-          onPaletteHoverChange={onPaletteHoverChange}
-          isUnlocked={isUnlocked}
-          onUnlock={onUnlock}
-        />
+          {/* Modular Block Actions Plugin */}
+          {ActionComponent && (
+            <ActionComponent
+              blockId={blockId}
+              blockType={blockType}
+              currentBackgroundColor={currentBackgroundColor}
+              isTransparentBackground={isTransparentBackground}
+              onBackgroundColorChange={onBackgroundColorChange}
+              onPaletteOpenChange={onPaletteOpenChange}
+              onPaletteHoverChange={onPaletteHoverChange}
+              isUnlocked={isUnlocked}
+              onUnlock={onUnlock}
+            />
+          )}
+        </>
       )}
     </Toolbar.Root>
   );

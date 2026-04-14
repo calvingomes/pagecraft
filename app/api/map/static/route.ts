@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const size = `${w}x${h}@2x`;
   const style = searchParams.get("style") || "streets-v12";
   
-  const apiKey = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+  const apiKey = process.env.MAPBOX_ACCESS_TOKEN;
 
   if (!lat || !lng || !zoom) {
     return NextResponse.json({ error: "Missing required parameters (lat, lng, zoom)" }, { status: 400 });
