@@ -1,3 +1,4 @@
+/* eslint-disable css-modules/no-unused-class */
 "use client";
 
 import React from "react";
@@ -9,18 +10,11 @@ import {
   RectangleHorizontal,
   RectangleVertical,
   Check,
-  Palette,
-  Type,
-  Link2,
-  Minus,
-  Search
+  Minus
 } from "lucide-react";
 import { useEditorStore } from "@/stores/editor-store";
-import { BlockBackgroundPalette } from "../BlockBackgroundPalette/BlockBackgroundPalette";
-import { MapSearchPalette } from "@/components/blocks/MapBlock/MapSearchPalette";
-import { normalizeLinkUrl } from "@/lib/utils/linkBlock";
-import * as Label from "@radix-ui/react-label";
 import styles from "./MobileBlockToolbar.module.css";
+import { MobileActionRegistry } from "./MobileActionRegistry";
 import type { BlockWidthPreset } from "@/types/editor";
 
 const WIDTH_PRESETS = [
@@ -36,8 +30,6 @@ export function MobileBlockToolbar() {
   const blocks = useEditorStore((s) => s.blocks);
   const updateBlock = useEditorStore((s) => s.updateBlock);
   const selectBlock = useEditorStore((s) => s.selectBlock);
-  const [isCaptionPopoverOpen, setIsCaptionPopoverOpen] = React.useState(false);
-  const [isLinkPopoverOpen, setIsLinkPopoverOpen] = React.useState(false);
   const [isSizePopoverOpen, setIsSizePopoverOpen] = React.useState(false);
 
   const block = blocks.find((b) => b.id === selectedBlockId);
@@ -50,28 +42,7 @@ export function MobileBlockToolbar() {
     });
   };
 
-  const handleBackgroundColorChange = (color: string | null) => {
-    if (color === null) {
-      updateBlock(block.id, {
-        mobileStyles: {
-          ...(block.mobileStyles ?? {}),
-          transparentWrapper: true,
-          backgroundColor: undefined,
-        },
-      });
-    } else {
-      updateBlock(block.id, {
-        mobileStyles: {
-          ...(block.mobileStyles ?? {}),
-          transparentWrapper: false,
-          backgroundColor: color,
-        },
-      });
-    }
-  };
-
   const currentPreset = block.mobileStyles?.widthPreset ?? block.styles?.widthPreset ?? "small";
-  const currentBg = block.mobileStyles?.backgroundColor ?? block.styles?.backgroundColor;
 
   // Filter presets based on block type
   const visiblePresets = WIDTH_PRESETS.filter((p) => {
@@ -80,6 +51,9 @@ export function MobileBlockToolbar() {
     }
     return true;
   });
+
+  // Resolve block-specific actions from the registry
+  const ActionComponent = MobileActionRegistry[block.type];
 
   return (
     <div className={styles.mobileToolbar}>
@@ -123,150 +97,12 @@ export function MobileBlockToolbar() {
             </Popover.Portal>
           </Popover.Root>
 
-          {block.type !== "map" && (
-            <Popover.Root>
-              <Popover.Trigger asChild>
-                <button className={styles.actionButton}>
-                  <Palette size={20} />
-                </button>
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Content
-                  side="top"
-                  align="center"
-                  sideOffset={24}
-                  className={styles.popoverContent}
-                  onOpenAutoFocus={(e) => e.preventDefault()}
-                >
-                  <BlockBackgroundPalette
-                    currentValue={currentBg}
-                    onChange={handleBackgroundColorChange}
-                    showTransparentOption={block.type === "text"}
-                  />
-                </Popover.Content>
-              </Popover.Portal>
-            </Popover.Root>
-          )}
-
-          {/* Block-Specific Tools */}
-          {block.type === "map" && (
-            <Popover.Root>
-              <Popover.Trigger asChild>
-                <button className={styles.actionButton}>
-                  <Search size={20} />
-                </button>
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Content
-                  side="top"
-                  align="center"
-                  sideOffset={24}
-                  className={styles.popoverContent}
-                  onOpenAutoFocus={(e) => e.preventDefault()}
-                >
-                  <MapSearchPalette
-                    onSelect={(result) => {
-                      updateBlock(block.id, {
-                        content: {
-                          ...block.content,
-                          address: result.label,
-                          lat: result.lat,
-                          lng: result.lng,
-                          zoom: 12,
-                        }
-                      });
-                    }}
-                  />
-                </Popover.Content>
-              </Popover.Portal>
-            </Popover.Root>
-          )}
-
-          {block.type === "image" && (
-            <>
-              <Popover.Root open={isCaptionPopoverOpen} onOpenChange={setIsCaptionPopoverOpen}>
-                <Popover.Trigger asChild>
-                  <button className={`${styles.actionButton} ${block.content.caption ? styles.hasValue : ""}`}>
-                    <Type size={20} />
-                  </button>
-                </Popover.Trigger>
-                <Popover.Portal>
-                  <Popover.Content
-                    side="top"
-                    align="center"
-                    sideOffset={24}
-                    className={styles.popoverContent}
-                    onOpenAutoFocus={(e) => e.preventDefault()}
-                  >
-                    <div className={styles.inputWrapper}>
-                      <Label.Root className={styles.inputLabel}>Caption</Label.Root>
-                      <input
-                        type="text"
-                        placeholder="Add caption..."
-                        className={styles.popoverInput}
-                        value={block.content.caption ?? ""}
-                        onChange={(e) => {
-                          updateBlock(block.id, {
-                            content: { ...block.content, caption: e.target.value }
-                          });
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") setIsCaptionPopoverOpen(false);
-                        }}
-                      />
-                    </div>
-                  </Popover.Content>
-                </Popover.Portal>
-              </Popover.Root>
-
-              <Popover.Root open={isLinkPopoverOpen} onOpenChange={setIsLinkPopoverOpen}>
-                <Popover.Trigger asChild>
-                  <button className={`${styles.actionButton} ${block.content.linkUrl ? styles.hasValue : ""}`}>
-                    <Link2 size={20} />
-                  </button>
-                </Popover.Trigger>
-                <Popover.Portal>
-                  <Popover.Content
-                    side="top"
-                    align="center"
-                    sideOffset={24}
-                    className={styles.popoverContent}
-                    onOpenAutoFocus={(e) => e.preventDefault()}
-                  >
-                    <div className={styles.inputWrapper}>
-                      <Label.Root className={styles.inputLabel}>Link URL</Label.Root>
-                      <input
-                        type="text"
-                        placeholder="Paste or type a link..."
-                        className={styles.popoverInput}
-                        value={block.content.linkUrl ?? ""}
-                        onChange={(e) => {
-                          updateBlock(block.id, {
-                            content: { ...block.content, linkUrl: e.target.value }
-                          });
-                        }}
-                        onBlur={() => {
-                          if (!block.content.linkUrl?.trim()) return;
-                          updateBlock(block.id, {
-                            content: { ...block.content, linkUrl: normalizeLinkUrl(block.content.linkUrl) }
-                          });
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            if (block.content.linkUrl?.trim()) {
-                              updateBlock(block.id, {
-                                content: { ...block.content, linkUrl: normalizeLinkUrl(block.content.linkUrl) }
-                              });
-                            }
-                            setIsLinkPopoverOpen(false);
-                          }
-                        }}
-                      />
-                    </div>
-                  </Popover.Content>
-                </Popover.Portal>
-              </Popover.Root>
-            </>
+          {/* Plugin-based Action Component */}
+          {ActionComponent && (
+            <ActionComponent 
+              block={block} 
+              updateBlock={updateBlock} 
+            />
           )}
         </div>
 

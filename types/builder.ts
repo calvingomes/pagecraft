@@ -100,9 +100,17 @@ export interface MapActionsProps {
 }
 
 /**
- * Registry mapping for block types to their specific action components.
+ * Props passed to mobile action components.
  */
-export type ActionRegistryMapping = Record<string, React.ComponentType<ActionComponentProps>>;
+export interface MobileActionProps {
+  block: Block;
+  updateBlock: (id: string, updates: Partial<Block>) => void;
+}
+
+/**
+ * Registry mapping for block types to their mobile action components.
+ */
+export type MobileActionRegistryMapping = Record<string, React.ComponentType<MobileActionProps>>;
 
 /**
  * Registry mapping for block types to their renderer components.
