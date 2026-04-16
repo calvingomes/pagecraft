@@ -108,6 +108,11 @@ export interface MobileActionProps {
 }
 
 /**
+ * Registry mapping for block types to their specific toolbar action components (Desktop).
+ */
+export type ActionRegistryMapping = Partial<Record<BlockType, React.ComponentType<ActionComponentProps>>>;
+
+/**
  * Registry mapping for block types to their mobile action components.
  */
 export type MobileActionRegistryMapping = Record<string, React.ComponentType<MobileActionProps>>;
