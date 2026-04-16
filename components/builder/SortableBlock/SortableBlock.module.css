@@ -75,10 +75,6 @@
 .wrapper.selected {
   outline: 2px solid var(--color-purple);
   outline-offset: -2px;
-  /* Safari clip fix: maintain overflow hidden even when selected */
-  overflow: hidden;
-  /* Force a new stacking context for cleaner hardware-accelerated clipping */
-  -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 
 .mobileDragHandle {

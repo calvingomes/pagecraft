@@ -108,11 +108,12 @@ describe("MapBlock", () => {
     }));
   });
 
-  it("saves address updates immediately", () => {
+  it("saves address updates on blur", () => {
     render(<MapBlock block={mockBlock} isMapUnlocked={false} />);
     
-    const input = screen.getByPlaceholderText("Label this location...");
+    const input = screen.getByPlaceholderText("Add Location");
     fireEvent.change(input, { target: { value: "New Address" } });
+    fireEvent.blur(input);
 
     expect(mockOnUpdateBlock).toHaveBeenCalledWith("test-id", expect.objectContaining({
       content: expect.objectContaining({ address: "New Address" })

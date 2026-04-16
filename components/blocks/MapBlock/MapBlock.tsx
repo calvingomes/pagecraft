@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { useEditorContext } from "@/contexts/EditorContext";
 import type { MapBlock as MapBlockType } from "@/types/editor";
@@ -24,6 +24,13 @@ export function MapBlock({ block, isMapUnlocked = false, gridConfig = DESKTOP_GR
   const editor = useEditorContext();
   const { widthPx, heightPx } = sizePxForBlock(block, gridConfig);
 
+  const [localAddress, setLocalAddress] = useState(address || "");
+  const [prevAddress, setPrevAddress] = useState(address || "");
+
+  if (address !== prevAddress) {
+    setPrevAddress(address || "");
+    setLocalAddress(address || "");
+  }
 
   const pendingCoordsRef = useRef({ lat, lng, zoom });
   const wasUnlockedRef = useRef(isMapUnlocked);
@@ -49,6 +56,14 @@ export function MapBlock({ block, isMapUnlocked = false, gridConfig = DESKTOP_GR
 
   const handleMoveEnd = (newLat: number, newLng: number, newZoom: number) => {
     pendingCoordsRef.current = { lat: newLat, lng: newLng, zoom: newZoom };
+  };
+
+  const handleLabelBlur = () => {
+    if (localAddress !== address && editor?.onUpdateBlock) {
+      editor.onUpdateBlock(block.id, {
+        content: { ...block.content, address: localAddress }
+      });
+    }
   };
 
   const CenterIndicator = (
@@ -80,7 +95,11 @@ export function MapBlock({ block, isMapUnlocked = false, gridConfig = DESKTOP_GR
           loading="lazy"
         />
         {CenterIndicator}
-        {address && <div className={styles.addressLabel}>{address}</div>}
+        {address && (
+          <div className={styles.labelWrapper}>
+            <div className={styles.addressLabel}>{address}</div>
+          </div>
+        )}
       </div>
     );
   }
@@ -100,21 +119,20 @@ export function MapBlock({ block, isMapUnlocked = false, gridConfig = DESKTOP_GR
         height={heightPx}
       />
       {CenterIndicator}
-      {(address || editor) && (
-        <input
-          className={styles.addressLabel}
-          value={address || ""}
-          onChange={(e) => {
-            if (editor?.onUpdateBlock) {
-              editor.onUpdateBlock(block.id, {
-                content: { ...block.content, address: e.target.value }
-              });
-            }
-          }}
-          placeholder="Label this location..."
-          onPointerDown={(e) => e.stopPropagation()}
-          spellCheck={false}
-        />
+      {(localAddress || editor) && (
+        <div className={styles.labelWrapper}>
+          <span className={styles.labelMirror}>{localAddress || "Add Location"}</span>
+          <input
+            className={styles.addressLabel}
+            value={localAddress}
+            onChange={(e) => setLocalAddress(e.target.value)}
+            onBlur={handleLabelBlur}
+            placeholder="Add Location"
+            onPointerDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+            spellCheck={false}
+          />
+        </div>
       )}
       {!isMapUnlocked && <div className={styles.clickShield} />}
     </div>

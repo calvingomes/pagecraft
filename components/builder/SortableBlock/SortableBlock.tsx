@@ -200,11 +200,6 @@ export function SortableBlock({
                 : "transparent",
           } as React.CSSProperties & { [key: string]: string | number }}
         >
-          {isActualMobile && isSelected && (
-            <div className={`drag-handle ${styles.mobileDragHandle}`}>
-              <GripVertical size={18} />
-            </div>
-          )}
           <div className={styles.content}>
             <div className={styles.blockContent}>
               <BlockRenderer
@@ -215,6 +210,12 @@ export function SortableBlock({
             </div>
           </div>
         </div>
+
+        {isActualMobile && isSelected && (
+          <div className={`drag-handle ${styles.mobileDragHandle}`}>
+            <GripVertical size={18} />
+          </div>
+        )}
 
         {showDeleteButton && (
           <DeleteButtonCorner

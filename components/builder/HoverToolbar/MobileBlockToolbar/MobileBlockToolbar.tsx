@@ -123,28 +123,30 @@ export function MobileBlockToolbar() {
             </Popover.Portal>
           </Popover.Root>
 
-          <Popover.Root>
-            <Popover.Trigger asChild>
-              <button className={styles.actionButton}>
-                <Palette size={20} />
-              </button>
-            </Popover.Trigger>
-            <Popover.Portal>
-              <Popover.Content
-                side="top"
-                align="center"
-                sideOffset={24}
-                className={styles.popoverContent}
-                onOpenAutoFocus={(e) => e.preventDefault()}
-              >
-                <BlockBackgroundPalette
-                  currentValue={currentBg}
-                  onChange={handleBackgroundColorChange}
-                  showTransparentOption={block.type === "text"}
-                />
-              </Popover.Content>
-            </Popover.Portal>
-          </Popover.Root>
+          {block.type !== "map" && (
+            <Popover.Root>
+              <Popover.Trigger asChild>
+                <button className={styles.actionButton}>
+                  <Palette size={20} />
+                </button>
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Content
+                  side="top"
+                  align="center"
+                  sideOffset={24}
+                  className={styles.popoverContent}
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                >
+                  <BlockBackgroundPalette
+                    currentValue={currentBg}
+                    onChange={handleBackgroundColorChange}
+                    showTransparentOption={block.type === "text"}
+                  />
+                </Popover.Content>
+              </Popover.Portal>
+            </Popover.Root>
+          )}
 
           {/* Block-Specific Tools */}
           {block.type === "map" && (

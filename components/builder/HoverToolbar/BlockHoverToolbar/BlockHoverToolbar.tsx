@@ -1,6 +1,7 @@
 /* eslint-disable css-modules/no-unused-class */
 "use client";
 
+import { useEffect } from "react";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import * as Toolbar from "@radix-ui/react-toolbar";
 import { useState } from "react";
@@ -77,10 +78,13 @@ export function BlockHoverToolbar({
 
   if (visible !== prevVisible) {
     setPrevVisible(visible);
+  }
+
+  useEffect(() => {
     if (!visible) {
       onPaletteOpenChange?.(false);
     }
-  }
+  }, [visible, onPaletteOpenChange]);
 
   if (!editor) return null;
 
