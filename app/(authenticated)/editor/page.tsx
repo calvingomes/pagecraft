@@ -46,6 +46,10 @@ export default function EditorPage() {
     router.replace("/auth");
   };
 
+  const handleOpenSettings = () => {
+    router.push("/settings");
+  };
+
   if (!viewport.viewportResolved || !data.isEditorDataReady) {
     return (
       <PageLoader 
@@ -73,6 +77,7 @@ export default function EditorPage() {
     setSidebarPosition: data.setDesktopSidebarPosition,
     onAddBlock: data.onAddBlock,
     onSave: data.onSave,
+    onOpenSettings: handleOpenSettings,
     onLogout: handleLogout,
   };
 

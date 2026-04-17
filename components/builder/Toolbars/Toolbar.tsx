@@ -53,6 +53,7 @@ export const Toolbar = (props: ToolbarDefaultProps) => {
     <ToolbarDefault
       {...props}
       onOpenLink={() => setMode("link")}
+      onOpenSettings={props.onOpenSettings}
       onLogout={props.onLogout}
     />
   );

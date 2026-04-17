@@ -38,6 +38,21 @@
     color 0.2s;
 }
 
+.navButton {
+  width: auto;
+  min-width: 44px;
+  padding: 0 12px;
+  gap: 8px;
+  color: var(--color-white);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.navButton:hover {
+  transform: none;
+  background: var(--color-dark-grey);
+}
+
 .toolButton:hover {
   background: var(--color-dark-grey);
   color: var(--color-white);

@@ -25,6 +25,7 @@ export const DesktopEditor = ({
   setBackground,
   setSidebarPosition,
   onAddBlock,
+  onOpenSettings,
   onLogout,
   previewView = "desktop",
   setPreviewView,
@@ -66,6 +67,7 @@ export const DesktopEditor = ({
         showSidebarPositionControls={isDesktopEditing}
         previewViewport={previewView}
         onViewportChange={setPreviewView}
+        onOpenSettings={onOpenSettings}
         onLogout={onLogout}
       />
     </div>
