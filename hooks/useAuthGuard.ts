@@ -76,8 +76,10 @@ export function useAuthGuard(mode: AuthGuardMode) {
 
     const {
       data: { subscription },
-    } = AuthService.onAuthStateChange((_event, session) => {
-      applyGuard(session?.user ?? null);
+    } = AuthService.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || event === "USER_UPDATED") {
+        applyGuard(session?.user ?? null);
+      }
     });
 
     return () => {

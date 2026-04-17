@@ -13,7 +13,6 @@ const COMING_SOON_ITEMS = [
   "More block types",
   "SEO settings",
   "Custom domains",
-  "Connect your apps",
 ];
 
 export function RoadmapSection() {
@@ -21,8 +20,13 @@ export function RoadmapSection() {
     <section className={styles.section} aria-labelledby="roadmap-title">
       <div className="container">
         <header className={styles.header}>
-          <h2 id="roadmap-title" className={styles.title}>Built for craft</h2>
-          <p className={styles.subtitle}>Here&apos;s what you&apos;re working with, and what&apos;s on the way.</p>
+          <h2 id="roadmap-title" className={styles.title}>
+            Built for craft
+          </h2>
+          <p className={styles.subtitle}>
+            Here&apos;s what you&apos;re working with, and what&apos;s on the
+            way.
+          </p>
         </header>
 
         <div className={styles.grid}>
