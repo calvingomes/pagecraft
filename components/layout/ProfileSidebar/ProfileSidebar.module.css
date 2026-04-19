@@ -38,6 +38,8 @@
   width: 200px;
   height: 200px;
   border-radius: 50%;
+  border: 1px solid var(--page-avatar-bg);
+  box-sizing: border-box;
   background: var(--page-avatar-bg);
   color: var(--color-black);
   font-size: var(--font-size-3xl);
@@ -135,7 +137,7 @@
   }
 
   .sidebarCenter .profileCard {
-    flex-direction: row;
+    flex-direction: column;
     gap: 16px;
   }
 
@@ -165,11 +167,11 @@
 
 /* Force mobile styles when editor is in mobile preview mode */
 :global([data-preview="mobile"]) .sidebarCenter {
-  padding: 20px 0 60px;
+  padding: 20px 0 20px;
 }
 
 :global([data-preview="mobile"]) .sidebarCenter .profileCard {
-  flex-direction: row;
+  flex-direction: column;
   gap: 16px;
 }
 

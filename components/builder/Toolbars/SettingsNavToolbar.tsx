@@ -2,11 +2,16 @@
 /* eslint-disable css-modules/no-unused-class */
 
 import * as Toolbar from "@radix-ui/react-toolbar";
-import { ChartColumn, Pencil } from "lucide-react";
+import { LogOut, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
 import styles from "./Toolbar.module.css";
+import { Tooltip } from "@/components/ui/Tooltip/Tooltip";
 
-export function SettingsNavToolbar() {
+type SettingsNavToolbarProps = {
+  onLogout: () => void | Promise<void>;
+};
+
+export function SettingsNavToolbar({ onLogout }: SettingsNavToolbarProps) {
   const router = useRouter();
 
   return (
@@ -25,15 +30,17 @@ export function SettingsNavToolbar() {
           <span>Editor</span>
         </Toolbar.Button>
 
-        <Toolbar.Button
-          className={`${styles.toolButton} ${styles.navButton}`}
-          type="button"
-          aria-label="Open analytics"
-          onClick={() => router.push("/analytics")}
-        >
-          <ChartColumn size={16} />
-          <span>Analytics</span>
-        </Toolbar.Button>
+        <div className={styles.divider} />
+        <Tooltip content="Sign out" side="top">
+          <Toolbar.Button
+            className={`${styles.toolButton} ${styles.logoutButton}`}
+            type="button"
+            onClick={onLogout}
+            aria-label="Logout"
+          >
+            <LogOut size={18} />
+          </Toolbar.Button>
+        </Tooltip>
       </Toolbar.Root>
     </div>
   );

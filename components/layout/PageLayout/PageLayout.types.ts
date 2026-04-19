@@ -13,4 +13,5 @@ export type PageLayoutProps = {
   previewViewport?: PreviewViewport;
   framedMobilePreview?: boolean;
   isEditor?: boolean;
+  stickySidebar?: boolean;
 };
