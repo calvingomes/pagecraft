@@ -9,6 +9,7 @@ import {
   Palette,
   Laptop,
   Smartphone,
+  Settings,
   LogOut,
 } from "lucide-react";
 import styles from "./Toolbar.module.css";
@@ -28,6 +29,7 @@ export const ToolbarDefault = ({
   showSidebarPositionControls = true,
   previewViewport = "desktop",
   onViewportChange,
+  onOpenSettings,
   onLogout,
 }: ToolbarDefaultProps) => {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
@@ -122,6 +124,17 @@ export const ToolbarDefault = ({
           </>
         )}
         <div className={styles.divider} />
+        <Tooltip content="Settings" side="top">
+          <Toolbar.Button
+            className={styles.toolButton}
+            title=""
+            type="button"
+            onClick={onOpenSettings}
+            aria-label="Open settings"
+          >
+            <Settings size={18} />
+          </Toolbar.Button>
+        </Tooltip>
         <Tooltip content="Sign out" side="top">
           <Toolbar.Button
             className={`${styles.toolButton} ${styles.logoutButton}`}

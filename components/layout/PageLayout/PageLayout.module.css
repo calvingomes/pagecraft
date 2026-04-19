@@ -117,11 +117,12 @@
   align-items: center;
 }
 
-/* Sticky side profile only in desktop viewport mode */
-.pageLayout[data-preview="desktop"]:not([data-sidebar="center"]) .sidebarSlot {
-  position: sticky;
-  top: 100px;
-  align-self: flex-start;
+@media (--bp-desktop) {
+  .pageLayout[data-preview="desktop"][data-sticky-sidebar="true"]:not([data-sidebar="center"]) .sidebarSlot {
+    position: sticky;
+    top: 100px;
+    align-self: flex-start;
+  }
 }
 
 /* Center mode: profile uses the same width as content */

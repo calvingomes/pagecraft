@@ -25,6 +25,7 @@ export const MobileEditor = ({
   setAvatarUrl,
   setAvatarShape,
   onAddBlock,
+  onOpenSettings,
   onLogout,
   setBackground,
   setSidebarPosition,
@@ -70,6 +71,7 @@ export const MobileEditor = ({
         background={background}
         sidebarPosition={sidebarPosition}
         showSidebarPositionControls={false}
+        onOpenSettings={onOpenSettings}
         onLogout={onLogout}
       />
     </div>

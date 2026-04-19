@@ -71,6 +71,14 @@ create table if not exists public.blocks (
   updated_at timestamptz not null default now()
 );
 
+-- Feedback submissions
+create table if not exists public.feedback (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  message text not null check (char_length(trim(message)) between 5 and 3000),
+  created_at timestamptz not null default now()
+);
+
 -- Keep updated_at fresh on every update.
 create or replace function public.handle_updated_at()
 returns trigger as $$
@@ -107,11 +115,18 @@ create index if not exists blocks_page_username_viewport_order_idx
 create index if not exists blocks_page_username_viewport_idx
   on public.blocks (page_username, viewport_mode);
 
+create index if not exists feedback_user_created_at_idx
+  on public.feedback (user_id, created_at desc);
+
+create index if not exists feedback_created_at_idx
+  on public.feedback (created_at desc);
+
 -- RLS
 alter table public.profiles enable row level security;
 alter table public.usernames enable row level security;
 alter table public.pages enable row level security;
 alter table public.blocks enable row level security;
+alter table public.feedback enable row level security;
 
 -- Public read policies for published content
 drop policy if exists "Public read pages" on public.pages;
@@ -182,6 +197,11 @@ create policy "Owner write blocks"
         and p.uid = auth.uid()
     )
   );
+
+drop policy if exists "Owner insert feedback" on public.feedback;
+create policy "Owner insert feedback"
+  on public.feedback for insert
+  with check (auth.uid() = user_id);
 
 -- Storage bucket for uploaded page media (avatars, block images)
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

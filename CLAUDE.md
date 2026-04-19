@@ -11,7 +11,7 @@ This file provides the operational overview for PageCraft, focusing on commands,
 bun run dev      # Start dev server (http://localhost:3000)
 bun run build    # Production build
 bun run start    # Start production server
-npm run lint     # Run ESLint
+bun run lint     # Run ESLint
 bun run test     # Run Vitest suite (pre-commit gate)
 bun run test:e2e # Run Playwright E2E suite
 ```
@@ -27,6 +27,7 @@ bun run test:e2e # Run Playwright E2E suite
 - **Dual-Viewport Layout**: Users can customize their layout **independently** for Desktop and Mobile views using a "Viewport-Aware Unified Block Model." 
 - **Modular Block Architecture**: Uses a plugin-based `ActionRegistry` for block-specific tools and a centralized `blockRegistry` for dynamic rendering.
 - **Editor vs. View**: The editor (`/editor`) uses Zustand + RGL + Tiptap. The public view page (`/[username]`) uses a high-performance, zero-dependency `ReadOnlyGrid`.
+- **Settings Feedback**: `/settings` uses static block-like cards. Feedback inserts into `public.feedback`; email delivery is handled by Supabase Edge Function `feedback-email` via Resend.
 
 ---
 
@@ -41,6 +42,7 @@ bun run test:e2e # Run Playwright E2E suite
 - Tests live in `tests/e2e/`.
 - Auth state is cached in `playwright/.auth/user.json`.
 - Uses a dedicated test user for local/CI environments to bypass Google OAuth.
+- Keep feedback E2E tests non-sending (validation paths) to avoid triggering real feedback emails.
 
 ### E2E Authentication
 Playwright's global setup (`global-setup.ts`) handles the auth handshake:
@@ -56,3 +58,4 @@ Playwright's global setup (`global-setup.ts`) handles the auth handshake:
 3. **Images**: Upload → WebP conversion → Render check.
 4. **Previews**: Desktop/Mobile toggle in editor.
 5. **Security**: Unauthenticated redirects.
+6. **Settings Feedback (Safe)**: Validation flow at `/settings` without DB insert/email side effects.

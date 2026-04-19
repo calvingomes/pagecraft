@@ -1,0 +1,35 @@
+@import "@styles/media.css";
+
+.content {
+  width: 100%;
+  max-width: 805px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rowWrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+@media (--bp-tablet) {
+  .content {
+    max-width: 100%;
+  }
+}
+
+@media (--bp-mobile) {
+  .sectionTitle {
+    font-size: var(--font-size-2xl);
+  }
+}

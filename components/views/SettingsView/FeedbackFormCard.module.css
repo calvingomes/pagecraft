@@ -1,0 +1,95 @@
+@import "@styles/media.css";
+
+.card {
+  width: var(--card-width, 200px);
+  min-height: var(--card-height, 200px);
+  background: var(--color-white);
+  border: 1px solid color-mix(in srgb, var(--color-light-grey), transparent 45%);
+  border-radius: 24px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cardHeader h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.cardDescription {
+  margin: 0;
+  color: var(--color-grey-dark);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  border: 1px solid var(--color-light-grey);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--color-black);
+  background: var(--color-white);
+  box-sizing: border-box;
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.ghostBtn {
+  border: 1px solid var(--color-light-grey);
+  border-radius: 10px;
+  padding: 9px 14px;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+  background: var(--color-white);
+  color: var(--color-black);
+}
+
+.ghostBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.statusSuccess,
+.statusError {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.statusSuccess {
+  color: #0f6d34;
+}
+
+.statusError {
+  color: #9b1e15;
+}
+
+@media (--bp-mobile) {
+  .cardHeader h3 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .card {
+    width: 100%;
+    min-height: auto;
+  }
+}

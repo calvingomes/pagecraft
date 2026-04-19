@@ -20,6 +20,7 @@ export interface EditorLayoutProps {
   setSidebarPosition: (val: SidebarPosition) => void;
   onAddBlock: (type: BlockType, options?: AddBlockOptions) => Promise<void>;
   onSave: () => Promise<void>;
+  onOpenSettings: () => void;
   onLogout: () => Promise<void>;
   
   // Desktop only
