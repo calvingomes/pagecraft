@@ -102,3 +102,18 @@ Refer to [NEW_BLOCK.md](NEW_BLOCK.md) for the full 8-step integration guide.
 6. Handle normalization.
 7. Integrate custom tools in `ActionRegistry`.
 8. Verify via Unit & E2E tests.
+
+---
+
+## 6. Settings Feedback Pipeline
+
+- Settings feedback is submitted from `/settings` into `public.feedback` (`user_id`, `message`, `created_at`).
+- Email notifications are sent by Supabase Edge Function `feedback-email` via Resend (not `mailto:`).
+- Trigger path: DB webhook on `public.feedback` `INSERT` -> `feedback-email`.
+- Keep secret names stable across environments:
+  - `SUPABASE_URL`
+  - `SUPABASE_SERVICE_ROLE_KEY`
+  - `RESEND_API_KEY`
+  - `FEEDBACK_TO_EMAIL`
+  - `WEBHOOK_SHARED_SECRET`
+- For tests: avoid E2E cases that submit valid feedback content, or they can trigger real emails.
