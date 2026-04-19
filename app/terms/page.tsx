@@ -8,7 +8,8 @@ export default function TermsPage() {
   return (
     <div className={styles.pageWrapper}>
       <Navbar
-        cta={{ label: "Sign up", href: "/auth" }}
+        cta={{ label: "Get PageCraft free", href: "/auth?mode=signup" }}
+        links={[{ label: "Login", href: "/auth?mode=signin" }]}
       />
 
       <main className={styles.main}>

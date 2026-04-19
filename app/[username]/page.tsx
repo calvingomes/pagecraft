@@ -79,6 +79,7 @@ export default async function UserPage({ params }: Props) {
           href: "/",
           trackingEvent: "username_page_cta_click" 
         }}
+        links={[{ label: "Login", href: "/auth?mode=signin" }]}
         logoColor="var(--color-forest-green)"
         transparentOnMobile
       />

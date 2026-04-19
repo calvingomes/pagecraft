@@ -39,12 +39,8 @@
   text-decoration: none;
   font-size: var(--font-size-sm);
   font-weight: 600;
-  transition:
-    color 200ms ease,
-    transform 200ms ease;
 }
 
 .navLink:hover {
   color: var(--color-black);
-  transform: scale(1.05);
 }

@@ -5,7 +5,8 @@ export default function GlobalNotFound() {
   return (
     <>
       <Navbar
-        cta={{ label: "Sign up", href: "/auth" }}
+        cta={{ label: "Get PageCraft free", href: "/auth?mode=signup" }}
+        links={[{ label: "Login", href: "/auth?mode=signin" }]}
         logoColor="var(--color-forest-green)"
       />
       <main style={{ padding: "0 24px" }}>

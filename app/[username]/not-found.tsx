@@ -13,7 +13,8 @@ export default function ProfileNotFound() {
   return (
     <>
       <Navbar
-        cta={{ label: "Sign up", href: "/auth" }}
+        cta={{ label: "Get PageCraft free", href: "/auth?mode=signup" }}
+        links={[{ label: "Login", href: "/auth?mode=signin" }]}
         logoColor="var(--color-forest-green)"
         transparentOnMobile
       />

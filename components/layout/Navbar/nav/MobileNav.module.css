@@ -150,6 +150,7 @@
   flex-direction: column;
   gap: 16px;
   margin-bottom: 32px;
+  margin-left: 20px;
 }
 
 .mobileMenuLink {
@@ -168,6 +169,7 @@
 
 .mobileMenuFooter {
   margin-top: auto;
+  margin-left: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;

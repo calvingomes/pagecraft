@@ -19,7 +19,8 @@ export default function GlobalError({
   return (
     <>
       <Navbar
-        cta={{ label: "Sign up", href: "/auth" }}
+        links={[{ label: "Login", href: "/auth?mode=signin" }]}
+        cta={{ label: "Get PageCraft free", href: "/auth?mode=signup" }}
         logoColor="var(--color-forest-green)"
       />
       <main style={{ padding: "0 24px" }}>

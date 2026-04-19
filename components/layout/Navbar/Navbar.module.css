@@ -44,7 +44,7 @@
 
 .nav {
   width: fit-content;
-  min-width: 500px;
+  min-width: 600px;
   height: 78px;
   background: var(--color-white);
   border-bottom-left-radius: 16px;

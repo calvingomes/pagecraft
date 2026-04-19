@@ -11,6 +11,7 @@ import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { useAuthStore } from "@/stores/auth-store";
 import { Navbar } from "@/components/layout/Navbar/Navbar";
 import AuthView from "@/components/views/AuthView/AuthView";
+import type { AuthQueryMode } from "@/components/views/AuthView/AuthView.types";
 import { PageLoader } from "@/components/ui/PageLoader/PageLoader";
 
 function AuthPageContent() {
@@ -22,6 +23,9 @@ function AuthPageContent() {
   const [claiming, setClaiming] = useState(false);
 
   const initialUsername = searchParams.get("username") ?? undefined;
+  const modeParam = searchParams.get("mode");
+  const initialMode: AuthQueryMode | undefined =
+    modeParam === "signup" || modeParam === "signin" ? modeParam : undefined;
 
   useEffect(() => {
     if (!authChecked || !user || !initialUsername || claiming) return;
@@ -75,6 +79,7 @@ function AuthPageContent() {
       <AuthView
         key={user?.id ?? 'guest'}
         initialUsername={initialUsername}
+        initialMode={initialMode}
       />
     </>
   );

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import type { AuthMode, AuthViewProps } from "./AuthView.types";
 import { ThemeButton } from "@/components/ui/ThemeButton/ThemeButton";
@@ -43,12 +43,15 @@ const GithubIcon = (props: Partial<React.ComponentProps<typeof Image>>) => (
 // );
 
 const AuthView = (props: AuthViewProps) => {
-  const { initialUsername } = props;
+  const { initialUsername, initialMode } = props;
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user, setUsername: setUsernameInStore } = useAuthStore();
 
   const [mode, setMode] = useState<AuthMode>(() => {
     if (user && !user.user_metadata?.username) return "on-boarding";
+    if (initialMode) return initialMode;
     if (initialUsername) return "signup";
     return "signin";
   });
@@ -66,6 +69,18 @@ const AuthView = (props: AuthViewProps) => {
   useEffect(() => {
     setError(null);
   }, [mode, email, password, username]);
+
+  // Keep mode reflected in query params for direct links and refresh persistence.
+  useEffect(() => {
+    if (mode === "on-boarding") return;
+
+    const currentMode = searchParams.get("mode");
+    if (currentMode === mode) return;
+
+    const next = new URLSearchParams(searchParams.toString());
+    next.set("mode", mode);
+    router.replace(`${pathname}?${next.toString()}`, { scroll: false });
+  }, [mode, pathname, router, searchParams]);
 
   const handleOAuthSignIn = async (provider: "google" | "github" | "figma", username?: string) => {
     const usernameToClaim = mode === "signup" ? username : undefined;
