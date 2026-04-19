@@ -93,7 +93,12 @@ export const MobileNav = ({
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.mobileMenuHeader}>
-              <Link href="/" className={styles.mobileMenuLogo} style={{ color: logoColor }}>
+              <Link
+                href="/"
+                className={styles.mobileMenuLogo}
+                onClick={handleCloseMenu}
+                style={{ color: logoColor }}
+              >
                 <Image
                   src="/logo/pagecraft-logo.svg"
                   alt=""
@@ -145,8 +150,8 @@ export const MobileNav = ({
                   cta={cta.href}
                   bgColor="var(--color-success)"
                   textColor="var(--color-white)"
-                  buttonWidth="auto"
-                  size="medium"
+                  buttonWidth="full"
+                  size="large"
                   icon={ArrowRight}
                   trackingEvent={cta.trackingEvent}
                 />

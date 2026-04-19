@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { usePostHog } from 'posthog-js/react';
+import { usePostHog } from "posthog-js/react";
 import { AuthService } from "@/lib/services/auth.client";
 import { PageService } from "@/lib/services/page.client";
 import { BlockService } from "@/lib/services/block.client";
@@ -32,7 +32,10 @@ function AuthPageContent() {
 
     // If the user already has a username in metadata, don't claim.
     const currentUsername = user.user_metadata?.username;
-    if (typeof currentUsername === "string" && currentUsername.trim().length > 0) {
+    if (
+      typeof currentUsername === "string" &&
+      currentUsername.trim().length > 0
+    ) {
       return;
     }
 
@@ -43,10 +46,10 @@ function AuthPageContent() {
         await BlockService.createStarterBlocks(initialUsername, user.id);
         await AuthService.updateUserMetadata({ username: initialUsername });
 
-        const provider = user.app_metadata?.provider || 'unknown';
-        posthog.capture(`signup_${provider}`, { 
+        const provider = user.app_metadata?.provider || "unknown";
+        posthog.capture(`signup_${provider}`, {
           username: initialUsername,
-          method: provider 
+          method: provider,
         });
 
         setUsernameInStore(initialUsername);
@@ -70,14 +73,21 @@ function AuthPageContent() {
   ]);
 
   if (!authChecked || claiming) {
-    return <PageLoader label={claiming ? "Creating your page..." : undefined} />;
+    return (
+      <PageLoader label={claiming ? "Creating your page..." : undefined} />
+    );
   }
 
   return (
     <>
-      <Navbar />
+      <Navbar
+        links={[
+          { label: "How it works", href: "/#how-it-works" },
+          { label: "Features", href: "/#features" },
+        ]}
+      />
       <AuthView
-        key={user?.id ?? 'guest'}
+        key={user?.id ?? "guest"}
         initialUsername={initialUsername}
         initialMode={initialMode}
       />

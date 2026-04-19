@@ -9,7 +9,11 @@ export default function CookiePolicyPage() {
     <div className={styles.pageWrapper}>
       <Navbar
         cta={{ label: "Get PageCraft free", href: "/auth?mode=signup" }}
-        links={[{ label: "Login", href: "/auth?mode=signin" }]}
+        links={[
+          { label: "How it works", href: "/#how-it-works" },
+          { label: "Features", href: "/#features" },
+          { label: "Login", href: "/auth?mode=signin" },
+        ]}
       />
 
       <main className={styles.main}>

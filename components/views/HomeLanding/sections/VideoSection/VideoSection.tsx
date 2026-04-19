@@ -14,7 +14,7 @@ export function VideoSection() {
   const scale = 0.5 + progress * 0.5;
 
   return (
-    <section ref={sectionRef} className={styles.videoSection}>
+    <section id="how-it-works" ref={sectionRef} className={styles.videoSection}>
       <div 
         className={styles.container}
         style={{
