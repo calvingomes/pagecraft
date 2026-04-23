@@ -98,7 +98,7 @@ describe("BlockService", () => {
           expect.objectContaining({ type: "sectionTitle" }),
           expect.objectContaining({ 
             type: "image", 
-            content: expect.objectContaining({ url: "/starter-welcome.png" }),
+            content: expect.objectContaining({ url: "/starter-welcome.webp" }),
             styles: expect.objectContaining({ mobileLayout: expect.anything() })
           }),
           expect.objectContaining({ type: "text" }),

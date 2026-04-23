@@ -63,7 +63,7 @@ export const BlockService = {
         type: "image",
         order: 1,
         content: {
-          url: "/starter-welcome.png",
+          url: "/starter-welcome.webp",
           alt: "Welcome to PageCraft",
         },
         layout: { x: 0, y: 1 },
