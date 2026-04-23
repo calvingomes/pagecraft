@@ -47,12 +47,26 @@ export const PageService = {
       throw new Error(`The username "${username}" is reserved and cannot be claimed.`);
     }
 
-    // 1. Insert into usernames table
-    const { error: usernameError } = await supabase.from("usernames").insert({
-      username,
-      uid: userId,
-    });
-    if (usernameError) throw usernameError;
+    // 1. Check if username is already claimed
+    const { data: existingUsername } = await supabase
+      .from("usernames")
+      .select("uid")
+      .eq("username", username)
+      .maybeSingle();
+
+    if (existingUsername) {
+      if (existingUsername.uid !== userId) {
+        throw new Error(`The username "${username}" is already taken.`);
+      }
+      // If it's ours, we just continue to ensure profile/page are created
+    } else {
+      // 2. Insert into usernames table if it doesn't exist
+      const { error: usernameError } = await supabase.from("usernames").insert({
+        username,
+        uid: userId,
+      });
+      if (usernameError) throw usernameError;
+    }
 
     // 2. Upsert profile
     const { error: profileError } = await supabase.from("profiles").upsert(
@@ -67,7 +81,7 @@ export const PageService = {
         username,
         uid: userId,
         published: true,
-        background: "page-bg-1",
+        background: "page-bg-2",
         sidebar_position: "left",
       },
       { onConflict: "username" },

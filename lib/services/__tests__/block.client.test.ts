@@ -85,16 +85,24 @@ describe("BlockService", () => {
   });
 
   describe("createStarterBlocks", () => {
-    it("inserts starter blocks for a new user", async () => {
+    it("inserts premium starter pack for a new user", async () => {
       asMock(s.insert).mockResolvedValue({ error: null });
 
       await BlockService.createStarterBlocks("testuser", "user-123");
 
       expect(supabase.from).toHaveBeenCalledWith("blocks");
-      expect(s.insert).toHaveBeenCalledWith(
+      const insertedBlocks = asMock(s.insert).mock.calls[0][0];
+      expect(insertedBlocks).toHaveLength(5);
+      expect(insertedBlocks).toEqual(
         expect.arrayContaining([
-          expect.objectContaining({ page_username: "testuser", type: "text" }),
-          expect.objectContaining({ page_username: "testuser", type: "link" }),
+          expect.objectContaining({ type: "sectionTitle" }),
+          expect.objectContaining({ 
+            type: "image", 
+            content: expect.objectContaining({ url: "/starter-welcome.png" }),
+            styles: expect.objectContaining({ mobileLayout: expect.anything() })
+          }),
+          expect.objectContaining({ type: "text" }),
+          expect.objectContaining({ type: "link" }),
         ]),
       );
     });

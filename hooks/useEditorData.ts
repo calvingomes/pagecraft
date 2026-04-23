@@ -66,7 +66,7 @@ export function useEditorData() {
             await PageService.claimUsername(username, user.id);
             await BlockService.createStarterBlocks(username, user.id);
             pageData = await PageService.getPageByUsername(username);
-          } catch (e) {
+          } catch (e: unknown) {
             console.error("[useEditorData] Self-healing failed:", e);
           }
         }

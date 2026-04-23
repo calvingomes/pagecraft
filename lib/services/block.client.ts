@@ -11,11 +11,13 @@ export const BlockService = {
    * Fetch all blocks for a page, normalized and split by viewport
    */
   getBlocksForPage: async (username: string): Promise<Block[]> => {
-    const { data: blockRows } = await supabase
+    const { data: blockRows, error } = await supabase
       .from("blocks")
       .select("id, type, order, content, layout, styles, viewport_mode")
       .eq("page_username", username)
       .order("order", { ascending: true });
+
+    if (error) throw error;
 
     const safeBlockRows = blockRows ?? [];
 
@@ -26,6 +28,7 @@ export const BlockService = {
       content: row.content,
       layout: row.layout,
       styles: row.styles,
+      viewport_mode: row.viewport_mode,
     }));
 
     const normalizedBlocks = normalizeStoredBlocks(rawBlocks);
@@ -44,12 +47,46 @@ export const BlockService = {
         page_username: username,
         uid: userId,
         viewport_mode: "desktop",
-        type: "text",
+        type: "sectionTitle",
         order: 0,
         content: {
-          text: `<p>Hi, I'm ${username} 👋</p>`,
+          title: `Welcome to ${username}'s page!`,
         },
         layout: { x: 0, y: 0 },
+        styles: { widthPreset: "full" },
+      },
+      {
+        id: crypto.randomUUID(),
+        page_username: username,
+        uid: userId,
+        viewport_mode: "desktop",
+        type: "image",
+        order: 1,
+        content: {
+          url: "/starter-welcome.png",
+          alt: "Welcome to PageCraft",
+        },
+        layout: { x: 0, y: 1 },
+        styles: {
+          widthPreset: "large",
+          mobileLayout: { x: 0, y: 1 },
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        page_username: username,
+        uid: userId,
+        viewport_mode: "desktop",
+        type: "text",
+        order: 2,
+        content: {
+          text: `<p>I'm building something cool here. This is PageCraft—a block-based page builder that gives you full control over your layout. Drag things around, customize every block, and make it yours.</p>`,
+        },
+        layout: { x: 2, y: 1 },
+        styles: {
+          widthPreset: "wide",
+          mobileLayout: { x: 0, y: 3 },
+        },
       },
       {
         id: crypto.randomUUID(),
@@ -57,12 +94,33 @@ export const BlockService = {
         uid: userId,
         viewport_mode: "desktop",
         type: "link",
-        order: 1,
+        order: 3,
         content: {
-          url: "https://example.com",
-          title: "My Website",
+          url: "https://pagecraft.me",
+          title: "My Portfolio",
         },
-        layout: { x: 1, y: 0 },
+        layout: { x: 2, y: 2 },
+        styles: {
+          widthPreset: "small",
+          mobileLayout: { x: 0, y: 4 },
+        },
+      },
+      {
+        id: crypto.randomUUID(),
+        page_username: username,
+        uid: userId,
+        viewport_mode: "desktop",
+        type: "link",
+        order: 4,
+        content: {
+          url: "https://twitter.com",
+          title: "Twitter / X",
+        },
+        layout: { x: 3, y: 2 },
+        styles: {
+          widthPreset: "small",
+          mobileLayout: { x: 1, y: 4 },
+        },
       },
     ];
 
