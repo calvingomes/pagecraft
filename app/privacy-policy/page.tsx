@@ -1,5 +1,3 @@
-"use client";
-
 import { Navbar } from "@/components/layout/Navbar/Navbar";
 import { BottomBar } from "@/components/layout/Footer/BottomBar";
 import styles from "./page.module.css";
@@ -22,7 +20,7 @@ export default function PrivacyPolicyPage() {
 
           <section className={styles.section}>
             <p className={styles.text}>
-              Effective date: 7 April 2026
+              Effective date: 29 April 2026
             </p>
             <p className={styles.text}>
               We built PageCraft to help people publish pages that feel like them. Part of that promise is being straightforward about data. So here it is — plain and simple.
@@ -32,7 +30,7 @@ export default function PrivacyPolicyPage() {
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>What we collect</h2>
             <p className={styles.text}>
-              When you sign in via Google, GitHub, or Figma, we receive your name and email address — nothing else. We do not receive your password or any other data from those providers.
+              When you sign in via Google or GitHub, we receive your name and email address. We do not receive your password or any other data from those providers.
             </p>
             <p className={styles.text}>
               We also collect the content you create: your blocks, links, and page settings. That is what makes your page work.
@@ -44,30 +42,19 @@ export default function PrivacyPolicyPage() {
             <ul className={styles.list}>
               <li className={styles.listItem}>We do not track you across other websites.</li>
               <li className={styles.listItem}>We do not sell your data. Ever.</li>
-              <li className={styles.listItem}>We do not run Google Analytics or any cookie-based analytics.</li>
+              <li className={styles.listItem}>We do not use advertising or retargeting pixels.</li>
             </ul>
             <p className={styles.text}>
-              For platform analytics, we use Vercel Analytics — a privacy-first tool that is cookieless and collects no personally identifiable information. It tells us things like how many people visited the site, not who they are.
+              For platform analytics, we use PostHog to understand how people use PageCraft and to improve the product. We configure it to avoid personal identification and we do not use it for advertising.
             </p>
           </section>
 
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Your page analytics</h2>
-            <p className={styles.text}>
-              If your plan includes page analytics, you will be able to see how many people visited your page and which links they clicked. This data is private to you — other users cannot see it, and we do not use it for our own purposes.
-            </p>
-          </section>
 
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>Who we share data with</h2>
             <p className={styles.text}>
-              We work with a small number of trusted services to run PageCraft:
+              We work with a small number of trusted service providers to run PageCraft, including hosting and infrastructure, authentication, analytics, and storage.
             </p>
-            <ul className={styles.list}>
-              <li className={styles.listItem}><strong>Vercel</strong> — hosts the platform and provides anonymous analytics.</li>
-              <li className={styles.listItem}><strong>Supabase</strong> — stores your account data and content securely.</li>
-              <li className={styles.listItem}><strong>Payment processor</strong> — handles billing if you are on a paid plan. We never see or store your card details.</li>
-            </ul>
             <p className={styles.text}>
               That is it. No data brokers, no ad networks, no surprises.
             </p>
