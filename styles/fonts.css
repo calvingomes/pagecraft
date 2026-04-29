@@ -1,5 +1,6 @@
 :root {
-  --font-primary: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  --font-primary: var(--font-geist), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
 
   --font-size-xs: 12px;
   --font-size-sm: 14px;
