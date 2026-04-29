@@ -308,7 +308,7 @@ const AuthView = (props: AuthViewProps) => {
                 )}
 
                 {/* Email and Password Fields */}
-                {!isOnboarding && (
+                {false && !isOnboarding && (
                   <div className={styles.credentialFields}>
                     <div className={styles.standardInputWrapper}>
                       <input
