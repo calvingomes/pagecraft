@@ -80,7 +80,7 @@ export const BlockService = {
         type: "text",
         order: 2,
         content: {
-          text: `<p>I'm building something cool here. This is PageCraft—a block-based page builder that gives you full control over your layout. Drag things around, customize every block, and make it yours.</p>`,
+          text: `<p>This is PageCraft—a block-based page builder that gives you full control over your layout. Drag things around, customize every block, and make it yours.</p>`,
         },
         layout: { x: 2, y: 1 },
         styles: {

@@ -85,6 +85,7 @@
   left: 12px;
   display: inline-grid;
   max-width: calc(100% - 24px);
+  width: auto;
   z-index: 1001;
   overflow: hidden;
 }
@@ -101,6 +102,13 @@
   max-width: 100%;
   overflow: hidden;
   border-radius: 10px;
+}
+
+.small .labelMirror,
+.small .addressLabel {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 8px;
 }
 
 .addressLabel {

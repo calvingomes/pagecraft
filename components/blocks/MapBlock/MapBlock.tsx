@@ -107,7 +107,7 @@ export function MapBlock({ block, isMapUnlocked = false, gridConfig = DESKTOP_GR
   return (
     <div
       data-testid="map-block-container"
-      className={`${styles.container} ${isMapUnlocked ? styles.unlocked : ""}`}
+      className={`${styles.container} ${isMapUnlocked ? styles.unlocked : ""} ${widthPx < 300 ? styles.small : ""}`}
     >
       <MapInterface
         lat={lat}
