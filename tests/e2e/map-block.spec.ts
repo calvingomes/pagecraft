@@ -1,5 +1,6 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
+import { getTestUsername } from "./testUser";
 
 /**
  * Helper to add a Map block from the widget menu
@@ -81,15 +82,14 @@ test.describe("Map Block E2E", () => {
     // 4. Reload and verify the block is still there
     await page.reload();
     await page.waitForSelector('[data-is-editor="true"]');
-    await expect(page.locator('[data-testid="map-block-container"]')).toBeVisible();
+    await expect(page.locator('[data-testid="map-block-container"]').last()).toBeVisible();
   });
 
   test("should render a static image on the public username page", async ({ page }) => {
-    // 1. Get the username from the editor URL or state (assuming we're at /editor)
-    // For local tests, we typically know the test user's handle
-    await page.goto("/testuser"); // Adjust based on your E2E global setup user
+    const username = getTestUsername();
+    await page.goto(`/${username}`);
     
-    const mapBlock = page.locator('[data-testid="map-block-container"]');
+    const mapBlock = page.locator('[data-testid="map-block-container"]').last();
     await expect(mapBlock).toBeVisible();
 
     // 2. Verify it's a static image (public view doesn't render MapInterface)
