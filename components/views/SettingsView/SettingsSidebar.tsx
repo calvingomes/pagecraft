@@ -32,11 +32,11 @@ export function SettingsSidebar({
         {resolvedAvatarUrl ? (
           <Image
             src={resolvedAvatarUrl}
+            unoptimized
             alt={display}
             width={200}
             height={200}
             className={styles.avatarImage}
-            priority
           />
         ) : (
           <span className={styles.avatarLetter}>{avatarLetter}</span>

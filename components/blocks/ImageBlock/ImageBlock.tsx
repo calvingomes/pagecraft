@@ -10,7 +10,6 @@ import Image from "next/image";
 import { useEditorContext } from "@/contexts/EditorContext";
 import { getCacheBustedUrl } from "@/lib/utils/imageUtils";
 import { normalizeLinkUrl } from "@/lib/utils/linkBlock";
-import { ImageZoom } from "./ImageZoom";
 import styles from "./ImageBlock.module.css";
 
 export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
@@ -33,10 +32,11 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
   const ImageElement = (
     <Image
       src={imageUrl}
+      unoptimized
       loading="lazy"
       alt={block.content.alt ?? ""}
       fill
-      sizes="(max-width: 768px) 100vw, 600px"
+      sizes="(max-width: 959px) 370px, 425px"
       style={{ objectFit: "cover" }}
     />
   );
@@ -69,16 +69,6 @@ export const ImageBlock = ({ block }: { block: ImageBlockType }) => {
           <ArrowUpRight size={18} />
         </div>
       )}
-
-      <ImageZoom
-        url={imageUrl}
-        alt={block.content.alt}
-        showTrigger={isHovered}
-        isEditable={isEditable}
-        onOpenChange={(open) => {
-          if (open) setIsHovered(false);
-        }}
-      />
 
       {isEditable && isHovered && !editor?.isActualMobile ? (
         <div className={styles.editorControls}>

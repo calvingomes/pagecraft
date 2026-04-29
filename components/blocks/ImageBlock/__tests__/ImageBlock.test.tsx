@@ -115,9 +115,4 @@ describe("ImageBlock — read-only (useEditorContext returns null)", () => {
     render(<ImageBlock block={makeBlock()} />);
     expect(screen.queryByRole("link")).toBeNull();
   });
-
-  it("should show the expand zoom trigger button in read-only mode", () => {
-    render(<ImageBlock block={makeBlock()} />);
-    expect(screen.getByRole("button", { name: "Expand image" })).toBeInTheDocument();
-  });
 });

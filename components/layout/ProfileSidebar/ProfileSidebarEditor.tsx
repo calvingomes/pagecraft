@@ -73,11 +73,11 @@ export const ProfileSidebarEditor = (props: ProfileSidebarEditorProps) => {
             {avatarUrl ? (
               <Image
                 src={avatarUrl}
+                unoptimized
                 alt="Profile image"
                 width={200}
                 height={200}
                 className={styles.avatarImage}
-                priority
               />
             ) : (
               avatarLetter

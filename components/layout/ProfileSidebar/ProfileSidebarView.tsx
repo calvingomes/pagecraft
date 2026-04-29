@@ -57,6 +57,7 @@ export const ProfileSidebarView = (props: ProfileSidebarViewProps) => {
               {avatarUrl ? (
                 <Image
                   src={avatarUrl}
+                  unoptimized
                   alt={displayNameText}
                   width={200}
                   height={200}
