@@ -6,6 +6,7 @@ import type {
   SidebarPosition,
 } from "@/types/page";
 import { PageView } from "@/components/views/PageView/PageView";
+import { MobileUsernameCta } from "@/components/views/PageView/MobileUsernameCta";
 import { Navbar } from "@/components/layout/Navbar/Navbar";
 import { notFound } from "next/navigation";
 import { type Metadata } from "next";
@@ -82,6 +83,7 @@ export default async function UserPage({ params }: Props) {
         links={[{ label: "Login", href: "/auth?mode=signin" }]}
         logoColor="var(--color-forest-green)"
         transparentOnMobile
+        disableMobileMenuTrigger
       />
       <PageView
         username={username}
@@ -102,6 +104,7 @@ export default async function UserPage({ params }: Props) {
         blocks={blocks}
         updatedAt={page.updated_at as string}
       />
+      <MobileUsernameCta />
     </>
   );
 }

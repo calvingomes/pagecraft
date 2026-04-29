@@ -13,7 +13,7 @@
   min-height: 100vh;
   padding-top: 100px;
   background: var(--page-bg);
-  padding-bottom: 40px;
+  padding-bottom: 70px;
 }
 .pageLayout[data-is-editor="true"] {
   padding-bottom: 150px;

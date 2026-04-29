@@ -1,0 +1,17 @@
+.mobileCtaDock {
+  display: none;
+}
+
+@media (max-width: 959px) {
+  .mobileCtaDock {
+    width: fit-content;
+    border-radius: 10px;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+    z-index: 999;
+    display: block;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+}

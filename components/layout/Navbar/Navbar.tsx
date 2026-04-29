@@ -14,6 +14,7 @@ interface NavbarProps {
   transparentOnMobile?: boolean;
   logoColor?: string;
   textColor?: string;
+  disableMobileMenuTrigger?: boolean;
 }
 
 const Navbar = ({
@@ -23,6 +24,7 @@ const Navbar = ({
   transparentOnMobile = false,
   logoColor,
   textColor,
+  disableMobileMenuTrigger = false,
 }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -64,6 +66,7 @@ const Navbar = ({
             secondaryCTA={secondaryCTA}
             logoColor={logoColor}
             textColor={textColor}
+            disableMenuTrigger={disableMobileMenuTrigger}
           />
         </div>
       </nav>

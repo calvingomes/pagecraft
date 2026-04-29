@@ -16,6 +16,7 @@ interface MobileNavProps {
   secondaryCTA?: NavCTA;
   logoColor?: string;
   textColor?: string;
+  disableMenuTrigger?: boolean;
 }
 
 export const MobileNav = ({
@@ -26,6 +27,7 @@ export const MobileNav = ({
   secondaryCTA,
   logoColor,
   textColor,
+  disableMenuTrigger = false,
 }: MobileNavProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMenuClosing, setIsMenuClosing] = useState(false);
@@ -54,7 +56,7 @@ export const MobileNav = ({
         PageCraft
       </Link>
 
-      {links.length > 0 ? (
+      {links.length > 0 && !disableMenuTrigger ? (
         <button
           type="button"
           className={styles.mobileMenuTrigger}
@@ -64,24 +66,24 @@ export const MobileNav = ({
         >
           <Menu size={20} />
         </button>
+      ) : !disableMenuTrigger && cta ? (
+        <div className={styles.ctaWrapper}>
+          <ThemeButton
+            label={cta.label}
+            cta={cta.href}
+            bgColor="var(--color-success)"
+            textColor="var(--color-white)"
+            buttonWidth="auto"
+            size="small"
+            icon={ArrowRight}
+            trackingEvent={cta.trackingEvent}
+          />
+        </div>
       ) : (
-        cta && (
-          <div className={styles.ctaWrapper}>
-            <ThemeButton
-              label={cta.label}
-              cta={cta.href}
-              bgColor="var(--color-success)"
-              textColor="var(--color-white)"
-              buttonWidth="auto"
-              size="small"
-              icon={ArrowRight}
-              trackingEvent={cta.trackingEvent}
-            />
-          </div>
-        )
+        <div className={styles.mobileRightSpacer} aria-hidden />
       )}
 
-      {isMobileMenuOpen && (
+      {!disableMenuTrigger && isMobileMenuOpen && (
         <div
           className={`${styles.mobileMenuOverlay} ${isMenuClosing ? styles.closing : ""}`}
           role="dialog"

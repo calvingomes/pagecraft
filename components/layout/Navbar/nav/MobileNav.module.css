@@ -66,6 +66,11 @@
   align-items: center;
 }
 
+.mobileRightSpacer {
+  width: 40px;
+  height: 40px;
+}
+
 .mobileMenuOverlay {
   position: fixed;
   inset: 0;
