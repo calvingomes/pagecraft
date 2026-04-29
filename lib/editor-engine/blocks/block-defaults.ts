@@ -18,6 +18,11 @@ export const getDefaultContent = (
     case "sectionTitle":
       return { title: "" };
     case "map":
-      return { address: "", zoom: 12 };
+      return {
+        address: "",
+        lat: 50.1109,
+        lng: 8.6821,
+        zoom: 12,
+      };
   }
 };

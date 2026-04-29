@@ -20,7 +20,7 @@ type MapBlockProps = {
 };
 
 export function MapBlock({ block, isMapUnlocked = false, gridConfig = DESKTOP_GRID }: MapBlockProps) {
-  const { address, lat = 0, lng = 0, zoom = 12 } = block.content || {};
+  const { address, lat = 50.1109, lng = 8.6821, zoom = 12 } = block.content || {};
   const editor = useEditorContext();
   const { widthPx, heightPx } = sizePxForBlock(block, gridConfig);
 
