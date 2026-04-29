@@ -9,6 +9,7 @@
 }
 
 .navLogo {
+  font-family: var(--font-display);
   font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--color-forest-green);
@@ -130,6 +131,7 @@
 }
 
 .mobileMenuLogo {
+  font-family: var(--font-primary);
   font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--color-forest-green);
